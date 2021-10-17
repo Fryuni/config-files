@@ -1,0 +1,24 @@
+ctrlc_exit = false
+disable_table_indexes = false
+filesize_metric = false
+path = ["/home/lotus/.nvm/versions/node/v14.18.0/bin", "/home/lotus/google-cloud-sdk/bin", "/home/lotus/.cargo/bin", "/home/lotus/.local/bin", "/usr/local/sbin", "/usr/local/bin", "/usr/sbin", "/usr/bin", "/sbin", "/bin", "/usr/games", "/usr/local/games", "/snap/bin", "/home/lotus/.yarn/bin", "/home/lotus/go/bin", "/home/lotus/.spawnctl/bin"]
+pivot_mode = "never"
+prompt = "starship_prompt"
+skip_welcome_message = true
+startup = ["alias la = ls --long", "def nuver [] { version | pivot key value }", "mkdir ~/.cache/starship", "starship init nu | save ~/.cache/starship/init.nu", "source ~/.cache/starship/init.nu"]
+table_mode = "rounded"
+
+[env]
+EDITOR = "nvim"
+LANG = "en_US.UTF-8"
+NVM_BIN = "/home/lotus/.nvm/versions/node/v14.18.0/bin"
+NVM_CD_FLAGS = "-q"
+NVM_DIR = "/home/lotus/.nvm"
+NVM_INC = "/home/lotus/.nvm/versions/node/v14.18.0/include/node"
+PAGER = "less"
+
+[textview]
+grid = true
+line_numbers = true
+tab_width = 2
+true_color = true
