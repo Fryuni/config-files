@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# -*- coding: utf-8 -*-
+
+#=============================================================================
+# @TheCodeTherapy - https://mgz.me
+# updatehosts
+#=============================================================================
+
+ME="/home/$(whoami)"
+DOTDIR="${ME}/ZShutils"
+HOSTSBACKUP=/etc/hosts.bak
+HOSTSDENYBACKUP=/etc/hostsdeny.bak
+HOSTSSECURED="${DOTDIR}/hostssecured"
+
+if [ ! -f "$HOSTSBACKUP" ]; then
+    sudo cp /etc/hosts $HOSTSBACKUP
+fi
+if [ ! -f "$HOSTSDENYBACKUP" ]; then
+    sudo cp /etc/hosts.deny $HOSTSDENYBACKUP
+fi
+
+msg="# Protecting hosts and hosts.deny"
+echo "${msg}"
+sudo wget https://hosts.ubuntu101.co.za/hosts -O /etc/hosts
+rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+sudo wget https://hosts.ubuntu101.co.za/hosts.deny -O /etc/hosts.deny
+rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+touch $HOSTSSECURED

@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "bungcip.better-toml",
+        "dbaeumer.vscode-eslint",
+        "dlasagno.rasi",
+        "Equinusocio.vsc-community-material-theme",
+        "Equinusocio.vsc-material-theme",
+        "equinusocio.vsc-material-theme-icons",
+        "ms-vscode.cpptools"
+    ]
+  }
+  

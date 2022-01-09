@@ -1,0 +1,22 @@
+#!/bin/sh
+
+#=============================================================================
+# @TheCodeTherapy - https://mgz.me
+# Rofi Temps
+# To use, create a custom keyboard shortcut by following below instructions:
+# Settings > Keyboard Shortcuts > +
+# Name: Rofi Temps
+# Command: [full path to this script file]
+# Shortcut: Super + Shift + t (or any other you might want)
+#=============================================================================
+
+THEME="/home/${USER}/ZShutils/rofi/sp.theme.rasi"
+chosen=$(/home/${USER}/ZShutils/shellscripts/readtemps | rofi -dmenu -theme ${THEME})
+[ -z "$chosen" ] && exit
+
+if [ -n "$1" ]; then
+	xdotool type "$chosen"
+else
+	echo "$chosen" | tr -d '\n' | xclip -selection clipboard
+	notify-send -a "Rofi Temps" "'$chosen' copied to clipboard." --expire-time=2100 &
+fi

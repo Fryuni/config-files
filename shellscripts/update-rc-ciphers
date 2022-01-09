@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# -*- coding: utf-8 -*-
+
+#=============================================================================
+# @TheCodeTherapy - https://mgz.me
+# updatehosts
+#=============================================================================
+
+ME="/home/$(whoami)"
+DOTDIR="${ME}/ZShutils"
+
+encrypt_rcfile () {
+    msg="Encrypting rcfile $1 ..."
+    print_yellow "${msg}"
+    local rcbase="$ME/rcfiles/$1"
+    local cipher_rc="$rcbase.cipher"
+    local plain_rc="$rcbase.unsafe"
+
+    $gcloud --project lferraz-portfolio kms encrypt \
+        --ciphertext-file "$cipher_rc" \
+        --plaintext-file "$plain_rc" \
+        --location global \
+        --keyring cipher-files \
+        --key rcfiles
+}
+
+encrypt_rcfile "npmrc"

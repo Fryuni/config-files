@@ -1,0 +1,12 @@
+#!/bin/bash
+# set -eu -o pipefail
+for i in /sys/class/hwmon/hwmon*/temp*_input; do
+    DIRNAME="$(<$(dirname $i)/name)"
+    DEV="$(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*}))"
+    DEV_LOWER=$(echo $DEV | awk '{print tolower($0)}')
+    DEVICE="$(echo "${DIRNAME}_${DEV_LOWER}" | sed -e 's/ /_/g')"
+    POINTS_TO="$(readlink -f $i)"
+    READING=$(cat ${POINTS_TO})
+    TEMP=$(echo ${READING:0:2})
+    printf "%-20s %s°C\n" ${DEVICE} "${TEMP}"
+done

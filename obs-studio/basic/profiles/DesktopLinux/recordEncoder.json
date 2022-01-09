@@ -1,0 +1,5 @@
+{
+    "bitrate": 21000,
+    "preset": "medium",
+    "rate_control": "CBR"
+}

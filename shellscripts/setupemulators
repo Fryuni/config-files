@@ -1,0 +1,116 @@
+#!/bin/bash
+#set -eu -o pipefail
+
+#=============================================================================
+# @TheCodeTherapy - https://mgz.me
+# Emulation setup script
+#=============================================================================
+
+ME="/home/$(whoami)"
+EMUDIR="${ME}/Emulation"
+FRONTDIR="${EMUDIR}/frontends"
+
+declare -rA COLORS=(
+    [RED]=$'\033[0;31m'
+    [GREEN]=$'\033[0;32m'
+    [BLUE]=$'\033[0;34m'
+    [PURPLE]=$'\033[0;35m'
+    [CYAN]=$'\033[0;36m'
+    [WHITE]=$'\033[0;37m'
+    [YELLOW]=$'\033[0;33m'
+    [BOLD]=$'\033[1m'
+    [OFF]=$'\033[0m'
+)
+
+print_yellow () {
+    echo -e "\n${COLORS[YELLOW]}${1}${COLORS[OFF]}\n"
+    sleep 1
+}
+
+print_green () {
+    echo -e "\n${COLORS[GREEN]}${1}${COLORS[OFF]}\n"
+    sleep 1
+}
+
+install_with_pip () {
+    msg="Installing $1 ..."
+    print_yellow "${msg}"
+    sudo -H pip install --upgrade $1
+    rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+}
+
+mkdir -p ${EMUDIR}
+
+install_dependencies () {
+    msg="INSTALLING EMULATION DEPENDENCIES ..."
+    print_yellow "${msg}"
+    sudo aptitude update
+    sudo aptitude install git build-essential libsdl2-dev \
+        libsdl2-ttf-dev libfontconfig-dev libpulse-dev \
+        qt5-default python3-sphinx python3-pip libx11-dev \
+        libx11-xcb-dev latexmk texlive texlive-science \
+        texlive-formats-extra libsfml-dev libopenal-dev \
+        zlib1g-dev libfreetype-dev libavformat-dev \
+        libavcodec-dev libswscale-dev libavutil-dev \
+        libavresample-dev libjpeg-dev libxrandr-dev \
+        libfontconfig1-dev libcurl4-openssl-dev libarchive-dev
+    rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+    install_with_pip sphinxcontrib-svg2pdfconverter
+}
+
+build_mame0226 () {
+    if [[ -f ${EMUDIR}/emulators/mame0226/mame64 ]]; then
+        msg="MAME 0.226 already installed."
+        print_green "${msg}"
+    else
+        msg="INSTALLING MAME 0.226 ..."
+        print_yellow "${msg}"
+        mkdir -p ${EMUDIR}/emulators
+        cd ${EMUDIR}/emulators
+        git clone -b mame0226 --depth 1 \
+            https://github.com/TheCodeTherapy/mame.git mame0226
+        rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+        cd mame0226
+        NOWERROR=1 make OVERRIDE_CC=clang OVERRIDE_CXX=clang++ TOOLS=1 REGENIE=1 -j$(nproc) ARCHOPTS=-U_FORTIFY_SOURCE
+        rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+    fi
+}
+
+build_retroarch () {
+    if [[ -f ${EMUDIR}/emulators/RetroArch/retroarch ]]; then
+        msg="RetroArch already installed."
+        print_green "${msg}"
+    else
+        msg="INSTALLING RETROARCH ..."
+        print_yellow "${msg}"
+        mkdir -p ${EMUDIR}/emulators
+        cd ${EMUDIR}/emulators
+        git clone https://github.com/TheCodeTherapy/RetroArch.git
+        cd RetroArch
+        ./configure
+        rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+        make -j$(nproc)
+        rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+    fi
+}
+
+build_attract () {
+    mkdir -p ${FRONTDIR}
+    if [[ -f ${FRONTDIR}/attract/attract ]]; then
+        msg="Attract-Mode already installed."
+        print_green "${msg}"
+    else
+        msg="INSTALLING ATTRACT-MODE ..."
+        print_yellow "${msg}"
+        cd ${FRONTDIR}
+        git clone https://github.com/TheCodeTherapy/attract.git
+        cd attract
+        make -j$(nproc)
+        rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+    fi
+}
+
+install_dependencies
+build_mame0226
+build_retroarch
+build_attract
