@@ -401,8 +401,6 @@ install_syncthing () {
         msg="INSTALLING SYNCTHING ..."
         print_yellow "${msg}"
         sudo curl -s -o /usr/share/keyrings/syncthing-archive-keyring.gpg https://syncthing.net/release-key.gpg
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
-            | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/syncthing-archive-keyring.gpg] https://apt.syncthing.net/ syncthing stable" \
             | sudo tee /etc/apt/sources.list.d/syncthing.list > /dev/null
         sudo aptitude -y update
@@ -550,6 +548,7 @@ main () {
     install_node
     install_yarn
     install_rust
+    install_syncthing
 
     install_docker
     install_docker_compose
