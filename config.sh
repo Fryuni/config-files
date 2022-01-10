@@ -118,7 +118,7 @@ fix_cedilla () {
 decrypt_rcfile () {
     msg="Decrypting rcfile $1 ..."
     print_yellow "${msg}"
-    local rcbase="$ME/rcfiles/$1"
+    local rcbase="$DOTDIR/rcfiles/$1"
     local cipher_rc="$rcbase.cipher"
     local plain_rc="$rcbase.unsafe"
 
@@ -225,7 +225,8 @@ install_basic_packages () {
         python-is-python3 ipython3 python3-pip python3-dev \
         unzip lzma tree neofetch git zsh tmux gnome-tweaks \
         inxi most ttfautohint v4l2loopback-dkms ffmpeg \
-        ranger libxext-dev ripgrep python3-pynvim jq
+        ranger libxext-dev ripgrep python3-pynvim jq \
+        libfontconfig1-dev libfreetype6-dev libssl-dev
     install_oh_my_zsh
     install_neovim
     install_with_pip ueberzug
@@ -281,6 +282,19 @@ install_exa () {
         msg="INSTALLING EXA ..."
         print_yellow "${msg}"
         cargo install exa
+    fi
+}
+
+install_starship () {
+    if $(starship --version > /dev/null 2>&1); then
+        msg="Startship already installed."
+        print_green "${msg}"
+    else
+        msg="INSTALLING STARSHIP ..."
+        print_yellow "${msg}"
+        # To install from source, use this
+        # cargo install starship
+        sh -c "$(curl -fsSL https://starship.rs/install.sh)"
     fi
 }
 
@@ -470,12 +484,12 @@ install_extra_packages () {
     install_with_aptitude hexchat
     install_with_snap telegram-desktop
     install_with_snap discord
-    install_with_snap starship
     install_with_snap kdiskmark
     install_with_snap spotify
     # install_with_pip youtube-dl
     # install_vscode
     install_exa
+    install_starship
     install_obs_studio
     install_screenkey
 }
@@ -518,33 +532,38 @@ setup_fonts () {
     fc-cache -f
 }
 
-update_system
-choose_fastest_mirror
-protect_hosts
 
-install_basic_packages
-install_extra_packages
-install_gcloud_sdk
-install_gcloud_components docker-credentials-gcr alpha beta kubectl bq gsutil
-authenticate_gcloud
-link_dotfiles
+main () {
+    update_system
+    # choose_fastest_mirror
+    protect_hosts
 
-install_nvm
-install_node
-install_yarn
-install_rust
+    install_basic_packages
+    install_extra_packages
+    install_gcloud_sdk
+    install_gcloud_components docker-credential-gcr alpha beta kubectl bq gsutil
+    authenticate_gcloud
+    link_dotfiles
 
-install_docker
-install_docker_compose
-$gcloud auth configure-docker
+    install_nvm
+    install_node
+    install_yarn
+    install_rust
 
-install_neovide
-install_fd
+    install_docker
+    install_docker_compose
+    $gcloud auth configure-docker
 
-setup_fonts
+    # install_neovide
+    install_fd
 
-source ${ME}/.bashrc
-sudo updatedb
+    setup_fonts
 
-msg="CONFIG COMPLETE"
-print_cyan "${msg}"
+    source ${ME}/.bashrc
+    sudo updatedb
+
+    msg="CONFIG COMPLETE"
+    print_cyan "${msg}"
+}
+
+main
