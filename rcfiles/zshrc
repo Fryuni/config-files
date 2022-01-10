@@ -74,8 +74,8 @@ COMPLETION_WAITING_DOTS="true"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-	git gcloud docker nvm node npm npx yarn rust
-	spawnctl command-not-found sudo systemd
+	git gcloud docker nvm node npm yarn rust
+	command-not-found sudo systemd
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -122,5 +122,5 @@ export PAGER="most"
 
 eval "$(starship init zsh)"
 
-clear
-neofetch
+# clear
+# neofetch

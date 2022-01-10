@@ -152,6 +152,7 @@ link_dotfiles () {
     home_link "rcfiles/bashrc" ".bashrc"
     home_link "rcfiles/zshrc" ".zshrc"
     home_link "rcfiles/inputrc" ".inputrc"
+    home_link "rcfiles/gitconfig" ".gitconfig"
     home_link "rcfiles/starship.toml" ".config/starship.toml"
 
     decrypt_rcfile "npmrc"
@@ -566,4 +567,4 @@ main () {
     print_cyan "${msg}"
 }
 
-main
+# main
