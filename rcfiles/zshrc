@@ -110,6 +110,7 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+alias refresh_gcloud_credentials='gcloud auth print-access-token > /dev/null'
 
 export PATH=$PATH:$HOME/${DOTFILESPATH}/shellscripts
 export PATH=$PATH:$HOME/${DOTFILESPATH}/bin
@@ -118,6 +119,7 @@ export PATH=$PATH:$HOME/go/bin
 export PATH=$PATH:$HOME/.cargo/bin
 export DOTFILES=$DOTFILESPATH
 export PAGER="most"
+export EDITOR="nvim"
 # source /home/lotus/IsoWorkspaces/Croct/libraries/php/imageData/.bashrc
 
 eval "$(starship init zsh)"

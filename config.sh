@@ -458,6 +458,23 @@ install_obs_studio () {
     fi
 }
 
+install_appimaagelauncher () {
+    PPA=`ls /etc/apt/sources.list.d/appimagelauncher-team* 2>/dev/null | wc -l`
+    if [ $PPA != 0 ]; then
+        msg="AppImageLauncher PPA already configured."
+        print_green "${msg}"
+    else
+        sudo add-apt-repository -y ppa:appimagelauncher-team/stable
+        sudo apt update
+    fi
+    if $(AppImageLauncher --appimagelauncher-version > /dev/null 2>&1); then
+        msg="AppImageLauncher alteady installed."
+        print_green "${msg}"
+    else
+        install_with_aptitude appimagelauncher
+    fi
+}
+
 install_screenkey () {
     if $(screenkey --help > /dev/null 2>&1); then
         msg="Screenkey already installed."
@@ -490,6 +507,7 @@ install_extra_packages () {
     install_exa
     install_starship
     install_obs_studio
+    install_appimagelauncher
     install_screenkey
 }
 
