@@ -1,0 +1,22 @@
+[values]
+gh-account = "Fryuni"
+gh-username = "Fryuni"
+
+[favorites.basic]
+description = "Basic application with GitHub Actions configured"
+git = "git@github.com:bengreenier/rust-templates.git"
+subfolder = "basic"
+
+[favorites.tui]
+description = "TUI application using tui-rs and crossterm"
+git = "git@github.com:orhun/rust-tui-template.git"
+
+[favorites.tokio-app]
+description = "A basic tokio application with signal handling"
+git = "git@github.com:Finomnis/rust-tokio-template.git"
+subfolder = "template"
+
+
+[favorites.utility]
+description = "A rust utility CLI template"
+git = "git@github.com:jcpst/rust-utility-template.git"

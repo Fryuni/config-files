@@ -154,6 +154,8 @@ link_dotfiles () {
     home_link "rcfiles/inputrc" ".inputrc"
     home_link "rcfiles/gitconfig" ".gitconfig"
     home_link "rcfiles/starship.toml" ".config/starship.toml"
+    home_link "rcfiles/cargo.toml" ".cargo/config.toml"
+    home_link "rcfiles/cargo-generate.toml" ".cargo/cargo-generate.toml"
 
     decrypt_rcfile "npmrc"
     home_link "rcfiles/npmrc.unsafe" ".npmrc"
@@ -261,6 +263,12 @@ install_rust () {
         msg="INSTALLING RUST ..."
         print_yellow "${msg}"
         wget -qO - https://sh.rustup.rs | sudo RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/rust sh -s -- --no-modify-path -y
+
+        rustup="sudo RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/rust /opt/rust/bin/rustup"
+        $rustup component add rust-src rust-docs rls clippy
+
+        $rustup toolchain install -c rust-src -c rust-docs -c rls -c clippy beta nightly
+
         echo 'export RUSTUP_HOME=/opt/rust' | sudo tee -a /etc/profile.d/rust.sh
         echo 'export PATH=$PATH:/opt/rust/bin' | sudo tee -a /etc/profile.d/rust.sh
         source /etc/profile
@@ -275,15 +283,15 @@ uninstall_rust () {
     rm -rf ~/.cargo
 }
 
-install_exa () {
-    if [[ -f $HOME/.cargo/bin/exa ]]; then
-        msg="Exa already installed."
-        print_green "${msg}"
-    else
-        msg="INSTALLING EXA ..."
-        print_yellow "${msg}"
-        cargo install exa
-    fi
+install_with_cargo () {
+  if [[ -f $HOME/.cargo/bin/$1 ]]; then
+      msg="$1 already installed."
+      print_green "${msg}"
+  else
+      msg="INSTALLING $1 ..."
+      print_yellow "${msg}"
+      cargo install $1
+  fi
 }
 
 install_starship () {
@@ -504,7 +512,10 @@ install_extra_packages () {
     install_with_snap spotify
     # install_with_pip youtube-dl
     # install_vscode
-    install_exa
+    install_with_cargo exa
+    install_with_cargo just
+    install_with_cargo bat
+    install_with_cargo cargo-generate
     install_starship
     install_obs_studio
     install_appimagelauncher
@@ -585,3 +596,5 @@ main () {
 }
 
 # main
+authenticate_gcloud
+link_dotfiles
