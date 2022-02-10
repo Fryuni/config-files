@@ -75,7 +75,7 @@ COMPLETION_WAITING_DOTS="true"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
 	git gcloud docker nvm node npm yarn rust
-	command-not-found sudo systemd
+	command-not-found sudo systemd terraform
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -118,8 +118,9 @@ export PATH=$PATH:$HOME/${DOTFILESPATH}/bin
 export PATH=$PATH:/opt/rust/bin
 export PATH=$PATH:$HOME/go/bin
 export PATH=$PATH:$HOME/.cargo/bin
+export PATH=$PATH:$HOME/.local/bin
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 export DOTFILES=$DOTFILESPATH
-export PAGER="most"
 export EDITOR="nvim"
 # source /home/lotus/IsoWorkspaces/Croct/libraries/php/imageData/.bashrc
 

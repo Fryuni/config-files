@@ -133,7 +133,7 @@ decrypt_rcfile () {
 home_link () {
     msg="[LINKING] $DOTDIR/$1 to $ME/$2"
     print_cyan "${msg}"
-    sudo rm -rf $ME/$2 > /dev/null 2>&1 \
+    rm -rf $ME/$2 > /dev/null 2>&1 \
         && ln -s $DOTDIR/$1 $ME/$2 \
         || ln -s $DOTDIR/$1 $ME/$2
 }
@@ -149,21 +149,23 @@ home_link_cfg () {
 link_dotfiles () {
     msg="LINKING DOTFILES ..."
     print_yellow "${msg}"
-    home_link "rcfiles/bashrc" ".bashrc"
-    home_link "rcfiles/zshrc" ".zshrc"
-    home_link "rcfiles/inputrc" ".inputrc"
-    home_link "rcfiles/gitconfig" ".gitconfig"
-    home_link "rcfiles/starship.toml" ".config/starship.toml"
-    home_link "rcfiles/cargo.toml" ".cargo/config.toml"
-    home_link "rcfiles/cargo-generate.toml" ".cargo/cargo-generate.toml"
+    # home_link "rcfiles/bashrc" ".bashrc"
+    # home_link "rcfiles/zshrc" ".zshrc"
+    # home_link "rcfiles/inputrc" ".inputrc"
+    # home_link "rcfiles/gitconfig" ".gitconfig"
+    # home_link "rcfiles/starship.toml" ".config/starship.toml"
+    # home_link "rcfiles/cargo.toml" ".cargo/config.toml"
+    # home_link "rcfiles/cargo-generate.toml" ".cargo/cargo-generate.toml"
+    # home_link "rcfiles/tmux.conf" ".tmux.conf"
 
     decrypt_rcfile "npmrc"
     home_link "rcfiles/npmrc.unsafe" ".npmrc"
 
-    home_link "x/XCompose" ".XCompose"
+    # home_link "x/XCompose" ".XCompose"
 
-    home_link_cfg "neofetch"
-    home_link_cfg "screenkey"
+    # home_link_cfg "neofetch"
+    # home_link_cfg "screenkey"
+    # home_link_cfg "nvim"
 }
 
 update_system () {

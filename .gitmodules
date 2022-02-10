@@ -1,0 +1,7 @@
+[submodule "doom-nvim"]
+	path = nvim
+	url = https://github.com/NTBBloodbath/doom-nvim.git
+[submodule "nvim/"]
+	branch = develop
+[submodule "nvim"]
+	branch = develop

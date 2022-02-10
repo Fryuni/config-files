@@ -385,9 +385,11 @@ detect_folders = []
 symbol = '☸ '
 format = '[$symbol$context( \($namespace\))]($style) in '
 style = 'cyan bold'
-disabled = true
+disabled = false
 
 [kubernetes.context_aliases]
+gke_croct-production_southamerica-east1_app = "croct-prod"
+gke_croct-test-wtur_southamerica-east1_app = "croct-wtur"
 
 [line_break]
 disabled = false
