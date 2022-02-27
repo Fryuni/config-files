@@ -9,3 +9,4 @@
 	defaultBranch = main
 [core]
 	pager = delta
+	excludesFile = ~/.gitignore_global
