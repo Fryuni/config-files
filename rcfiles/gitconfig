@@ -9,4 +9,9 @@
 	defaultBranch = main
 [core]
 	pager = delta
-	excludesFile = ~/.gitignore_global
+	excludesfile = ~/.gitignore_global
+	attributesfile = ~/.gitattributes
+[alias]
+	diff-image = "!f() { cd -- \"${GIT_PREFIX:-.}\"; GIT_DIFF_IMAGE_ENABLED=1 git diff \"$@\"; }; f"
+[diff "image"]
+	command = /home/lotus/IsoWorkspace/OSS/git-diff-image/git_diff_image

@@ -149,23 +149,24 @@ home_link_cfg () {
 link_dotfiles () {
     msg="LINKING DOTFILES ..."
     print_yellow "${msg}"
-    # home_link "rcfiles/bashrc" ".bashrc"
-    # home_link "rcfiles/zshrc" ".zshrc"
-    # home_link "rcfiles/inputrc" ".inputrc"
-    # home_link "rcfiles/gitconfig" ".gitconfig"
-    # home_link "rcfiles/starship.toml" ".config/starship.toml"
-    # home_link "rcfiles/cargo.toml" ".cargo/config.toml"
-    # home_link "rcfiles/cargo-generate.toml" ".cargo/cargo-generate.toml"
-    # home_link "rcfiles/tmux.conf" ".tmux.conf"
+    home_link "rcfiles/bashrc" ".bashrc"
+    home_link "rcfiles/zshrc" ".zshrc"
+    home_link "rcfiles/inputrc" ".inputrc"
+    home_link "rcfiles/gitconfig" ".gitconfig"
+    home_link "rcfiles/gitignore" ".gitignore_global"
+    home_link "rcfiles/starship.toml" ".config/starship.toml"
+    home_link "rcfiles/cargo.toml" ".cargo/config.toml"
+    home_link "rcfiles/cargo-generate.toml" ".cargo/cargo-generate.toml"
+    home_link "rcfiles/tmux.conf" ".tmux.conf"
 
     decrypt_rcfile "npmrc"
     home_link "rcfiles/npmrc.unsafe" ".npmrc"
 
-    # home_link "x/XCompose" ".XCompose"
+    home_link "x/XCompose" ".XCompose"
 
-    # home_link_cfg "neofetch"
-    # home_link_cfg "screenkey"
-    # home_link_cfg "nvim"
+    home_link_cfg "neofetch"
+    home_link_cfg "screenkey"
+    home_link_cfg "nvim"
 }
 
 update_system () {
@@ -269,14 +270,14 @@ install_rust () {
         rustup="sudo RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/rust /opt/rust/bin/rustup"
         $rustup component add rust-src rust-docs rls clippy
 
-        $rustup toolchain install -c rust-src -c rust-docs -c rls -c clippy beta nightly
+        $rustup toolchain install beta nightly --component rust-src rust-docs rls clippy
 
         echo 'export RUSTUP_HOME=/opt/rust' | sudo tee -a /etc/profile.d/rust.sh
         echo 'export PATH=$PATH:/opt/rust/bin' | sudo tee -a /etc/profile.d/rust.sh
-        source /etc/profile
-        source ${ME}/.bashrc
-        rustup show
     fi
+    source /etc/profile
+    source ${ME}/.bashrc
+    rustup show
 }
 
 uninstall_rust () {
@@ -569,6 +570,7 @@ main () {
     protect_hosts
 
     install_basic_packages
+    install_rust
     install_extra_packages
     install_gcloud_sdk
     install_gcloud_components docker-credential-gcr alpha beta kubectl bq gsutil
@@ -578,7 +580,6 @@ main () {
     install_nvm
     install_node
     install_yarn
-    install_rust
     install_syncthing
 
     install_docker
