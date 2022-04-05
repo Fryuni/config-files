@@ -15,6 +15,8 @@ HOSTSBACKUP=/etc/hosts.bak
 HOSTSDENYBACKUP=/etc/hostsdeny.bak
 HOSTSSECURED="${DOTDIR}/hostssecured"
 
+gcloud=$ME/google-cloud-sdk/bin/gcloud
+
 declare -rA COLORS=(
     [RED]=$'\033[0;31m'
     [GREEN]=$'\033[0;32m'
@@ -26,8 +28,6 @@ declare -rA COLORS=(
     [BOLD]=$'\033[1m'
     [OFF]=$'\033[0m'
 )
-
-gcloud=$ME/google-cloud-sdk/bin/gcloud
 
 print_red () {
     echo -e "\n${COLORS[RED]}${1}${COLORS[OFF]}\n"
