@@ -133,6 +133,7 @@ decrypt_rcfile () {
 home_link () {
     msg="[LINKING] $DOTDIR/$1 to $ME/$2"
     print_cyan "${msg}"
+    mkdir -p $(dirname "$ME/$2")
     rm -rf $ME/$2 > /dev/null 2>&1 \
         && ln -s $DOTDIR/$1 $ME/$2 \
         || ln -s $DOTDIR/$1 $ME/$2
@@ -161,6 +162,8 @@ link_dotfiles () {
 
     decrypt_rcfile "npmrc"
     home_link "rcfiles/npmrc.unsafe" ".npmrc"
+    decrypt_rcfile "maven_settings"
+    home_link "rcfiles/maven_settings.unsafe" ".m2/settings.xml"
 
     home_link "x/XCompose" ".XCompose"
 
