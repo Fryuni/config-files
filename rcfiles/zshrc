@@ -76,6 +76,7 @@ COMPLETION_WAITING_DOTS="true"
 plugins=(
 	git gcloud docker nvm node npm yarn rust
 	command-not-found sudo systemd terraform
+	encode64
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -111,7 +112,7 @@ fi
 
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 alias refresh_gcloud_credentials='gcloud auth print-access-token > /dev/null'
-alias rustup-manager='sudo RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/rust rustup'
+alias rustup-manager='sudo RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/rust /opt/rust/bin/rustup'
 
 export PATH=$PATH:$HOME/${DOTFILESPATH}/shellscripts
 export PATH=$PATH:$HOME/${DOTFILESPATH}/bin
