@@ -11,3 +11,6 @@ vcs = "git"
 
 [profile.release]
 opt-level = 3
+
+[experimental]
+sparse-registry = true
