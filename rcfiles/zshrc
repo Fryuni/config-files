@@ -125,6 +125,8 @@ export DOTFILES=$DOTFILESPATH
 export EDITOR="nvim"
 # source /home/lotus/IsoWorkspaces/Croct/libraries/php/imageData/.bashrc
 
+. $(pack completion --shell zsh)
+
 eval $(thefuck --alias)
 eval "$(starship init zsh)"
 
