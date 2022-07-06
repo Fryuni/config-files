@@ -602,5 +602,6 @@ main () {
 }
 
 # main
-authenticate_gcloud
-link_dotfiles
+# authenticate_gcloud
+# link_dotfiles
+$@
