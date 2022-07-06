@@ -11,7 +11,25 @@
 	pager = delta
 	excludesfile = ~/.gitignore_global
 	attributesfile = ~/.gitattributes
+
+
 [alias]
 	diff-image = "!f() { cd -- \"${GIT_PREFIX:-.}\"; GIT_DIFF_IMAGE_ENABLED=1 git diff \"$@\"; }; f"
 [diff "image"]
 	command = /home/lotus/IsoWorkspace/OSS/git-diff-image/git_diff_image
+
+
+[interactive]
+    diffFilter = delta --color-only
+[add.interactive]
+    useBuiltin = false
+[delta]
+    side-by-side = true
+    line-numbers = true
+    navigate = true
+    light = false
+[merge]
+    conflictstyle = diff3
+[diff]
+    colorMoved = default
+
