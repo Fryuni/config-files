@@ -1,7 +1,0 @@
-{
-    "editor.tabSize": 4,
-    "editor.rulers": [79,120],
-    "editor.fontSize": 22,
-    "editor.fontFamily": "'Iosevka Custom', 'FiraCode Nerd Font', 'Ubuntu Mono Regular', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
-    "editor.fontLigatures": true
-}
