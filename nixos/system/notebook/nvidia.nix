@@ -12,7 +12,15 @@ in
   environment.systemPackages = [ nvidia-offload ];
 
   services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.opengl.enable = true;
+  hardware.opengl = {
+    enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
+    extraPackages = with pkgs; [
+      rocm-opencl-icd
+      rocm-opencl-runtime
+    ];
+  };
   hardware.nvidia.modesetting.enable = true;
   hardware.nvidia.prime = {
     sync.enable = true;
