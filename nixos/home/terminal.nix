@@ -53,4 +53,40 @@
   programs.tmux = {
     enable = true;
   };
+
+  # environment.pathsToLink = [ "/share/zsh" ];
+
+  programs.zsh = {
+    enable = true;
+    enableAutosuggestions = true;
+    enableCompletion = true;
+    autocd = true;
+
+    shellAliases = {
+      ls = "ls --color=auto";
+      ll = "exa -bghHliS --git";
+      la = "exa -bghHliSa --git";
+      tmux = "tmux -2";
+    };
+
+    oh-my-zsh = {
+      enable = true;
+      plugins = [
+        "git"
+        "gcloud"
+        "docker"
+        "nvm"
+        "node"
+        "npm"
+        "yarn"
+        "rust"
+        "command-not-found"
+        "sudo"
+        "systemd"
+        "terraform"
+        "encode64"
+        "httpie"
+      ];
+    };
+  };
 }

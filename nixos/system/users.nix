@@ -5,7 +5,7 @@
     uid = 1000;
     isNormalUser = true;
     description = "Void Lotus";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
 
     shell = pkgs.zsh;
 
