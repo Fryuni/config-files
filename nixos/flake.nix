@@ -28,7 +28,7 @@
         ];
       };
 
-      homeConfiguration.notebook = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations.notebook = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
 
         modules = [
@@ -39,7 +39,7 @@
       apps.${system} = {
         "activate/notebook" = {
           type = "app";
-          program = "${self.outputs.homeConfigurations.notebook.activationPackage}}/activate";
+          program = "${self.outputs.homeConfigurations.notebook.activationPackage}/activate";
         };
       };
     } //
@@ -69,6 +69,48 @@
               '';
             }
 
+            # --- Home Environment ---
+            {
+              name = "ls-pkg";
+              category = "Home";
+              help = "List all packages installed in home-manager-path";
+              command = ''
+                home-manager packages
+              '';
+            }
+            {
+              name = "ls-gen";
+              category = "Home";
+              help = "List all home environment generations";
+              command = ''
+                home-manager generations
+              '';
+            }
+            {
+              name = "switch";
+              category = "Home";
+              help = "Switch home-manager to apply home config changes";
+              command = ''
+                home-manager switch --flake '.#notebook' -b bck --impure
+              '';
+            }
+            {
+              name = "update";
+              category = "Home";
+              help = "Update things";
+              command = ''
+                home-manager switch --flake '.#notebook' -b bck --impure --recreate-lock-file
+              '';
+            }
+            {
+              name = "update-lock-only";
+              category = "Home";
+              help = "Update the flake lock file only";
+              command = ''
+                nix flake update
+              '';
+            }
+
             # NixOS
             {
               name = "os-switch";
@@ -91,7 +133,7 @@
               category = "NixOS";
               help = "Build NixOS configuration without applying";
               command = ''
-                sudo nixos-rebuild build --flake '.#notebook' --impure
+                nixos-rebuild build --flake '.#notebook' --impure
               '';
             }
             {

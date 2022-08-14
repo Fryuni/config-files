@@ -14,33 +14,41 @@
   xdg.configFile."starship.toml".source = ../../common/rcfiles/starship.toml;
 
   programs.alacritty.enable = true;
-  programs.alacritty.settigns = ''
-    env:
-      TERM: screen-256color
+  programs.alacritty.settings = {
+    env.TERM = "screen-256color";
 
-    window:
-      dimensions:
-        columns: 0
-        lines: 0
-      padding:
-        x: 2
-        y: 2
-      decorations: full
-      dynamic_title: true
+    window = {
+      dimensions.columns = 0;
+      dimensions.lines = 0;
 
-    draw_bold_text_with_bright_colors: true
+      padding.x = 2;
+      paddind.y = 2;
 
-    font:
-      normal:
-        family: &terminalFont 'FiraMono Nerd Font'
-        style: Regular
+      decorations = "full";
+      dynamic_title = true;
+    };
 
-      bold:
-        family: *terminalFont
-        style: Bold
+    draw_bold_text_with_bright_colors = true;
 
-      italic:
-        family: *terminalFont
-        style: Italic
-  '';
+    font = let
+     family = "FiraMono Nerd Font";
+    in {
+      normal = {
+        inherit family;
+        style = "Regular";
+      };
+      bold = {
+        inherit family;
+        style = "Bold";
+      };
+      italic = {
+        inherit family;
+        style = "Italic";
+      };
+    };
+  };
+
+  programs.tmux = {
+    enable = true;
+  };
 }

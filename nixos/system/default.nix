@@ -3,7 +3,7 @@
   imports = [
     # Include the results of the hardware scan.
     /etc/nixos/hardware-configuration.nix
-    ./nix-settings
+    ./nix-settings.nix
   ];
 
   # Configure network proxy if necessary
@@ -35,8 +35,7 @@
   services.xserver.enable = true;
 
   # Enable the XFCE Desktop Environment.
-  services.xserver.displayManager.sddm.enable = true;
-  services.xserver.displayManager.lightdm.enable = false;
+  services.xserver.displayManager.lightdm.enable = true;
   services.xserver.desktopManager.xfce.enable = true;
 
   # Configure keymap in X11
@@ -91,7 +90,8 @@
     gnumake
   ];
 
-  services.flatpak.enable = true;
+  # xdg.portal.enable = true;
+  # services.flatpak.enable = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

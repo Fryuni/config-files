@@ -4,6 +4,9 @@
   home.stateVersion = "22.05";
   programs.home-manager.enable = true;
 
+  # https://github.com/nix-community/home-manager/issues/2942
+  nixpkgs.config.allowUnfreePredicate = (pkg: true);
+
   home.username = "lotus";
   home.homeDirectory = "/home/lotus";
 
@@ -22,7 +25,7 @@
     discord-canary
   ];
 
-  programs.bash.enable = true;
+  programs.zsh.enable = true;
 
   programs.ssh.enable = true;
   programs.gpg.enable = true;

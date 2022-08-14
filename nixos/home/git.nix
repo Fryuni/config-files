@@ -30,5 +30,4 @@
       tag.gpgSign = true;
     };
   };
-  programs.gitui.enable = true;
 }
