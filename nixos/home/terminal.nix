@@ -30,22 +30,24 @@
 
     draw_bold_text_with_bright_colors = true;
 
-    font = let
-     family = "FiraMono Nerd Font";
-    in {
-      normal = {
-        inherit family;
-        style = "Regular";
+    font =
+      let
+        family = "FiraMono Nerd Font";
+      in
+      {
+        normal = {
+          inherit family;
+          style = "Regular";
+        };
+        bold = {
+          inherit family;
+          style = "Bold";
+        };
+        italic = {
+          inherit family;
+          style = "Italic";
+        };
       };
-      bold = {
-        inherit family;
-        style = "Bold";
-      };
-      italic = {
-        inherit family;
-        style = "Italic";
-      };
-    };
   };
 
   programs.tmux = {

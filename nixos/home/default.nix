@@ -21,6 +21,7 @@
 
   home.packages = with pkgs; [
     flameshot
+    firefox
     sublime4
     discord-canary
   ];
