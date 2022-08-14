@@ -28,6 +28,10 @@
     ripgrep
     fd
     dua
+
+    # Cloud
+    google-cloud-sdk
+    terraform
   ];
 
   programs.fzf = {

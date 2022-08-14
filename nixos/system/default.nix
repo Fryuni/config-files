@@ -1,4 +1,4 @@
-{ config, pkgs, sops-nix, ... }:
+{ config, pkgs, ... }:
 {
   imports = [
     # Include the results of the hardware scan.
