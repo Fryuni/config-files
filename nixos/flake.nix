@@ -91,7 +91,7 @@
               category = "Home";
               help = "Switch home-manager to apply home config changes";
               command = ''
-                home-manager switch --flake '.#notebook' -b bck --impure
+                home-manager switch --flake '.#notebook' -b bck --impure $@
               '';
             }
             {
@@ -99,7 +99,7 @@
               category = "Home";
               help = "Update things";
               command = ''
-                home-manager switch --flake '.#notebook' -b bck --impure --recreate-lock-file
+                home-manager switch --flake '.#notebook' -b bck --impure --recreate-lock-file $@
               '';
             }
             {
@@ -107,7 +107,7 @@
               category = "Home";
               help = "Update the flake lock file only";
               command = ''
-                nix flake update
+                nix flake update $@
               '';
             }
 
@@ -117,7 +117,7 @@
               category = "NixOS";
               help = "Apply NixOS configuration and configure it as the default profile";
               command = ''
-                sudo nixos-rebuild switch --flake '.#notebook' --impure
+                sudo nixos-rebuild switch --flake '.#notebook' --impure $@
               '';
             }
             {
@@ -125,7 +125,7 @@
               category = "NixOS";
               help = "Apply NixOS configuration but don't set it on any boot entry";
               command = ''
-                sudo nixos-rebuild test --flake '.#notebook' --impure
+                sudo nixos-rebuild test --flake '.#notebook' --impure $@
               '';
             }
             {
@@ -133,7 +133,7 @@
               category = "NixOS";
               help = "Build NixOS configuration without applying";
               command = ''
-                nixos-rebuild build --flake '.#notebook' --impure
+                nixos-rebuild build --flake '.#notebook' --impure $@
               '';
             }
             {
@@ -141,7 +141,7 @@
               category = "NixOS";
               help = "Apply NixOS configuration as the default boot profile, but don't load it immediately";
               command = ''
-                sudo nixos-rebuild build --flake '.#notebook' --impure
+                sudo nixos-rebuild build --flake '.#notebook' --impure $@
               '';
             }
 
@@ -151,7 +151,7 @@
               category = "Utility";
               help = "Print a nice hello world";
               command = ''
-                nix run 'nixpkgs#figlet' -- -f isometric1 -c "Hello World"
+                nix run 'nixpkgs#figlet' -- -f isometric1 -c "Hello World" $@
               '';
             }
             {
@@ -159,7 +159,7 @@
               category = "Utility";
               help = "Format nix files";
               command = ''
-                nix fmt
+                nix fmt $@
               '';
             }
             {
@@ -167,7 +167,7 @@
               category = "Utility";
               help = "Garbage collection";
               command = ''
-                sudo nix-collect-garbage
+                sudo nix-collect-garbage $@
               '';
             }
             {
@@ -175,7 +175,7 @@
               category = "Utility";
               help = ''Delete old generations and garbage collection'';
               command = ''
-                sudo nix-collect-garbage -d
+                sudo nix-collect-garbage -d $@
               '';
             }
           ];
