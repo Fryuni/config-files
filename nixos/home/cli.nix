@@ -27,6 +27,7 @@
     ripgrep
     fd
     dua
+    lazygit
 
     # Cloud
     google-cloud-sdk
