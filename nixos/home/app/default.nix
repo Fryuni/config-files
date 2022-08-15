@@ -7,6 +7,7 @@
     discord-canary
     dbeaver
     vlc
+    slack
     jetbrains.pycharm-professional
     jetbrains.goland
     jetbrains.webstorm
