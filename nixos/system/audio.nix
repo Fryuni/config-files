@@ -1,14 +1,16 @@
 {
-  environment.variables = {
-    AE_SINK = "ALSA";
-    SDL_AUDIODRIVER = "pipewire";
-    ALSOFT_DRIVERS = "alsa";
-  };
+  # environment.variables = {
+  #   AE_SINK = "ALSA";
+  #   SDL_AUDIODRIVER = "pipewire";
+  #   ALSOFT_DRIVERS = "alsa";
+  # };
 
-  hardware.pulseaudio.enable = false;
+  hardware.pulseaudio.enable = true;
+  nixpkgs.config.pulseaudio = true;
 
+  security.rtkit.enable = true;
   services.pipewire = {
-    enable = true;
+    enable = false;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
