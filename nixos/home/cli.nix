@@ -13,7 +13,6 @@
     pciutils
     gnused
     jo
-    jq
     curl
     wget
     xsel
@@ -33,6 +32,9 @@
     google-cloud-sdk
     terraform
   ];
+
+  programs.jq.enable = true;
+  programs.command-not-found.enable = true;
 
   programs.fzf = {
     enable = true;
