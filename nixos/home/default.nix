@@ -11,19 +11,16 @@
   home.homeDirectory = "/home/lotus";
 
   imports = [
+    ./app
     ./git.nix
     ./cli.nix
     ./fonts.nix
     ./terminal.nix
     ./neovim.nix
     ./dev-tools.nix
-  ];
 
-  home.packages = with pkgs; [
-    flameshot
-    firefox
-    sublime4
-    discord-canary
+    # Missing configuration regarding i3 windowManager. Inspiration reference:
+    # https://github.com/tars0x9752/home/blob/main/modules/rice.nix
   ];
 
   programs.ssh.enable = true;
