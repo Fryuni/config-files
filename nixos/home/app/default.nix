@@ -2,6 +2,7 @@
 {
   home.packages = with pkgs; [
     calibre
+    spotify
     flameshot
     sublime4
     discord-canary
