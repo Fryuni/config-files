@@ -41,4 +41,6 @@
     enable = true;
     enableZshIntegration = true;
   };
+
+  home.file.".cargo/cargo.toml".source = ../../common/rcfiles/cargo.toml;
 }
