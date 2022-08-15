@@ -6,6 +6,7 @@
     ./nix-settings.nix
     ./users.nix
     ./audio.nix
+    ./registries.nix
   ];
 
   # Configure network proxy if necessary
