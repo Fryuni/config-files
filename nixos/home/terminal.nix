@@ -67,6 +67,7 @@
       ll = "exa -bghHliS --git";
       la = "exa -bghHliSa --git";
       tmux = "tmux -2";
+      "refresh-gcloud-credentials" = "gcloud auth print-access-token > /dev/null";
     };
 
     oh-my-zsh = {
