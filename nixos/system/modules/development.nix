@@ -9,8 +9,11 @@
     inotify-tools
     ripgrep
     gcc
+    file
     jq
     fd
+
+    docker-compose
   ];
 
   systemd.enableUnifiedCgroupHierarchy = true;
