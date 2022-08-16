@@ -16,6 +16,7 @@
     ./cli.nix
     ./fonts.nix
     ./terminal.nix
+    ./wezterm.nix
     ./neovim.nix
     ./dev-tools.nix
 
