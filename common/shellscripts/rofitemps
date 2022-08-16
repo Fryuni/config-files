@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 #=============================================================================
 # @TheCodeTherapy - https://mgz.me
@@ -10,8 +10,8 @@
 # Shortcut: Super + Shift + t (or any other you might want)
 #=============================================================================
 
-THEME="/home/${USER}/ZShutils/rofi/sp.theme.rasi"
-chosen=$(/home/${USER}/ZShutils/shellscripts/readtemps | rofi -dmenu -theme ${THEME})
+THEME="/home/${USER}/ZShutils/common/rofi/sp.theme.rasi"
+chosen=$(/home/${USER}/ZShutils/common/shellscripts/readtemps | rofi -dmenu -theme ${THEME})
 [ -z "$chosen" ] && exit
 
 if [ -n "$1" ]; then

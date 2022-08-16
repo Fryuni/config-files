@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 #=============================================================================
 # @TheCodeTherapy - https://mgz.me
@@ -10,7 +10,7 @@
 # Shortcut: Super + - (or any other you might want)
 #=============================================================================
 EXTIP=$(dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | sed "s/\"//g")
-THEME="/home/${USER}/ZShutils/rofi/sp.theme.rasi"
+THEME="/home/${USER}/ZShutils/common/rofi/sp.theme.rasi"
 chosen=$(echo $EXTIP | rofi -dmenu -theme ${THEME} | sed "s/ .*//")
 [ -z "$chosen" ] && exit
 
