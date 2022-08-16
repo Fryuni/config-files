@@ -1,5 +1,13 @@
 { config, pkgs, sops-nix, ... }:
 {
+  environment.systemPackages = with pkgs; [
+    pkgs.nix-doc
+  ];
+
+  nix.extraOptions = ''
+    plugin-files = ${pkgs.nix-doc}/lib/libnix_doc_plugin.so
+  '';
+
   nixpkgs.config.allowUnfree = true;
 
   nix.settings = {
