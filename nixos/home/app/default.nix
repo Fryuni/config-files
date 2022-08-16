@@ -28,14 +28,14 @@
     };
   };
 
-  xdg.desktopEntries = {
-    "discord" = {
-      name = "Discord";
-      exec = "nowl ${pkgs.discord-canary}/bin/discord";
-      terminal = false;
-      categories = [ "Application" "Network" ];
-    };
-  };
+  # xdg.desktopEntries = {
+  #   "discord" = {
+  #     name = "Discord";
+  #     exec = "nowl ${pkgs.discord-canary}/bin/discord";
+  #     terminal = false;
+  #     categories = [ "Application" "Network" ];
+  #   };
+  # };
   xdg.mimeApps = import ./xdg-mime.nix {
     defaultBrowser = "firefox.desktop";
     defaultVideo = "mpv.desktop";
