@@ -24,6 +24,7 @@
     extraConfig = {
       url = {
         "ssh://git@github.com/" = { insteadOf = "https://github.com/"; };
+        "ssh://git@gitlab.com/" = { insteadOf = "https://gitlab.com/"; };
       };
 
       init.defaultBranch = "main";
