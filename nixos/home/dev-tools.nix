@@ -13,5 +13,6 @@
 
   home.sessionPath = [
     "$HOME/.cargo/bin"
+    "$HOME/go/bin"
   ];
 }
