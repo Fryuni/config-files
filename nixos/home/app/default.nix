@@ -1,5 +1,9 @@
 { pkgs, ... }:
 {
+  imports = [
+    ./xfce.nix
+  ];
+
   home.packages = with pkgs; [
     calibre
     spotify
