@@ -8,14 +8,9 @@
     neovim
     inotify-tools
     ripgrep
-    cargo
-    rust-analyzer
-    rustfmt
-    rustc
     gcc
     jq
     fd
-    xdelta
   ];
 
   systemd.enableUnifiedCgroupHierarchy = true;
