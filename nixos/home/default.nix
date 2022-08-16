@@ -17,6 +17,7 @@
     ./fonts.nix
     ./terminal.nix
     ./wezterm.nix
+    ./rofi-power-menu.nix
     ./neovim.nix
     ./dev-tools.nix
     ./xsession.nix
