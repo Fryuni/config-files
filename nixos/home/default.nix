@@ -19,9 +19,7 @@
     ./wezterm.nix
     ./neovim.nix
     ./dev-tools.nix
-
-    # Missing configuration regarding i3 windowManager. Inspiration reference:
-    # https://github.com/tars0x9752/home/blob/main/modules/rice.nix
+    ./xsession.nix
   ];
 
   programs.ssh.enable = true;
