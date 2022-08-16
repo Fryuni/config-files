@@ -2,6 +2,7 @@
 {
   home.packages = with pkgs; [
     rustup
+    python310
     nodejs-18_x
     nodePackages.yarn
 
