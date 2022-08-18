@@ -62,12 +62,21 @@
     enableCompletion = true;
     autocd = true;
 
+    dirHashes = {
+      nix-system = "/run/current-system";
+      nix-boot = "/nix/var/nix/profiles/system";
+      nix-hm = "/nix/var/nix/profiles/per-user/$USER/home-manager";
+    };
+
     shellAliases = {
       ls = "ls --color=auto";
       ll = "exa -bghHliS --git";
       la = "exa -bghHliSa --git";
       tmux = "tmux -2";
       "refresh-gcloud-credentials" = "gcloud auth print-access-token > /dev/null";
+
+      ns = "nix-shell --command zsh";
+      nixc = "nix develop -c";
     };
 
     oh-my-zsh = {
