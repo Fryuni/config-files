@@ -10,6 +10,9 @@
     golangci-lint
     gosec
     go2nix
+
+    kubectl
+    k9s
   ];
 
   home.sessionPath = [
