@@ -87,6 +87,23 @@
               '';
             }
             {
+              name = "diff";
+              category = "Home";
+              help = "Compute the package difference that will be applied to home-manager on a switch";
+              command = ''
+                build
+                ${pkgs.nvd}/bin/nvd diff /nix/var/nix/profiles/per-user/$USER/home-manager ./result
+              '';
+            }
+            {
+              name = "build";
+              category = "Home";
+              help = "Build home-manager configuration without applying it";
+              command = ''
+                home-manager build --flake '.#notebook' -b bck --impure $@
+              '';
+            }
+            {
               name = "switch";
               category = "Home";
               help = "Switch home-manager to apply home config changes";
@@ -96,14 +113,6 @@
             }
             {
               name = "update";
-              category = "Home";
-              help = "Update things";
-              command = ''
-                home-manager switch --flake '.#notebook' -b bck --impure --recreate-lock-file $@
-              '';
-            }
-            {
-              name = "update-lock-only";
               category = "Home";
               help = "Update the flake lock file only";
               command = ''
@@ -126,6 +135,15 @@
               help = "Apply NixOS configuration but don't set it on any boot entry";
               command = ''
                 sudo nixos-rebuild test --flake '.#notebook' --impure $@
+              '';
+            }
+            {
+              name = "os-diff";
+              category = "NixOS";
+              help = "Compute the package difference that will be applied to the system on a switch";
+              command = ''
+                os-build
+                ${pkgs.nvd}/bin/nvd diff /run/current-system ./result
               '';
             }
             {
