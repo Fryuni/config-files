@@ -28,6 +28,7 @@
     fd
     dua
     lazygit
+    gum
 
     # Cloud
     google-cloud-sdk
