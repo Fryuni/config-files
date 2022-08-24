@@ -27,7 +27,12 @@
     ripgrep
     fd
     dua
+
+    # Charm.sh pretty binaries
     gum
+    charm
+    glow
+    skate
 
     # Git stuff
     gh
