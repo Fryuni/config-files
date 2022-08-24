@@ -43,4 +43,5 @@
   };
 
   home.file.".cargo/cargo.toml".source = ../../common/rcfiles/cargo.toml;
+  home.file.".cargo/config.toml".source = ../../common/rcfiles/cargo-config.toml;
 }
