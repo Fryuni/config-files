@@ -27,8 +27,11 @@
     ripgrep
     fd
     dua
-    lazygit
     gum
+
+    # Git stuff
+    gh
+    lazygit
 
     # Cloud
     google-cloud-sdk
