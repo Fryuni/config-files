@@ -159,7 +159,16 @@
               category = "NixOS";
               help = "Apply NixOS configuration as the default boot profile, but don't load it immediately";
               command = ''
-                sudo nixos-rebuild build --flake '.#notebook' --impure $@
+                sudo nixos-rebuild boot --flake '.#notebook' --impure $@
+              '';
+            }
+            {
+              name = "os-purge";
+              category = "NixOS";
+              help = "Drop a system profile and purges it from the bootloader";
+              command = ''
+                sudo rm -vrf /nix/var/nix/profiles/system-profiles/$1 /nix/var/nix/profiles/system-profiles/$1-*-link
+                sudo /nix/var/nix/profiles/system/bin/switch-to-configuration switch
               '';
             }
 
