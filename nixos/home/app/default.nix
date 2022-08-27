@@ -13,9 +13,12 @@
     dbeaver
     vlc
     slack
+
+    # JetBrains Suite
     jetbrains.pycharm-professional
     jetbrains.goland
     jetbrains.webstorm
+    jetbrains.datagrip
   ];
 
   programs.mpv = {
