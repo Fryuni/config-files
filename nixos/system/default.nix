@@ -68,6 +68,7 @@
     git
     dig
     gnumake
+    xarchiver
   ];
 
   # xdg.portal.enable = true;
