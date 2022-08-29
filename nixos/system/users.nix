@@ -11,6 +11,7 @@
       "docker"
       "audio"
       "rtkit"
+      "dialout"
     ];
 
     shell = pkgs.zsh;
