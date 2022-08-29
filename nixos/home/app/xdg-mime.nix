@@ -1,9 +1,17 @@
 { defaultBrowser, defaultVideo, defaultAudio ? defaultVideo }:
 {
   enable = true;
+  associations.added = {
+    "applications/zip" = "xarchiver.desktop";
+    "text/plain" = "org.xfce.mousepad.desktop";
+    "x-scheme-handler/http" = defaultBrowser;
+    "x-scheme-handler/https" = defaultBrowser;
+  };
+
   defaultApplications = {
     "image/png" = "org.nomacs.ImageLounge.desktop";
     "image/jpeg" = "org.nomacs.ImageLounge.desktop";
+    "applications/zip" = "xarchiver.desktop";
     "application/pdf" = defaultBrowser;
     "application/ogg" = defaultAudio;
     "application/x-ogg" = defaultAudio;
