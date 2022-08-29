@@ -19,6 +19,8 @@
     jetbrains.goland
     jetbrains.webstorm
     jetbrains.datagrip
+    jetbrains.idea-ultimate
+    android-studio
   ];
 
   programs.mpv = {
