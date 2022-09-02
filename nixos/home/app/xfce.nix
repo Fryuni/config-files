@@ -5,7 +5,7 @@ in
 {
   home.file.".config/xfce4/terminal/terminalrc".text = toINI {
     Configuration = {
-      FontName = "FiraMono Nerd Font 12";
+      FontName = "FiraCode Nerd Font weight=450 12";
       MiscAlwaysShowTabs = "FALSE";
       MiscBell = "FALSE";
       MiscBellUrgent = "FALSE";
