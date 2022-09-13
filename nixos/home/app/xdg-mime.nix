@@ -2,6 +2,8 @@
 {
   enable = true;
   associations.added = {
+    "image/png" = "org.xfce.ristretto.desktop";
+    "image/jpeg" = "org.xfce.ristretto.desktop";
     "applications/zip" = "xarchiver.desktop";
     "text/plain" = "org.xfce.mousepad.desktop";
     "x-scheme-handler/http" = defaultBrowser;
@@ -9,8 +11,8 @@
   };
 
   defaultApplications = {
-    "image/png" = "org.nomacs.ImageLounge.desktop";
-    "image/jpeg" = "org.nomacs.ImageLounge.desktop";
+    "image/png" = "org.xfce.ristretto.desktop";
+    "image/jpeg" = "org.xfce.ristretto.desktop";
     "applications/zip" = "xarchiver.desktop";
     "application/pdf" = defaultBrowser;
     "application/ogg" = defaultAudio;
