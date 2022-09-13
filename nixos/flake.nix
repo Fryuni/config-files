@@ -17,6 +17,8 @@
       pkgs = nixpkgs.legacyPackages.${system};
     in
     {
+      inherit pkgs nixpkgs;
+
       formatter.x86_64-linux = pkgs.nixpkgs-fmt;
 
       nixosConfigurations.notebook = nixpkgs.lib.nixosSystem {
