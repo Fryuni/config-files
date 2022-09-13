@@ -1,4 +1,14 @@
 { pkgs, ... }:
+let
+  nix-visualize = import
+    (pkgs.fetchFromGitHub {
+      owner = "craigmbooth";
+      repo = "nix-visualize";
+      rev = "ee6ad3cb3ea31bd0e9fa276f8c0840e9025c321a";
+      sha256 = "sha256-nsD5U70Ue30209t4fU8iMLCHzNZo18wKFutaFp55FOw=";
+    })
+    { inherit pkgs; };
+in
 {
   home.packages = with pkgs; [
     # Nix
@@ -6,6 +16,7 @@
     nixpkgs-fmt
     nix-prefetch-git
     nix-prefetch-github
+    #nix-visualize
 
     # Utils
     coreutils
