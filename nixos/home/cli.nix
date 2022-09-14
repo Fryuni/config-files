@@ -55,7 +55,6 @@ in
   ];
 
   programs.jq.enable = true;
-  programs.command-not-found.enable = true;
 
   programs.fzf = {
     enable = true;
@@ -64,4 +63,9 @@ in
 
   home.file.".cargo/cargo.toml".source = ../../common/rcfiles/cargo.toml;
   home.file.".cargo/config.toml".source = ../../common/rcfiles/cargo-config.toml;
+
+  programs.nix-index = {
+    enable = true;
+    enableZshIntegration = true;
+  };
 }
