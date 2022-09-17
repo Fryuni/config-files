@@ -35,6 +35,7 @@
 
         modules = [
           ./home
+          ./home/notebook
         ];
       };
 

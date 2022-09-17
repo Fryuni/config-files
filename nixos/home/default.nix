@@ -13,22 +13,9 @@
   imports = [
     ./app
     ./git.nix
-    ./cli.nix
     ./fonts.nix
-    ./terminal.nix
-    ./wezterm.nix
-    ./rofi-power-menu.nix
-    ./neovim.nix
-    ./dev-tools.nix
     ./xsession.nix
   ];
-
-  programs.ssh.enable = true;
-  programs.gpg.enable = true;
-  programs.gpg.mutableKeys = true;
-
-  services.gpg-agent.enable = true;
-  services.gpg-agent.pinentryFlavor = "tty";
 
   services.syncthing.enable = true;
 }
