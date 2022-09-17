@@ -6,6 +6,7 @@
     ../wezterm.nix
     ../neovim.nix
     ../dev-tools.nix
+    ../modules/gaming
   ];
   programs.ssh.enable = true;
   programs.gpg.enable = true;
