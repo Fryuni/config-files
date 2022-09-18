@@ -1,7 +1,4 @@
 { pkgs, lib, stdenv, ... }:
-let
-  stdenv = pkgs.stdenv;
-in
 {
   environment.variables.EDITOR = "nvim";
 

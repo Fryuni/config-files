@@ -23,6 +23,7 @@
         inherit system;
 
         overlays = [
+          (import ./overlay)
           attrs.polymc.overlay
         ];
 
