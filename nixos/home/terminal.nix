@@ -1,7 +1,9 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
+    pfetch
     neofetch
+    zellij
   ];
 
   xdg.configFile."neofetch/config.conf".source = ../../common/neofetch/config.conf;
