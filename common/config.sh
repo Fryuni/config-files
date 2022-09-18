@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #set -eu -o pipefail
 
 #=============================================================================
@@ -6,8 +6,10 @@
 # at https://github.com/TheCodeTherapy/ZDotfiles
 #=============================================================================
 
+BASE_FOLDER=$(dirname $(realpath $0))
+
 ME="/home/$(whoami)"
-DOTDIR="${ME}/ZShutils"
+DOTDIR="${BASE_FOLDER}"
 NVMDIR="${ME}/.nvm"
 BINDIR="${DOTDIR}/bin"
 CFG="$ME/.config"
@@ -16,6 +18,11 @@ HOSTSDENYBACKUP=/etc/hostsdeny.bak
 HOSTSSECURED="${DOTDIR}/hostssecured"
 
 gcloud=$ME/google-cloud-sdk/bin/gcloud
+
+# Use the environment GCloud if the user install is not available (for Nix compatibility)
+if [ ! -f $gcloud ]; then
+    gcloud=`which gcloud`
+fi
 
 declare -rA COLORS=(
     [RED]=$'\033[0;31m'
@@ -160,16 +167,22 @@ link_dotfiles () {
     home_link "rcfiles/cargo-generate.toml" ".cargo/cargo-generate.toml"
     home_link "rcfiles/tmux.conf" ".tmux.conf"
 
-    decrypt_rcfile "npmrc"
-    home_link "rcfiles/npmrc.unsafe" ".npmrc"
-    decrypt_rcfile "maven_settings"
-    home_link "rcfiles/maven_settings.unsafe" ".m2/settings.xml"
-
     home_link "x/XCompose" ".XCompose"
 
     home_link_cfg "neofetch"
     home_link_cfg "screenkey"
     home_link_cfg "nvim"
+}
+
+link_credentials () {
+    msg="LINKING CREDENTIAL FILES ..."
+    print_yellow "$msg"
+
+    decrypt_rcfile "npmrc"
+    home_link "rcfiles/npmrc.unsafe" ".npmrc"
+
+    decrypt_rcfile "maven_settings"
+    home_link "rcfiles/maven_settings.unsafe" ".m2/settings.xml"
 }
 
 update_system () {

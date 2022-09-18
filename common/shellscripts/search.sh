@@ -17,7 +17,7 @@
 # -----------------------------------------------------------------------------
 # Script:
 
-THEME="/home/${USER}/ZShutils/rofi/sp.theme.rasi"
+THEME="/home/${USER}/ZShutils/common/rofi/sp.theme.rasi"
 
 declare -A URLS
 

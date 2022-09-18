@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # set -eu -o pipefail
 for i in /sys/class/hwmon/hwmon*/temp*_input; do
     DIRNAME="$(<$(dirname $i)/name)"

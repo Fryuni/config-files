@@ -1,22 +1,22 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 #=============================================================================
 # @TheCodeTherapy - https://mgz.me
-# External IP
+# Rofi Temps
 # To use, create a custom keyboard shortcut by following below instructions:
 # Settings > Keyboard Shortcuts > +
-# Name: External IP Picker
+# Name: Rofi Temps
 # Command: [full path to this script file]
-# Shortcut: Super + - (or any other you might want)
+# Shortcut: Super + Shift + t (or any other you might want)
 #=============================================================================
-EXTIP=$(dig TXT +short o-o.myaddr.l.google.com @ns1.google.com | sed "s/\"//g")
-THEME="/home/${USER}/ZShutils/rofi/sp.theme.rasi"
-chosen=$(echo $EXTIP | rofi -dmenu -theme ${THEME} | sed "s/ .*//")
+
+THEME="/home/${USER}/ZShutils/common/rofi/sp.theme.rasi"
+chosen=$(/home/${USER}/ZShutils/common/shellscripts/readtemps | rofi -dmenu -theme ${THEME})
 [ -z "$chosen" ] && exit
 
 if [ -n "$1" ]; then
 	xdotool type "$chosen"
 else
 	echo "$chosen" | tr -d '\n' | xclip -selection clipboard
-	notify-send -a "External IP Picker" "'$chosen' copied to clipboard." --expire-time=2100 &
+	notify-send -a "Rofi Temps" "'$chosen' copied to clipboard." --expire-time=2100 &
 fi
