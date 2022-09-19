@@ -1,5 +1,6 @@
 final: pkgs:
-{
+(import ./jetbrains.nix final pkgs)
+  // {
   overlay-test = pkgs.writeShellScriptBin "overlay-hello" ''
     echo "This hellow world came from the custom derivation inside the overlay."
   '';
