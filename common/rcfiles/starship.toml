@@ -214,12 +214,14 @@ style = 'bold black'
 symbol = '.'
 
 [gcloud]
-format = 'on [$symbol$account(@$domain)(\($region\))]($style) '
+format = 'on [$symbol(@$domain)(\($region\))]($style) '
 symbol = '☁️  '
 style = 'bold blue'
 disabled = false
 
 [gcloud.region_aliases]
+southamerica-east1 = "BR"
+us-east1 = "US_SC"
 
 [git_branch]
 format = 'on [$symbol$branch]($style)(:[$remote]($style)) '
