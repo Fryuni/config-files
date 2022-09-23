@@ -48,4 +48,18 @@ final: pkgs:
     cargoSha256 = "sha256-XSbptD7lZCEsRoa3KxNOOjJcR0N/8gyL6t+RDb5NBQw=";
     cargoDepsName = pname;
   };
+
+  toml-merge = pkgs.rustPlatform.buildRustPackage rec {
+    pname = "toml-merge";
+    version = "0.1.0";
+    doCheck = false;
+
+    src = pkgs.fetchCrate {
+      inherit pname version;
+      sha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
+    };
+
+    cargoSha256 = "sha256-BOBKbV4jInygN9l13jxi7guzdn5ao8owofomCdjXWng=";
+    cargoDepsName = pname;
+  };
 }
