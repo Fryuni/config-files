@@ -9,6 +9,7 @@
     local wezterm = require 'wezterm'
     
     return {
+      font = wezterm.font 'JetBrainsMono Nerd Font',
       font_size = 16,
       color_scheme = 'Chalk', -- 候補: Chester, Chalk, Ayu Mirage など
       window_background_opacity = 0.85,
