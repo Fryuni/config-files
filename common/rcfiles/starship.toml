@@ -240,7 +240,7 @@ symbol = "."
 
 [gcloud]
 disabled = false
-format = "on [$symbol(@$domain)(\\($region\\))]($style) "
+format = "on [$symbol$active(\\($region\\))]($style) "
 style = "bold blue"
 symbol = "☁️  "
 
