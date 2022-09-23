@@ -42,7 +42,7 @@
   #   };
   # };
   xdg.mimeApps = import ./xdg-mime.nix {
-    defaultBrowser = "firefox.desktop";
+    defaultBrowser = "xfce4-web-browser.desktop";
     defaultVideo = "mpv.desktop";
   };
 
