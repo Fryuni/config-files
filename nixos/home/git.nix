@@ -27,6 +27,8 @@
         "ssh://git@gitlab.com/" = { insteadOf = "https://gitlab.com/"; };
       };
 
+      core.excludesfile = "${../../common/rcfiles/gitignore}";
+
       init.defaultBranch = "main";
       tag.gpgSign = true;
     };
