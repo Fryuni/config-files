@@ -11,6 +11,11 @@ let
       url = "https://download.jetbrains.com/go/goland-${version}.tar.gz";
       sha256 = "sha256-/aR9mTm5XYmV0aN1RDAlWZzXSxtaKWYnNHfs+vqc5PE=";
     };
+    pycharm-professional = rec {
+      version = "2022.2.2";
+      url = "https://download.jetbrains.com/python/pycharm-professional-${version}.tar.gz";
+      sha256 = "sha256-t7+4YCb7pmm7IkKasIQK+6UEdoAgJ2IHDPux8YHVPQ4=";
+    };
   };
 in
 {
