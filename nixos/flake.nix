@@ -191,11 +191,11 @@
 
             # Utility
             {
-              name = "hello";
+              name = "clear";
               category = "Utility";
-              help = "Print a nice hello world";
+              help = "Clear build result";
               command = ''
-                nix run 'nixpkgs#figlet' -- -f isometric1 -c "Hello World" $@
+                rm -rf ./result
               '';
             }
             {
