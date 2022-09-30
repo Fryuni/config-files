@@ -9,10 +9,18 @@
   home.packages = with pkgs; [
     pfetch
     neofetch
-    zellij
   ];
 
   xdg.configFile."neofetch/config.conf".source = ../../../common/neofetch/config.conf;
+
+  programs.zellij = {
+    enable = true;
+    package = pkgs.zellij;
+    settings = {
+      default-mode = "locked";
+      pane-frames = false;
+    };
+  };
 
   programs.starship = {
     enable = true;
