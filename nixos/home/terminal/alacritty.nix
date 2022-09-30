@@ -4,6 +4,10 @@
   programs.alacritty.settings = {
     env.TERM = "screen-256color";
 
+    shell = {
+      program = "${pkgs.zellij}/bin/zellij";
+    };
+
     window = {
       dimensions.columns = 0;
       dimensions.lines = 0;
