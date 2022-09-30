@@ -2,12 +2,6 @@
 {
   programs.alacritty.enable = true;
   programs.alacritty.settings = {
-    env.TERM = "screen-256color";
-
-    shell = {
-      program = "${pkgs.zellij}/bin/zellij";
-    };
-
     window = {
       dimensions.columns = 0;
       dimensions.lines = 0;
@@ -17,6 +11,8 @@
 
       decorations = "full";
       dynamic_title = true;
+
+      startup_mode = "Maximized";
     };
 
     draw_bold_text_with_bright_colors = true;

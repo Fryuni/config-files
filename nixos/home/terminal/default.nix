@@ -17,8 +17,7 @@
     enable = true;
     package = pkgs.zellij;
     settings = {
-      default-mode = "locked";
-      pane-frames = false;
+      pane_frames = false;
     };
   };
 
@@ -45,12 +44,57 @@
       ls = "ls --color=auto";
       ll = "exa -bghHliS --git";
       la = "exa -bghHliSa --git";
-      tmux = "tmux -2";
       "refresh-gcloud-credentials" = "gcloud auth print-access-token > /dev/null";
 
       ns = "nix-shell --command zsh";
       nixc = "nix develop -c";
     };
+
+    initExtra = ''
+      trim() {
+        local var="$*"
+        # remove leading whitespace characters
+        var="''${var#"''${var%%[![:space:]]*}"}"
+        # remove trailing whitespace characters
+        var="''${var%"''${var##*[![:space:]]}"}"
+        printf '%s' "$var"
+      }
+
+      start_zellij() {
+        local session_name="$1"
+
+        if [ -z "$session_name"]; then
+          gum style --faint --italic --bold "Zellij session name:"
+
+          local session_name=$(gum input --char-limit=40)
+        fi
+
+        if [ -z "$session_name" ]; then
+          exec ${pkgs.zellij}/bin/zellij
+        else
+          exec ${pkgs.zellij}/bin/zellij -s "$session_name"
+        fi
+      }
+
+      if [ -z "$ZELLIJ" ]; then
+        ongoing_sessions=$(trim "$(${pkgs.zellij}/bin/zellij ls 2>/dev/null)")
+
+        if [ -z "$ongoing_sessions" ]; then
+          start_zellij main
+        else
+          gum style --faint --italic --bold "Chose a session (or create a new one):"
+
+          pick_options=$(trim "''${ongoing_sessions}\nCreate new session")
+          chosen=$(echo "$pick_options" | ${pkgs.gum}/bin/gum filter)
+
+          if [ "$chosen" = "Create new session" ]; then
+            start_zellij
+          else
+            exec ${pkgs.zellij}/bin/zellij attach "$chosen"
+          fi
+        fi
+      fi
+    '';
 
     oh-my-zsh = {
       enable = true;
