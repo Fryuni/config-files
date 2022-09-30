@@ -6,6 +6,8 @@
     nodejs-16_x
     nodePackages.yarn
 
+    slack
+
     go_1_19
     golangci-lint
     gosec
@@ -25,9 +27,9 @@
     (name: _: {
       name = ".local/bin/${name}";
       value = {
-        source = ../../common/shellscripts/${name};
+        source = ../../../common/shellscripts/${name};
         executable = true;
       };
     })
-    (lib.filterAttrs (_: typ: typ == "regular") (builtins.readDir ../../common/shellscripts));
+    (lib.filterAttrs (_: typ: typ == "regular") (builtins.readDir ../../../common/shellscripts));
 }

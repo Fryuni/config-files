@@ -11,10 +11,7 @@
   home.homeDirectory = "/home/lotus";
 
   imports = [
-    ./app
-    ./git.nix
-    ./fonts.nix
-    ./xsession.nix
+    ./ui
   ];
 
   services.syncthing.enable = true;

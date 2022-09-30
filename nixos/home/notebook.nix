@@ -1,13 +1,11 @@
 { pkgs, ... }:
 {
   imports = [
-    ../cli.nix
-    ../terminal.nix
-    ../wezterm.nix
-    ../neovim.nix
-    ../dev-tools.nix
-    ../modules/gaming
+    ./gaming
+    ./terminal
+    ./development
   ];
+
   programs.ssh.enable = true;
   programs.gpg.enable = true;
   programs.gpg.mutableKeys = true;

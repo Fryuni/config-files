@@ -49,7 +49,7 @@
 
         modules = [
           ./home
-          ./home/notebook
+          ./home/notebook.nix
         ];
       };
 

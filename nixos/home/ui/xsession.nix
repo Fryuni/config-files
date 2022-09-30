@@ -128,12 +128,12 @@ in
 
   # picom
   services.picom = {
-    enable = true;
+    enable = false;
   };
 
   # rofi
   programs.rofi = {
-    enable = true;
+    enable = false;
 
     package = with pkgs; rofi.override { plugins = [ rofi-calc rofi-emoji ]; };
     extraConfig = {
