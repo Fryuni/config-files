@@ -5,7 +5,7 @@
   programs.home-manager.enable = true;
 
   # https://github.com/nix-community/home-manager/issues/2942
-  nixpkgs.config.allowUnfreePredicate = (pkg: true);
+  nixpkgs.config.allowUnfreePredicate = pkg: true;
 
   home.username = "lotus";
   home.homeDirectory = "/home/lotus";

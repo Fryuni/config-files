@@ -79,9 +79,7 @@ in
         keybindings =
           let
             main-display-g = "1920x1080+1920+0";
-          in
-          let
-            modifier = config.xsession.windowManager.i3.config.modifier;
+            inherit (config.xsession.windowManager.i3.config) modifier;
           in
           lib.mkOptionDefault {
             "${modifier}+c" = ''exec --no-startup-id "rofi -show calc -modi calc -no-show-match -no-sort > /dev/null"'';
@@ -110,7 +108,7 @@ in
 
           unfocused = {
             text = colors.foreground; # タイトルのテキスト
-            background = colors.background; # タイトルの背景
+            inherit (colors) background; # タイトルの背景
             border = colors.background; # タイトルのボーダー
             childBorder = colors.background; # window全体のボーダー
             indicator = colors.alert; # vertical / horizontal のアレ

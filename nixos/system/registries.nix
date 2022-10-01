@@ -1,4 +1,4 @@
-{ ... }:
+_:
 {
   nix.registry = {
     node.to = {
