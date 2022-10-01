@@ -48,8 +48,8 @@
         inherit pkgs;
 
         modules = [
-          ./home
-          ./home/notebook.nix
+          ./nix-home
+          ./nix-home/notebook.nix
         ];
       };
 
