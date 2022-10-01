@@ -1,10 +1,4 @@
 {
-  # environment.variables = {
-  #   AE_SINK = "ALSA";
-  #   SDL_AUDIODRIVER = "pipewire";
-  #   ALSOFT_DRIVERS = "alsa";
-  # };
-
   hardware.pulseaudio.enable = true;
   nixpkgs.config.pulseaudio = true;
 

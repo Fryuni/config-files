@@ -7,11 +7,8 @@
   environment.systemPackages = with pkgs; [
     neovim
     inotify-tools
-    ripgrep
     gcc
     file
-    jq
-    fd
 
     docker-compose
   ];

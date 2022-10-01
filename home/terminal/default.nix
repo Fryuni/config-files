@@ -11,7 +11,7 @@
     neofetch
   ];
 
-  xdg.configFile."neofetch/config.conf".source = ../../../common/neofetch/config.conf;
+  xdg.configFile."neofetch/config.conf".source = ../../common/neofetch/config.conf;
 
   programs.zellij = {
     enable = true;
@@ -26,7 +26,7 @@
     enableBashIntegration = true;
     enableZshIntegration = true;
   };
-  xdg.configFile."starship.toml".source = ../../../common/rcfiles/starship.toml;
+  xdg.configFile."starship.toml".source = ../../common/rcfiles/starship.toml;
 
   programs.zsh = {
     enable = true;

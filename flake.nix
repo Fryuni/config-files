@@ -39,8 +39,8 @@
         inherit system;
         specialArgs = attrs;
         modules = [
-          ./system
-          ./system/notebook
+          ./nixos
+          ./nixos/notebook
         ];
       };
 

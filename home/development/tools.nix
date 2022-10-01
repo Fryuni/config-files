@@ -27,9 +27,9 @@
     (name: _: {
       name = ".local/bin/${name}";
       value = {
-        source = ../../../common/shellscripts/${name};
+        source = ../../common/shellscripts/${name};
         executable = true;
       };
     })
-    (lib.filterAttrs (_: typ: typ == "regular") (builtins.readDir ../../../common/shellscripts));
+    (lib.filterAttrs (_: typ: typ == "regular") (builtins.readDir ../../common/shellscripts));
 }

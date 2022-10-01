@@ -41,6 +41,7 @@ in
           Language support to enable.
           https://github.com/NTBBloodbath/doom-nvim/blob/main/docs/modules.md#features-modules
         '';
+        default = [];
       };
 
       doom-nvim-src = {
