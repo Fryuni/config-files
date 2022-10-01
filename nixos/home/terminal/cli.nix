@@ -2,7 +2,6 @@
 {
   home.packages = with pkgs; [
     # Nix
-    rnix-lsp
     nixpkgs-fmt
     nix-prefetch-git
     nix-prefetch-github

@@ -203,6 +203,7 @@
               category = "Utility";
               help = "Format nix files";
               command = ''
+                ${pkgs.statix}/bin/statix fix
                 nix fmt $@
               '';
             }

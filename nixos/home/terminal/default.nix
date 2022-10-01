@@ -2,7 +2,7 @@
 {
   imports = [
     ./cli.nix
-    ./neovim.nix
+    ./doom-nvim.nix
     ./alacritty.nix
   ];
 

@@ -1,4 +1,4 @@
-final: pkgs:
+_: pkgs:
 let
   overrides = {
     webstorm = rec {
