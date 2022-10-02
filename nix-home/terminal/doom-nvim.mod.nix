@@ -50,6 +50,12 @@ in
         default = [ ];
       };
 
+      autoInstallBinaries = mkOption {
+        type = types.bool;
+        description = "When enabled, the binaries required to use a feature will be automatically included on `home.packages`.";
+        default = true;
+      };
+
       languages = mkOption {
         type = types.listOf types.str;
         description = ''
@@ -109,14 +115,14 @@ in
         default = "";
       };
 
-      package = mkOption {
+      nvimPackage = mkOption {
         type = types.package;
         default = pkgs.neovim-unwrapped;
         defaultText = literalExpression "pkgs.neovim-unwrapped";
         description = "The package to use for the neovim binary.";
       };
 
-      finalPackage = mkOption {
+      finalNvimPackage = mkOption {
         type = types.package;
         visible = false;
         readOnly = true;
@@ -130,64 +136,18 @@ in
 
       neovimConfig = pkgs.neovimUtils.makeNeovimConfig {
         inherit (cfg) withNodeJs;
-        customRC = cfg.extraConfig;
       };
-
-      nixLanguageModule = ''
-        local nix = {}
-
-        nix.settings = {}
-
-        nix.autocmds = {
-          {
-            "BufWinEnter",
-            "*.nix",
-            function()
-              local langs_utils = require("doom.modules.langs.utils")
-
-              langs_utils.use_lsp("rnix-lsp")
-
-              require("nvim-treesitter.install").ensure_installed("nix")
-
-              -- Setup null-ls
-              if doom.features.linter then
-                local null_ls = require("null-ls")
-                langs_utils.use_null_ls_source({
-                  -- null_ls.builtins.formatting.nixfmt,
-                  null_ls.builtins.formatting.nixpkgs_fmt,
-                  -- null_ls.builtins.formatting.alejandra,
-                  null_ls.builtins.code_actions.statix,
-                  null_ls.builtins.diagnostics.statix,
-                  null_ls.builtins.diagnostics.deadnix,
-                })
-              end
-            end,
-            once = true,
-          },
-        }
-
-        return nix
-      '';
 
       doom-src = stdenv.mkDerivation {
         pname = "doom-nvim";
         version = cfg.doom-nvim-src.rev;
 
-        src = pkgs.fetchFromGitHub rec {
-          inherit (cfg.doom-nvim-src) rev sha256;
-
-          owner = "NTBBloodbath";
-          repo = "doom-nvim";
-        };
-
-        inherit nixLanguageModule;
+        src = pkgs.fetchFromGitHub cfg.doom-nvim-src;
 
         strictDeps = true;
         enableParallelBuilding = true;
         preferLocalBuild = true;
         allowSubstitutes = false;
-
-        passAsFile = [ "nixLanguageModule" ];
 
         installPhase = ''
           mkdir -p $out
@@ -195,8 +155,6 @@ in
           cp -R lua $out/lua
           cp -R doc $out/docs
           cp -R colors $out/colors
-          mkdir -p $out/lua/doom/modules/langs/nix
-          mv "$nixLanguageModulePath" $out/lua/doom/modules/langs/nix/init.lua
         '';
       };
 
@@ -210,11 +168,9 @@ in
 
     in
     mkIf cfg.enable {
-      home.packages = [
-        cfg.finalPackage
-      ]
-      ++ featurePackages
-      ++ languagePackages;
+      home.packages = [ cfg.finalNvimPackage ]
+        ++ (lists.optionals cfg.autoInstallBinaries
+        (featurePackages ++ languagePackages));
 
       programs.doom-nvim.generatedModulesFile = ''
         return {
@@ -239,7 +195,7 @@ in
         "nvim/modules.lua".text = cfg.generatedModulesFile;
       };
 
-      programs.doom-nvim.finalPackage = pkgs.wrapNeovimUnstable cfg.package
+      programs.doom-nvim.finalNvimPackage = pkgs.wrapNeovimUnstable cfg.nvimPackage
         (neovimConfig // {
           wrapRc = false;
         });

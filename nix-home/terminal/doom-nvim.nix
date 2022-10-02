@@ -5,6 +5,12 @@ _:
   programs.doom-nvim = {
     enable = true;
 
+    doom-nvim-src = {
+      owner = "Fryuni";
+      rev = "main";
+      sha256 = "sha256-ws3jyjq/zZGYSg/grWI520bqFuLxBobeMPgmrZMATQg=";
+    };
+
     features = [
       # Language features
       "annotations" # Code annotation generator
