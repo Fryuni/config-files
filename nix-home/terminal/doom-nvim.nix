@@ -76,6 +76,7 @@ _:
       "rust"
       # "cc"
       # "ocaml"
+      "go"
 
       # JIT
       # "c_sharp"
