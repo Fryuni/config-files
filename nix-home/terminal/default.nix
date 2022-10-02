@@ -64,9 +64,9 @@
         local session_name="$1"
 
         if [ -z "$session_name"]; then
-          gum style --faint --italic --bold "Zellij session name:"
+          ${pkgs.gum}/bin/gum style --faint --italic --bold "Zellij session name:"
 
-          local session_name=$(gum input --char-limit=40)
+          session_name=$(${pkgs.gum}/bin/gum input --char-limit=40)
         fi
 
         if [ -z "$session_name" ]; then
@@ -82,12 +82,13 @@
         if [ -z "$ongoing_sessions" ]; then
           start_zellij main
         else
-          gum style --faint --italic --bold "Chose a session (or create a new one):"
+          ${pkgs.gum}/bin/gum style --faint --italic --bold "Chose a session (or create a new one):"
 
           pick_options=$(trim "''${ongoing_sessions}\nCreate new session")
           chosen=$(echo "$pick_options" | ${pkgs.gum}/bin/gum filter)
 
           if [ "$chosen" = "Create new session" ]; then
+            ${pkgs.gum}/bin/gum style --faint --italic -- "--> $chosen"
             start_zellij
           else
             exec ${pkgs.zellij}/bin/zellij attach "$chosen"
