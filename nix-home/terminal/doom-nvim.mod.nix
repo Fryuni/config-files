@@ -11,12 +11,27 @@ let
   featureDependencies = with pkgs; {
     ranger = [ ranger ];
     lazygit = [ lazygit ];
+    neogit = [ neogit ];
   };
 
   languageDependencies = with pkgs; {
-    nix = [ rnix-lsp statix deadnix nixpkgs-fmt ];
-    lua = [ sumneko-lua-language-server luajitPackages.luacheck ];
-    go = [ gopls golangci-lint ];
+    nix = {
+      lsp = [ rnix-lsp ];
+      linter = [ statix deadnix nixpkgs-fmt ];
+    };
+    lua = {
+      lsp = [ sumneko-lua-language-server ];
+      linter = [ luajitPackages.luacheck ];
+    };
+    go = {
+      lsp = [ gopls ];
+      linter = [ golangci-lint ];
+    };
+    # Do not add rls and rustfmt if rustup is installed already
+    rust = mkIf (!builtins.elem rustup config.home.packages) {
+      lsp = [ rls ];
+      linter = [ rustfmt ];
+    };
   };
 
 in
@@ -41,7 +56,7 @@ in
           Language support to enable.
           https://github.com/NTBBloodbath/doom-nvim/blob/main/docs/modules.md#features-modules
         '';
-        default = [];
+        default = [ ];
       };
 
       doom-nvim-src = {
@@ -187,7 +202,11 @@ in
 
       featurePackages = lists.concatMap (feature: featureDependencies.${feature} or [ ]) cfg.features;
 
-      languagePackages = lists.concatMap (feature: languageDependencies.${feature} or [ ]) cfg.languages;
+      languagePackages = lists.concatMap
+        (language:
+          lists.concatMap (feature: languageDependencies.${language}.${feature} or [ ]) cfg.features
+        )
+        cfg.languages;
 
     in
     mkIf cfg.enable {
