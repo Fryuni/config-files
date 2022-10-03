@@ -110,6 +110,15 @@ in
         '';
       };
 
+      mutableConfig = mkOption {
+        type = types.bool;
+        description = ''
+          Write the configuration file as a mutable copy instead of a link.
+          This allows actively exploring the configuration without new home-manager generations.
+        '';
+        default = false;
+      };
+
       extraConfig = mkOption {
         type = types.lines;
         default = "";
@@ -190,9 +199,26 @@ in
         "nvim/lua/doom".source = "${doom-src}/lua/doom";
         "nvim/lua/colors".source = "${doom-src}/lua/colors";
 
-        # Must be linked even if empty.
-        "nvim/config.lua".text = cfg.extraConfig;
         "nvim/modules.lua".text = cfg.generatedModulesFile;
+
+        # Must be linked even if empty.
+        "nvim/config.lua" = mkIf (!cfg.mutableConfig) { text = cfg.extraConfig; };
+        "nvim/config-hm.lua" = mkIf cfg.mutableConfig { text = cfg.extraConfig; };
+      };
+
+      home.activation = {
+        "mutable doom-nvim" = mkIf cfg.mutableConfig (hm.dag.entryAfter [ "writeBoundary " ] ''
+          if [ -f $HOME/.config/nvim/config.lua.bck ]; then
+            mv $HOME/.config/nvim/config.lua.bck $HOME/.config/nvim/config.lua
+          fi
+
+          if [ ! -f $HOME/.config/nvim/config.lua ]; then
+            echo "dofile('/home/lotus/.config/nvim/config-hm.lua')" > $HOME/.config/nvim/config.lua
+            echo >> $HOME/.config/nvim/config.lua
+            echo "-- Mutate the configuration below" >> $HOME/.config/nvim/config.lua
+            echo >> $HOME/.config/nvim/config.lua
+          fi
+        '');
       };
 
       programs.doom-nvim.finalNvimPackage = pkgs.wrapNeovimUnstable cfg.nvimPackage
