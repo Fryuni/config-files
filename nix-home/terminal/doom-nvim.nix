@@ -7,8 +7,8 @@ _:
 
     doom-nvim-src = {
       owner = "Fryuni";
-      rev = "main";
-      sha256 = "sha256-ws3jyjq/zZGYSg/grWI520bqFuLxBobeMPgmrZMATQg=";
+      rev = "a87a00cfb6fd74574d59ddba2afeddae0fcc8b12";
+      sha256 = "sha256-PJRXeJl6wZhnh64CDZti8X1hpDRqdWE+6pitRJLYnew=";
     };
 
     features = [
