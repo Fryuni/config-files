@@ -60,6 +60,7 @@ in
         type = types.listOf types.str;
         description = ''
           Language support to enable.
+          The list of supported languages is documented here:
           https://github.com/NTBBloodbath/doom-nvim/blob/main/docs/modules.md#features-modules
         '';
         default = [ ];
@@ -76,11 +77,11 @@ in
         };
         rev = mkOption {
           type = types.str;
-          default = "v4.0.4";
+          default = "v4.0.5";
         };
         sha256 = mkOption {
           type = types.str;
-          default = "sha256-j12ffyr8WpY7NrngM59FmL3lnY6VfM3YjeeRD7ggqpU=";
+          default = "sha256-PJRXeJl6wZhnh64CDZti8X1hpDRqdWE+6pitRJLYnew=";
         };
       };
 
