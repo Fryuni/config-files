@@ -105,7 +105,34 @@ _:
       doom.preserve_edit_pos = true
       doom.indent = 2
 
-      local whichkey = doom.modules.features.whichkey
+      doom.use_keybind({
+        { '<leader>', name = '+prefix', {
+          {'y', name = "Yank to clipboard",    mode = 'v', '"+y'},
+          {'p', name = "Paste from clipboard", mode = 'n', '"+p'},
+        }}
+      })
+
+      local persistence = doom.features.auto_session
+      persistence.settings.options = { "buffers", "curdir", "tabpages", "winsize" }
+      persistence.binds = {
+        "<leader>",
+        name = "+prefix",
+        {
+          {
+            "q",
+            name = "+quit",
+            {
+              {
+                "r",
+                function() require("persistence").load() end,
+                name = "Restore session",
+              },
+            },
+          },
+        },
+      }
+  
+      local whichkey = doom.features.whichkey
       whichkey.settings.plugins.marks = true
       whichkey.settings.plugins.registers = true
       whichkey.settings.plugins.presets.operators = true
