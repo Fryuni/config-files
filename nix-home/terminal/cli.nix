@@ -27,6 +27,7 @@
     exa
     ripgrep
     fd
+    sd
     xplr
     dua
 
