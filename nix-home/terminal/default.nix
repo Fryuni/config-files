@@ -38,6 +38,8 @@
       nix-system = "/run/current-system";
       nix-boot = "/nix/var/nix/profiles/system";
       nix-hm = "/nix/var/nix/profiles/per-user/$USER/home-manager";
+
+      croct-meta = "$HOME/IsoWorkspaces/Croct/metas";
     };
 
     shellAliases = {
