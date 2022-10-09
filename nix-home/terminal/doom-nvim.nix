@@ -7,8 +7,9 @@ _:
 
     doom-nvim-src = {
       owner = "Fryuni";
-      rev = "a87a00cfb6fd74574d59ddba2afeddae0fcc8b12";
-      sha256 = "sha256-PJRXeJl6wZhnh64CDZti8X1hpDRqdWE+6pitRJLYnew=";
+      repo = "doom-nvim";
+      rev = "main";
+      sha256 = "sha256-VicXomc6IU181z7fifnvJKPrd9JOpHFWEZ2yv2dXL9s=";
     };
 
     features = [
@@ -96,7 +97,12 @@ _:
       "dockerfile"
     ];
 
+    mutableConfig = false;
+
     extraConfig = ''
+      doom.global_statusline = true
+      doom.clipboard = false
+      doom.preserve_edit_pos = true
       doom.indent = 2
 
       local whichkey = doom.modules.features.whichkey
