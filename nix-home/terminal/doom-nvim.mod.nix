@@ -16,17 +16,20 @@ let
 
   languageDependencies = with pkgs; {
     nix = {
-      lsp = [ rnix-lsp ];
+      lsp = [ rnix-lsp nil ];
       linter = [ statix deadnix nixpkgs-fmt ];
     };
+
     lua = {
       lsp = [ sumneko-lua-language-server ];
       linter = [ luajitPackages.luacheck ];
     };
+
     go = {
       lsp = [ gopls ];
       linter = [ golangci-lint ];
     };
+
     # Do not add rls and rustfmt if rustup is installed already
     rust = mkIf (!builtins.elem rustup config.home.packages) {
       lsp = [ rls ];

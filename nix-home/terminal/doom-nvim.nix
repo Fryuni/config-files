@@ -20,6 +20,7 @@ _:
       "comment" # Adds keybinds to comment in any language
       "linter" # Linting and formatting for languages
       "lsp" # Code completion
+      "lsp_tests"
       "extra_snippets" # Code snippets for all languages
 
       # Editor
@@ -97,7 +98,9 @@ _:
       "dockerfile"
     ];
 
-    mutableConfig = false;
+    mutableConfig = true;
+
+    luaUserFiles = "${builtins.getEnv "PWD"}/common/doom-nvim";
 
     extraConfig = ''
       doom.global_statusline = true
