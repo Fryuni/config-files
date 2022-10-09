@@ -29,6 +29,14 @@ _:
 
       core.excludesfile = "${../../common/rcfiles/gitignore}";
 
+      alias = {
+        # Worktree
+        wt = "worktree";
+        wtl = "worktree list";
+        wta = "worktree add";
+        wtp = "worktree prune";
+      };
+
       init.defaultBranch = "main";
       tag.gpgSign = true;
     };
