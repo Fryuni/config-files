@@ -111,11 +111,19 @@ in
         '';
       };
 
+      luaUserFiles = mkOption {
+        type = types.nullOr types.path;
+        default = null;
+        description = "Path of users modules to be installed.";
+      };
+
       mutableConfig = mkOption {
         type = types.bool;
         description = ''
           Write the configuration file as a mutable copy instead of a link.
           This allows actively exploring the configuration without new home-manager generations.
+          When enabled, passing a string `luaUserFiles` will not be resolved as a path,
+          so the user modules can be linked to a mutable local copy.
         '';
         default = false;
       };
@@ -197,8 +205,9 @@ in
         "nvim/init.lua".source = "${doom-src}/init.lua";
         "nvim/doc".source = "${doom-src}/docs";
         "nvim/colors".source = "${doom-src}/colors";
-        "nvim/lua/doom".source = "${doom-src}/lua/doom";
         "nvim/lua/colors".source = "${doom-src}/lua/colors";
+        "nvim/lua/doom".source = "${doom-src}/lua/doom";
+        "nvim/lua/user" = mkIf (!cfg.mutableConfig && cfg.luaUserFiles != null) { source = cfg.luaUserFiles; };
 
         "nvim/modules.lua".text = cfg.generatedModulesFile;
 
@@ -208,18 +217,26 @@ in
       };
 
       home.activation = {
-        "mutable doom-nvim" = mkIf cfg.mutableConfig (hm.dag.entryAfter [ "writeBoundary " ] ''
-          if [ -f $HOME/.config/nvim/config.lua.bck ]; then
-            mv $HOME/.config/nvim/config.lua.bck $HOME/.config/nvim/config.lua
-          fi
+        "mutable doom-nvim" = mkIf cfg.mutableConfig (hm.dag.entryAfter [ "writeBoundary " ]
+          (strings.concatStringsSep "\n" ([
+            ''
+              if [ -f $HOME/.config/nvim/config.lua.bck ]; then
+                mv $HOME/.config/nvim/config.lua.bck $HOME/.config/nvim/config.lua
+              fi
 
-          if [ ! -f $HOME/.config/nvim/config.lua ]; then
-            echo "dofile('/home/lotus/.config/nvim/config-hm.lua')" > $HOME/.config/nvim/config.lua
-            echo >> $HOME/.config/nvim/config.lua
-            echo "-- Mutate the configuration below" >> $HOME/.config/nvim/config.lua
-            echo >> $HOME/.config/nvim/config.lua
-          fi
-        '');
+              if [ ! -f $HOME/.config/nvim/config.lua ]; then
+                echo "dofile('/home/lotus/.config/nvim/config-hm.lua')" > $HOME/.config/nvim/config.lua
+                echo >> $HOME/.config/nvim/config.lua
+                echo "-- Mutate the configuration below" >> $HOME/.config/nvim/config.lua
+                echo >> $HOME/.config/nvim/config.lua
+              fi
+            ''
+          ]
+          ++ (lists.optional (cfg.luaUserFiles != null) ''
+            rm -f $HOME/.config/nvim/lua/user
+            ln -s ${cfg.luaUserFiles} $HOME/.config/nvim/lua/user
+          '')))
+        );
       };
 
       programs.doom-nvim.finalNvimPackage = pkgs.wrapNeovimUnstable cfg.nvimPackage
