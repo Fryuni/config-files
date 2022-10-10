@@ -10,6 +10,7 @@
     spotify
     flameshot
     discord-canary
+    obsidian
     vlc
   ];
 
