@@ -49,6 +49,7 @@
       ls = "ls --color=auto";
       ll = "exa -bghHliS --git";
       la = "exa -bghHliSa --git";
+      lg = "lazygit";
       "refresh-gcloud-credentials" = "gcloud auth print-access-token > /dev/null";
 
       ns = "nix-shell --command zsh";
