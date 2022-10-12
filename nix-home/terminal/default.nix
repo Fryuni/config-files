@@ -39,6 +39,9 @@
       nix-boot = "/nix/var/nix/profiles/system";
       nix-hm = "/nix/var/nix/profiles/per-user/$USER/home-manager";
 
+      syscfg = "$HOME/ZShutils";
+      oss = "$HOME/IsoWorkspaces/OSS";
+
       croct-meta = "$HOME/IsoWorkspaces/Croct/metas";
     };
 
