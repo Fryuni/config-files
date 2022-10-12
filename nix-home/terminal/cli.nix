@@ -44,6 +44,7 @@
     # Cloud
     google-cloud-sdk
     terraform
+    pulumi-bin
 
     grafterm
   ];
