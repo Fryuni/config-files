@@ -20,10 +20,10 @@ let
       linter = [ statix deadnix nixpkgs-fmt ];
     };
 
-    lua = {
-      lsp = [ sumneko-lua-language-server ];
-      linter = [ luajitPackages.luacheck ];
-    };
+    # lua = {
+    #   lsp = [ sumneko-lua-language-server ];
+    #   linter = [ luajitPackages.luacheck ];
+    # };
 
     go = {
       lsp = [ gopls ];

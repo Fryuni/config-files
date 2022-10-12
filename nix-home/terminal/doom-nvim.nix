@@ -1,6 +1,10 @@
-_:
+{ pkgs, ... }:
 {
   imports = [ ./doom-nvim.mod.nix ];
+
+  home.packages = with pkgs; [
+    luarocks
+  ];
 
   programs.doom-nvim = {
     enable = true;
@@ -9,7 +13,7 @@ _:
       owner = "Fryuni";
       repo = "doom-nvim";
       rev = "main";
-      sha256 = "sha256-VicXomc6IU181z7fifnvJKPrd9JOpHFWEZ2yv2dXL9s=";
+      sha256 = "sha256-UrHKVdz53c/OnpXvK2MeEVCgzDosUqODUhQtfNiFpLU=";
     };
 
     features = [
@@ -92,7 +96,9 @@ _:
       # "java"
 
       "nix"
-      "config"
+      "json"
+      "yaml"
+      "toml"
       "markdown"
       "terraform"
       "dockerfile"
