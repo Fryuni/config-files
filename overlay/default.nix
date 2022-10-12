@@ -1,5 +1,6 @@
 final: pkgs:
 (import ./jetbrains.nix final pkgs)
+// (import ./pulumi final pkgs)
   // {
   nix-visualize = import
     (pkgs.fetchFromGitHub {
