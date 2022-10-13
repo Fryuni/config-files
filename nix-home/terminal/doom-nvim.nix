@@ -14,7 +14,7 @@
       owner = "Fryuni";
       repo = "doom-nvim";
       rev = "main";
-      sha256 = "sha256-UrHKVdz53c/OnpXvK2MeEVCgzDosUqODUhQtfNiFpLU=";
+      sha256 = "sha256-OqZYUub+ROLHrJmOijWBbR50cGcyzKqke9QJA2rfwgw=";
     };
 
     features = [
@@ -43,7 +43,7 @@
       "lsp_progress" # Check status of LSP loading
       # "tabline" # Tab bar buffer switcher
       "dashboard" # A pretty dashboard upon opening
-      # "trouble" # A pretty diagnostic viewer
+      "trouble" # A pretty diagnostic viewer
       # "statusline" # A pretty status line at the bottom of the buffer
       # "minimap" # Shows current position in document
       "terminal" # Integrated terminal in neovim
