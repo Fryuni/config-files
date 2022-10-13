@@ -4,6 +4,7 @@
 
   home.packages = with pkgs; [
     luarocks
+    (tree-sitter.withPlugins (_: tree-sitter.allGrammars))
   ];
 
   programs.doom-nvim = {
