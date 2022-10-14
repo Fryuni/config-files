@@ -79,8 +79,8 @@
       # "php"
 
       # Web
-      "javascript"
-      "typescript"
+      # "javascript"
+      # "typescript"
       # "css"
       # "vue"
       # "tailwindcss"
