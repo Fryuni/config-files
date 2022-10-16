@@ -1,12 +1,15 @@
 { pkgs, lib, ... }:
 {
   home.packages = with pkgs; [
-    rustup
     python310
     nodejs-16_x
     nodePackages.yarn
 
     slack
+
+    # Rust tooling
+    rustup
+    cargo-feature
 
     go_1_19
     golangci-lint
