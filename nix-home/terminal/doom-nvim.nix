@@ -25,7 +25,7 @@
       "comment" # Adds keybinds to comment in any language
       "linter" # Linting and formatting for languages
       "lsp" # Code completion
-      "lsp_tests"
+      # "lsp_tests"
       "extra_snippets" # Code snippets for all languages
 
       # Editor
