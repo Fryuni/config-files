@@ -25,6 +25,10 @@ let
     #   linter = [ luajitPackages.luacheck ];
     # };
 
+    typescript = {
+      linter = [ eslint_d ];
+    };
+
     go = {
       lsp = [ gopls ];
       linter = [ golangci-lint ];
