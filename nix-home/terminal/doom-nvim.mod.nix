@@ -138,8 +138,8 @@ in
 
       nvimPackage = mkOption {
         type = types.package;
-        default = pkgs.neovim-unwrapped;
-        defaultText = literalExpression "pkgs.neovim-unwrapped";
+        default = pkgs.neovim;
+        defaultText = literalExpression "pkgs.neovim";
         description = "The package to use for the neovim binary.";
       };
 
@@ -242,10 +242,11 @@ in
         );
       };
 
-      programs.doom-nvim.finalNvimPackage = pkgs.wrapNeovimUnstable cfg.nvimPackage
-        (neovimConfig // {
-          wrapRc = false;
-        });
+      # programs.doom-nvim.finalNvimPackage = pkgs.wrapNeovimUnstable cfg.nvimPackage
+      #   (neovimConfig // {
+      #     wrapRc = false;
+      #   });
+      programs.doom-nvim.finalNvimPackage = cfg.nvimPackage;
 
       programs.bash.shellAliases = mkIf cfg.vimdiffAlias { vimdiff = "nvim -d"; };
       programs.fish.shellAliases = mkIf cfg.vimdiffAlias { vimdiff = "nvim -d"; };
