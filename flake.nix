@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-22.05";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -18,11 +19,17 @@
   outputs = { self, nixpkgs, home-manager, flake-utils, devshell, ... }@attrs:
     let
       system = "x86_64-linux";
-      # pkgs = nixpkgs.legacyPackages.${system};
       pkgs = import nixpkgs {
         inherit system;
 
         overlays = [
+          (_: _: {
+            stable = import attrs.nixpkgs-stable {
+              inherit system;
+              config.allowUnfree = true;
+            };
+          })
+
           (import ./overlay)
           attrs.polymc.overlay
         ];
