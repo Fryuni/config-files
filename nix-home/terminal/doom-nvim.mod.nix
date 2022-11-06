@@ -26,7 +26,8 @@ let
     # };
 
     typescript = {
-      linter = [ eslint_d ];
+      # TODO: Cofigure eslint_d with nix instead of relying on yarn after the installation.
+      # linter = [ eslint_d ];
     };
 
     go = {

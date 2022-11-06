@@ -2,6 +2,10 @@ final: pkgs:
 (import ./jetbrains.nix final pkgs)
 // (import ./pulumi final pkgs)
   // {
+  # neovim = pkgs.stable.neovim;
+  # neovim-unwrapped = pkgs.stable.neovim-unwrapped;
+  # wrapNeovimUnstable = pkgs.stable.wrapNeovimUnstable;
+
   nix-visualize = import
     (pkgs.fetchFromGitHub {
       owner = "craigmbooth";
@@ -10,7 +14,6 @@ final: pkgs:
       sha256 = "sha256-nsD5U70Ue30209t4fU8iMLCHzNZo18wKFutaFp55FOw=";
     })
     { inherit pkgs; };
-
 
   grafterm = pkgs.buildGoModule rec {
     pname = "grafterm";
