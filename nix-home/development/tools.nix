@@ -9,6 +9,7 @@
 
     # Rust tooling
     rustup
+    rust-analyzer
     cargo-feature
 
     go_1_19
