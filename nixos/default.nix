@@ -4,17 +4,11 @@
     # Include the results of the hardware scan.
     /etc/nixos/hardware-configuration.nix
     ./nix-settings.nix
+    ./modules/networking
     ./users.nix
     ./audio.nix
     ./registries.nix
   ];
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
-  networking.networkmanager.enable = true;
 
   # Set your time zone.
   time.timeZone = "America/Sao_Paulo";
