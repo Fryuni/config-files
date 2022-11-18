@@ -16,10 +16,11 @@
   programs.zellij = {
     enable = true;
     package = pkgs.zellij;
-    settings = {
-      pane_frames = false;
-    };
   };
+
+  xdg.configFile."zellij/config.kdl".text = ''
+    pane_frames false
+  '';
 
   programs.starship = {
     enable = true;

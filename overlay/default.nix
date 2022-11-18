@@ -31,7 +31,7 @@ final: pkgs:
 
   zellij = pkgs.rustPlatform.buildRustPackage rec {
     pname = "zellij";
-    version = "0.31.4";
+    version = "0.33.0";
 
     doCheck = false;
 
@@ -42,10 +42,10 @@ final: pkgs:
 
     src = pkgs.fetchCrate {
       inherit pname version;
-      sha256 = "sha256-v8rOQCLpEcrMb03lIGXIS2J0ex4fVZ0o8yj3iXb/Wxc=";
+      sha256 = "sha256-2o5JKotk5cwaN48ai5Pk7UmfIILXlZQbIR17Zus+Rjo=";
     };
 
-    cargoSha256 = "sha256-XSbptD7lZCEsRoa3KxNOOjJcR0N/8gyL6t+RDb5NBQw=";
+    cargoSha256 = "sha256-YqNnKtyCF51x2RZTeB+xLVZpTFhqhVzUF7G796TvFmE=";
     cargoDepsName = pname;
   };
 
