@@ -77,7 +77,7 @@ in
       doom-nvim-src = {
         owner = mkOption {
           type = types.str;
-          default = "NTBBloodbath";
+          default = "doom-neovim";
         };
         repo = mkOption {
           type = types.str;
@@ -85,11 +85,11 @@ in
         };
         rev = mkOption {
           type = types.str;
-          default = "v4.0.5";
+          default = "v4.1.0";
         };
         sha256 = mkOption {
           type = types.str;
-          default = "sha256-PJRXeJl6wZhnh64CDZti8X1hpDRqdWE+6pitRJLYnew=";
+          default = "sha256-UekDUyyy/9YGL3QJV/z5RSMgNfVOhr1NWQsTWK/39UY=";
         };
       };
 
