@@ -5,7 +5,7 @@ module.settings = {}
 module.packages = {
   ["klen/nvim-test"] = {
     "klen/nvim-test",
-    commit = "dbf0bc1c928a3f6c66482498c271ea8ced7c2998",
+    commit = "bea40f71fc2b918ad6cf2154bcc12521ac664dc2",
   },
 }
 
