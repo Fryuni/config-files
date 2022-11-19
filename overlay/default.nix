@@ -49,6 +49,42 @@ final: pkgs:
     cargoDepsName = pname;
   };
 
+  cargo-doctor = pkgs.rustPlatform.buildRustPackage rec {
+    pname = "cargo-doctor";
+    version = "0.1.2";
+
+    doCheck = false;
+
+    nativeBuildInputs = with pkgs; [
+      openssl
+      pkg-config
+    ];
+
+    src = pkgs.fetchCrate {
+      inherit pname version;
+      sha256 = "";
+    };
+  };
+
+  cargo-docs = pkgs.rustPlatform.buildRustPackage rec {
+    pname = "cargo-docs";
+    version = "0.1.24";
+
+    doCheck = false;
+
+    nativeBuildInputs = with pkgs; [
+      openssl
+      pkg-config
+    ];
+
+    src = pkgs.fetchCrate {
+      inherit pname version;
+      sha256 = "sha256-OxI+8JqSD6AoHx8AjRbWpXwIS/ER1U0vOqr2tFlNq4M=";
+    };
+
+    cargoSha256 = "sha256-tf/exlEHYar6IpUk7fJwrx4eo98uk4lE6W7J/7HyUp8=";
+  };
+
   toml-merge = pkgs.rustPlatform.buildRustPackage rec {
     pname = "toml-merge";
     version = "0.1.0";
