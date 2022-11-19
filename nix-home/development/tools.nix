@@ -2,7 +2,7 @@
 {
   home.packages = with pkgs; [
     python310
-    nodejs-16_x
+    stable.nodejs-18_x
     nodePackages.yarn
 
     slack
