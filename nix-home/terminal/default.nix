@@ -63,6 +63,7 @@
       enable = true;
       plugins = [
         "git"
+        "dotenv"
         "gcloud"
         "docker"
         "nvm"
