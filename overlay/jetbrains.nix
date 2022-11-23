@@ -7,14 +7,14 @@ let
       sha256 = "sha256-HX1GS7y4PVr0g1mu2mqn0WUDi/qh8m/vEBl2HrJ4+iI=";
     };
     goland = rec {
-      version = "2022.2.3";
+      version = "2022.2.5";
       url = "https://download.jetbrains.com/go/goland-${version}.tar.gz";
-      sha256 = "sha256-/aR9mTm5XYmV0aN1RDAlWZzXSxtaKWYnNHfs+vqc5PE=";
+      sha256 = "sha256-Fk1KESLPFdsmNhZTjfXSSjMxT+gqmdmSX9PLspl6eYc=";
     };
     pycharm-professional = rec {
-      version = "2022.2.3";
+      version = "2022.2.4";
       url = "https://download.jetbrains.com/python/pycharm-professional-${version}.tar.gz";
-      sha256 = "sha256-xzdQouJ+0kEHQac5BxqSDMqYRGCKgfB3Ne0uNaAkzKE=";
+      sha256 = "sha256-zWJT9VjvCy84kHE0Ac/hHq23F8FDc9+7UgvtzmIecos=";
     };
   };
 in
