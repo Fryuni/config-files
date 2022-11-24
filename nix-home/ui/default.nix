@@ -13,6 +13,7 @@
     discord-canary
     obsidian
     vlc
+    screenkey
   ];
 
   programs.mpv = {
