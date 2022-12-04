@@ -3,16 +3,17 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-22.05";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-22.11";
+    nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     flake-utils.url = "github:numtide/flake-utils";
     devshell.url = "github:numtide/devshell";
     polymc = {
       url = "github:PolyMC/PolyMC";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
     };
   };
 
@@ -24,6 +25,10 @@
 
         overlays = [
           (_: _: {
+            master = import attrs.nixpkgs-master {
+              inherit system;
+              config.allowUnfree = true;
+            };
             stable = import attrs.nixpkgs-stable {
               inherit system;
               config.allowUnfree = true;
