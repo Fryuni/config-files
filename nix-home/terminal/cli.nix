@@ -1,4 +1,16 @@
 { pkgs, ... }:
+let
+  gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (
+    with pkgs.google-cloud-sdk.components; [
+      docker-credential-gcr
+      beta
+      alpha
+      gsutil
+      gke-gcloud-auth-plugin
+      terraform-tools
+    ]
+  );
+in
 {
   home.packages = with pkgs; [
     # Nix
@@ -42,9 +54,9 @@
     lazygit
 
     # Cloud
-    google-cloud-sdk
     terraform
     pulumi-bin
+    gcloud-sdk
 
     grafterm
   ];
