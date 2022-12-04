@@ -214,6 +214,15 @@
       doom.use_keybind({
         { 'gA', name = "All code actions", run_all_similar },
       })
+
+      doom.use_package({
+        "ellisonleao/glow.nvim",
+        config = function()
+          require('glow').setup{
+            glow_path = "${pkgs.glow}/bin/glow",
+          }
+        end,
+      })
     '';
   };
 }
