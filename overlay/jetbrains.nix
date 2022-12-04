@@ -1,20 +1,23 @@
 _: pkgs:
 let
   overrides = {
+    # https://www.jetbrains.com/webstorm/download/other.html
     webstorm = rec {
-      version = "2022.2.3";
+      version = "2022.3";
       url = "https://download.jetbrains.com/webstorm/WebStorm-${version}.tar.gz";
-      sha256 = "sha256-HX1GS7y4PVr0g1mu2mqn0WUDi/qh8m/vEBl2HrJ4+iI=";
+      sha256 = "sha256-pwogdPg4xKX1C5nYeXN2vz9XzbQOnHKCRlVfm0rF01s=";
     };
+    # https://www.jetbrains.com/go/download/other.html
     goland = rec {
       version = "2022.2.5";
       url = "https://download.jetbrains.com/go/goland-${version}.tar.gz";
       sha256 = "sha256-Fk1KESLPFdsmNhZTjfXSSjMxT+gqmdmSX9PLspl6eYc=";
     };
+    # https://www.jetbrains.com/pycharm/download/other.html
     pycharm-professional = rec {
-      version = "2022.2.4";
+      version = "2022.3";
       url = "https://download.jetbrains.com/python/pycharm-professional-${version}.tar.gz";
-      sha256 = "sha256-zWJT9VjvCy84kHE0Ac/hHq23F8FDc9+7UgvtzmIecos=";
+      sha256 = "sha256-WhLHxpm3yrLoG8L4NCXBQe85Y4EQA5XalPqgZM/Zxc0=";
     };
   };
 in
