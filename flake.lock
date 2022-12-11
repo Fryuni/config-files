@@ -73,11 +73,11 @@
         "utils": "utils"
       },
       "locked": {
-        "lastModified": 1670280307,
-        "narHash": "sha256-3x+0whP1nCz5adQMIsBA3L9fI/ABOpRUJdbw0AmxBnU=",
+        "lastModified": 1670513770,
+        "narHash": "sha256-muL74fsbGA8K8WlZSPNWddOiuBnC54kAajncX6nXrh4=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "2af0d07678fc15612345e0dd55337550dcf6465f",
+        "rev": "054d9e3187ca00479e8036dc0e92900a384f30fd",
         "type": "github"
       },
       "original": {
@@ -120,11 +120,11 @@
     },
     "nixpkgs-master": {
       "locked": {
-        "lastModified": 1670329699,
-        "narHash": "sha256-a2COGA8sIwGtiShuO8T8fgT+MhOhpGYdsywJP34DUEg=",
+        "lastModified": 1670769372,
+        "narHash": "sha256-9bOU7J61+r/wyjhEF++RFZI+UYOTC35cGOlQs/6uij0=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "2be8b0ec2fa3fc02c3fe6ed608d29743a1fd76e0",
+        "rev": "0587b40b3edde5dcf53b6fbefb38d9de601480a0",
         "type": "github"
       },
       "original": {
@@ -136,11 +136,11 @@
     },
     "nixpkgs-stable": {
       "locked": {
-        "lastModified": 1670193339,
-        "narHash": "sha256-oHTAhX4p6+uxcabq0rKL4EyKWPbDLGKec88ocPIU/2Y=",
+        "lastModified": 1670625113,
+        "narHash": "sha256-3XuCP1b8U0/rzvQciowoM6sZjtq7nYzHOFUcNRa0WhY=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "e169cf5b3b1e6cc4a25ff15087c2621605f83409",
+        "rev": "e8ec26f41fd94805d8fbf2552d8e7a449612c08e",
         "type": "github"
       },
       "original": {
@@ -152,11 +152,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1670152712,
-        "narHash": "sha256-LJttwIvJqsZIj8u1LxVRv82vwUtkzVqQVi7Wb8gxPS4=",
+        "lastModified": 1670597555,
+        "narHash": "sha256-/k939P2S2246G6K5fyvC0U2IWvULhb4ZJg9K7ZxsX+k=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "14ddeaebcbe9a25748221d1d7ecdf98e20e2325e",
+        "rev": "2dea0f4c2d6e4603f54b2c56c22367e77869490c",
         "type": "github"
       },
       "original": {
@@ -176,11 +176,11 @@
         "tomlplusplus": "tomlplusplus"
       },
       "locked": {
-        "lastModified": 1670286495,
-        "narHash": "sha256-5Y2hQ15wZdCCYPAQPdcsgHp4f/0xq2g7oRznNzpmbIE=",
+        "lastModified": 1670482198,
+        "narHash": "sha256-b5/Ca/8uYhs6cAVdK3AwVX4VzHesljZAcNf6SK2XRyM=",
         "owner": "PolyMC",
         "repo": "PolyMC",
-        "rev": "7f226eba9cb354ab73c72f28ce00b3fde2f23d24",
+        "rev": "7839bd0e541f237cbd7248b87f0166dd342b4e0d",
         "type": "github"
       },
       "original": {
