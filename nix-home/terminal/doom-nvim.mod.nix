@@ -1,23 +1,28 @@
-{ config, lib, pkgs, ... }:
-with lib;
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   inherit (pkgs) stdenv;
 
-  cfg = trivial.throwIf
+  cfg =
+    trivial.throwIf
     (config.programs.doom-nvim.enable && config.programs.neovim.enable)
     "Cannot enable neovim and doom-nvim modules at the same time."
     config.programs.doom-nvim;
 
   featureDependencies = with pkgs; {
-    ranger = [ ranger ];
-    lazygit = [ lazygit ];
-    neogit = [ neogit ];
+    ranger = [ranger];
+    lazygit = [lazygit];
+    neogit = [neogit];
   };
 
   languageDependencies = with pkgs; {
     nix = {
-      lsp = [ rnix-lsp nil ];
-      linter = [ statix deadnix nixpkgs-fmt ];
+      lsp = [rnix-lsp nil];
+      linter = [statix deadnix nixpkgs-fmt];
     };
 
     # lua = {
@@ -31,19 +36,17 @@ let
     };
 
     go = {
-      lsp = [ gopls ];
-      linter = [ golangci-lint ];
+      lsp = [gopls];
+      linter = [golangci-lint];
     };
 
     # Do not add rls and rustfmt if rustup is installed already
     rust = mkIf (!builtins.elem rustup config.home.packages) {
-      lsp = [ rls ];
-      linter = [ rustfmt ];
+      lsp = [rls];
+      linter = [rustfmt];
     };
   };
-
-in
-{
+in {
   options = {
     programs.doom-nvim = {
       enable = mkEnableOption "DOOM Neovim";
@@ -55,7 +58,7 @@ in
           The list of features is documented here:
           https://github.com/NTBBloodbath/doom-nvim/blob/main/docs/modules.md#features-modules
         '';
-        default = [ ];
+        default = [];
       };
 
       autoInstallBinaries = mkOption {
@@ -71,7 +74,7 @@ in
           The list of supported languages is documented here:
           https://github.com/NTBBloodbath/doom-nvim/blob/main/docs/modules.md#features-modules
         '';
-        default = [ ];
+        default = [];
       };
 
       doom-nvim-src = {
@@ -157,46 +160,46 @@ in
     };
   };
 
-  config =
-    let
+  config = let
+    neovimConfig = pkgs.neovimUtils.makeNeovimConfig {
+      inherit (cfg) withNodeJs;
+    };
 
-      neovimConfig = pkgs.neovimUtils.makeNeovimConfig {
-        inherit (cfg) withNodeJs;
-      };
+    doom-src = stdenv.mkDerivation {
+      pname = "doom-nvim";
+      version = cfg.doom-nvim-src.rev;
 
-      doom-src = stdenv.mkDerivation {
-        pname = "doom-nvim";
-        version = cfg.doom-nvim-src.rev;
+      src = pkgs.fetchFromGitHub cfg.doom-nvim-src;
 
-        src = pkgs.fetchFromGitHub cfg.doom-nvim-src;
+      strictDeps = true;
+      enableParallelBuilding = true;
+      preferLocalBuild = true;
+      allowSubstitutes = false;
 
-        strictDeps = true;
-        enableParallelBuilding = true;
-        preferLocalBuild = true;
-        allowSubstitutes = false;
+      installPhase = ''
+        mkdir -p $out
+        cp init.lua $out/init.lua
+        cp -R lua $out/lua
+        cp -R doc $out/docs
+        cp -R colors $out/colors
+      '';
+    };
 
-        installPhase = ''
-          mkdir -p $out
-          cp init.lua $out/init.lua
-          cp -R lua $out/lua
-          cp -R doc $out/docs
-          cp -R colors $out/colors
-        '';
-      };
+    featurePackages = lists.concatMap (feature: featureDependencies.${feature} or []) cfg.features;
 
-      featurePackages = lists.concatMap (feature: featureDependencies.${feature} or [ ]) cfg.features;
-
-      languagePackages = lists.concatMap
-        (language:
-          lists.concatMap (feature: languageDependencies.${language}.${feature} or [ ]) cfg.features
-        )
-        cfg.languages;
-
-    in
+    languagePackages =
+      lists.concatMap
+      (
+        language:
+          lists.concatMap (feature: languageDependencies.${language}.${feature} or []) cfg.features
+      )
+      cfg.languages;
+  in
     mkIf cfg.enable {
-      home.packages = [ cfg.finalNvimPackage ]
+      home.packages =
+        [cfg.finalNvimPackage]
         ++ (lists.optionals cfg.autoInstallBinaries
-        (featurePackages ++ languagePackages));
+          (featurePackages ++ languagePackages));
 
       programs.doom-nvim.generatedModulesFile = ''
         return {
@@ -215,35 +218,36 @@ in
         "nvim/colors".source = "${doom-src}/colors";
         "nvim/lua/colors".source = "${doom-src}/lua/colors";
         "nvim/lua/doom".source = "${doom-src}/lua/doom";
-        "nvim/lua/user" = mkIf (!cfg.mutableConfig && cfg.luaUserFiles != null) { source = cfg.luaUserFiles; };
+        "nvim/lua/user" = mkIf (!cfg.mutableConfig && cfg.luaUserFiles != null) {source = cfg.luaUserFiles;};
 
         "nvim/modules.lua".text = cfg.generatedModulesFile;
 
         # Must be linked even if empty.
-        "nvim/config.lua" = mkIf (!cfg.mutableConfig) { text = cfg.extraConfig; };
-        "nvim/config-hm.lua" = mkIf cfg.mutableConfig { text = cfg.extraConfig; };
+        "nvim/config.lua" = mkIf (!cfg.mutableConfig) {text = cfg.extraConfig;};
+        "nvim/config-hm.lua" = mkIf cfg.mutableConfig {text = cfg.extraConfig;};
       };
 
       home.activation = {
-        "mutable doom-nvim" = mkIf cfg.mutableConfig (hm.dag.entryAfter [ "writeBoundary " ]
+        "mutable doom-nvim" = mkIf cfg.mutableConfig (
+          hm.dag.entryAfter ["writeBoundary "]
           (strings.concatStringsSep "\n" ([
-            ''
-              if [ -f $HOME/.config/nvim/config.lua.bck ]; then
-                mv $HOME/.config/nvim/config.lua.bck $HOME/.config/nvim/config.lua
-              fi
+              ''
+                if [ -f $HOME/.config/nvim/config.lua.bck ]; then
+                  mv $HOME/.config/nvim/config.lua.bck $HOME/.config/nvim/config.lua
+                fi
 
-              if [ ! -f $HOME/.config/nvim/config.lua ]; then
-                echo "dofile('/home/lotus/.config/nvim/config-hm.lua')" > $HOME/.config/nvim/config.lua
-                echo >> $HOME/.config/nvim/config.lua
-                echo "-- Mutate the configuration below" >> $HOME/.config/nvim/config.lua
-                echo >> $HOME/.config/nvim/config.lua
-              fi
-            ''
-          ]
-          ++ (lists.optional (cfg.luaUserFiles != null) ''
-            rm -f $HOME/.config/nvim/lua/user
-            ln -s ${cfg.luaUserFiles} $HOME/.config/nvim/lua/user
-          '')))
+                if [ ! -f $HOME/.config/nvim/config.lua ]; then
+                  echo "dofile('/home/lotus/.config/nvim/config-hm.lua')" > $HOME/.config/nvim/config.lua
+                  echo >> $HOME/.config/nvim/config.lua
+                  echo "-- Mutate the configuration below" >> $HOME/.config/nvim/config.lua
+                  echo >> $HOME/.config/nvim/config.lua
+                fi
+              ''
+            ]
+            ++ (lists.optional (cfg.luaUserFiles != null) ''
+              rm -f $HOME/.config/nvim/lua/user
+              ln -s ${cfg.luaUserFiles} $HOME/.config/nvim/lua/user
+            '')))
         );
       };
 
@@ -253,8 +257,8 @@ in
       #   });
       programs.doom-nvim.finalNvimPackage = cfg.nvimPackage;
 
-      programs.bash.shellAliases = mkIf cfg.vimdiffAlias { vimdiff = "nvim -d"; };
-      programs.fish.shellAliases = mkIf cfg.vimdiffAlias { vimdiff = "nvim -d"; };
-      programs.zsh.shellAliases = mkIf cfg.vimdiffAlias { vimdiff = "nvim -d"; };
+      programs.bash.shellAliases = mkIf cfg.vimdiffAlias {vimdiff = "nvim -d";};
+      programs.fish.shellAliases = mkIf cfg.vimdiffAlias {vimdiff = "nvim -d";};
+      programs.zsh.shellAliases = mkIf cfg.vimdiffAlias {vimdiff = "nvim -d";};
     };
 }

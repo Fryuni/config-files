@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{pkgs, ...}: {
   # Let home-manager manage itself.
   home.stateVersion = "22.05";
   programs.home-manager.enable = true;

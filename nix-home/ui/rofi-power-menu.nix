@@ -1,9 +1,10 @@
-{ lib, pkgs, ... }:
-
+{
+  lib,
+  pkgs,
+  ...
+}:
 # https://github.com/jluttine/rofi-power-menu
-
-with pkgs;
-let
+with pkgs; let
   rofi-power-menu = writeShellScriptBin "rofi-power-menu" ''
     # This script defines just a mode for rofi instead of being a self-contained
     # executable that launches rofi by itself. This makes it more flexible than
@@ -241,8 +242,7 @@ let
         exit 1
     fi
   '';
-in
-{
+in {
   # 直接叩くのではなく rofi -show power-menu -modi power-menu:rofi-power-menu のようにして呼ぶ
-  home.packages = [ rofi-power-menu ];
+  home.packages = [rofi-power-menu];
 }

@@ -1,5 +1,8 @@
-{ pkgs, nixpkgs, ... }:
 {
+  pkgs,
+  nixpkgs,
+  ...
+}: {
   environment.variables = {
     GAMEMODERUNEXEC = "mangohud WINEFSYNC=1 PROTON_WINEDBG_DISABLE=1 DXVK_LOG_PATH=none DXVK_HUD=compiler ALSOFT_DRIVERS=alsa";
   };
@@ -17,7 +20,7 @@
 
   nixpkgs.config.packageOverrides = pkgs: {
     steam = pkgs.steam.override {
-      extraPkgs = pkgs: with pkgs; [ gamemode mangohud ];
+      extraPkgs = pkgs: with pkgs; [gamemode mangohud];
     };
   };
 

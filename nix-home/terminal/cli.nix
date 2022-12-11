@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-let
+{pkgs, ...}: let
   gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (
     with pkgs.google-cloud-sdk.components; [
       docker-credential-gcr
@@ -10,8 +9,7 @@ let
       terraform-tools
     ]
   );
-in
-{
+in {
   home.packages = with pkgs; [
     # Nix
     nixpkgs-fmt

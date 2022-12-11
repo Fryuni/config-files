@@ -1,8 +1,6 @@
-final: pkgs:
-let
-  data = import ./data.nix { };
-in
-{
+final: pkgs: let
+  data = import ./data.nix {};
+in {
   pulumi-bin = pkgs.pulumi-bin.overrideAttrs (_: _: {
     inherit (data) version;
 

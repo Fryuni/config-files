@@ -1,5 +1,9 @@
-{ pkgs, lib, stdenv, ... }:
 {
+  pkgs,
+  lib,
+  stdenv,
+  ...
+}: {
   environment.variables.EDITOR = "nvim";
 
   documentation.dev.enable = true;
@@ -23,7 +27,7 @@
 
       autoPrune.enable = true;
       autoPrune.dates = "weekly";
-      autoPrune.flags = [ "--all" ];
+      autoPrune.flags = ["--all"];
     };
   };
 

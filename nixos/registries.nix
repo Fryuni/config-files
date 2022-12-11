@@ -1,11 +1,9 @@
-{ inputs, ... }:
-let
+{inputs, ...}: let
   base = "/etc/nixpkgs/channels";
   nixpkgsPath = "${base}/nixpkgs";
   nixpkgsStablePath = "${base}/nixpkgsStable";
   devshellPath = "${base}/devshell";
-in
-{
+in {
   nix.nixPath = [
     "nixpkgs=${nixpkgsPath}"
     "nixpkgs-stable=${nixpkgsStablePath}"

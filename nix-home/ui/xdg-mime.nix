@@ -1,5 +1,8 @@
-{ defaultBrowser, defaultVideo, defaultAudio ? defaultVideo }:
 {
+  defaultBrowser,
+  defaultVideo,
+  defaultAudio ? defaultVideo,
+}: {
   enable = true;
   associations.added = {
     "image/png" = "org.xfce.ristretto.desktop";

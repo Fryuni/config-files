@@ -1,6 +1,5 @@
 # DO NOT EDIT! This file is generated automatically by update.sh
-_:
-{
+_: {
   version = "3.42.0";
   pulumiPkgs = {
     x86_64-linux = [

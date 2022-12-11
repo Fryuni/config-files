@@ -1,5 +1,4 @@
-_: pkgs:
-let
+_: pkgs: let
   overrides = {
     # https://www.jetbrains.com/webstorm/download/other.html
     webstorm = rec {
@@ -20,11 +19,15 @@ let
       sha256 = "sha256-WhLHxpm3yrLoG8L4NCXBQe85Y4EQA5XalPqgZM/Zxc0=";
     };
   };
-in
-{
-  jetbrains = pkgs.jetbrains
+in {
+  jetbrains =
+    pkgs.jetbrains
     // builtins.mapAttrs
-    (name: { version, url, sha256 }:
+    (name: {
+      version,
+      url,
+      sha256,
+    }:
       pkgs.jetbrains.${name}.overrideAttrs (_: _: rec {
         inherit version;
         src = pkgs.fetchurl {

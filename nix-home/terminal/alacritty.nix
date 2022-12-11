@@ -1,8 +1,6 @@
-{ pkgs, ... }:
-let
-  zellij-starter = pkgs.callPackage ./zellijStarter.nix { };
-in
-{
+{pkgs, ...}: let
+  zellij-starter = pkgs.callPackage ./zellijStarter.nix {};
+in {
   programs.alacritty.enable = true;
   programs.alacritty.settings = {
     window = {
@@ -24,23 +22,21 @@ in
 
     draw_bold_text_with_bright_colors = true;
 
-    font =
-      let
-        family = "JetBrainsMono Nerd Font";
-      in
-      {
-        normal = {
-          inherit family;
-          style = "Regular";
-        };
-        bold = {
-          inherit family;
-          style = "Bold";
-        };
-        italic = {
-          inherit family;
-          style = "Italic";
-        };
+    font = let
+      family = "JetBrainsMono Nerd Font";
+    in {
+      normal = {
+        inherit family;
+        style = "Regular";
       };
+      bold = {
+        inherit family;
+        style = "Bold";
+      };
+      italic = {
+        inherit family;
+        style = "Italic";
+      };
+    };
   };
 }

@@ -1,4 +1,8 @@
-{ zellij, gum, writeShellScriptBin }:
+{
+  zellij,
+  gum,
+  writeShellScriptBin,
+}:
 writeShellScriptBin "__start_zellij" ''
   trim() {
     local var="$*"

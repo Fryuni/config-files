@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   imports = [
     ./xfce.nix
     ./xsession.nix
@@ -34,7 +33,7 @@
   programs.chromium = {
     enable = true;
     package = pkgs.google-chrome-beta;
-    extensions = builtins.map (id: { inherit id; }) [
+    extensions = builtins.map (id: {inherit id;}) [
       "eimadpbcbfnmbkopoojfekhnkhdbieeh"
     ];
   };
@@ -43,5 +42,4 @@
     enable = true;
     package = pkgs.firefox-beta-bin;
   };
-
 }

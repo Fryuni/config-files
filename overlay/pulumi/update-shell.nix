@@ -1,7 +1,7 @@
-{ nixpkgs ? import <nixpkgs> { } }:
+{nixpkgs ? import <nixpkgs> {}}:
 with nixpkgs;
-mkShell {
-  packages = with pkgs; [
-    gh
-  ];
-}
+  mkShell {
+    packages = with pkgs; [
+      gh
+    ];
+  }

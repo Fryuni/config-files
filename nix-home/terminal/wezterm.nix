@@ -1,13 +1,11 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   home.packages = with pkgs; [
     wezterm
   ];
 
   xdg.configFile."wezterm/wezterm.lua".text = ''
     local wezterm = require 'wezterm'
-    
+
     return {
       font = wezterm.font 'JetBrainsMono Nerd Font',
       font_size = 16,
@@ -18,7 +16,7 @@
       backgrounds = {
         { Color = 'black' },
         {
-          source = { File = '${../../common/wallpaper/wallpaper.png}' }, 
+          source = { File = '${../../common/wallpaper/wallpaper.png}' },
 
           repeat_x = 'NoRepeat',
           repeat_y = 'NoRepeat',

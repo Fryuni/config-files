@@ -1,8 +1,6 @@
-{ lib, ... }:
-let
-  toINI = lib.generators.toINI { };
-in
-{
+{lib, ...}: let
+  toINI = lib.generators.toINI {};
+in {
   home.file.".config/xfce4/terminal/terminalrc".text = toINI {
     Configuration = {
       FontName = "FiraCode Nerd Font weight=450 12";

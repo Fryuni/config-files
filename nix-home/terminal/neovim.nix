@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   # TODO: Follow this guide to the end: https://www.youtube.com/watch?v=rUvjkBuKua4
 
   xdg.configFile = {
@@ -22,7 +21,7 @@
         languageserver = {
           nix = {
             command = "rnix-lsp";
-            filetypes = [ "nix" ];
+            filetypes = ["nix"];
           };
         };
       };

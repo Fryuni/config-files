@@ -17,24 +17,22 @@
     };
   };
 
-  outputs =
-    { self
-    , nixpkgs
-    , home-manager
-    , flake-utils
-    , devshell
-    , ...
-    } @ attrs:
-    let
-      pkgFun = system:
-        let
-          pkgConfig = {
-            inherit system;
-            config.allowUnfree = true;
-          };
-        in
-        import nixpkgs (pkgConfig
-          // {
+  outputs = {
+    self,
+    nixpkgs,
+    home-manager,
+    flake-utils,
+    devshell,
+    ...
+  } @ attrs: let
+    pkgFun = system: let
+      pkgConfig = {
+        inherit system;
+        config.allowUnfree = true;
+      };
+    in
+      import nixpkgs (pkgConfig
+        // {
           overlays = [
             (_: _: {
               master = import attrs.nixpkgs-master pkgConfig;
@@ -46,8 +44,8 @@
           ];
         });
 
-      pkgs = pkgFun builtins.currentSystem;
-    in
+    pkgs = pkgFun builtins.currentSystem;
+  in
     {
       nixosConfigurations.notebook = nixpkgs.lib.nixosSystem {
         system = builtins.currentSystem;
@@ -69,12 +67,10 @@
         ];
       };
     }
-    // flake-utils.lib.eachDefaultSystem (system:
-    let
+    // flake-utils.lib.eachDefaultSystem (system: let
       pkgs = pkgFun system;
-    in
-    {
-      formatter = pkgs.nixpkgs-fmt;
+    in {
+      formatter = pkgs.alejandra;
 
       apps = {
         "activate/notebook" = {

@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   users.mutableUsers = false;
   users.users.lotus = {
     uid = 1000;

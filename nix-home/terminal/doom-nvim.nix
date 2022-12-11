@@ -1,6 +1,5 @@
-{ pkgs, ... }:
-{
-  imports = [ ./doom-nvim.mod.nix ];
+{pkgs, ...}: {
+  imports = [./doom-nvim.mod.nix];
 
   home.packages = with pkgs; [
     luarocks

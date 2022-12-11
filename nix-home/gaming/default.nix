@@ -1,8 +1,7 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   home.packages = with pkgs; [
     polymc
   ];
 
-  programs.obs-studio = { enable = true; };
+  programs.obs-studio = {enable = true;};
 }

@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   imports = [
     ./cli.nix
     ./doom-nvim.nix
@@ -57,7 +56,6 @@
       ns = "nix-shell --command zsh";
       nixc = "nix develop -c";
     };
-
 
     oh-my-zsh = {
       enable = true;

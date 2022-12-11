@@ -1,5 +1,8 @@
-{ pkgs, lib, ... }:
 {
+  pkgs,
+  lib,
+  ...
+}: {
   home.packages = with pkgs; [
     python310
     stable.nodejs-18_x
@@ -27,7 +30,8 @@
     "$HOME/.local/bin"
   ];
 
-  home.file = lib.mapAttrs'
+  home.file =
+    lib.mapAttrs'
     (name: _: {
       name = ".local/bin/${name}";
       value = {
