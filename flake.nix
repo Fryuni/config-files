@@ -63,6 +63,9 @@
 
       homeConfigurations.notebook = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
+        extraSpecialArgs = {
+          inputs = attrs;
+        };
         modules = [
           ./nix-home
           ./nix-home/notebook.nix
