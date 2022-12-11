@@ -7,6 +7,7 @@ in {
   nix.nixPath = [
     "nixpkgs=${nixpkgsPath}"
     "nixpkgs-stable=${nixpkgsStablePath}"
+    "nixpkgs-overlays=${../overlay}"
     "devshell=${devshellPath}"
     "/nix/var/nix/profiles/per-user/root/channels"
   ];
