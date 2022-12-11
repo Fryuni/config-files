@@ -225,6 +225,8 @@
         }
       ];
     in {
+      legacyPackages = pkgs;
+
       formatter = pkgs.alejandra;
 
       apps = let
