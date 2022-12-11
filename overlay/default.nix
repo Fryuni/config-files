@@ -1,20 +1,20 @@
 final: pkgs:
 (import ./jetbrains.nix final pkgs)
 // (import ./pulumi final pkgs)
-// {
+  // {
   # neovim = pkgs.stable.neovim;
   # neovim-unwrapped = pkgs.stable.neovim-unwrapped;
   # wrapNeovimUnstable = pkgs.stable.wrapNeovimUnstable;
 
   nix-visualize =
     import
-    (pkgs.fetchFromGitHub {
-      owner = "craigmbooth";
-      repo = "nix-visualize";
-      rev = "ee6ad3cb3ea31bd0e9fa276f8c0840e9025c321a";
-      sha256 = "sha256-nsD5U70Ue30209t4fU8iMLCHzNZo18wKFutaFp55FOw=";
-    })
-    {inherit pkgs;};
+      (pkgs.fetchFromGitHub {
+        owner = "craigmbooth";
+        repo = "nix-visualize";
+        rev = "ee6ad3cb3ea31bd0e9fa276f8c0840e9025c321a";
+        sha256 = "sha256-nsD5U70Ue30209t4fU8iMLCHzNZo18wKFutaFp55FOw=";
+      })
+      { inherit pkgs; };
 
   grafterm = pkgs.buildGoModule rec {
     pname = "grafterm";
@@ -54,8 +54,6 @@ final: pkgs:
     pname = "cargo-doctor";
     version = "0.1.2";
 
-    doCheck = false;
-
     nativeBuildInputs = with pkgs; [
       openssl
       pkg-config
@@ -70,8 +68,6 @@ final: pkgs:
   cargo-docs = pkgs.rustPlatform.buildRustPackage rec {
     pname = "cargo-docs";
     version = "0.1.24";
-
-    doCheck = false;
 
     nativeBuildInputs = with pkgs; [
       openssl
@@ -89,7 +85,6 @@ final: pkgs:
   toml-merge = pkgs.rustPlatform.buildRustPackage rec {
     pname = "toml-merge";
     version = "0.1.0";
-    doCheck = false;
 
     src = pkgs.fetchCrate {
       inherit pname version;
@@ -97,6 +92,19 @@ final: pkgs:
     };
 
     cargoSha256 = "sha256-BOBKbV4jInygN9l13jxi7guzdn5ao8owofomCdjXWng=";
+    cargoDepsName = pname;
+  };
+
+  prr = pkgs.rustPlatform.buildRustPackage rec {
+    pname = "prr";
+    version = "0.8.0";
+    nativeBuildInputs = [pkgs.pkg-config];
+    buildInputs = [pkgs.openssl];
+    src = pkgs.fetchCrate {
+      inherit pname version;
+      sha256 = "sha256-HwChF+977k93uAEc+x6AgXNc3AH3NPsH4dq/JorwhJ0=";
+    };
+    cargoSha256 = "sha256-WWxZyRVBac925X0LdVnIR1R3PJW9biqq9lFpXUIwZKo=";
     cargoDepsName = pname;
   };
 }
