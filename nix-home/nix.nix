@@ -1,8 +1,7 @@
-_:
-{
+_: {
   xdg.configFile."nixpkgs/config.nix".text = ''
-  {
-    allowUnfree = true;
-  }
+    {
+      allowUnfree = true;
+    }
   '';
 }

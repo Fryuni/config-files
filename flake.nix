@@ -17,24 +17,22 @@
     };
   };
 
-  outputs =
-    { self
-    , nixpkgs
-    , home-manager
-    , flake-utils
-    , devshell
-    , ...
-    } @ attrs:
-    let
-      pkgFun = system:
-        let
-          pkgConfig = {
-            inherit system;
-            config.allowUnfree = true;
-          };
-        in
-        import nixpkgs (pkgConfig
-          // {
+  outputs = {
+    self,
+    nixpkgs,
+    home-manager,
+    flake-utils,
+    devshell,
+    ...
+  } @ attrs: let
+    pkgFun = system: let
+      pkgConfig = {
+        inherit system;
+        config.allowUnfree = true;
+      };
+    in
+      import nixpkgs (pkgConfig
+        // {
           overlays = [
             (_: _: {
               master = import attrs.nixpkgs-master pkgConfig;
@@ -46,9 +44,11 @@
           ];
         });
 
-      pkgs = pkgFun (builtins.currentSystem or flake-utils.lib.system.x86_64-linux);
-    in
+    pkgs = pkgFun (builtins.currentSystem or flake-utils.lib.system.x86_64-linux);
+  in
     {
+      templates = import ./templates (attrs // {inherit pkgs;});
+
       nixosConfigurations.notebook = nixpkgs.lib.nixosSystem {
         system = builtins.currentSystem;
         specialArgs = {
@@ -69,8 +69,7 @@
         ];
       };
     }
-    // flake-utils.lib.eachDefaultSystem (system:
-    let
+    // flake-utils.lib.eachDefaultSystem (system: let
       pkgs = pkgFun system;
       commands = [
         # Setup
@@ -222,21 +221,19 @@
           '';
         }
       ];
-    in
-    {
+    in {
       formatter = pkgs.alejandra;
 
-      apps =
-        let
-          commandToApp = cmd: {
-            inherit (cmd) name;
-            value = {
-              type = "app";
-              program = builtins.toString (pkgs.writeShellScript cmd.name cmd.command);
-            };
+      apps = let
+        commandToApp = cmd: {
+          inherit (cmd) name;
+          value = {
+            type = "app";
+            program = builtins.toString (pkgs.writeShellScript cmd.name cmd.command);
           };
-          appList = builtins.map commandToApp commands;
-        in
+        };
+        appList = builtins.map commandToApp commands;
+      in
         builtins.listToAttrs appList;
 
       devShells.default = pkgs.devshell.mkShell {
@@ -245,10 +242,13 @@
           $(type -p menu &>/dev/null && menu)
         '';
 
-        commands = builtins.map
-          (cmd: cmd // {
-            command = self.outputs.apps.${system}.${cmd.name}.program;
-          })
+        commands =
+          builtins.map
+          (cmd:
+            cmd
+            // {
+              command = self.outputs.apps.${system}.${cmd.name}.program;
+            })
           commands;
       };
     });
