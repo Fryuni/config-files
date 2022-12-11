@@ -1,5 +1,7 @@
-{ config, pkgs, sops-nix, ... }:
-{
+{ config
+, pkgs
+, ...
+}: {
   environment.systemPackages = with pkgs; [
     pkgs.nix-doc
   ];
@@ -8,8 +10,6 @@
     plugin-files = ${pkgs.nix-doc}/lib/libnix_doc_plugin.so
   '';
 
-  nixpkgs.config.allowUnfree = true;
-
   nix.settings = {
     trusted-users = [ "root" "lotus" ];
 
@@ -17,8 +17,7 @@
 
     auto-optimise-store = true;
 
-    substituters =
-      [ "https://nix-gaming.cachix.org" "https://nixpkgs.cachix.org" ];
+    substituters = [ "https://nix-gaming.cachix.org" "https://nixpkgs.cachix.org" ];
     trusted-public-keys = [
       "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
       "nixpkgs.cachix.org-1:q91R6hxbwFvDqTSDKwDAV4T5PxqXGxswD8vhONFMeOE="
