@@ -8,6 +8,7 @@
 
   imports = [
     ./ui
+    ./nix.nix
   ];
 
   services.syncthing.enable = true;
