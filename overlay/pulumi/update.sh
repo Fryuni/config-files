@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env nix-shell
+#!nix-shell update-shell.nix -i bash
 # shellcheck shell=bash
 # Bash 3 compatible for Darwin
 
@@ -9,7 +10,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Version of Pulumi from
 # https://www.pulumi.com/docs/get-started/install/versions/
-VERSION="3.42.0"
+VERSION="3.49.0"
 
 # An array of plugin names. The respective repository inside Pulumi's
 # Github organization is called pulumi-$name by convention.
