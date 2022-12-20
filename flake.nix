@@ -134,6 +134,9 @@
           help = "Update the flake lock file only";
           command = ''
             nix flake update $@
+            git restore --staged .
+            git add flake.lock
+            git commit -m "chore: Update flake"
           '';
         }
 
