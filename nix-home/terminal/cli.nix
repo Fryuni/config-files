@@ -31,7 +31,7 @@ in {
     unzip
     figlet
     protobuf
-    httpie
+    stable.httpie
     yq-go
     bat
     exa
