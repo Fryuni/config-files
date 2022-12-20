@@ -21,14 +21,14 @@ _: pkgs: let
   };
 in {
   jetbrains =
-    pkgs.jetbrains
+    pkgs.master.jetbrains
     // builtins.mapAttrs
     (name: {
       version,
       url,
       sha256,
     }:
-      pkgs.jetbrains.${name}.overrideAttrs (_: _: rec {
+      pkgs.master.jetbrains.${name}.overrideAttrs (_: _: rec {
         inherit version;
         src = pkgs.fetchurl {
           inherit url sha256;
