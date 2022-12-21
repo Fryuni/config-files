@@ -264,7 +264,7 @@ truncation_symbol = "…"
 
 [git_commit]
 commit_hash_length = 7
-disabled = false
+disabled = true
 format = "[\\($hash$tag\\)]($style) "
 only_detached = true
 style = "green bold"
@@ -275,7 +275,7 @@ tag_symbol = " 🏷  "
 [git_metrics]
 added_style = "bold green"
 deleted_style = "bold red"
-disabled = false
+disabled = true
 format = "([+$added]($added_style) )([-$deleted]($deleted_style) )"
 only_nonzero_diffs = true
 
