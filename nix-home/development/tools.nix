@@ -4,7 +4,9 @@
   ...
 }: {
   home.packages = with pkgs; [
-    python310
+    (python310.withPackages (py: [
+      py.pyopenssl
+    ]))
     stable.nodejs-18_x
     nodePackages.yarn
 
