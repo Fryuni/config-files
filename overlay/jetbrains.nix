@@ -1,5 +1,4 @@
-final: pkgs:
-let
+final: pkgs: let
   inherit (pkgs) jetbrains;
 
   overrides = {
