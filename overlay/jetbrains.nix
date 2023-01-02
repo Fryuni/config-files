@@ -1,10 +1,13 @@
-_: pkgs: let
+final: pkgs:
+let
+  inherit (pkgs) jetbrains;
+
   overrides = {
     # https://www.jetbrains.com/webstorm/download/other.html
     webstorm = rec {
-      version = "2022.3";
+      version = "2022.3.1";
       url = "https://download.jetbrains.com/webstorm/WebStorm-${version}.tar.gz";
-      sha256 = "sha256-pwogdPg4xKX1C5nYeXN2vz9XzbQOnHKCRlVfm0rF01s=";
+      sha256 = "sha256-14vWSUzO1R/nfYfAcED6Oinor5FzFzmQNq8WHFav2Sc=";
     };
     # https://www.jetbrains.com/go/download/other.html
     goland = rec {
@@ -14,21 +17,21 @@ _: pkgs: let
     };
     # https://www.jetbrains.com/pycharm/download/other.html
     pycharm-professional = rec {
-      version = "2022.3";
+      version = "2022.3.1";
       url = "https://download.jetbrains.com/python/pycharm-professional-${version}.tar.gz";
-      sha256 = "sha256-WhLHxpm3yrLoG8L4NCXBQe85Y4EQA5XalPqgZM/Zxc0=";
+      sha256 = "sha256-j4RQd8wPo1gjSO49dqaf8AE5Gz89Y6myebgDn9bgdiI=";
     };
   };
 in {
   jetbrains =
-    pkgs.jetbrains
+    jetbrains
     // builtins.mapAttrs
     (name: {
       version,
       url,
       sha256,
     }:
-      pkgs.jetbrains.${name}.overrideAttrs (_: _: rec {
+      jetbrains.${name}.overrideAttrs (_: _: rec {
         inherit version;
         src = pkgs.fetchurl {
           inherit url sha256;
