@@ -1,6 +1,6 @@
 {pkgs, ...}: let
   gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (
-    with pkgs.google-cloud-sdk.components; [
+    with pkgs.master.google-cloud-sdk.components; [
       docker-credential-gcr
       beta
       alpha
@@ -58,6 +58,10 @@ in {
 
     grafterm
   ];
+
+  home.sessionVariables = {
+    USE_GKE_GCLOUD_AUTH_PLUGIN = "True";
+  };
 
   programs.jq.enable = true;
 
