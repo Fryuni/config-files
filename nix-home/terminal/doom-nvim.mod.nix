@@ -40,6 +40,10 @@ with lib; let
       linter = [golangci-lint];
     };
 
+    java = {
+      lsp = [jdk17_headless];
+    };
+
     # Do not add rls and rustfmt if rustup is installed already
     rust = mkIf (!builtins.elem rustup config.home.packages) {
       lsp = [rls];

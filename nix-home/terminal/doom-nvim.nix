@@ -86,7 +86,7 @@
       # JIT
       # "c_sharp"
       # "kotlin"
-      # "java"
+      "java"
 
       "nix"
       "json"
