@@ -5,6 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-22.11";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs-stable";
@@ -20,6 +21,7 @@
   outputs = {
     self,
     nixpkgs,
+    nixos-hardware,
     home-manager,
     flake-utils,
     devshell,
@@ -58,6 +60,7 @@
         modules = [
           ./nixos
           ./nixos/notebook
+          # nixos-hardware.nixosModules.dell-g3-3779
         ];
       };
 
