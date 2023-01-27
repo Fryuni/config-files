@@ -10,9 +10,9 @@ final: pkgs: let
     };
     # https://www.jetbrains.com/go/download/other.html
     goland = rec {
-      version = "2022.2.5";
+      version = "2022.3.1";
       url = "https://download.jetbrains.com/go/goland-${version}.tar.gz";
-      sha256 = "sha256-Fk1KESLPFdsmNhZTjfXSSjMxT+gqmdmSX9PLspl6eYc=";
+      sha256 = "sha256-Vm6tpAURzQZyfWkEfopqHnWwbrrek9HqeCYvwnFcijg=";
     };
     # https://www.jetbrains.com/pycharm/download/other.html
     pycharm-professional = rec {
