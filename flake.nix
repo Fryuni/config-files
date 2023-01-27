@@ -226,6 +226,7 @@
           category = "Utility";
           help = ''Delete old generations and garbage collection'';
           command = ''
+            rm -rf ./result
             sudo nix-collect-garbage -d $@
           '';
         }
