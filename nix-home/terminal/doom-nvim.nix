@@ -9,6 +9,13 @@
   programs.doom-nvim = {
     enable = true;
 
+    doom-nvim-src = {
+      owner = "doom-neovim";
+      repo = "doom-nvim";
+      rev = "d878cd9a69eb86ad10177d3f974410317ab9f2fe";
+      sha256 = "sha256-Qd9NJVOydnElV1P0r/duHshtVPQl+Ba3R0PlNp0c0wI=";
+    };
+
     features = [
       # Language features
       "annotations" # Code annotation generator
@@ -17,7 +24,7 @@
       "comment" # Adds keybinds to comment in any language
       "linter" # Linting and formatting for languages
       "lsp" # Code completion
-      "lsp_tests" # Integrated tests
+      # "lsp_tests" # Integrated tests
       "extra_snippets" # Code snippets for all languages
 
       # Editor
