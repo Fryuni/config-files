@@ -1,7 +1,10 @@
 final: pkgs:
 (import ./jetbrains.nix final pkgs)
 // (import ./pulumi final pkgs)
+// (import ./pulumi final pkgs)
 // {
+  ksp-ckan = pkgs.callPackage ./ckan.nix {};
+
   # neovim = pkgs.stable.neovim;
   # neovim-unwrapped = pkgs.stable.neovim-unwrapped;
   # wrapNeovimUnstable = pkgs.stable.wrapNeovimUnstable;
