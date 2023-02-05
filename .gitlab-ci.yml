@@ -1,0 +1,10 @@
+image: nixpkgs/nix-flakes:latest
+update:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  script:
+    - git config user.email "bot@lferraz.com"
+    - git config user.name "LFerraz Bot"
+    - 'git remote add gitlab_origin https://oauth2:$COMMIT_TOKEN@gitlab.com/Fryuni/ZShutils.git'
+    - 'nix run .#update'
+    - 'git push gitlab_origin HEAD:main -o ci.skip'
