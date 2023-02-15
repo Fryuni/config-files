@@ -25,6 +25,7 @@
       "linter" # Linting and formatting for languages
       "lsp" # Code completion
       # "lsp_tests" # Integrated tests
+      "ai_magic"
       "extra_snippets" # Code snippets for all languages
 
       # Editor
