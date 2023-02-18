@@ -7,7 +7,7 @@
     (python310.withPackages (py: [
       py.pyopenssl
     ]))
-    stable.nodejs-18_x
+    nodejs-18_x
     nodePackages.yarn
 
     slack

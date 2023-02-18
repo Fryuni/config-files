@@ -36,10 +36,10 @@
       import nixpkgs (pkgConfig
         // {
           overlays = [
-            (_: _: {
-              master = import attrs.nixpkgs-master pkgConfig;
-              stable = import attrs.nixpkgs-stable pkgConfig;
-            })
+            # (_: _: {
+            #   master = import attrs.nixpkgs-master pkgConfig;
+            #   stable = import attrs.nixpkgs-stable pkgConfig;
+            # })
             (import ./overlay)
             attrs.polymc.overlay
             devshell.overlay
