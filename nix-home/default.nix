@@ -11,9 +11,9 @@
     ./nix.nix
   ];
 
-  home.packages = [
-    inputs.home-manager.packages.${builtins.currentSystem}.docs-html
-  ];
+  # home.packages = [
+  #   inputs.home-manager.packages.${builtins.currentSystem}.docs-html
+  # ];
 
   services.syncthing.enable = true;
 }
