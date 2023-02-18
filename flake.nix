@@ -77,6 +77,7 @@
     }
     // flake-utils.lib.eachDefaultSystem (system: let
       pkgs = pkgFun system;
+      homeManager = "${home-manager.packages.${system}.home-manager}/bin/home-manager";
       commands = [
         # Setup
         {
@@ -95,7 +96,7 @@
           category = "Home";
           help = "List all packages installed in home-manager-path";
           command = ''
-            home-manager packages
+            ${homeManager} packages
           '';
         }
         {
@@ -103,7 +104,7 @@
           category = "Home";
           help = "List all home environment generations";
           command = ''
-            home-manager generations
+            ${homeManager} generations
           '';
         }
         {
@@ -120,7 +121,7 @@
           category = "Home";
           help = "Build home-manager configuration without applying it";
           command = ''
-            home-manager build --flake '.#notebook' -b bck --impure $@
+            ${homeManager} build --flake '.#notebook' -b bck --impure $@
           '';
         }
         {
@@ -128,7 +129,7 @@
           category = "Home";
           help = "Switch home-manager to apply home config changes";
           command = ''
-            home-manager switch --flake '.#notebook' -b bck --impure $@
+            ${homeManager} switch --flake '.#notebook' -b bck --impure $@
           '';
         }
         {
