@@ -21,7 +21,7 @@
   outputs = {
     self,
     nixpkgs,
-    nixos-hardware,
+    # nixos-hardware,
     home-manager,
     flake-utils,
     devshell,
@@ -47,8 +47,8 @@
         });
 
     pkgs = pkgFun (builtins.currentSystem or flake-utils.lib.system.x86_64-linux);
-  in
-    {
+
+    globalConfig = {
       templates = import ./templates (attrs // {inherit pkgs;});
 
       nixosConfigurations.notebook = nixpkgs.lib.nixosSystem {
@@ -74,8 +74,9 @@
           ./nix-home/notebook.nix
         ];
       };
-    }
-    // flake-utils.lib.eachDefaultSystem (system: let
+    };
+
+    perSystemConfig = flake-utils.lib.eachDefaultSystem (system: let
       pkgs = pkgFun system;
       homeManager = "${home-manager.packages.${system}.home-manager}/bin/home-manager";
       commands = [
@@ -265,4 +266,6 @@
           commands;
       };
     });
+  in
+    globalConfig // perSystemConfig;
 }
