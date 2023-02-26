@@ -26,7 +26,7 @@ build-system-notebook:
     - nix-env --install --attr nixpkgs.cachix
     - cachix use "$CACHIX_CACHE_NAME"
   script:
-    - cachix watch-exec $CACHIX_CACHE_NAME -- nix run .#os-build
+    - cachix watch-exec $CACHIX_CACHE_NAME -- nix build .#homeConfigurations.notebook.activationPackage
 
 build-home-notebook:
   stage: build
@@ -45,4 +45,4 @@ build-home-notebook:
     - nix-env --install --attr nixpkgs.cachix
     - cachix use "$CACHIX_CACHE_NAME"
   script:
-    - cachix watch-exec $CACHIX_CACHE_NAME -- nix run .#build
+    - cachix watch-exec $CACHIX_CACHE_NAME -- nix build .#nixosConfigurations.notebook.config.system.build.topLevel
