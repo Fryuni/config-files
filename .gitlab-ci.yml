@@ -13,9 +13,14 @@ update:
 
 build:
   # image: nixos/nix:2.3.12
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
   variables:
     CACHIX_CACHE_NAME: fryuni
   before_script:
+    - nix-channel --add https://nixos.org/channels/nixpkgs-unstable
+    - nix-channel --update
     - nix-env --install --attr nixpkgs.cachix
     - cachix use "$CACHIX_CACHE_NAME"
   script:
