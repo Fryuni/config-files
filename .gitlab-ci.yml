@@ -16,6 +16,7 @@ build:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
+    - when: on_success
   variables:
     CACHIX_CACHE_NAME: fryuni
   before_script:
