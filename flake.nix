@@ -27,36 +27,31 @@
     devshell,
     ...
   } @ attrs: let
-    pkgFun = system: let
-      pkgConfig = {
+    pkgsFun = system:
+      import nixpkgs {
         inherit system;
         config.allowUnfree = true;
+        overlays = [
+          # (_: _: {
+          #   master = import attrs.nixpkgs-master pkgConfig;
+          #   stable = import attrs.nixpkgs-stable pkgConfig;
+          # })
+          (import ./overlay)
+          attrs.polymc.overlay
+          devshell.overlay
+        ];
       };
-    in
-      import nixpkgs (pkgConfig
-        // {
-          overlays = [
-            # (_: _: {
-            #   master = import attrs.nixpkgs-master pkgConfig;
-            #   stable = import attrs.nixpkgs-stable pkgConfig;
-            # })
-            (import ./overlay)
-            attrs.polymc.overlay
-            devshell.overlay
-          ];
-        });
-
-    pkgs = pkgFun (builtins.currentSystem or flake-utils.lib.system.x86_64-linux);
 
     globalConfig = {
-      templates = import ./templates (attrs // {inherit pkgs;});
+      templates = import ./templates attrs;
 
-      nixosConfigurations.notebook = nixpkgs.lib.nixosSystem {
-        system = builtins.currentSystem;
+      nixosConfigurations.notebook = nixpkgs.lib.nixosSystem rec {
+        system = flake-utils.lib.system.x86_64-linux;
+        pkgs = pkgsFun system;
         specialArgs = {
-          inherit pkgs;
           inputs = attrs;
         };
+
         modules = [
           ./nixos
           ./nixos/notebook
@@ -65,10 +60,11 @@
       };
 
       homeConfigurations.notebook = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
+        pkgs = pkgsFun flake-utils.lib.system.x86_64-linux;
         extraSpecialArgs = {
           inputs = attrs;
         };
+
         modules = [
           ./nix-home
           ./nix-home/notebook.nix
@@ -77,7 +73,8 @@
     };
 
     perSystemConfig = flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = pkgFun system;
+      pkgs = pkgsFun system;
+
       homeManager = "${home-manager.packages.${system}.home-manager}/bin/home-manager";
       commands = [
         # Setup
@@ -122,7 +119,7 @@
           category = "Home";
           help = "Build home-manager configuration without applying it";
           command = ''
-            ${homeManager} build --flake '.#notebook' -b bck --impure $@
+            ${homeManager} build --flake '.#notebook' -b bck $@
           '';
         }
         {
@@ -130,7 +127,7 @@
           category = "Home";
           help = "Switch home-manager to apply home config changes";
           command = ''
-            ${homeManager} switch --flake '.#notebook' -b bck --impure $@
+            ${homeManager} switch --flake '.#notebook' -b bck $@
           '';
         }
         {
@@ -151,7 +148,7 @@
           category = "NixOS";
           help = "Apply NixOS configuration and configure it as the default profile";
           command = ''
-            sudo nixos-rebuild switch --flake '.#notebook' --impure $@
+            sudo nixos-rebuild switch --flake '.#notebook' $@
           '';
         }
         {
@@ -159,7 +156,7 @@
           category = "NixOS";
           help = "Apply NixOS configuration but don't set it on any boot entry";
           command = ''
-            sudo nixos-rebuild test --flake '.#notebook' --impure $@
+            sudo nixos-rebuild test --flake '.#notebook' $@
           '';
         }
         {
@@ -176,7 +173,7 @@
           category = "NixOS";
           help = "Build NixOS configuration without applying";
           command = ''
-            nixos-rebuild build --flake '.#notebook' --impure $@
+            nixos-rebuild build --flake '.#notebook' $@
           '';
         }
         {
@@ -184,7 +181,7 @@
           category = "NixOS";
           help = "Apply NixOS configuration as the default boot profile, but don't load it immediately";
           command = ''
-            sudo nixos-rebuild boot --flake '.#notebook' --impure $@
+            sudo nixos-rebuild boot --flake '.#notebook' $@
           '';
         }
         {
