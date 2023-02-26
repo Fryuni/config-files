@@ -45,4 +45,4 @@ build-home-notebook:
     - nix-env --install --attr nixpkgs.cachix
     - cachix use "$CACHIX_CACHE_NAME"
   script:
-    - cachix watch-exec $CACHIX_CACHE_NAME -- nix build .#nixosConfigurations.notebook.config.system.build.topLevel
+    - cachix watch-exec $CACHIX_CACHE_NAME -- nix build .#nixosConfigurations.notebook.config.system.build.toplevel
