@@ -66,6 +66,7 @@
     dig
     gnumake
     xarchiver
+    cachix
   ];
 
   # xdg.portal.enable = true;
