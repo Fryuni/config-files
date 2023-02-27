@@ -1,26 +1,17 @@
-{inputs, ...}: let
-  base = "/etc/nixpkgs/channels";
-  nixpkgsPath = "${base}/nixpkgs";
-  # nixpkgsStablePath = "${base}/nixpkgsStable";
-  devshellPath = "${base}/devshell";
-in {
+{inputs, ...}: {
   nix.nixPath = [
-    "nixpkgs=${nixpkgsPath}"
+    "nixpkgs=${inputs.nixpkgs}"
     # "nixpkgs-stable=${nixpkgsStablePath}"
     "nixpkgs-overlays=${../overlay}"
-    "devshell=${devshellPath}"
+    "devshell=${inputs.devshell}"
     "/nix/var/nix/profiles/per-user/root/channels"
   ];
 
-  system.activationScripts.nix-channel-update = ''
-    /run/current-system/sw/bin/nix-channel --update
-  '';
-
-  systemd.tmpfiles.rules = [
-    "L+ ${nixpkgsPath}       - - - - ${inputs.nixpkgs}"
-    # "L+ ${nixpkgsStablePath} - - - - ${inputs.nixpkgs-stable}"
-    "L+ ${devshellPath}      - - - - ${inputs.devshell}"
-  ];
+  # systemd.tmpfiles.rules = [
+  # "L+ ${nixpkgsPath}       - - - - ${inputs.nixpkgs}"
+  # "L+ ${nixpkgsStablePath} - - - - ${inputs.nixpkgs-stable}"
+  # "L+ ${devshellPath}      - - - - ${inputs.devshell}"
+  # ];
 
   nix.registry = {
     # Register this flake itself on the registry

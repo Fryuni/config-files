@@ -12,9 +12,7 @@
 in {
   home.packages = with pkgs; [
     # Nix
-    nixpkgs-fmt
-    nix-prefetch-git
-    nix-prefetch-github
+    nix-prefetch
     nix-visualize
 
     # Utils
