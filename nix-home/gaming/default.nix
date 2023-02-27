@@ -1,6 +1,6 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
-    polymc
+    # polymc
   ];
 
   programs.obs-studio = {enable = true;};

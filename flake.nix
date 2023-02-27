@@ -37,8 +37,8 @@
           #   stable = import attrs.nixpkgs-stable pkgConfig;
           # })
           (import ./overlay)
-          attrs.polymc.overlay
-          devshell.overlay
+          # attrs.polymc.overlay
+          # devshell.overlay
         ];
       };
 
