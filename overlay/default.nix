@@ -1,7 +1,7 @@
 final: pkgs:
 (import ./jetbrains.nix final pkgs)
 // (import ./pulumi final pkgs)
-// (import ./pulumi final pkgs)
+// (import ./rustPackages pkgs)
 // {
   # ksp-ckan = pkgs.callPackage ./ckan.nix {};
 
@@ -31,83 +31,5 @@ final: pkgs:
     };
 
     vendorSha256 = "sha256-veg5B68AQhkSZg8YA/e4FbqJNG0YGwnUQFsAdscz0QI=";
-  };
-
-  zellij = pkgs.rustPlatform.buildRustPackage rec {
-    pname = "zellij";
-    version = "0.33.0";
-
-    doCheck = false;
-
-    nativeBuildInputs = with pkgs; [
-      openssl
-      pkg-config
-    ];
-
-    src = pkgs.fetchCrate {
-      inherit pname version;
-      sha256 = "sha256-2o5JKotk5cwaN48ai5Pk7UmfIILXlZQbIR17Zus+Rjo=";
-    };
-
-    cargoSha256 = "sha256-YqNnKtyCF51x2RZTeB+xLVZpTFhqhVzUF7G796TvFmE=";
-    cargoDepsName = pname;
-  };
-
-  cargo-doctor = pkgs.rustPlatform.buildRustPackage rec {
-    pname = "cargo-doctor";
-    version = "0.1.2";
-
-    nativeBuildInputs = with pkgs; [
-      openssl
-      pkg-config
-    ];
-
-    src = pkgs.fetchCrate {
-      inherit pname version;
-      sha256 = "";
-    };
-  };
-
-  cargo-docs = pkgs.rustPlatform.buildRustPackage rec {
-    pname = "cargo-docs";
-    version = "0.1.24";
-
-    nativeBuildInputs = with pkgs; [
-      openssl
-      pkg-config
-    ];
-
-    src = pkgs.fetchCrate {
-      inherit pname version;
-      sha256 = "sha256-OxI+8JqSD6AoHx8AjRbWpXwIS/ER1U0vOqr2tFlNq4M=";
-    };
-
-    cargoSha256 = "sha256-tf/exlEHYar6IpUk7fJwrx4eo98uk4lE6W7J/7HyUp8=";
-  };
-
-  toml-merge = pkgs.rustPlatform.buildRustPackage rec {
-    pname = "toml-merge";
-    version = "0.1.0";
-
-    src = pkgs.fetchCrate {
-      inherit pname version;
-      sha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
-    };
-
-    cargoSha256 = "sha256-BOBKbV4jInygN9l13jxi7guzdn5ao8owofomCdjXWng=";
-    cargoDepsName = pname;
-  };
-
-  prr = pkgs.rustPlatform.buildRustPackage rec {
-    pname = "prr";
-    version = "0.8.0";
-    nativeBuildInputs = [pkgs.pkg-config];
-    buildInputs = [pkgs.openssl];
-    src = pkgs.fetchCrate {
-      inherit pname version;
-      sha256 = "sha256-HwChF+977k93uAEc+x6AgXNc3AH3NPsH4dq/JorwhJ0=";
-    };
-    cargoSha256 = "sha256-WWxZyRVBac925X0LdVnIR1R3PJW9biqq9lFpXUIwZKo=";
-    cargoDepsName = pname;
   };
 }
