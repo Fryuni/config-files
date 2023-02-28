@@ -13,7 +13,7 @@
     package = pkgs.nix;
     settings = {
       nix-path = [
-        "me=${inputs.self}"
+        "fryuni-pkgs=${inputs.self}"
         "nixpkgs=${inputs.nixpkgs}"
         # "nixpkgs-stable=${nixpkgsStablePath}"
         # "nixpkgs-overlays=${../overlay}"
