@@ -28,16 +28,6 @@
     keywords = ["dependency" "cargo" "lock" "lockfile"];
     version = "8.0.3";
   };
-  cargo-show = {
-    crateSha256 = "sha256-8yPoVt8iJrOwm/XgCj+NYcAMiu2hRw54bfT8GcWZzvQ=";
-    depsSha256 = "sha256-47U1faZC766wEe4ZTGBE4Tvpj1F6BuDwi0o0Id60XA8=";
-    description = "Prints package metadata like pip show, apt-cache show, npm view, gem query, etc.";
-    documentation = null;
-    homepage = null;
-    id = "cargo-show";
-    keywords = ["cargo" "cargo-subcommand" "crates" "cli" "dependencies"];
-    version = "0.5.9";
-  };
   cargo-watch = {
     crateSha256 = "sha256-q1UAqVGWJNvcmIXqDYRNGuRgfdYeBTzNt1IclGEdEs4=";
     depsSha256 = "sha256-BzcKWQSB94H3XOsbwNvJoAHlZwkJvLABIrfFh9Ugfig=";

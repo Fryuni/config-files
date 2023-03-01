@@ -12,11 +12,6 @@
 
     slack
 
-    # Rust tooling
-    rustup
-    rust-analyzer
-    cargo-feature
-
     go_1_19
     golangci-lint
     gosec
@@ -27,7 +22,6 @@
   ];
 
   home.sessionPath = [
-    "$HOME/.cargo/bin"
     "$HOME/go/bin"
     "$HOME/.local/bin"
   ];

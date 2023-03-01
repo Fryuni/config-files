@@ -5,7 +5,7 @@ with pkgs;
       cargo
       alejandra
       ripgrep
-      # cargo-show
+      rustCrates.cargo-crate
       jq
       moreutils
       coreutils

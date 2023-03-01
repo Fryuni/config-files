@@ -10,6 +10,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-utils.url = "github:numtide/flake-utils";
     devshell.url = "github:numtide/devshell";
     polymc = {
@@ -21,6 +25,7 @@
   outputs = {
     self,
     nixpkgs,
+    fenix,
     # nixos-hardware,
     home-manager,
     flake-utils,
@@ -32,10 +37,7 @@
         inherit system;
         config.allowUnfree = true;
         overlays = [
-          # (_: _: {
-          #   master = import attrs.nixpkgs-master pkgConfig;
-          #   stable = import attrs.nixpkgs-stable pkgConfig;
-          # })
+          fenix.overlays.default
           (import ./overlay)
           # attrs.polymc.overlay
           # devshell.overlay

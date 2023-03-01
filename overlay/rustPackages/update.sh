@@ -14,7 +14,9 @@ declare -a cargo_crates
 
 if [ $# -eq 0 ]; then
 	cargo_crates=(
-		"cargo-show"
+		"bootimage"
+		"cargo-deps"
+		"cargo-expand"
 		"cargo-crate"
 		"cargo-watch"
 		"cargo-lock"
@@ -35,8 +37,8 @@ function genLatest() {
 
 	echo "Retrieving latest version of ${crate}..."
 
-	cargo show --json "$crate" |
-		jq '.crate|{id,description,homepage,keywords,version:.max_version}' \
+	cargo crate into --json "$crate" |
+		jq '{owners} + (.krate.crate|{id,description,homepage,keywords,version:.max_version})' \
 			>"${tmpdir}/${crate}_latest.json"
 
 	local version
