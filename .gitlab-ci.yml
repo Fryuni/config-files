@@ -1,4 +1,5 @@
 image: nixpkgs/nix-flakes:latest
+
 update:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
@@ -8,3 +9,40 @@ update:
     - 'git remote add gitlab_origin https://oauth2:$COMMIT_TOKEN@gitlab.com/Fryuni/ZShutils.git'
     - 'nix run .#update'
     - 'git push gitlab_origin HEAD:main -o ci.skip'
+
+build-system-notebook:
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - when: on_success
+  cache:
+    - paths: [/nix/store]
+  variables:
+    CACHIX_CACHE_NAME: fryuni
+  before_script:
+    - nix-channel --add https://nixos.org/channels/nixpkgs-unstable
+    - nix-channel --update
+    - nix-env --install --attr nixpkgs.cachix
+    - cachix use "$CACHIX_CACHE_NAME"
+  script:
+    - cachix watch-exec $CACHIX_CACHE_NAME -- nix build .#homeConfigurations.notebook.activationPackage
+
+build-home-notebook:
+  stage: build
+  # image: nixos/nix:2.3.12
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - when: on_success
+  cache:
+    - paths: [/nix/store]
+  variables:
+    CACHIX_CACHE_NAME: fryuni
+  before_script:
+    - nix-channel --add https://nixos.org/channels/nixpkgs-unstable
+    - nix-channel --update
+    - nix-env --install --attr nixpkgs.cachix
+    - cachix use "$CACHIX_CACHE_NAME"
+  script:
+    - cachix watch-exec $CACHIX_CACHE_NAME -- nix build .#nixosConfigurations.notebook.config.system.build.toplevel

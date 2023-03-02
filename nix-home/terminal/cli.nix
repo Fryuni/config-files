@@ -1,6 +1,6 @@
 {pkgs, ...}: let
   gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (
-    with pkgs.master.google-cloud-sdk.components; [
+    with pkgs.google-cloud-sdk.components; [
       docker-credential-gcr
       beta
       alpha
@@ -12,9 +12,7 @@
 in {
   home.packages = with pkgs; [
     # Nix
-    nixpkgs-fmt
-    nix-prefetch-git
-    nix-prefetch-github
+    nix-prefetch
     nix-visualize
 
     # Utils
@@ -31,7 +29,7 @@ in {
     unzip
     figlet
     protobuf
-    stable.httpie
+    httpie
     yq-go
     bat
     exa

@@ -2,7 +2,7 @@
 gen = "generate -i ~/.ssh/id_ed25519"
 
 [build]
-target-dir = "./.cargo/target"
+target-dir = "~/.cargo/target"
 incremental = true
 pipelining = true
 

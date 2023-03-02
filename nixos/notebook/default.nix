@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./hardware-configuration.nix
     ./nvidia.nix
     ../modules/development.nix
     ../modules/gaming.nix

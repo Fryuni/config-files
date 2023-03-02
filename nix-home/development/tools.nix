@@ -7,15 +7,10 @@
     (python310.withPackages (py: [
       py.pyopenssl
     ]))
-    stable.nodejs-18_x
+    nodejs-18_x
     nodePackages.yarn
 
     slack
-
-    # Rust tooling
-    rustup
-    rust-analyzer
-    cargo-feature
 
     go_1_19
     golangci-lint
@@ -27,7 +22,6 @@
   ];
 
   home.sessionPath = [
-    "$HOME/.cargo/bin"
     "$HOME/go/bin"
     "$HOME/.local/bin"
   ];

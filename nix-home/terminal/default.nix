@@ -14,7 +14,7 @@
 
   programs.zellij = {
     enable = true;
-    package = pkgs.zellij;
+    package = pkgs.rustCrates.zellij;
   };
 
   xdg.configFile."zellij/config.kdl".text = ''
@@ -56,7 +56,7 @@
       # Run code inside of a container with the full home context
       drun = "docker run -it --rm -v /home/lotus:/home/lotus -w $(pwd) -u $(id -u):$(id -g) -e HOME=$HOME";
 
-      ns = "nix-shell --command zsh";
+      ns = "nix shell";
       nixc = "nix develop -c";
     };
 
