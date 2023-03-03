@@ -104,7 +104,7 @@
       "dockerfile"
     ];
 
-    mutableConfig = true;
+    mutableConfig = false;
 
     luaUserFiles = "${builtins.getEnv "PWD"}/common/doom-nvim";
 
