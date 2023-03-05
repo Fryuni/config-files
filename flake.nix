@@ -114,8 +114,9 @@
           category = "Home";
           help = "Compute the package difference that will be applied to home-manager on a switch";
           command = ''
-            ${self.outputs.apps.${system}.build.program}
-            ${pkgs.nvd}/bin/nvd diff /nix/var/nix/profiles/per-user/$USER/home-manager ./result
+            ${pkgs.nvd}/bin/nvd diff \
+              /nix/var/nix/profiles/per-user/$USER/home-manager \
+              ${self.outputs.homeConfigurations.notebook.activationPackage}
           '';
         }
         {
@@ -123,7 +124,7 @@
           category = "Home";
           help = "Build home-manager configuration without applying it";
           command = ''
-            ${homeManager} build --flake '.#notebook' -b bck $@
+            nix build --no-link .#homeConfigurations.notebook.activationPackage $@
           '';
         }
         {
@@ -168,8 +169,9 @@
           category = "NixOS";
           help = "Compute the package difference that will be applied to the system on a switch";
           command = ''
-            ${self.outputs.apps.${system}.os-build.program}
-            ${pkgs.nvd}/bin/nvd diff /run/current-system ./result
+            ${pkgs.nvd}/bin/nvd diff \
+              /run/current-system \
+              ${self.outputs.nixosConfigurations.notebook.config.system.build.toplevel}
           '';
         }
         {
@@ -177,7 +179,7 @@
           category = "NixOS";
           help = "Build NixOS configuration without applying";
           command = ''
-            nixos-rebuild build --flake '.#notebook' $@
+            nix build --no-link .#nixosConfigurations.notebook.config.system.build.toplevel $@
           '';
         }
         {
