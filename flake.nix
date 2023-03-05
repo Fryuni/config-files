@@ -72,6 +72,8 @@
           ./nix-home/notebook.nix
         ];
       };
+
+      pkgs = pkgsFun flake-utils.lib.system.x86_64-linux;
     };
 
     perSystemConfig = flake-utils.lib.eachDefaultSystem (system: let
