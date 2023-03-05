@@ -1,11 +1,11 @@
-{ pkgs
-, lib
-, ...
+{
+  pkgs,
+  lib,
+  ...
 }: {
-  home.packages =
-    let
-      rc = pkgs.rustCrates;
-    in
+  home.packages = let
+    rc = pkgs.rustCrates;
+  in
     with pkgs; [
       # Rust tooling
       fenix.complete.toolchain

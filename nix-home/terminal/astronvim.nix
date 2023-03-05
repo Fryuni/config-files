@@ -1,9 +1,9 @@
-{ config
-, lib
-, pkgs
-, ...
-}:
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   inherit (pkgs) stdenv;
 
   astro-src = stdenv.mkDerivation rec {
@@ -30,8 +30,7 @@ let
       cp -R colors $out/colors
     '';
   };
-in
-{
+in {
   home.packages = with pkgs; [
     neovim
     rnix-lsp
@@ -52,7 +51,7 @@ in
     "nvim/lua/default_theme".source = "${astro-src}/lua/default_theme";
   };
 
-  programs.bash.shellAliases = { vimdiff = "nvim -d"; };
-  programs.fish.shellAliases = { vimdiff = "nvim -d"; };
-  programs.zsh.shellAliases = { vimdiff = "nvim -d"; };
+  programs.bash.shellAliases = {vimdiff = "nvim -d";};
+  programs.fish.shellAliases = {vimdiff = "nvim -d";};
+  programs.zsh.shellAliases = {vimdiff = "nvim -d";};
 }
