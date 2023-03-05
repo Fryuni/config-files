@@ -11,6 +11,7 @@
   environment.systemPackages = with pkgs; [
     neovim
     inotify-tools
+    gcc-unwrapped.lib
     gcc
     file
 
