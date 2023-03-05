@@ -22,7 +22,11 @@ with lib; let
   languageDependencies = with pkgs; {
     nix = {
       lsp = [rnix-lsp nil];
-      linter = [statix deadnix nixpkgs-fmt];
+      linter = [
+        statix
+        deadnix
+        alejandra
+      ];
     };
 
     # lua = {
