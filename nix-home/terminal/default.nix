@@ -43,7 +43,9 @@
       syscfg = "$HOME/ZShutils";
       oss = "$HOME/IsoWorkspaces/OSS";
 
+      croct-base = "$HOME/IsoWorkspaces/Croct";
       croct-meta = "$HOME/IsoWorkspaces/Croct/metas";
+      croct-infra = "$HOME/IsoWorkspaces/Croct/infra";
     };
 
     shellAliases = {
@@ -51,6 +53,7 @@
       ll = "exa -bghHliS --git";
       la = "exa -bghHliSa --git";
       lg = "lazygit";
+      nivm = "nvim";
       "refresh-gcloud-credentials" = "gcloud auth print-access-token > /dev/null";
 
       # Run code inside of a container with the full home context
