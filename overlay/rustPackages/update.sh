@@ -5,6 +5,7 @@
 set -eo pipefail
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+cd "$SCRIPT_DIR"
 
 # An array of plugin names. The respective repository inside Pulumi's
 # Github organization is called pulumi-$name by convention.
@@ -13,16 +14,20 @@ declare -a cargo_crates
 
 if [ $# -eq 0 ]; then
 	cargo_crates=(
-		"bootimage"
-		"cargo-deps"
-		"cargo-expand"
-		"cargo-crate"
-		"cargo-watch"
-		"cargo-lock"
-		"cargo-docs"
-		"toml-merge"
-		"zellij"
-		"prr"
+    "bootimage"
+    "cargo-deps"
+    "cargo-expand"
+    "cargo-watch"
+    "cargo-crate"
+    "cargo-edit"
+    "cargo-sort"
+    "cargo-cache"
+    "cargo-public-api"
+    "cargo-lock"
+    "cargo-docs"
+    "toml-merge"
+    "zellij"
+    "prr"
 	)
 else
 	cargo_crates=("$@")
@@ -36,7 +41,7 @@ function genLatest() {
 
 	echo "Retrieving latest version of ${crate}..."
 
-	cargo crate into --json "$crate" |
+	cargo crate info --json "$crate" |
 		jq '{owners} + (.krate.crate|{id,description,homepage,keywords,version:.max_version})' \
 			>"${tmpdir}/${crate}_latest.json"
 
