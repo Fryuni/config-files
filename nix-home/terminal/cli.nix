@@ -13,7 +13,7 @@ in {
   home.packages = with pkgs; [
     # Nix
     nix-prefetch
-    nix-visualize
+    # nix-visualize
 
     # Utils
     coreutils
