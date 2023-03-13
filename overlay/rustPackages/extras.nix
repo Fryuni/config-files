@@ -5,4 +5,10 @@ pkgs: {
       pkg-config
     ];
   };
+  cargo-edit = {
+    buildInputs = with pkgs; [
+      openssl
+      pkg-config
+    ];
+  };
 }

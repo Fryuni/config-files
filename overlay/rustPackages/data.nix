@@ -252,13 +252,60 @@
     version = "0.1.0";
   };
   zellij = {
-    crateSha256 = "sha256-ZWrg7sPdENB7NSDvEf9MG/Eimhkq3gCzvnhn8sWkX9M=";
-    depsSha256 = "sha256-iMwj7CVdlmj7mC+uhAh7Opra5NDyMCfmpe1Z4qIHAsI=";
+    crateSha256 = "sha256-X8NEHVI06VV1t+yEdZMvhg/1V44CpqoXVbbDY5Pku3s=";
+    depsSha256 = "sha256-zk8/cUsr1UZMUYaYusTAChJkROZlRk0wJdwk1daSk+w=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
     id = "zellij";
     keywords = [];
-    version = "0.34.4";
+    owners = [
+      {
+        avatar = "https://avatars.githubusercontent.com/u/6251883?v=4";
+        email = null;
+        id = 6277;
+        kind = "user";
+        login = "TheLostLambda";
+        name = "Brooks Rady";
+        url = "https://github.com/TheLostLambda";
+      }
+      {
+        avatar = "https://avatars.githubusercontent.com/u/1002622?v=4";
+        email = null;
+        id = 35784;
+        kind = "user";
+        login = "qballer";
+        name = "Doron Tsur";
+        url = "https://github.com/qballer";
+      }
+      {
+        avatar = "https://avatars.githubusercontent.com/u/795598?v=4";
+        email = null;
+        id = 64017;
+        kind = "user";
+        login = "imsnif";
+        name = "Aram Drevekenin";
+        url = "https://github.com/imsnif";
+      }
+      {
+        avatar = "https://avatars.githubusercontent.com/u/71698300?v=4";
+        email = null;
+        id = 101386;
+        kind = "user";
+        login = "henil";
+        name = "Henil Dedania";
+        url = "https://github.com/henil";
+      }
+      {
+        avatar = "https://avatars.githubusercontent.com/u/99636919?v=4";
+        email = null;
+        id = 173084;
+        kind = "user";
+        login = "har7an";
+        name = null;
+        url = "https://github.com/har7an";
+      }
+    ];
+    version = "0.35.2";
   };
 }

@@ -12,11 +12,11 @@
       rc.cargo-crate
       rc.cargo-watch
       rc.cargo-expand
-      rc.cargo-edit
+      cargo-edit
       rc.cargo-sort
       rc.cargo-cache
       rc.bootimage
-      rc.cargo-public-api
+      # rc.cargo-public-api
       # cargo-semver-checks
       # cargo-feature
       # cargo-tauri

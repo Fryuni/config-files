@@ -1,8 +1,11 @@
 {
-  zellij,
+  rustCrates,
   gum,
   writeShellScriptBin,
 }:
+let
+  inherit (rustCrates) zellij;
+in
 writeShellScriptBin "__start_zellij" ''
   trim() {
     local var="$*"
