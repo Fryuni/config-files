@@ -64,6 +64,8 @@
     wget
     git
     dig
+    htop
+    btop
     gnumake
     xarchiver
     cachix
