@@ -11,7 +11,7 @@
       fenix.complete.toolchain
       rc.cargo-crate
       rc.cargo-watch
-      rc.cargo-expand
+      # rc.cargo-expand
       cargo-edit
       rc.cargo-sort
       rc.cargo-cache
