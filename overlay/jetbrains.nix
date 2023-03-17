@@ -4,9 +4,9 @@ final: pkgs: let
   overrides = {
     # https://www.jetbrains.com/webstorm/download/other.html
     webstorm = rec {
-      version = "2022.3.3";
+      version = "2022.3.4";
       url = "https://download.jetbrains.com/webstorm/WebStorm-${version}.tar.gz";
-      sha256 = "sha256-V7BTb7h+hAqPcaHHl+t/drYfFqk9wGQlDgLoto/1Iag=";
+      sha256 = "sha256-wz9yteJvNHmDt7rpJgjZtDQ9y7QAc2rdsHk0B67cMmA=";
     };
     # https://www.jetbrains.com/go/download/other.html
     goland = rec {
