@@ -16,6 +16,7 @@
     golangci-lint
     gosec
     go2nix
+    ngrok
 
     kubectl
     k9s
