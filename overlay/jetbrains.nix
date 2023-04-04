@@ -10,15 +10,15 @@ final: pkgs: let
     };
     # https://www.jetbrains.com/go/download/other.html
     goland = rec {
-      version = "2022.3.4";
+      version = "2023.1";
       url = "https://download.jetbrains.com/go/goland-${version}.tar.gz";
-      sha256 = "sha256-+P+WM2xBarVqvqA4Gcs2N6HUa4CojoVE8enph0a3gaw=";
+      sha256 = "sha256-8gjiRx71xOIy/0lDTowUzmFLeSSWPr0o1MhjOZ3ULSw=";
     };
     # https://www.jetbrains.com/pycharm/download/other.html
     pycharm-professional = rec {
-      version = "2022.3.3";
+      version = "2023.1";
       url = "https://download.jetbrains.com/python/pycharm-professional-${version}.tar.gz";
-      sha256 = "sha256-UMN6r9n746eNl8zPT3q9gCZsVI0cfqR1GwjFKBDxby0=";
+      sha256 = "sha256-JsP0mtiZF4EFlD62Phq66FxA8vRDYqKyBimmJjpPjaY=";
     };
   };
 
