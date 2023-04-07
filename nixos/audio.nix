@@ -8,7 +8,6 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    media-session.enable = false;
     systemWide = false;
     wireplumber.enable = true;
   };
