@@ -17,6 +17,7 @@
     gosec
     go2nix
     ngrok
+    just
 
     kubectl
     k9s
