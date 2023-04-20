@@ -36,6 +36,9 @@
       import nixpkgs {
         inherit system;
         config.allowUnfree = true;
+        config.permittedInsecurePackages = [
+          "electron-21.4.0"
+        ];
         overlays = [
           fenix.overlays.default
           (import ./overlay)
@@ -124,7 +127,7 @@
           category = "Home";
           help = "Build home-manager configuration without applying it";
           command = ''
-            nix build --no-link .#homeConfigurations.notebook.activationPackage $@
+            nix build --no-link --print-out-paths .#homeConfigurations.notebook.activationPackage $@
           '';
         }
         {
