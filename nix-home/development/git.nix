@@ -23,7 +23,7 @@ _: {
     extraConfig = {
       url = {
         "ssh://git@github.com/" = {insteadOf = "https://github.com/";};
-        "git@gitlab.com:" = {insteadOf = "https://gitlab.com/";};
+        "ssh://git@gitlab.com/" = {insteadOf = "https://gitlab.com/";};
       };
 
       core.excludesfile = "${../../common/rcfiles/gitignore}";
@@ -34,6 +34,10 @@ _: {
         wtl = "worktree list";
         wta = "worktree add";
         wtp = "worktree prune";
+      };
+
+      "includeIf \"gitdir:~/IsoWorkspaces/Croct/\"" = {
+        path = "${../../common/rcfiles/gitconfig_croct}";
       };
 
       init.defaultBranch = "main";
