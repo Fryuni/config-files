@@ -8,7 +8,7 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     home-manager = {
       url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     fenix = {
       url = "github:nix-community/fenix";
@@ -18,7 +18,7 @@
     devshell.url = "github:numtide/devshell";
     polymc = {
       url = "github:PolyMC/PolyMC";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 

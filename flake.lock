@@ -92,7 +92,7 @@
     "home-manager": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs-stable"
+          "nixpkgs"
         ]
       },
       "locked": {
@@ -210,7 +210,7 @@
         "flake-compat": "flake-compat",
         "libnbtplusplus": "libnbtplusplus",
         "nixpkgs": [
-          "nixpkgs-stable"
+          "nixpkgs"
         ],
         "tomlplusplus": "tomlplusplus"
       },
