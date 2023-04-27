@@ -12,6 +12,7 @@
     discord-canary
     obsidian
     vlc
+    stremio
     screenkey
   ];
 
