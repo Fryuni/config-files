@@ -60,6 +60,26 @@
     ];
     version = "0.1.8";
   };
+  cargo-deps = {
+    crateSha256 = "sha256-0zK1qwu+awZGd9hgH2WRrzJMzwpI830Lh//P0wVp6Js=";
+    depsSha256 = "sha256-ZPQIt+TL1OKX3Ch4A17eAELjaSTo2uk+X6YWFAXvWJA=";
+    description = "Cargo subcommand for building dependency graphs of Rust projects.";
+    homepage = "https://github.com/m-cat/cargo-deps";
+    id = "cargo-deps";
+    keywords = ["dependencies" "cargo" "graphviz" "graph" "visualization"];
+    owners = [
+      {
+        avatar = "https://avatars.githubusercontent.com/u/6035856?v=4";
+        email = null;
+        id = 9430;
+        kind = "user";
+        login = "mrcnski";
+        name = "Marcin S.";
+        url = "https://github.com/mrcnski";
+      }
+    ];
+    version = "1.5.0";
+  };
   cargo-docs = {
     crateSha256 = "sha256-OxI+8JqSD6AoHx8AjRbWpXwIS/ER1U0vOqr2tFlNq4M=";
     depsSha256 = "sha256-tf/exlEHYar6IpUk7fJwrx4eo98uk4lE6W7J/7HyUp8=";
@@ -67,6 +87,17 @@
     homepage = null;
     id = "cargo-docs";
     keywords = [];
+    owners = [
+      {
+        avatar = "https://avatars.githubusercontent.com/u/54848194?v=4";
+        email = null;
+        id = 76113;
+        kind = "user";
+        login = "btwiuse";
+        name = null;
+        url = "https://github.com/btwiuse";
+      }
+    ];
     version = "0.1.24";
   };
   cargo-edit = {
@@ -117,8 +148,8 @@
     version = "0.11.9";
   };
   cargo-expand = {
-    crateSha256 = "sha256-Y+3htWT1tTTMzwRkQEX5MqMh9FBgFZ/Qn5/2mswuVBg=";
-    depsSha256 = "sha256-umEbHzt2IqTkAAlzGmvHfyrSvbzT1crtQMkpaOw4s6U=";
+    crateSha256 = "sha256-Pw9ws9GpHemyJyLV7nrdn2Ea43/J7regu+U0xTkltPw=";
+    depsSha256 = "sha256-NswN28wbnX4cV7QB357PKzDpaLh93LeOSij3KV9SPek=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -134,21 +165,50 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.40";
+    version = "1.0.48";
   };
   cargo-lock = {
-    crateSha256 = "sha256-Xh39gaiTC3g1FHVWqUr8PR/MzeoRaGlCmGZZZnHB4Kc=";
-    depsSha256 = "sha256-gf9KDzGKjZt4p5ldZShH4lOwrieJeI2WJQ8hU4hhGJE=";
+    crateSha256 = "sha256-SMxM66qo3Xmst+SVXu4LYZ0Zzn15wqVVNqqHzAkip/s=";
+    depsSha256 = "sha256-wUp4zBY64MvD4anGlVsJrI3pyfwVSQGnn6YuweTeYNk=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
     id = "cargo-lock";
-    keywords = ["dependency" "cargo" "lock" "lockfile"];
-    version = "8.0.3";
+    keywords = ["cargo" "lock" "dependency" "lockfile"];
+    owners = [
+      {
+        avatar = "https://avatars.githubusercontent.com/u/772?v=4";
+        email = null;
+        id = 163;
+        kind = "user";
+        login = "alex";
+        name = "Alex Gaynor";
+        url = "https://github.com/alex";
+      }
+      {
+        avatar = "https://avatars.githubusercontent.com/u/797?v=4";
+        email = null;
+        id = 267;
+        kind = "user";
+        login = "tarcieri";
+        name = "Tony Arcieri";
+        url = "https://github.com/tarcieri";
+      }
+      {
+        avatar = "https://avatars.githubusercontent.com/u/291257?v=4";
+        email = null;
+        id = 96567;
+        kind = "user";
+        login = "Shnatsel";
+        name = "Sergey \"Shnatsel\" Davidoff";
+        url = "https://github.com/Shnatsel";
+      }
+    ];
+    version = "9.0.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-s5aPzaH08XvGm+hZy+dQkvp8rVFcGWoTgniIfOzQk4E=";
-    depsSha256 = "sha256-q5Oq9Lg7cNteHvzaAWwzoHThYiXac/x1Y5LyFZjfSCo=";
+    crateSha256 = "sha256-lItbWIY9CytvcLmASkbbF5wLYKWrXn2Gl9mgccg9J0M=";
+    depsSha256 = "sha256-6Eula3fex0KhWhBR53K0Kl0nlbqpfZfD/Y3zrEURPmc=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/Enselic/cargo-public-api";
     id = "cargo-public-api";
@@ -182,7 +242,7 @@
         url = "https://github.com/cargo-public-api";
       }
     ];
-    version = "0.27.3";
+    version = "0.28.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-i3Skc3Pc/3SxVCcLdMdxYVpkZZAZ0iew5UUq2tPVae8=";
@@ -192,6 +252,15 @@
     id = "cargo-sort";
     keywords = ["dependencies" "sort" "subcommand" "check" "cargo"];
     owners = [
+      {
+        avatar = "https://avatars.githubusercontent.com/u/951129?v=4";
+        email = null;
+        id = 6913;
+        kind = "user";
+        login = "jplatte";
+        name = "Jonas Platte";
+        url = "https://github.com/jplatte";
+      }
       {
         avatar = "https://avatars.githubusercontent.com/u/29749111?v=4";
         email = null;
@@ -240,6 +309,17 @@
     homepage = null;
     id = "prr";
     keywords = [];
+    owners = [
+      {
+        avatar = "https://avatars.githubusercontent.com/u/824615?v=4";
+        email = null;
+        id = 85490;
+        kind = "user";
+        login = "danobi";
+        name = "Daniel Xu";
+        url = "https://github.com/danobi";
+      }
+    ];
     version = "0.8.0";
   };
   toml-merge = {
@@ -249,11 +329,22 @@
     homepage = null;
     id = "toml-merge";
     keywords = [];
+    owners = [
+      {
+        avatar = "https://avatars.githubusercontent.com/u/645226?v=4";
+        email = null;
+        id = 82703;
+        kind = "user";
+        login = "reidrankin";
+        name = "Reid Rankin";
+        url = "https://github.com/reidrankin";
+      }
+    ];
     version = "0.1.0";
   };
   zellij = {
-    crateSha256 = "sha256-X8NEHVI06VV1t+yEdZMvhg/1V44CpqoXVbbDY5Pku3s=";
-    depsSha256 = "sha256-zk8/cUsr1UZMUYaYusTAChJkROZlRk0wJdwk1daSk+w=";
+    crateSha256 = "sha256-wt4jTqVqlRTWgYYiSo+MnAgTapHuO+Q4bUFfFSDuWVk=";
+    depsSha256 = "sha256-6EJ6b8MqiE+g/qT6xxULM5VLkFaeYtqv5Wvzq+wOcdI=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
@@ -306,6 +397,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.35.2";
+    version = "0.36.0";
   };
 }
