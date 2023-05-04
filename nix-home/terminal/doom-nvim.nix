@@ -229,6 +229,22 @@
           }
         end,
       })
+
+      doom.langs.rust.settings.lsp_config.settings['rust-analyzer'] = {
+        cargo = {enableExperimental = true},
+        diagnostics = {
+          enable = true,
+          enableExperimental = true,
+        },
+        procMacro = {enable = true},
+        completion = {
+          autoimport = {enable = true},
+        },
+        checkOnSave = {
+          allFeatures = true,
+          allTargets = true,
+        },
+      }
     '';
   };
 }
