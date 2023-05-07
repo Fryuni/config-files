@@ -9,5 +9,6 @@
 
     postman
     altair
+    insomnia
   ];
 }
