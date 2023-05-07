@@ -5,7 +5,7 @@
     jetbrains.webstorm
     jetbrains.datagrip
     jetbrains.idea-ultimate
-    android-studio
+    # android-studio
 
     postman
     altair
