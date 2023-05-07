@@ -18,7 +18,7 @@ in
     start_zellij() {
       local session_name="$1"
 
-      if [ -z "$session_name"]; then
+      if [ -z "$session_name" ]; then
         ${gum}/bin/gum style --faint --italic --bold "Zellij session name:"
 
         session_name=$(${gum}/bin/gum input --char-limit=40)
