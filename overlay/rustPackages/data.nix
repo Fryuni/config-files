@@ -41,12 +41,12 @@
     version = "0.8.3";
   };
   cargo-crate = {
-    crateSha256 = "sha256-n8iFtGA86GTe7j6ZQ7JRrUHTu998XdajjXIWy/fyg5w=";
-    depsSha256 = "sha256-fKwMe4cE6C2q6RYcxiAB/E4XkHH253qLenrXmNmEdLc=";
+    crateSha256 = "sha256-sa4oLZB7rR0tlemUTy8utypWY/7bDjYzuSOnzdvPxKw=";
+    depsSha256 = "sha256-S3KNfJ0EKnxDPJHITUIH3d53JHrV9r54m2g2HGgSPZo=";
     description = "A set of crate related cargo commands. You can for instance get the information about a crate, as text or json, including the owners of a crate and its versions.";
     homepage = "https://github.com/chevdor/cargo-crate";
     id = "cargo-crate";
-    keywords = ["cargo" "cli" "cargo-subcommand" "crate"];
+    keywords = ["cli" "cargo" "crate" "cargo-subcommand"];
     owners = [
       {
         avatar = "https://avatars.githubusercontent.com/u/738724?v=4";
@@ -58,7 +58,7 @@
         url = "https://github.com/chevdor";
       }
     ];
-    version = "0.1.8";
+    version = "0.2.1";
   };
   cargo-deps = {
     crateSha256 = "sha256-0zK1qwu+awZGd9hgH2WRrzJMzwpI830Lh//P0wVp6Js=";
@@ -81,8 +81,8 @@
     version = "1.5.0";
   };
   cargo-docs = {
-    crateSha256 = "sha256-OxI+8JqSD6AoHx8AjRbWpXwIS/ER1U0vOqr2tFlNq4M=";
-    depsSha256 = "sha256-tf/exlEHYar6IpUk7fJwrx4eo98uk4lE6W7J/7HyUp8=";
+    crateSha256 = "sha256-fwHpYJ1sfhWS0wR1hStmPKaP9XGYs0ZEgRWJ0KqA6Uk=";
+    depsSha256 = "sha256-1VmmiVVS8JXaO4xhmpRdj/tM1BNkwdWS2m1i8KS+N0A=";
     description = "A cargo plugin for serving rust and crate doc locally.";
     homepage = null;
     id = "cargo-docs";
@@ -98,7 +98,7 @@
         url = "https://github.com/btwiuse";
       }
     ];
-    version = "0.1.24";
+    version = "0.1.25";
   };
   cargo-edit = {
     crateSha256 = "sha256-8QH1aud8IdPAhmZbk9hpDAOzubY2KG00Iw0D8T/vOZE=";
@@ -207,8 +207,8 @@
     version = "9.0.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-lItbWIY9CytvcLmASkbbF5wLYKWrXn2Gl9mgccg9J0M=";
-    depsSha256 = "sha256-6Eula3fex0KhWhBR53K0Kl0nlbqpfZfD/Y3zrEURPmc=";
+    crateSha256 = "sha256-4UaLzYwOhVK3Ca4EqQTdi/cMozAeXLWALB5yTQCNi/k=";
+    depsSha256 = "sha256-zDgohGKu7jbaWNkb/Nr6ZVkQFEiXzNdEReVBsVuvKDA=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/Enselic/cargo-public-api";
     id = "cargo-public-api";
@@ -242,7 +242,7 @@
         url = "https://github.com/cargo-public-api";
       }
     ];
-    version = "0.28.0";
+    version = "0.29.1";
   };
   cargo-sort = {
     crateSha256 = "sha256-i3Skc3Pc/3SxVCcLdMdxYVpkZZAZ0iew5UUq2tPVae8=";
