@@ -20,6 +20,7 @@
     just
 
     kubectl
+    krew
     k9s
   ];
 
