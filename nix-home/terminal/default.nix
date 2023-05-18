@@ -35,6 +35,12 @@
     enableCompletion = true;
     autocd = true;
 
+    initExtraFirst = ''
+    if [ -z "$ZELLIJ" ]; then
+      exec zellij
+    fi
+    '';
+
     dirHashes = {
       nix-system = "/run/current-system";
       nix-boot = "/nix/var/nix/profiles/system";
