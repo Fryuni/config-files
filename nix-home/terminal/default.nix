@@ -36,7 +36,7 @@
     autocd = true;
 
     initExtraFirst = ''
-    if [ -z "$ZELLIJ" ]; then
+    if [ -z "$ZELLIJ" ] && [ -z "$TERMINAL_EMULATOR" ]; then
       exec zellij
     fi
     '';
