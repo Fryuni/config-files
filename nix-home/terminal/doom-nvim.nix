@@ -16,6 +16,8 @@
       sha256 = "sha256-wO/3/AH9AoPwckbDtsO/Oa4SU9yT5u9TIEdGSI5S2Qc=";
     };
 
+    nvimPackage = pkgs.stable.neovim;
+
     features = [
       # Language features
       "annotations" # Code annotation generator
