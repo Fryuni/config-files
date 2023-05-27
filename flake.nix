@@ -33,11 +33,24 @@
     ...
   } @ attrs: let
     pkgsFun = system:
+      let
+        stable = import attrs.nixpkgs-stable {
+          inherit system;
+          config.allowUnfree = true;
+          config.permittedInsecurePackages = [];
+        };
+        master = import attrs.nixpkgs-stable {
+          inherit system;
+          config.allowUnfree = true;
+          config.permittedInsecurePackages = [];
+        };
+      in
       import nixpkgs {
         inherit system;
         config.allowUnfree = true;
         config.permittedInsecurePackages = [];
         overlays = [
+          (_: _: { inherit stable master; })
           fenix.overlays.default
           (import ./overlay)
           # attrs.polymc.overlay
