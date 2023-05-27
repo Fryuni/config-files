@@ -10,10 +10,10 @@
     enable = true;
 
     doom-nvim-src = {
-      owner = "doom-neovim";
+      owner = "Fryuni";
       repo = "doom-nvim";
-      rev = "d878cd9a69eb86ad10177d3f974410317ab9f2fe";
-      sha256 = "sha256-Qd9NJVOydnElV1P0r/duHshtVPQl+Ba3R0PlNp0c0wI=";
+      rev = "603e633da0b77615e36899adff9ed0ad55387260";
+      sha256 = "sha256-wO/3/AH9AoPwckbDtsO/Oa4SU9yT5u9TIEdGSI5S2Qc=";
     };
 
     features = [
