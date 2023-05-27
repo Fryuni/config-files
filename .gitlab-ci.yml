@@ -20,13 +20,14 @@ build-system-notebook:
     - paths: [/nix/store]
   variables:
     CACHIX_CACHE_NAME: fryuni
+    CACHIX_AUTH_TOKEN: "$CACHIX_AUTH_TOKEN"
   before_script:
     - nix-channel --add https://nixos.org/channels/nixpkgs-unstable
     - nix-channel --update
     - nix-env --install --attr nixpkgs.cachix
     - cachix use "$CACHIX_CACHE_NAME"
   script:
-    - cachix watch-exec $CACHIX_CACHE_NAME -- nix build .#homeConfigurations.notebook.activationPackage
+    - cachix watch-exec "$CACHIX_CACHE_NAME" -- nix build .#homeConfigurations.notebook.activationPackage
 
 build-home-notebook:
   stage: build
@@ -39,10 +40,11 @@ build-home-notebook:
     - paths: [/nix/store]
   variables:
     CACHIX_CACHE_NAME: fryuni
+    CACHIX_AUTH_TOKEN: "$CACHIX_AUTH_TOKEN"
   before_script:
     - nix-channel --add https://nixos.org/channels/nixpkgs-unstable
     - nix-channel --update
     - nix-env --install --attr nixpkgs.cachix
     - cachix use "$CACHIX_CACHE_NAME"
   script:
-    - cachix watch-exec $CACHIX_CACHE_NAME -- nix build .#nixosConfigurations.notebook.config.system.build.toplevel
+    - cachix watch-exec "$CACHIX_CACHE_NAME" -- nix build .#nixosConfigurations.notebook.config.system.build.toplevel
