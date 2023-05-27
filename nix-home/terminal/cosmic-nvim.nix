@@ -6,7 +6,7 @@
     # (tree-sitter.withPlugins (_: tree-sitter.allGrammars))
   ];
 
-  programs.doom-nvim = {
+  programs.cosmic-nvim = {
     enable = true;
   };
 }

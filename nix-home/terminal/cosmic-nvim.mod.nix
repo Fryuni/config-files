@@ -13,47 +13,47 @@ with lib; let
     "Cannot enable neovim and cosmic-nvim modules at the same time."
     config.programs.cosmic-nvim;
 
-  featureDependencies = with pkgs; {
-    ranger = [ranger];
-    lazygit = [lazygit];
-    neogit = [neogit];
-  };
+  # featureDependencies = with pkgs; {
+  #   ranger = [ranger];
+  #   lazygit = [lazygit];
+  #   neogit = [neogit];
+  # };
 
-  languageDependencies = with pkgs; {
-    nix = {
-      lsp = [rnix-lsp nil];
-      linter = [
-        statix
-        deadnix
-        alejandra
-      ];
-    };
-
-    # lua = {
-    #   lsp = [ sumneko-lua-language-server ];
-    #   linter = [ luajitPackages.luacheck ];
-    # };
-
-    typescript = {
-      # TODO: Cofigure eslint_d with nix instead of relying on yarn after the installation.
-      # linter = [ eslint_d ];
-    };
-
-    go = {
-      lsp = [gopls];
-      linter = [golangci-lint];
-    };
-
-    java = {
-      lsp = [jdk17_headless];
-    };
-
-    # Do not add rls and rustfmt if rustup is installed already
-    rust = mkIf (!builtins.elem rustup config.home.packages) {
-      lsp = [rls];
-      linter = [rustfmt];
-    };
-  };
+  # languageDependencies = with pkgs; {
+  #   nix = {
+  #     lsp = [rnix-lsp nil];
+  #     linter = [
+  #       statix
+  #       deadnix
+  #       alejandra
+  #     ];
+  #   };
+  #
+  #   # lua = {
+  #   #   lsp = [ sumneko-lua-language-server ];
+  #   #   linter = [ luajitPackages.luacheck ];
+  #   # };
+  #
+  #   typescript = {
+  #     # TODO: Cofigure eslint_d with nix instead of relying on yarn after the installation.
+  #     # linter = [ eslint_d ];
+  #   };
+  #
+  #   go = {
+  #     lsp = [gopls];
+  #     linter = [golangci-lint];
+  #   };
+  #
+  #   java = {
+  #     lsp = [jdk17_headless];
+  #   };
+  #
+  #   # Do not add rls and rustfmt if rustup is installed already
+  #   rust = mkIf (!builtins.elem rustup config.home.packages) {
+  #     lsp = [rls];
+  #     linter = [rustfmt];
+  #   };
+  # };
 in {
   options = {
     programs.cosmic-nvim = {
@@ -100,7 +100,7 @@ in {
         };
         sha256 = mkOption {
           type = types.str;
-          default = "";
+          default = "sha256-88oVfzzQcGEJCaxpab+9ZxfXX8TOsnYlGWqcpN8PxvE=";
         };
       };
 
@@ -154,9 +154,9 @@ in {
   };
 
   config = let
-    neovimConfig = pkgs.neovimUtils.makeNeovimConfig {
-      inherit (cfg) withNodeJs;
-    };
+    # neovimConfig = pkgs.neovimUtils.makeNeovimConfig {
+    #   inherit (cfg) withNodeJs;
+    # };
 
     cosmic-src = pkgs.fetchFromGitHub cfg.cosmic-nvim-src;
     # cosmic-src = stdenv.mkDerivation {
@@ -190,21 +190,20 @@ in {
     #   cfg.languages;
   in
     mkIf cfg.enable {
-      home.packages =
-        [cfg.finalNvimPackage]
-        ++ (lists.optionals cfg.autoInstallBinaries
-          (featurePackages ++ languagePackages));
+      home.packages = [cfg.finalNvimPackage];
+        # ++ (lists.optionals cfg.autoInstallBinaries
+        #   (featurePackages ++ languagePackages));
 
-      programs.cosmic-nvim.generatedModulesFile = ''
-        return {
-          features = {
-            ${concatMapStringsSep "\n    " (s: "\"${s}\",") cfg.features}
-          },
-          langs = {
-            ${concatMapStringsSep "\n    " (s: "\"${s}\",") cfg.languages}
-          },
-        }
-      '';
+      # programs.cosmic-nvim.generatedModulesFile = ''
+      #   return {
+      #     features = {
+      #       ${concatMapStringsSep "\n    " (s: "\"${s}\",") cfg.features}
+      #     },
+      #     langs = {
+      #       ${concatMapStringsSep "\n    " (s: "\"${s}\",") cfg.languages}
+      #     },
+      #   }
+      # '';
 
       xdg.configFile.nvim.source = "${cosmic-src}";
       # xdg.configFile = {
