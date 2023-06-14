@@ -16,24 +16,24 @@
       sha256 = "sha256-wO/3/AH9AoPwckbDtsO/Oa4SU9yT5u9TIEdGSI5S2Qc=";
     };
 
-    nvimPackage = pkgs.stable.neovim;
+    nvimPackage = pkgs.neovim;
 
     features = [
       # Language features
-      "annotations" # Code annotation generator
-      "auto_install" # Auto install LSP providers
-      "autopairs" # Automatically close character pairs
+      # "annotations" # Code annotation generator
+      # "auto_install" # Auto install LSP providers
+      # "autopairs" # Automatically close character pairs
       "comment" # Adds keybinds to comment in any language
-      "linter" # Linting and formatting for languages
+      # "linter" # Linting and formatting for languages
       "lsp" # Code completion
       # "lsp_tests" # Integrated tests
-      "extra_snippets" # Code snippets for all languages
+      # "extra_snippets" # Code snippets for all languages
 
       # Editor
-      "auto_session" # Remember sessions between loads
+      # "auto_session" # Remember sessions between loads
       "colorizer" # Show colors in neovim
-      "editorconfig" # Support editorconfig files
-      "gitsigns" # Show git changes in sidebar
+      # "editorconfig" # Support editorconfig files
+      # "gitsigns" # Show git changes in sidebar
       "illuminate" # Highlight other copies of the word you're hovering on
       "indentlines" # Show indent lines with special characters
       "range_highlight" # Highlight selected range from commands
@@ -45,7 +45,7 @@
       # "tabline" # Tab bar buffer switcher
       "dashboard" # A pretty dashboard upon opening
       "trouble" # A pretty diagnostic viewer
-      # "statusline" # A pretty status line at the bottom of the buffer
+      "statusline" # A pretty status line at the bottom of the buffer
       # "minimap" # Shows current position in document
       "terminal" # Integrated terminal in neovim
       "symbols" # Navigate between code symbols using telescope
@@ -55,16 +55,16 @@
       # "zen" # Distraction free mode
 
       # Tools
-      "dap" # Debug code through neovim
+      # "dap" # Debug code through neovim
       # "repl" # Interactive REPL in neovim
       # "explorer" # An enhanced filetree explorer
       # "firenvim" # Embed neovim in your browser
-      "lazygit" # Lazy git integration
+      # "lazygit" # Lazy git integration
       # "neogit" # A git client for neovim
       # "neorg" # Organise your life
-      "projects" # Quickly switch between projects
+      # "projects" # Quickly switch between projects
       # "superman" # Read unix man pages in neovim
-      "suda" # Save using sudo when necessary
+      # "suda" # Save using sudo when necessary
       "telescope" # Fuzzy searcher to find files, grep code and more
       "whichkey" # An interactive sheet
     ];
@@ -123,25 +123,25 @@
         }}
       })
 
-      local persistence = doom.features.auto_session
-      persistence.settings.options = { "buffers", "curdir", "tabpages", "winsize" }
-      persistence.binds = {
-        "<leader>",
-        name = "+prefix",
-        {
-          {
-            "q",
-            name = "+quit",
-            {
-              {
-                "r",
-                function() require("persistence").load() end,
-                name = "Restore session",
-              },
-            },
-          },
-        },
-      }
+      -- local persistence = doom.features.auto_session
+      -- persistence.settings.options = { "buffers", "curdir", "tabpages", "winsize" }
+      -- persistence.binds = {
+      --   "<leader>",
+      --   name = "+prefix",
+      --   {
+      --     {
+      --       "q",
+      --       name = "+quit",
+      --       {
+      --         {
+      --           "r",
+      --           function() require("persistence").load() end,
+      --           name = "Restore session",
+      --         },
+      --       },
+      --     },
+      --   },
+      -- }
 
       local whichkey = doom.features.whichkey
       whichkey.settings.plugins.marks = true
@@ -223,14 +223,14 @@
         { 'gA', name = "All code actions", run_all_similar },
       })
 
-      doom.use_package({
-        "ellisonleao/glow.nvim",
-        config = function()
-          require('glow').setup{
-            glow_path = "${pkgs.glow}/bin/glow",
-          }
-        end,
-      })
+      -- doom.use_package({
+      --   "ellisonleao/glow.nvim",
+      --   config = function()
+      --     require('glow').setup{
+      --       glow_path = "${pkgs.glow}/bin/glow",
+      --     }
+      --   end,
+      -- })
 
       doom.langs.rust.settings.lsp_config.settings['rust-analyzer'] = {
         cargo = {enableExperimental = true},

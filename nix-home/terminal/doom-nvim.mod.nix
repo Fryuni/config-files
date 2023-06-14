@@ -169,10 +169,6 @@ in {
   };
 
   config = let
-    neovimConfig = pkgs.neovimUtils.makeNeovimConfig {
-      inherit (cfg) withNodeJs;
-    };
-
     doom-src = stdenv.mkDerivation {
       pname = "doom-nvim";
       version = cfg.doom-nvim-src.rev;
