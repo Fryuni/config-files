@@ -1,7 +1,13 @@
-{pkgs, ...}: let
-  zellij-starter = pkgs.callPackage ./zellijStarter.nix {};
+{
+  pkgs,
+  config,
+  ...
+}: let
+  zellij-starter = pkgs.callPackage ./zellijStarter.nix {
+    zellij = config.programs.zellij.package;
+  };
 in {
-  home.packages = [ zellij-starter ];
+  home.packages = [zellij-starter];
   programs.alacritty.enable = true;
   programs.alacritty.settings = {
     window = {

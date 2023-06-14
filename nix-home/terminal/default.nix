@@ -36,9 +36,9 @@
     autocd = true;
 
     initExtraFirst = ''
-    if [ -z "$ZELLIJ" ] && [ -z "$TERMINAL_EMULATOR" ]; then
-      exec zellij
-    fi
+      if [ -z "$ZELLIJ" ] && [ -z "$TERMINAL_EMULATOR" ]; then
+        exec zellij
+      fi
     '';
 
     dirHashes = {
