@@ -34,7 +34,9 @@
       "nixpkgs.cachix.org-1:q91R6hxbwFvDqTSDKwDAV4T5PxqXGxswD8vhONFMeOE="
       "fryuni.cachix.org-1:YCNe73zqPG2YLIxxJkTXDz3/VFKcCiZAvHDIjEJIoDQ="
     ];
-  };
+
+    plugin-files = [];
+ };
 
   nix.gc = {
     automatic = true;
