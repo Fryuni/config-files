@@ -20,6 +20,18 @@
       url = "github:PolyMC/PolyMC";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-phps = {
+      url = "github:fossar/nix-phps";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        utils.follows = "flake-utils";
+      };
+    };
+    php-shell = {
+      url = "github:loophp/nix-shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nix-phps.follows = "nix-phps";
+    };
   };
 
   outputs = {
@@ -30,6 +42,7 @@
     home-manager,
     flake-utils,
     devshell,
+    php-shell,
     ...
   } @ attrs: let
     pkgsFun = system: let
@@ -249,8 +262,18 @@
           '';
         }
       ];
+
+      croct-php = php-shell.api.makePhp system {
+            php = "php81";
+            withExtensions = ["pcov" "decimal" "xdebug"];
+            extraConfig = ''
+            '';
+          };
     in {
       legacyPackages = pkgs;
+      packages = {
+        inherit croct-php;
+      };
 
       formatter = pkgs.alejandra;
 
@@ -266,20 +289,33 @@
       in
         builtins.listToAttrs appList;
 
-      devShells.default = pkgs.devshell.mkShell {
-        devshell.motd = ''
-          {bold}{14}🔨 Management commands 🔨{reset}
-          $(type -p menu &>/dev/null && menu)
-        '';
+      devShells = {
+        default = pkgs.devshell.mkShell {
+          devshell.motd = ''
+            {bold}{14}🔨 Management commands 🔨{reset}
+            $(type -p menu &>/dev/null && menu)
+          '';
 
-        commands =
-          builtins.map
-          (cmd:
-            cmd
-            // {
-              command = self.outputs.apps.${system}.${cmd.name}.program;
-            })
-          commands;
+          commands =
+            builtins.map
+            (cmd:
+              cmd
+              // {
+                command = self.outputs.apps.${system}.${cmd.name}.program;
+              })
+            commands;
+        };
+
+        croct-php = let
+        in
+          pkgs.mkShellNoCC {
+            name = "Croct ready PHP shell";
+
+            buildInputs = [
+              croct-php
+              croct-php.packages.composer
+            ];
+          };
       };
     });
   in
