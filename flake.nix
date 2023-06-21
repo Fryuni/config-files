@@ -141,7 +141,7 @@
           help = "Compute the package difference that will be applied to home-manager on a switch";
           command = ''
             ${pkgs.nvd}/bin/nvd diff \
-              /nix/var/nix/profiles/per-user/$USER/home-manager \
+              /nix/var/nix/profiles/per-user/$USER/profile \
               ${self.outputs.homeConfigurations.notebook.activationPackage}
           '';
         }
