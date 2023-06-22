@@ -38,7 +38,7 @@
     ];
 
     plugin-files = [];
- };
+  };
 
   nix.gc = {
     automatic = true;
