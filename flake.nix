@@ -17,8 +17,10 @@
     flake-utils.url = "github:numtide/flake-utils";
     devshell.url = "github:numtide/devshell";
     polymc = {
-      url = "github:PolyMC/PolyMC";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:Fryuni/PolyMC/a17c546d3c74d94e58e8deb5bc844a215571977a";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+      };
     };
     nix-phps = {
       url = "github:fossar/nix-phps";
@@ -127,7 +129,7 @@
           })
           fenix.overlays.default
           (import ./overlay)
-          # attrs.polymc.overlay
+          attrs.polymc.overlay
           # devshell.overlay
         ];
       };

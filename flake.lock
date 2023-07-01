@@ -299,16 +299,17 @@
         "tomlplusplus": "tomlplusplus"
       },
       "locked": {
-        "lastModified": 1685454243,
-        "narHash": "sha256-znGrtL2kM9IQta3mTihu+iZCC8Ez8Nq7v/RpnjHOwr8=",
-        "owner": "PolyMC",
+        "lastModified": 1688182079,
+        "narHash": "sha256-s46b7de1zEeaZ10xl3mWRQnGitZHPLyegcbaEo8k5Bk=",
+        "owner": "Fryuni",
         "repo": "PolyMC",
-        "rev": "2358e6faa2b1204058c0d9d2bc1491c308f4e6d7",
+        "rev": "a17c546d3c74d94e58e8deb5bc844a215571977a",
         "type": "github"
       },
       "original": {
-        "owner": "PolyMC",
+        "owner": "Fryuni",
         "repo": "PolyMC",
+        "rev": "a17c546d3c74d94e58e8deb5bc844a215571977a",
         "type": "github"
       }
     },
@@ -377,11 +378,11 @@
     "tomlplusplus": {
       "flake": false,
       "locked": {
-        "lastModified": 1664034574,
-        "narHash": "sha256-EFMAl6tsTvkgK0DWC/pZfOIq06b2e5SnxJa1ngGRIQA=",
+        "lastModified": 1686746673,
+        "narHash": "sha256-klbvLhbtq6/h2sd/5ldd5GSgKRd9qKx0Ldis/L5g4zM=",
         "owner": "marzer",
         "repo": "tomlplusplus",
-        "rev": "8aa5c8b2a4ff2c440d4630addf64fa4f62146170",
+        "rev": "4a28c36c435d813ddbd39a9a48a79d8c862c547f",
         "type": "github"
       },
       "original": {
