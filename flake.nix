@@ -269,7 +269,7 @@
           category = "NixOS";
           help = "Build NixOS configuration without applying";
           command = ''
-            nix build --no-link .#nixosConfigurations.notebook.config.system.build.toplevel $@
+            nix build --print-out-paths --no-link .#nixosConfigurations.notebook.config.system.build.toplevel $@
           '';
         }
         {
@@ -278,6 +278,14 @@
           help = "Apply NixOS configuration as the default boot profile, but don't load it immediately";
           command = ''
             sudo nixos-rebuild boot --flake '.#notebook' $@
+          '';
+        }
+        {
+          name = "os-boot-offline";
+          category = "NixOS";
+          help = "Apply NixOS configuration as the default boot profile, but don't load it immediately";
+          command = ''
+            sudo nixos-rebuild boot --flake '.#notebook' --option substitute false $@
           '';
         }
         {
