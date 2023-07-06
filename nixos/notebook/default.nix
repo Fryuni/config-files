@@ -21,4 +21,6 @@
 
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
+
+  services.dnscrypt-proxy2.settings.static.NextDNS.stamp = "sdns://AgEAAAAAAAAAAAAOZG5zLm5leHRkbnMuaW8TL2Y3ZmQ1MS9HNS1Ob3RlYm9vaw";
 }
