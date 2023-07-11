@@ -76,7 +76,6 @@
         "dotenv"
         "gcloud"
         "docker"
-        "nvm"
         "node"
         "npm"
         "yarn"
