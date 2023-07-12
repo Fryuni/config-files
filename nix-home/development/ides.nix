@@ -7,8 +7,6 @@
     jetbrains.idea-ultimate
     # android-studio
 
-    postman
-    altair
     insomnia
   ];
 }
