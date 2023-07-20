@@ -1,6 +1,6 @@
 {pkgs, ...}: {
   imports = [
-    ./xfce.nix
+    # ./xfce.nix
     ./xsession.nix
   ];
 
@@ -27,7 +27,7 @@
   };
 
   xdg.mimeApps = import ./xdg-mime.nix {
-    defaultBrowser = "xfce4-web-browser.desktop";
+    defaultBrowser = "google-chrome-beta.desktop";
     defaultVideo = "mpv.desktop";
   };
 
