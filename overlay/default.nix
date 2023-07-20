@@ -45,4 +45,18 @@ final: pkgs:
 
     vendorSha256 = "sha256-veg5B68AQhkSZg8YA/e4FbqJNG0YGwnUQFsAdscz0QI=";
   };
+
+  pg-schema-diff = pkgs.buildGoModule rec {
+    name = "pg-schema-diff";
+    doCheck = false;
+
+    src = pkgs.fetchFromGitHub {
+      owner = "stripe";
+      repo = "pg-schema-diff";
+      rev = "7741e0941c20625d8f8efd0b9dabbe18faee8bca";
+      sha256 = "sha256-JVW2ML+2a9tRXRue0aPXRaPq8vNsgLP0NB7J0g1uMFw=";
+    };
+
+    vendorSha256 = "sha256-/pzW7zK7pPo205oio4QcnOXgP7imRQ8VCdt652YCJkg=";
+  };
 }
