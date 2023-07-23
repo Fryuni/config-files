@@ -16,6 +16,13 @@
     };
     flake-utils.url = "github:numtide/flake-utils";
     devshell.url = "github:numtide/devshell";
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        home-manager.follows = "home-manager";
+      };
+    };
     polymc = {
       url = "github:Fryuni/PolyMC/a17c546d3c74d94e58e8deb5bc844a215571977a";
       inputs = {
@@ -44,6 +51,7 @@
     home-manager,
     flake-utils,
     devshell,
+    agenix,
     php-shell,
     ...
   } @ attrs: let
@@ -128,6 +136,7 @@
             };
           })
           fenix.overlays.default
+          agenix.overlays.default
           (import ./overlay)
           attrs.polymc.overlay
           # devshell.overlay
@@ -145,6 +154,7 @@
         };
 
         modules = [
+          agenix.nixosModules.age
           ./nixos
           ./nixos/notebook
           # nixos-hardware.nixosModules.dell-g3-3779
@@ -158,6 +168,7 @@
         };
 
         modules = [
+          agenix.homeManagerModules.age
           ./nix-home
           ./nix-home/notebook.nix
         ];

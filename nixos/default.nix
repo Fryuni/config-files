@@ -74,6 +74,7 @@
     gnumake
     xarchiver
     cachix
+    agenix
   ];
 
   # xdg.portal.enable = true;

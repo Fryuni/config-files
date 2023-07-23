@@ -8,6 +8,7 @@
 
   imports = [
     ./ui
+    ./secrets.nix
     ./nix.nix
   ];
 
