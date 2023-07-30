@@ -59,4 +59,19 @@ final: pkgs:
 
     vendorSha256 = "sha256-/pzW7zK7pPo205oio4QcnOXgP7imRQ8VCdt652YCJkg=";
   };
+
+  wtf = pkgs.buildGoModule rec {
+    pname = "wtf";
+    version = "0.43.0";
+    doCheck = false;
+
+    src = pkgs.fetchFromGitHub {
+      owner = "wtfutil";
+      repo = "wtf";
+      rev = "v${version}";
+      sha256 = "sha256-DFrA4bx+wSOxmt1CVA1oNiYVmcWeW6wpfR5F1tnhyDY=";
+    };
+
+    vendorSha256 = "sha256-f82ibPnauUOuZ5D6Rz3Yyt0jiAXvjN8Or3gud+ri6FA=";
+  };
 }
