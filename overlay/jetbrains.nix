@@ -20,6 +20,12 @@ final: pkgs: let
       url = "https://download.jetbrains.com/python/pycharm-professional-${version}.tar.gz";
       sha256 = "sha256-lfFmbEcanXUsU+wLd2hAVS4CP2QFo7AAzm8QFBJb/IM=";
     };
+    # https://www.jetbrains.com/datagrip/download/other.html
+    datagrip = rec {
+      version = "2023.2";
+      url = "https://download.jetbrains.com/datagrip/datagrip-${version}.tar.gz";
+      sha256 = "sha256-+DRNrU9QKiFUQPt8y8TGms3QsY8z2FXw0NDSu+RKXyY=";
+    };
   };
 
   overrideFn = name: {
