@@ -20,6 +20,13 @@ _: {
 
     lfs.enable = true;
 
+    includes = [
+      {
+        condition = "gitdir:~/IsoWorkspaces/Croct/";
+        path = "${../../common/rcfiles/gitconfig_croct}";
+      }
+    ];
+
     extraConfig = {
       url = {
         "ssh://git@github.com/" = {insteadOf = "https://github.com/";};
@@ -34,10 +41,6 @@ _: {
         wtl = "worktree list";
         wta = "worktree add";
         wtp = "worktree prune";
-      };
-
-      "includeIf \"gitdir:~/IsoWorkspaces/Croct/\"" = {
-        path = "${../../common/rcfiles/gitconfig_croct}";
       };
 
       init.defaultBranch = "main";
