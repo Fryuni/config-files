@@ -341,6 +341,7 @@
           help = ''Delete old generations and garbage collection'';
           command = ''
             rm -rf ./result
+            ${homeManager} expire-generations now || true
             sudo nix-collect-garbage -d $@
           '';
         }
