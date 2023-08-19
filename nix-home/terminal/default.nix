@@ -14,7 +14,7 @@
 
   programs.zellij = {
     enable = true;
-    # package = pkgs.rustCrates.zellij;
+    package = pkgs.stable.zellij;
   };
 
   xdg.configFile."zellij/config.kdl".text = ''
