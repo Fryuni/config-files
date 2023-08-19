@@ -61,7 +61,7 @@
         config.allowUnfree = true;
         config.permittedInsecurePackages = [];
       };
-      master = import attrs.nixpkgs-stable {
+      master = import attrs.nixpkgs-master {
         inherit system;
         config.allowUnfree = true;
         config.permittedInsecurePackages = [];
