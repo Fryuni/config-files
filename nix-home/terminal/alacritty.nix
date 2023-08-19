@@ -2,12 +2,7 @@
   pkgs,
   config,
   ...
-}: let
-  zellij-starter = pkgs.callPackage ./zellijStarter.nix {
-    zellij = config.programs.zellij.package;
-  };
-in {
-  home.packages = [zellij-starter];
+}: {
   programs.alacritty.enable = true;
   programs.alacritty.settings = {
     window = {
@@ -22,10 +17,6 @@ in {
 
       startup_mode = "Maximized";
     };
-
-    # shell = {
-    #   program = "${zellij-starter}/bin/__start_zellij";
-    # };
 
     draw_bold_text_with_bright_colors = true;
 
