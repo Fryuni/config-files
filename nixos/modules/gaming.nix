@@ -13,6 +13,8 @@
     minecraft
     mesa-demos
     lutris
+    dconf
+    bottles
     vulkan-tools
     winetricks
     # nix-gaming.packages.x86_64-linux.wine-tkg
