@@ -181,7 +181,10 @@
       pkgs = pkgsFun system;
 
       homeManager = "${home-manager.packages.${system}.home-manager}/bin/home-manager";
-      commands = [
+      commands = let
+        bins = builtins.mapAttrs (name: pkg: pkgs.lib.meta.getExe pkg) pkgs;
+      in
+      [
         # Setup
         {
           name = "activate/notebook";
@@ -215,9 +218,9 @@
           category = "Home";
           help = "Compute the package difference that will be applied to home-manager on a switch";
           command = ''
-            ${pkgs.nvd}/bin/nvd diff \
-              /nix/var/nix/profiles/per-user/$USER/profile \
-              ${self.outputs.homeConfigurations.notebook.activationPackage}
+            ${bins.nvd} diff \
+              $(${bins.nix} eval -f ~/.nix-profile/manifest.nix --json | ${bins.jq} -r '.[0]') \
+              ${self.outputs.homeConfigurations.notebook.config.home.path}
           '';
         }
         {
@@ -225,7 +228,7 @@
           category = "Home";
           help = "Build home-manager configuration without applying it";
           command = ''
-            nix build --no-link --print-out-paths .#homeConfigurations.notebook.activationPackage $@
+            ${bins.nix} build --no-link --print-out-paths .#homeConfigurations.notebook.activationPackage $@
           '';
         }
         {
@@ -241,10 +244,10 @@
           category = "Home";
           help = "Update the flake lock file only";
           command = ''
-            nix flake update $@
-            git restore --staged .
-            git add flake.lock
-            git commit -m "chore: Update flake"
+            ${bins.nix} flake update $@
+            ${bins.git} restore --staged .
+            ${bins.git} add flake.lock
+            ${bins.git} commit -m "chore: Update flake"
           '';
         }
 
@@ -270,7 +273,7 @@
           category = "NixOS";
           help = "Compute the package difference that will be applied to the system on a switch";
           command = ''
-            ${pkgs.nvd}/bin/nvd diff \
+            ${bins.nvd} diff \
               /run/current-system \
               ${self.outputs.nixosConfigurations.notebook.config.system.build.toplevel}
           '';
@@ -280,7 +283,7 @@
           category = "NixOS";
           help = "Build NixOS configuration without applying";
           command = ''
-            nix build --print-out-paths --no-link .#nixosConfigurations.notebook.config.system.build.toplevel $@
+            ${bins.nix} build --print-out-paths --no-link .#nixosConfigurations.notebook.config.system.build.toplevel $@
           '';
         }
         {
@@ -323,8 +326,8 @@
           category = "Utility";
           help = "Format nix files";
           command = ''
-            ${pkgs.statix}/bin/statix fix
-            nix fmt $@
+            ${bins.statix} fix
+            ${bins.nix} fmt $@
           '';
         }
         {
