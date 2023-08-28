@@ -74,4 +74,13 @@ final: pkgs:
 
     vendorSha256 = "sha256-f82ibPnauUOuZ5D6Rz3Yyt0jiAXvjN8Or3gud+ri6FA=";
   };
+
+  # Workaround for https://github.com/NixOS/nixpkgs/issues/219567
+  xorg = pkgs.xorg // {
+    xrandr = pkgs.xorg.xrandr.overrideAttrs (_: prev: {
+      meta = prev.meta // {
+        mainProgram = "xrandr";
+      };
+    });
+  };
 }
