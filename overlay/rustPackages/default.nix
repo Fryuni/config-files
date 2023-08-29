@@ -12,7 +12,7 @@ pkgs: let
     extra = extras.${name} or {};
     safeExtras = builtins.removeAttrs extra ["nativeBuildInputs"];
   in
-    rustPlatform.buildRustPackage ({
+    pkgs.rustPlatform.buildRustPackage ({
         pname = name;
         inherit (definition) version;
 

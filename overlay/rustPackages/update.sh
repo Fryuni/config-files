@@ -89,7 +89,7 @@ function prefetch() {
 		local depsSha256
 		depsSha256=$(capture_hash nix build --no-link --impure --expr "
 		  with import <nixpkgs> {}; 
-      (pkgs.rustPlatform.buildRustPackage rec {
+      (pkgs.fenixPlatform.buildRustPackage rec {
         pname = \"${crate}\";
         version = \"${version}\";
 		    src = fetchCrate {
