@@ -36,7 +36,7 @@ pkgs: let
           inherit (definition) description keywords;
           homepage = definition.homepage or "https://crates.io/crates/${name}";
           documentation = "https://docs.rs/${name}/${definition.version}";
-          mainProgram = definition.mainProgram or null;
+          mainProgram = definition.mainProgram or name;
           maintainers = [pkgs.lib.maintainers.fryuni];
         };
       }

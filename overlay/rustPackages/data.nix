@@ -343,8 +343,8 @@
     version = "0.1.0";
   };
   zellij = {
-    crateSha256 = "sha256-wt4jTqVqlRTWgYYiSo+MnAgTapHuO+Q4bUFfFSDuWVk=";
-    depsSha256 = "sha256-6EJ6b8MqiE+g/qT6xxULM5VLkFaeYtqv5Wvzq+wOcdI=";
+    crateSha256 = "sha256-ZLU4Ufj5YJ+RxH0Wokwx6IVbJlfGeIjSXK1QCTbVxaY=";
+    depsSha256 = "sha256-2hgDRWygL1KVCcCpOnGzQBTgws1mkNsfl9ydJYyTZwU=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
@@ -397,6 +397,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.36.0";
+    version = "0.38.0";
   };
 }
