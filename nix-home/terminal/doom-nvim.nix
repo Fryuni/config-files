@@ -60,7 +60,7 @@
       # "explorer" # An enhanced filetree explorer
       # "firenvim" # Embed neovim in your browser
       # "lazygit" # Lazy git integration
-      # "neogit" # A git client for neovim
+      "neogit" # A git client for neovim
       # "neorg" # Organise your life
       # "projects" # Quickly switch between projects
       # "superman" # Read unix man pages in neovim
