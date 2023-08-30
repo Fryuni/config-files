@@ -16,7 +16,7 @@ with lib; let
   featureDependencies = with pkgs; {
     ranger = [ranger];
     lazygit = [lazygit];
-    neogit = [neogit];
+    neogit = [];
   };
 
   languageDependencies = with pkgs; {
