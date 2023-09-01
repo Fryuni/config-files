@@ -12,7 +12,7 @@
 
     slack
 
-    go
+    go_1_21
     golangci-lint
     gosec
     go2nix
