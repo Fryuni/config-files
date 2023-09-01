@@ -2,29 +2,29 @@ final: pkgs: let
   inherit (pkgs) jetbrains;
 
   overrides = {
-    # https://www.jetbrains.com/webstorm/download/other.html
+    # https://www.jetbrains.com/webstorm/nextversion
     webstorm = rec {
-      version = "2023.2";
+      version = "2023.2.1";
       url = "https://download.jetbrains.com/webstorm/WebStorm-${version}.tar.gz";
-      sha256 = "sha256-zJfIukRWDepB3hwD/WAjoofD3KZHbCl/AqRzrxJMBz8=";
+      sha256 = "sha256-BIfR6As9U4yWirZDfZUKUEFmsMJmNG1Slpv7goggpkI=";
     };
-    # https://www.jetbrains.com/go/download/other.html
+    # https://www.jetbrains.com/go/nextversion
     goland = rec {
-      version = "2023.2";
+      version = "2023.2.1";
       url = "https://download.jetbrains.com/go/goland-${version}.tar.gz";
-      sha256 = "sha256-F/G72aRgYf3QE9SamYWcHKPs4aPMUc3PK0bq4EMvJIE=";
+      sha256 = "sha256-fVyDy0MobVewRdHYNxhWM74TZzpeDkQ3c3eODUk2ZHo=";
     };
-    # https://www.jetbrains.com/pycharm/download/other.html
+    # https://www.jetbrains.com/pycharm/nextversion
     pycharm-professional = rec {
-      version = "2023.2";
+      version = "2023.2.1";
       url = "https://download.jetbrains.com/python/pycharm-professional-${version}.tar.gz";
-      sha256 = "sha256-lfFmbEcanXUsU+wLd2hAVS4CP2QFo7AAzm8QFBJb/IM=";
+      sha256 = "sha256-j3wKyo8qgyFkQmOT5V1UOztWhn8kl9iERUf7A+IX8WA=";
     };
-    # https://www.jetbrains.com/datagrip/download/other.html
+    # https://www.jetbrains.com/datagrip/nextversion
     datagrip = rec {
-      version = "2023.2";
+      version = "2023.2.1";
       url = "https://download.jetbrains.com/datagrip/datagrip-${version}.tar.gz";
-      sha256 = "sha256-+DRNrU9QKiFUQPt8y8TGms3QsY8z2FXw0NDSu+RKXyY=";
+      sha256 = "sha256-CyDw3GHY/ZtCli1JMcZHQt0X4/AI3+wsiGOlaxvEvps=";
     };
   };
 
