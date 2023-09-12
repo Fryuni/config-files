@@ -9,6 +9,7 @@
     ]))
     nodejs-18_x
     nodePackages.yarn
+    master.bun
 
     slack
 
