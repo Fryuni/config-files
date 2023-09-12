@@ -32,7 +32,7 @@ in {
     httpie
     yq-go
     bat
-    exa
+    eza
     ripgrep
     fd
     sd

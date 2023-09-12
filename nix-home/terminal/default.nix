@@ -56,8 +56,8 @@
 
     shellAliases = {
       ls = "ls --color=auto";
-      ll = "exa -bghHliS --git";
-      la = "exa -bghHliSa --git";
+      ll = "eza -bghHliS --git";
+      la = "eza -bghHliSa --git";
       lg = "lazygit";
       nivm = "nvim";
       "refresh-gcloud-credentials" = "gcloud auth print-access-token > /dev/null";
