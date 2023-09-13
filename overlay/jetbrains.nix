@@ -4,9 +4,9 @@ final: pkgs: let
   overrides = {
     # https://www.jetbrains.com/webstorm/nextversion
     webstorm = rec {
-      version = "2023.2.1";
+      version = "232.9921.26";
       url = "https://download.jetbrains.com/webstorm/WebStorm-${version}.tar.gz";
-      sha256 = "sha256-BIfR6As9U4yWirZDfZUKUEFmsMJmNG1Slpv7goggpkI=";
+      sha256 = "sha256-yfdePD6qp0Yd7Bno/l8wJmdtcHl02AdMJJHiL88G2m8=";
     };
     # https://www.jetbrains.com/go/nextversion
     goland = rec {
@@ -16,9 +16,9 @@ final: pkgs: let
     };
     # https://www.jetbrains.com/pycharm/nextversion
     pycharm-professional = rec {
-      version = "2023.2.1";
+      version = "232.9921.36";
       url = "https://download.jetbrains.com/python/pycharm-professional-${version}.tar.gz";
-      sha256 = "sha256-j3wKyo8qgyFkQmOT5V1UOztWhn8kl9iERUf7A+IX8WA=";
+      sha256 = "sha256-VY6t1Zl05dIEng1SZo2kffywRcO+lTRGJXcuqYX54hQ=";
     };
     # https://www.jetbrains.com/datagrip/nextversion
     datagrip = rec {
