@@ -7,7 +7,7 @@
     (python310.withPackages (py: [
       py.pyopenssl
     ]))
-    nodejs-18_x
+    nodejs_20
     nodePackages.yarn
     master.bun
 
