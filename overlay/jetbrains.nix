@@ -4,15 +4,15 @@ final: pkgs: let
   overrides = {
     # https://www.jetbrains.com/webstorm/nextversion
     webstorm = rec {
-      version = "232.9921.26";
+      version = "2023.2.2";
       url = "https://download.jetbrains.com/webstorm/WebStorm-${version}.tar.gz";
-      sha256 = "sha256-yfdePD6qp0Yd7Bno/l8wJmdtcHl02AdMJJHiL88G2m8=";
+      sha256 = "sha256-EMEgNiAli/SwyVLYCfUOqVT4DR7WAJiRekxk+ycYuTE=";
     };
     # https://www.jetbrains.com/go/nextversion
     goland = rec {
-      version = "2023.2.1";
+      version = "2023.2.2";
       url = "https://download.jetbrains.com/go/goland-${version}.tar.gz";
-      sha256 = "sha256-fVyDy0MobVewRdHYNxhWM74TZzpeDkQ3c3eODUk2ZHo=";
+      sha256 = "sha256-4pUd/NgFVvKTeNVcjU6/vG5ZnhStoXoGOGcpIh1xNTs=";
     };
     # https://www.jetbrains.com/pycharm/nextversion
     pycharm-professional = rec {
