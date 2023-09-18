@@ -9,7 +9,7 @@
     ]))
     nodejs_20
     nodePackages.yarn
-    master.bun
+    bun
 
     slack
 
