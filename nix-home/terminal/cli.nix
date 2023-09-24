@@ -42,6 +42,7 @@ in {
     # Charm.sh pretty binaries
     gum
     charm
+    mods
     glow
     skate
 
