@@ -24,6 +24,26 @@
         "type": "github"
       }
     },
+    "charm": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1695393915,
+        "narHash": "sha256-aLsmVlnxUrWKO31D0hCYO853Gymu6zIe7NhgW2uFg2M=",
+        "owner": "charmbracelet",
+        "repo": "nur",
+        "rev": "e1249a2f58e567159588da32e48e8171650bf370",
+        "type": "github"
+      },
+      "original": {
+        "owner": "charmbracelet",
+        "repo": "nur",
+        "type": "github"
+      }
+    },
     "darwin": {
       "inputs": {
         "nixpkgs": [
@@ -434,6 +454,7 @@
     "root": {
       "inputs": {
         "agenix": "agenix",
+        "charm": "charm",
         "devshell": "devshell",
         "fenix": "fenix",
         "flake-utils": "flake-utils",

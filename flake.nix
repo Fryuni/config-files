@@ -14,6 +14,10 @@
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    charm = {
+      url = "github:charmbracelet/nur";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-utils.url = "github:numtide/flake-utils";
     devshell.url = "github:numtide/devshell";
     agenix = {
@@ -47,6 +51,7 @@
     self,
     nixpkgs,
     fenix,
+    charm,
     # nixos-hardware,
     home-manager,
     flake-utils,
@@ -76,6 +81,7 @@
             (_: _: {inherit master stable;})
             fenix.overlays.default
             agenix.overlays.default
+            (import "${charm}/overlay.nix")
           ]
           ++ (import ./overlay)
           ++ [
