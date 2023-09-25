@@ -1,4 +1,8 @@
-{pkgs, config, ...}: let
+{
+  pkgs,
+  config,
+  ...
+}: let
   gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (
     with pkgs.google-cloud-sdk.components; [
       docker-credential-gcr
@@ -9,18 +13,19 @@
       terraform-tools
     ]
   );
-  withOpenAi = pkg: pkg.overrideAttrs (prev: {
-    buildInputs = (prev.buildInputs or []) ++ [pkgs.makeWrapper];
-    postFixup = ''
-      echo "Output of AI wrapper: $out"
+  withOpenAi = pkg:
+    pkg.overrideAttrs (prev: {
+      buildInputs = (prev.buildInputs or []) ++ [pkgs.makeWrapper];
+      postFixup = ''
+        echo "Output of AI wrapper: $out"
 
-      for file in $out/bin/*; do
-        echo "Processing $file"
-        wrapProgram "$file" \
-          --run 'export OPENAI_API_KEY="$(cat ${config.age.secrets.openai-key.path})"'
-      done
-    '';
-  });
+        for file in $out/bin/*; do
+          echo "Processing $file"
+          wrapProgram "$file" \
+            --run 'export OPENAI_API_KEY="$(cat ${config.age.secrets.openai-key.path})"'
+        done
+      '';
+    });
 in {
   home.packages = with pkgs; [
     # Nix
