@@ -1,6 +1,11 @@
 final: pkgs: let
   inherit (pkgs) jetbrains;
 
+  globalPlugins = [
+    "164"
+    "17718"
+  ];
+
   overrides = {
     # https://www.jetbrains.com/webstorm/nextversion
     webstorm = rec {
@@ -25,6 +30,7 @@ final: pkgs: let
       version = "2023.2.1";
       url = "https://download.jetbrains.com/datagrip/datagrip-${version}.tar.gz";
       sha256 = "sha256-CyDw3GHY/ZtCli1JMcZHQt0X4/AI3+wsiGOlaxvEvps=";
+      plugins = ["8182-beta"];
     };
   };
 
@@ -32,13 +38,17 @@ final: pkgs: let
     version,
     url,
     sha256,
-  }:
-    jetbrains.${name}.overrideAttrs (_: _: rec {
+    plugins ? [],
+  }: let
+    versionChangedPkg = jetbrains.${name}.overrideAttrs (_: _: rec {
       inherit version;
       src = pkgs.fetchurl {
         inherit url sha256;
       };
     });
+    idePlugins = plugins ++ globalPlugins;
+  in
+    jetbrains.plugins.addPlugins versionChangedPkg idePlugins;
 
   overridePkgs = builtins.mapAttrs overrideFn overrides;
 in {
