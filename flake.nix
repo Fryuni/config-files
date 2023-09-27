@@ -6,20 +6,7 @@
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-23.05";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    fenix = {
-      url = "github:nix-community/fenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    charm = {
-      url = "github:charmbracelet/nur";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    flake-utils.url = "github:numtide/flake-utils";
-    devshell.url = "github:numtide/devshell";
+
     agenix = {
       url = "github:ryantm/agenix";
       inputs = {
@@ -27,23 +14,22 @@
         home-manager.follows = "home-manager";
       };
     };
+    charm = {
+      url = "github:charmbracelet/nur";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    flake-utils.url = "github:numtide/flake-utils";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     polymc = {
       url = "github:Fryuni/PolyMC/a17c546d3c74d94e58e8deb5bc844a215571977a";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
-    nix-phps = {
-      url = "github:fossar/nix-phps";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        utils.follows = "flake-utils";
-      };
-    };
-    php-shell = {
-      url = "github:loophp/nix-shell";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nix-phps.follows = "nix-phps";
     };
   };
 
@@ -55,9 +41,7 @@
     # nixos-hardware,
     home-manager,
     flake-utils,
-    devshell,
     agenix,
-    php-shell,
     ...
   } @ attrs: let
     pkgsFun = system: let
@@ -86,7 +70,6 @@
           ++ (import ./overlay)
           ++ [
             attrs.polymc.overlay
-            # devshell.overlay
           ];
       };
 
