@@ -4,7 +4,6 @@
     "nixpkgs-stable=${inputs.nixpkgs-stable}"
     "nixpkgs-master=${inputs.nixpkgs-master}"
     "nixpkgs-overlays=${../overlay}"
-    "devshell=${inputs.devshell}"
     "/nix/var/nix/profiles/per-user/root/channels"
   ];
 
