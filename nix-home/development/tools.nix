@@ -19,6 +19,7 @@
     go2nix
     ngrok
     just
+    master.turso-cli
 
     kubectl
     krew
