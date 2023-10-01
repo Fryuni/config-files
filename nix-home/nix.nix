@@ -12,6 +12,14 @@
   nix = {
     package = pkgs.nix;
 
+    settings.nix-path = [
+      "fryuni=${inputs.self}"
+      "nixpkgs=${inputs.nixpkgs}"
+      "nixpkgs-stable=${inputs.nixpkgs-stable}"
+      "nixpkgs-master=${inputs.nixpkgs-master}"
+      "/nix/var/nix/profiles/per-user/root/channels"
+    ];
+
     registry = {
       # Register this flake itself on the registry
       me.flake = inputs.self;

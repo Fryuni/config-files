@@ -1,9 +1,9 @@
 {inputs, ...}: {
   nix.nixPath = [
+    "fryuni=${inputs.self}"
     "nixpkgs=${inputs.nixpkgs}"
     "nixpkgs-stable=${inputs.nixpkgs-stable}"
     "nixpkgs-master=${inputs.nixpkgs-master}"
-    "nixpkgs-overlays=${../overlay}"
     "/nix/var/nix/profiles/per-user/root/channels"
   ];
 
