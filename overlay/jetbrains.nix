@@ -1,5 +1,5 @@
 final: pkgs: let
-  inherit (pkgs) jetbrains;
+  inherit (pkgs.master) jetbrains;
 
   globalPlugins = [
     "164"
@@ -31,6 +31,12 @@ final: pkgs: let
       url = "https://download.jetbrains.com/datagrip/datagrip-${version}.tar.gz";
       sha256 = "sha256-CyDw3GHY/ZtCli1JMcZHQt0X4/AI3+wsiGOlaxvEvps=";
       plugins = ["8182-beta"];
+    };
+    # https://www.jetbrains.com/rust/download
+    rust-rover = rec {
+      version = "232.9921.62";
+      url = "https://download.jetbrains.com/rustrover/RustRover-${version}.tar.gz";
+      sha256 = "sha256-H2fhqC9cu3yEOCx/JRrgax4mmfp9L6QSniPsLkMlFoc=";
     };
   };
 
