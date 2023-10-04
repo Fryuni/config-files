@@ -13,19 +13,6 @@
       terraform-tools
     ]
   );
-  withOpenAi = pkg:
-    pkg.overrideAttrs (prev: {
-      buildInputs = (prev.buildInputs or []) ++ [pkgs.makeWrapper];
-      postFixup = ''
-        echo "Output of AI wrapper: $out"
-
-        for file in $out/bin/*; do
-          echo "Processing $file"
-          wrapProgram "$file" \
-            --run 'export OPENAI_API_KEY="$(cat ${config.age.secrets.openai-key.path})"'
-        done
-      '';
-    });
 in {
   home.packages = with pkgs; [
     # Nix
@@ -59,9 +46,20 @@ in {
     # Charm.sh pretty binaries
     gum
     charm
-    (withOpenAi mods)
     glow
     skate
+    (symlinkJoin {
+      name = "mods-authenticated";
+      nativeBuildInputs = [makeWrapper coreutils];
+      paths = [mods];
+      postBuild = ''
+        rm -rf $out/bin/*
+        for file in ${mods}/bin/*; do
+          makeWrapper $file "$out/bin/$(basename $file)" \
+            --run 'export OPENAI_API_KEY="$(cat ${config.age.secrets.openai-key.path})"'
+        done
+      '';
+    })
 
     # Git stuff
     gh
