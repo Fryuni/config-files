@@ -37,4 +37,14 @@
       };
     };
   };
+
+  programs.ssh.package = pkgs.symlinkJoin {
+    name = "openssh-fixed-term";
+    paths = [pkgs.openssh];
+    nativeBuildInputs = [pkgs.makeWrapper];
+    postBuild = ''
+      rm -f $out/bin/ssh
+      makeWrapper ${pkgs.openssh}/bin/ssh $out/bin/ssh --set TERM xterm-256color
+    '';
+  };
 }
