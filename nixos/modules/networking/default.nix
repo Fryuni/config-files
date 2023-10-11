@@ -64,9 +64,11 @@ with lib; {
       (server: {
         name = "${server.provider}.${server.protocol}.${server.name}";
         value = {
-          # authUserPass.username = "luiz@lferraz.com";
           autoStart = false;
-          config = "config ${server.configFile}";
+          config = ''
+            config ${server.configFile}
+            auth-user-pass ${config.age.secrets.nordvpn-credentials.path}
+          '';
         };
       })
       nordServers;
