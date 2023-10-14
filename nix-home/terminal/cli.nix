@@ -53,8 +53,8 @@ in {
       nativeBuildInputs = [makeWrapper coreutils];
       paths = [mods];
       postBuild = ''
-        rm -rf $out/bin/*
         for file in ${mods}/bin/*; do
+          rm -rf "$out/bin/$(basename $file)"
           makeWrapper $file "$out/bin/$(basename $file)" \
             --run 'export OPENAI_API_KEY="$(cat ${config.age.secrets.openai-key.path})"'
         done
@@ -72,6 +72,8 @@ in {
 
     grafterm
   ];
+
+  programs.zsh.shellAliases."clear-mods-conversations" = "rm -rf ~/.local/share/mods/conversations";
 
   home.sessionVariables = {
     USE_GKE_GCLOUD_AUTH_PLUGIN = "True";
