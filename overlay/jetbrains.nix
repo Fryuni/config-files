@@ -9,34 +9,35 @@ final: pkgs: let
   overrides = {
     # https://www.jetbrains.com/webstorm/nextversion
     webstorm = rec {
-      version = "2023.2.2";
+      version = "233.9802.11";
       url = "https://download.jetbrains.com/webstorm/WebStorm-${version}.tar.gz";
-      sha256 = "sha256-EMEgNiAli/SwyVLYCfUOqVT4DR7WAJiRekxk+ycYuTE=";
+      sha256 = "sha256-K9IvUj4R9WtMFlNjR8WlxsQV7WzH92imvrvoH4dR4hY=";
     };
     # https://www.jetbrains.com/go/nextversion
     goland = rec {
-      version = "2023.2.2";
+      version = "233.9102.195";
       url = "https://download.jetbrains.com/go/goland-${version}.tar.gz";
-      sha256 = "sha256-4pUd/NgFVvKTeNVcjU6/vG5ZnhStoXoGOGcpIh1xNTs=";
+      sha256 = "sha256-C73LZR1NSR8mB8YLRq1iVHvdWAJsPS1d/ygQ4MqAjN8=";
     };
     # https://www.jetbrains.com/pycharm/nextversion
     pycharm-professional = rec {
-      version = "232.9921.36";
+      version = "233.9802.6";
       url = "https://download.jetbrains.com/python/pycharm-professional-${version}.tar.gz";
-      sha256 = "sha256-VY6t1Zl05dIEng1SZo2kffywRcO+lTRGJXcuqYX54hQ=";
+      sha256 = "sha256-e0W5G2i4N3ECToL5zhs+qrQKofVCbZEWJitoH2jemc8=";
     };
     # https://www.jetbrains.com/datagrip/nextversion
     datagrip = rec {
-      version = "2023.2.1";
+      version = "233.9102.70";
       url = "https://download.jetbrains.com/datagrip/datagrip-${version}.tar.gz";
-      sha256 = "sha256-CyDw3GHY/ZtCli1JMcZHQt0X4/AI3+wsiGOlaxvEvps=";
+      sha256 = "sha256-jo6+OMglpOEaGKB+pYZ6TpZGj626EhqeijRCLM/bmfg=";
       plugins = ["8182-beta"];
     };
-    # https://www.jetbrains.com/rust/download
+    # https://www.jetbrains.com/rust/nextversion
     rust-rover = rec {
-      version = "232.9921.62";
+      version = "233.8264.22";
       url = "https://download.jetbrains.com/rustrover/RustRover-${version}.tar.gz";
-      sha256 = "sha256-H2fhqC9cu3yEOCx/JRrgax4mmfp9L6QSniPsLkMlFoc=";
+      sha256 = "sha256-PdjpmwZhZO/BHobjKJ5ETFI4386OkUL+LTqMNA7usXU=";
+      noGlobalPlugins = true;
     };
   };
 
@@ -44,6 +45,7 @@ final: pkgs: let
     version,
     url,
     sha256,
+    noGlobalPlugins ? false,
     plugins ? [],
   }: let
     versionChangedPkg = jetbrains.${name}.overrideAttrs (_: _: rec {
@@ -52,7 +54,7 @@ final: pkgs: let
         inherit url sha256;
       };
     });
-    idePlugins = plugins ++ globalPlugins;
+    idePlugins = if noGlobalPlugins then plugins else plugins ++ globalPlugins;
   in
     jetbrains.plugins.addPlugins versionChangedPkg idePlugins;
 
