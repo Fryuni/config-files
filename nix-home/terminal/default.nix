@@ -59,7 +59,10 @@
       ll = "eza -bghHliS --git";
       la = "eza -bghHliSa --git";
       lg = "lazygit";
+
+      nv = "nvim";
       nivm = "nvim";
+
       "refresh-gcloud-credentials" = "gcloud auth print-access-token > /dev/null";
 
       # Run code inside of a container with the full home context
