@@ -105,7 +105,7 @@
       category = "NixOS";
       help = "Build NixOS configuration without applying";
       command = ''
-        ${bins.nix} build --print-out-paths --no-link .#nixosConfigurations.notebook.config.system.build.toplevel $@
+        echo "${self.outputs.nixosConfigurations.notebook.config.system.build.toplevel}"
       '';
     }
     {
