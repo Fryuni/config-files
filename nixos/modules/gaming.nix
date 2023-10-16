@@ -23,17 +23,15 @@
     wine64
   ];
 
-  nixpkgs.config.packageOverrides = pkgs: {
-    steam = pkgs.steam.override {
-      extraPkgs = pkgs: with pkgs; [gamemode mangohud];
-    };
-  };
-
   programs.gamemode.enable = true;
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
+
+    package = pkgs.steam.override {
+      extraPkgs = pkgs: with pkgs; [gamemode mangohud];
+    };
   };
 
   services.udev.extraRules = ''
