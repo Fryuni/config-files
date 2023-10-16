@@ -59,8 +59,16 @@
     in
       import nixpkgs {
         inherit system;
-        config.allowUnfree = true;
-        config.permittedInsecurePackages = [];
+
+        config = {
+          allowUnfree = true;
+          permittedInsecurePackages = [];
+
+          # https://github.com/NixOS/nixpkgs/pull/258447
+          # https://discourse.nixos.org/t/your-system-configures-nixpkgs-with-an-externally-created-instance/33802
+          pulseaudio = true;
+        };
+
         overlays =
           [
             (_: _: {inherit master stable;})
