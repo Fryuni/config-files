@@ -33,7 +33,7 @@
 
   programs.chromium = {
     enable = true;
-    package = pkgs.google-chrome-beta;
+    package = pkgs.master.google-chrome-beta;
     extensions = builtins.map (id: {inherit id;}) [
       "eimadpbcbfnmbkopoojfekhnkhdbieeh"
     ];
