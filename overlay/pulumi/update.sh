@@ -140,20 +140,20 @@ EOF
   genSrcs "linux" "amd64"
   echo "    ];"
 
-  echo "    x86_64-darwin = ["
-  genMainSrc "darwin" "x64"
-  genSrcs "darwin" "amd64"
-  echo "    ];"
-
-  echo "    aarch64-linux = ["
-  genMainSrc "linux" "arm64"
-  genSrcs "linux" "arm64"
-  echo "    ];"
-
-  echo "    aarch64-darwin = ["
-  genMainSrc "darwin" "arm64"
-  genSrcs "darwin" "arm64"
-  echo "    ];"
+  # echo "    x86_64-darwin = ["
+  # genMainSrc "darwin" "x64"
+  # genSrcs "darwin" "amd64"
+  # echo "    ];"
+  #
+  # echo "    aarch64-linux = ["
+  # genMainSrc "linux" "arm64"
+  # genSrcs "linux" "arm64"
+  # echo "    ];"
+  #
+  # echo "    aarch64-darwin = ["
+  # genMainSrc "darwin" "arm64"
+  # genSrcs "darwin" "arm64"
+  # echo "    ];"
 
   echo "  };"
   echo "}"
