@@ -54,7 +54,10 @@ final: pkgs: let
         inherit url sha256;
       };
     });
-    idePlugins = if noGlobalPlugins then plugins else plugins ++ globalPlugins;
+    idePlugins =
+      if noGlobalPlugins
+      then plugins
+      else plugins ++ globalPlugins;
   in
     jetbrains.plugins.addPlugins versionChangedPkg idePlugins;
 
