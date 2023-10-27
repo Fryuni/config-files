@@ -9,15 +9,15 @@ final: pkgs: let
   overrides = {
     # https://www.jetbrains.com/webstorm/nextversion
     webstorm = rec {
-      version = "2023.2.3";
+      version = "233.10527.23";
       url = "https://download.jetbrains.com/webstorm/WebStorm-${version}.tar.gz";
-      sha256 = "sha256-tX9KcTYaIkrrDoDy8xH2MqsXVzVqLeNiet4+ndTuCJk=";
+      sha256 = "sha256-yx+rDIP+Vyn7TutCz+Fe5pwCFfePDfMC9ySLH96NpX0=";
     };
     # https://www.jetbrains.com/go/nextversion
     goland = rec {
-      version = "233.9102.195";
+      version = "233.10527.20";
       url = "https://download.jetbrains.com/go/goland-${version}.tar.gz";
-      sha256 = "sha256-C73LZR1NSR8mB8YLRq1iVHvdWAJsPS1d/ygQ4MqAjN8=";
+      sha256 = "sha256-q1IO63bI6zIzMwb2Reo5FtU+EiC9+vP8YacdavhFFmo=";
     };
     # https://www.jetbrains.com/pycharm/nextversion
     pycharm-professional = rec {
@@ -27,16 +27,16 @@ final: pkgs: let
     };
     # https://www.jetbrains.com/datagrip/nextversion
     datagrip = rec {
-      version = "233.9102.70";
+      version = "233.10527.14";
       url = "https://download.jetbrains.com/datagrip/datagrip-${version}.tar.gz";
-      sha256 = "sha256-jo6+OMglpOEaGKB+pYZ6TpZGj626EhqeijRCLM/bmfg=";
+      sha256 = "sha256-8mFfZ7zCYQGFjIWXOd/73pCM7jdeRqws4MQWyHVy8Bc=";
       plugins = ["8182-beta"];
     };
     # https://www.jetbrains.com/rust/nextversion
     rust-rover = rec {
-      version = "233.8264.22";
+      version = "233.8264.32";
       url = "https://download.jetbrains.com/rustrover/RustRover-${version}.tar.gz";
-      sha256 = "sha256-PdjpmwZhZO/BHobjKJ5ETFI4386OkUL+LTqMNA7usXU=";
+      sha256 = "sha256-UVD8M4WqpRi8L7lzf5Bz2kYLdtE9TAnWtMTZEr84E5s=";
       noGlobalPlugins = true;
     };
   };
