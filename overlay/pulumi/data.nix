@@ -1,11 +1,12 @@
 # DO NOT EDIT! This file is generated automatically by update.sh
-_: {
-  version = "3.90.1";
+_:
+{
+  version = "3.91.0";
   pulumiPkgs = {
     x86_64-linux = [
       {
-        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.90.1-linux-x64.tar.gz";
-        sha256 = "1bd9ra35zdhcakqk00x3rczh3smgmdhyzsl9kswcixl4i1a01sxg";
+        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.91.0-linux-x64.tar.gz";
+        sha256 = "07327ip8nskb1f1zy7llc8fkh3q30gl71ybsb349n7i520q6hiib";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-docker-v4.4.4-linux-amd64.tar.gz";
@@ -28,8 +29,8 @@ _: {
         sha256 = "1xq92rsk7bimkr52c13mjypd0ygs7qc9ijyi2ghnf0585d1z5bk5";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-kubernetes-v4.5.1-linux-amd64.tar.gz";
-        sha256 = "14b4q99h9dn7m86i3ir4is0hzfmi1wwjqikvq0irpb484dwn7jws";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-kubernetes-v4.5.2-linux-amd64.tar.gz";
+        sha256 = "15dah2h5b6d5kmar8iq6n7ng3cfzaf8adra8a1x1gldd6a4y44vv";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-postgresql-v3.10.0-linux-amd64.tar.gz";
