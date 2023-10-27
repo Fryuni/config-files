@@ -13,15 +13,7 @@
 
     slack
 
-    (pkgs.symlinkJoin {
-      name = "go-no-editor";
-      paths = [go_1_21];
-      nativeBuildInputs = [pkgs.makeWrapper];
-      postBuild = ''
-        rm -f $out/bin/go
-        makeWrapper ${go_1_21}/bin/go $out/bin/go --set EDITOR ""
-      '';
-    })
+    go_1_21
     golangci-lint
     gosec
     go2nix
