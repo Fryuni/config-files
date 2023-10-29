@@ -30,11 +30,9 @@ FRIENDLY_TO_PLUGIN = {
     "goland": "GOLAND",
     "idea-community": "IDEA_COMMUNITY",
     "idea-ultimate": "IDEA",
-    "mps": "MPS",
     "phpstorm": "PHPSTORM",
     "pycharm-community": "PYCHARM_COMMUNITY",
     "pycharm-professional": "PYCHARM",
-    "rider": "RIDER",
     "ruby-mine": "RUBYMINE",
     "rust-rover": "RUST",
     "webstorm": "WEBSTORM"
@@ -382,7 +380,7 @@ def main():
     write_result(result)
 
     # Commit the result
-    commitMessage = "jetbrains.plugins: update"
+    commitMessage = "chore(ide): Update JetBrains plugins"
     print("#### Committing changes... ####")
     run(['git', 'commit', f'-m{commitMessage}', '--', f'{PLUGINS_FILE}'], check=True)
 
