@@ -160,6 +160,5 @@ EOF
 
 } > "${SCRIPT_DIR}/data.nix"
 
-git restore --staged .
-git add  "${SCRIPT_DIR}/data.nix"
-git commit -m "chore(cli): Update pulumi"
+nix fmt "${SCRIPT_DIR}/data.nix"
+git commit -m "chore(cli): Update pulumi" -- "${SCRIPT_DIR}/data.nix"
