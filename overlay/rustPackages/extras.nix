@@ -7,4 +7,8 @@ pkgs: {
     nativeBuildInputs = with pkgs; [pkg-config];
     buildInputs = with pkgs; [openssl];
   };
+  prr = {
+    nativeBuildInputs = with pkgs; [pkg-config];
+    buildInputs = with pkgs; [openssl];
+  };
 }
