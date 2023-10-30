@@ -48,6 +48,7 @@
 
       syscfg = "$HOME/ZShutils";
       oss = "$HOME/IsoWorkspaces/OSS";
+      reviews = "$HOME/IsoWorkspaces/reviews";
 
       croct-base = "$HOME/IsoWorkspaces/Croct";
       croct-meta = "$HOME/IsoWorkspaces/Croct/metas";
