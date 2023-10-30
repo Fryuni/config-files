@@ -4,9 +4,9 @@
       "update-channel": "CLion EAP",
       "url-template": "https://download.jetbrains.com/cpp/CLion-{version}.tar.gz",
       "version": "2023.3 EAP",
-      "sha256": "4d18c18f4f8de9a080342239e0cbbcb0a8f9c785def46260616f30c76d68679a",
-      "url": "https://download.jetbrains.com/cpp/CLion-233.10527.7.tar.gz",
-      "build_number": "233.10527.7"
+      "sha256": "a1c238c1875ee69565d29f8148a9e5951c58430981656169298ffc10b2e79a95",
+      "url": "https://download.jetbrains.com/cpp/CLion-233.11361.11.tar.gz",
+      "build_number": "233.11361.11"
     },
     "datagrip": {
       "update-channel": "DataGrip EAP",
@@ -36,9 +36,9 @@
       "update-channel": "GoLand EAP",
       "url-template": "https://download.jetbrains.com/go/goland-{version}.tar.gz",
       "version": "2023.3 EAP",
-      "sha256": "ab520eeb76c8eb32333306f645ea3916d53e1220bdfaf3fc61a71d6af845166a",
-      "url": "https://download.jetbrains.com/go/goland-233.10527.20.tar.gz",
-      "build_number": "233.10527.20"
+      "sha256": "0d6316a5351e0d770d868b2637ab7df1a61bb4632be199c1b4de6d7bfd6f6f09",
+      "url": "https://download.jetbrains.com/go/goland-233.11361.11.tar.gz",
+      "build_number": "233.11361.11"
     },
     "idea-community": {
       "update-channel": "IntelliJ IDEA EAP",
@@ -69,17 +69,17 @@
       "update-channel": "PyCharm EAP",
       "url-template": "https://download.jetbrains.com/python/pycharm-community-{version}.tar.gz",
       "version": "2023.3 EAP",
-      "sha256": "eb6d6f3412814146e4c8ba82eee2704df5af84b98b281bf62fcad85c79b2d371",
-      "url": "https://download.jetbrains.com/python/pycharm-community-233.9802.6.tar.gz",
-      "build_number": "233.9802.6"
+      "sha256": "1a859e2e377ecd9fa276865142d31809690a869305dd9c7d9685108ab5bf67ae",
+      "url": "https://download.jetbrains.com/python/pycharm-community-233.11361.11.tar.gz",
+      "build_number": "233.11361.11"
     },
     "pycharm-professional": {
       "update-channel": "PyCharm EAP",
       "url-template": "https://download.jetbrains.com/python/pycharm-professional-{version}.tar.gz",
       "version": "2023.3 EAP",
-      "sha256": "7b45b91b68b83771024e82f9ce1b3eaab40aa1f5426d9116262b681f68de99cf",
-      "url": "https://download.jetbrains.com/python/pycharm-professional-233.9802.6.tar.gz",
-      "build_number": "233.9802.6"
+      "sha256": "1e780c7c010a3d28d100eda000f3c5ad7ca540c9579d11a791a064320f30d147",
+      "url": "https://download.jetbrains.com/python/pycharm-professional-233.11361.11.tar.gz",
+      "build_number": "233.11361.11"
     },
     "ruby-mine": {
       "update-channel": "RubyMine EAP",
