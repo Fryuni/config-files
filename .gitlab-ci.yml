@@ -2,7 +2,7 @@ image: nixpkgs/nix-flakes:latest
 
 update:
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
   script:
     - git config user.email "bot@lferraz.com"
     - git config user.name "LFerraz Bot"
