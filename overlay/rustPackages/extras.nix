@@ -1,14 +1,10 @@
 pkgs: {
   cargo-doctor = {
-    buildInputs = with pkgs; [
-      openssl
-      pkg-config
-    ];
+    nativeBuildInputs = with pkgs; [pkg-config];
+    buildInputs = with pkgs; [openssl];
   };
   cargo-edit = {
-    buildInputs = with pkgs; [
-      openssl
-      pkg-config
-    ];
+    nativeBuildInputs = with pkgs; [pkg-config];
+    buildInputs = with pkgs; [openssl];
   };
 }
