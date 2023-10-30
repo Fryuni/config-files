@@ -1,4 +1,11 @@
-_: {
+{pkgs, ...}: {
+  home.packages = with pkgs; [
+    # Git stuff
+    gh
+    lazygit
+    rustCrates.prr
+  ];
+
   programs.git = {
     enable = true;
 

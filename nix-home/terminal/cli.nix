@@ -61,10 +61,6 @@ in {
       '';
     })
 
-    # Git stuff
-    gh
-    lazygit
-
     # Cloud
     terraform
     pulumi-bin
