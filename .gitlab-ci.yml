@@ -1,5 +1,8 @@
 image: nixpkgs/nix-flakes:latest
 
+variables:
+  NIX_PATH: nixpkgs=channel:nixos-unstable
+
 update:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
