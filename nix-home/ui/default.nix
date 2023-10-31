@@ -26,6 +26,7 @@
     };
   };
 
+  xdg.configFile."mimeapps.list".force = true;
   xdg.mimeApps = import ./xdg-mime.nix {
     defaultBrowser = "google-chrome-beta.desktop";
     defaultVideo = "mpv.desktop";
