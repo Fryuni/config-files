@@ -12,8 +12,8 @@
     doom-nvim-src = {
       owner = "Fryuni";
       repo = "doom-nvim";
-      rev = "603e633da0b77615e36899adff9ed0ad55387260";
-      sha256 = "sha256-wO/3/AH9AoPwckbDtsO/Oa4SU9yT5u9TIEdGSI5S2Qc=";
+      rev = "0ecefdf37c3dac4ba0c133bbe3a8102da745fa20";
+      sha256 = "sha256-hqbgDPR3U1eEesM9Sxfcfo3oNFkMVN0UQboMYL8GkX4=";
     };
 
     nvimPackage = pkgs.neovim;

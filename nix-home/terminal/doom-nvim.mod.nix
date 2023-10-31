@@ -182,6 +182,7 @@ in {
 
       installPhase = ''
         mkdir -p $out
+        cp lazy-lock.json $out/lazy-lock.json
         cp init.lua $out/init.lua
         cp -R lua $out/lua
         cp -R doc $out/docs
@@ -232,6 +233,12 @@ in {
       };
 
       home.activation = {
+        "initialize doom-nvim lock" = hm.dag.entryAfter ["writeBoundary"] ''
+          if [ ! -f ${config.xdg.configHome}/nvim/lazy-lock.json ]; then
+            rm -rf ${config.xdg.configHome}/nvim/lazy-lock.json
+            cp ${doom-src}/lazy-lock.json ${config.xdg.configHome}/nvim/lazy-lock.json
+          fi
+        '';
         "mutable doom-nvim" = mkIf cfg.mutableConfig (
           hm.dag.entryAfter ["writeBoundary "]
           (strings.concatStringsSep "\n" ([
