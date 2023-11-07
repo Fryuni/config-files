@@ -28,13 +28,13 @@
 
   xdg.configFile."mimeapps.list".force = true;
   xdg.mimeApps = import ./xdg-mime.nix {
-    defaultBrowser = "google-chrome-beta.desktop";
+    defaultBrowser = "google-chrome.desktop";
     defaultVideo = "mpv.desktop";
   };
 
   programs.chromium = {
     enable = true;
-    package = pkgs.master.google-chrome-beta;
+    package = pkgs.master.google-chrome;
     extensions = builtins.map (id: {inherit id;}) [
       "eimadpbcbfnmbkopoojfekhnkhdbieeh"
     ];
