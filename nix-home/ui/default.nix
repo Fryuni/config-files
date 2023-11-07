@@ -36,6 +36,9 @@
     enable = true;
     package = pkgs.master.google-chrome;
     extensions = builtins.map (id: {inherit id;}) [
+      # LastPass
+      "hdokiejnpimakedhajhdlcegeplioahd"
+      # Dark Reader
       "eimadpbcbfnmbkopoojfekhnkhdbieeh"
     ];
   };
