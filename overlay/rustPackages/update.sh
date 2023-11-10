@@ -1,4 +1,4 @@
-#!/usr/bin/env -S nix shell -iv me#bash me#nix me#findutils me#cargo me#alejandra me#ripgrep me#rustCrates.cargo-crate me#jq me#moreutils me#coreutils me#nix-prefetch -c bash
+#!/usr/bin/env -S nix shell -iv me#bash me#nix me#findutils me#cargo me#alejandra me#ripgrep me#rustCrates.cargo-crate me#jq me#moreutils me#coreutils me#nix-prefetch -c bash --
 # shellcheck shell=bash
 
 # set -x
@@ -80,6 +80,8 @@ function prefetch() {
 	local version="${2}"
 	local tmpdir="${3}"
 
+  echo "Prefetching crate: ${crate}"
+
 	local crateSha256
 	crateSha256=$(nix-prefetch fetchCrate --pname "$crate" --version "$version" 2>/dev/null)
 
@@ -88,8 +90,9 @@ function prefetch() {
 
 		local depsSha256
 		depsSha256=$(capture_hash nix build --no-link --impure --expr "
-		  with import <nixpkgs> {}; 
-      (pkgs.fenixPlatform.buildRustPackage rec {
+		  with builtins.getFlake \"me\"; 
+		  with legacyPackages.\${builtins.currentSystem};
+      (fenixPlatform.buildRustPackage rec {
         pname = \"${crate}\";
         version = \"${version}\";
 		    src = fetchCrate {

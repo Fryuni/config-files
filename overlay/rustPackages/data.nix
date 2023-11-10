@@ -41,12 +41,12 @@
     version = "0.8.3";
   };
   cargo-crate = {
-    crateSha256 = "sha256-sa4oLZB7rR0tlemUTy8utypWY/7bDjYzuSOnzdvPxKw=";
-    depsSha256 = "sha256-S3KNfJ0EKnxDPJHITUIH3d53JHrV9r54m2g2HGgSPZo=";
+    crateSha256 = "sha256-zhmG76VsjhsC6jUt9SvI2Alb+6IGOQnHiHk9q1NTLdg=";
+    depsSha256 = "sha256-KQ/wy8B4tH7cjeFdRstTdKsi7CIIXHThK2OHgkGFo8k=";
     description = "A set of crate related cargo commands. You can for instance get the information about a crate, as text or json, including the owners of a crate and its versions.";
     homepage = "https://github.com/chevdor/cargo-crate";
     id = "cargo-crate";
-    keywords = ["cli" "cargo" "crate" "cargo-subcommand"];
+    keywords = ["cli" "cargo-subcommand" "crate" "cargo"];
     owners = [
       {
         avatar = "https://avatars.githubusercontent.com/u/738724?v=4";
@@ -58,15 +58,15 @@
         url = "https://github.com/chevdor";
       }
     ];
-    version = "0.2.1";
+    version = "0.2.2";
   };
   cargo-deps = {
-    crateSha256 = "sha256-0zK1qwu+awZGd9hgH2WRrzJMzwpI830Lh//P0wVp6Js=";
-    depsSha256 = "sha256-ZPQIt+TL1OKX3Ch4A17eAELjaSTo2uk+X6YWFAXvWJA=";
+    crateSha256 = "sha256-qnSHG4AhBrleYKZ4SJ4AwHdJyiidj8NTeSSphBRo7gg=";
+    depsSha256 = "sha256-dpCbFA9AZmIFPx69tw0CqHF+lVw7uhUlwAeVX1+lIK8=";
     description = "Cargo subcommand for building dependency graphs of Rust projects.";
-    homepage = "https://github.com/m-cat/cargo-deps";
+    homepage = "https://github.com/mrcnski/cargo-deps";
     id = "cargo-deps";
-    keywords = ["dependencies" "cargo" "graphviz" "graph" "visualization"];
+    keywords = ["cargo" "visualization" "graph" "dependencies" "graphviz"];
     owners = [
       {
         avatar = "https://avatars.githubusercontent.com/u/6035856?v=4";
@@ -78,11 +78,11 @@
         url = "https://github.com/mrcnski";
       }
     ];
-    version = "1.5.0";
+    version = "1.5.1";
   };
   cargo-docs = {
-    crateSha256 = "sha256-fwHpYJ1sfhWS0wR1hStmPKaP9XGYs0ZEgRWJ0KqA6Uk=";
-    depsSha256 = "sha256-1VmmiVVS8JXaO4xhmpRdj/tM1BNkwdWS2m1i8KS+N0A=";
+    crateSha256 = "sha256-ssX7Aee5/rWaCYtiI4xGJCnoUNTrYQQRSpPdjO/SVJc=";
+    depsSha256 = "sha256-7y01wdA8p4jOEm83qz77VneR1ARgk8+LfmeoxHqBNoM=";
     description = "A cargo plugin for serving rust and crate doc locally.";
     homepage = null;
     id = "cargo-docs";
@@ -98,15 +98,15 @@
         url = "https://github.com/btwiuse";
       }
     ];
-    version = "0.1.25";
+    version = "0.1.26";
   };
   cargo-edit = {
-    crateSha256 = "sha256-8QH1aud8IdPAhmZbk9hpDAOzubY2KG00Iw0D8T/vOZE=";
-    depsSha256 = "sha256-8pymmsZeV+1tujlm5nzkXMS72vHFPJN0M50MVnyo7uo=";
+    crateSha256 = "sha256-bNM+dpJt/Zfok4H74HdNjqar5xelpK4ckoMo9O+BcNk=";
+    depsSha256 = "sha256-lHwZh4EygM4O0sNcYvuPaMv//6gt7yM73lQxdtTForc=";
     description = "Cargo commands for modifying a `Cargo.toml` file..";
     homepage = "https://github.com/killercup/cargo-edit";
     id = "cargo-edit";
-    keywords = ["cargo-subcommand" "dependencies" "cli" "crates" "cargo"];
+    keywords = ["cargo" "cli" "dependencies" "crates" "cargo-subcommand"];
     owners = [
       {
         avatar = "https://avatars.githubusercontent.com/u/20063?v=4";
@@ -145,15 +145,15 @@
         url = "https://github.com/ordian";
       }
     ];
-    version = "0.11.9";
+    version = "0.12.2";
   };
   cargo-expand = {
-    crateSha256 = "sha256-Pw9ws9GpHemyJyLV7nrdn2Ea43/J7regu+U0xTkltPw=";
-    depsSha256 = "sha256-NswN28wbnX4cV7QB357PKzDpaLh93LeOSij3KV9SPek=";
+    crateSha256 = "sha256-rkPL3bUDXvVeV70e+WBuGi4bdEeV2xyQRg3OmcCk+kY=";
+    depsSha256 = "sha256-S4Ha7iuE2QXzhI1VDRpFVvrHsFFqJGSJKO+Azdwents=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
-    keywords = ["cargo" "subcommand" "macros"];
+    keywords = ["subcommand" "macros" "cargo"];
     owners = [
       {
         avatar = "https://avatars.githubusercontent.com/u/1940490?v=4";
@@ -165,7 +165,7 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.48";
+    version = "1.0.74";
   };
   cargo-lock = {
     crateSha256 = "sha256-SMxM66qo3Xmst+SVXu4LYZ0Zzn15wqVVNqqHzAkip/s=";
@@ -207,8 +207,8 @@
     version = "9.0.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-4UaLzYwOhVK3Ca4EqQTdi/cMozAeXLWALB5yTQCNi/k=";
-    depsSha256 = "sha256-zDgohGKu7jbaWNkb/Nr6ZVkQFEiXzNdEReVBsVuvKDA=";
+    crateSha256 = "sha256-etEwMmfwyOTHRb/UfkcHvmnLVVqeSagWJ5HjuJ6gZVo=";
+    depsSha256 = "sha256-7GyPjEit3FEjnegLnZt9TMLBI3BtzcDssrJPj60gpTo=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/Enselic/cargo-public-api";
     id = "cargo-public-api";
@@ -242,7 +242,7 @@
         url = "https://github.com/cargo-public-api";
       }
     ];
-    version = "0.29.1";
+    version = "0.32.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-i3Skc3Pc/3SxVCcLdMdxYVpkZZAZ0iew5UUq2tPVae8=";
@@ -274,12 +274,12 @@
     version = "1.0.9";
   };
   cargo-watch = {
-    crateSha256 = "sha256-q1UAqVGWJNvcmIXqDYRNGuRgfdYeBTzNt1IclGEdEs4=";
-    depsSha256 = "sha256-BzcKWQSB94H3XOsbwNvJoAHlZwkJvLABIrfFh9Ugfig=";
+    crateSha256 = "sha256-446pnOnDVXC7kcNMuOW59bVHydqtlOmw5uJXhBuLa48=";
+    depsSha256 = "sha256-0D+aM/zap5UDQ+k9c/p+ZfN1OUjDzFRArvcmqEOcBbM=";
     description = "Watches over your Cargo project’s source";
     homepage = "https://watchexec.github.io/#cargo-watch";
     id = "cargo-watch";
-    keywords = ["watch" "notify" "cargo" "compile"];
+    keywords = ["cargo" "notify" "compile" "watch"];
     owners = [
       {
         avatar = "https://avatars.githubusercontent.com/u/155787?v=4";
@@ -300,11 +300,11 @@
         url = "https://github.com/rust-bus";
       }
     ];
-    version = "8.4.0";
+    version = "8.4.1";
   };
   prr = {
-    crateSha256 = "sha256-HwChF+977k93uAEc+x6AgXNc3AH3NPsH4dq/JorwhJ0=";
-    depsSha256 = "sha256-7f4tRhMFRVNUff2dcUnoxmzfkxjIENGCDyuSXzNRqHw=";
+    crateSha256 = "sha256-VGGgTZPjPPLsWdcae3KEutt3sZ7JAc9TBK6fLkFxVW0=";
+    depsSha256 = "sha256-p+iquWJkQbYOVi++eeS0B2JL7VA8tmUepJGnRzphXN8=";
     description = "Mailing list style code reviews for github";
     homepage = null;
     id = "prr";
@@ -320,7 +320,7 @@
         url = "https://github.com/danobi";
       }
     ];
-    version = "0.8.0";
+    version = "0.8.2";
   };
   toml-merge = {
     crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
@@ -343,8 +343,8 @@
     version = "0.1.0";
   };
   zellij = {
-    crateSha256 = "sha256-ZLU4Ufj5YJ+RxH0Wokwx6IVbJlfGeIjSXK1QCTbVxaY=";
-    depsSha256 = "sha256-2hgDRWygL1KVCcCpOnGzQBTgws1mkNsfl9ydJYyTZwU=";
+    crateSha256 = "sha256-0DpA5fjdR4g5EXMU/jxNmSNdw3rbR4QfDaLxWZ19PaQ=";
+    depsSha256 = "sha256-jrblDtL43HGZyl24G7mG3f7Cth17ODx+V/8LVzFMCcQ=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
@@ -397,6 +397,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.38.0";
+    version = "0.39.0";
   };
 }
