@@ -20,10 +20,7 @@ final: prev: let
 
         nativeBuildInputs = with final;
           (extra.nativeBuildInputs or [])
-          ++ [
-            openssl.dev
-            pkg-config
-          ];
+          ++ [pkg-config];
 
         src = final.fetchCrate {
           pname = name;
