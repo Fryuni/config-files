@@ -8,8 +8,8 @@ _: {
         sha256 = "1s081ak1m55jckgrrcnj918smlx79sywqgqfbvf50hkcrk5pwdsj";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-docker-v4.4.4-linux-amd64.tar.gz";
-        sha256 = "01zckkhkji8579r6b18mc6h36ap5qm8pa5kjf3mzgy1j1v1mhlww";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-docker-v4.4.5-linux-amd64.tar.gz";
+        sha256 = "1m44dwr8q8w60s5clm4n1hini1bm5bqc7p7h1gvbh5zg1482hn5q";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gcp-v7.0.0-linux-amd64.tar.gz";
