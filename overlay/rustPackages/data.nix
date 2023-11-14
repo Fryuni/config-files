@@ -303,8 +303,8 @@
     version = "8.4.1";
   };
   prr = {
-    crateSha256 = "sha256-VGGgTZPjPPLsWdcae3KEutt3sZ7JAc9TBK6fLkFxVW0=";
-    depsSha256 = "sha256-p+iquWJkQbYOVi++eeS0B2JL7VA8tmUepJGnRzphXN8=";
+    crateSha256 = "sha256-c7ztIDJGJWWTZuSNSvdFCxU709uNpvwbsWyPw9KvqZE=";
+    depsSha256 = "sha256-cgV0iiu6EYHxZiazoQFmI3qZr+quEbfJYy4Ew4X70A8=";
     description = "Mailing list style code reviews for github";
     homepage = null;
     id = "prr";
@@ -320,7 +320,7 @@
         url = "https://github.com/danobi";
       }
     ];
-    version = "0.8.2";
+    version = "0.9.0";
   };
   toml-merge = {
     crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
@@ -343,8 +343,8 @@
     version = "0.1.0";
   };
   zellij = {
-    crateSha256 = "sha256-0DpA5fjdR4g5EXMU/jxNmSNdw3rbR4QfDaLxWZ19PaQ=";
-    depsSha256 = "sha256-jrblDtL43HGZyl24G7mG3f7Cth17ODx+V/8LVzFMCcQ=";
+    crateSha256 = "sha256-Y9fuInwGL29Hqt3ZPvlcfIojZhodF91ZXQseipZOFD8=";
+    depsSha256 = "sha256-fwxXCIyi1IvRM0zkg3qgH1wU8h2PGRmXJMemHu+xx7w=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
@@ -397,6 +397,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.39.0";
+    version = "0.39.1";
   };
 }
