@@ -8,6 +8,7 @@
       "networkmanager"
       "wheel"
       "docker"
+      "wireshark"
       "audio"
       "rtkit"
       "dialout"

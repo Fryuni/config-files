@@ -14,6 +14,8 @@
     gcc-unwrapped.lib
     gcc
     file
+    termshark
+    wireshark
 
     docker-compose
   ];
@@ -31,6 +33,8 @@
       autoPrune.flags = ["--all"];
     };
   };
+
+  programs.wireshark.enable = true;
 
   services.dgraph = {
     enable = false;
