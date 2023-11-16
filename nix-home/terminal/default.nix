@@ -65,6 +65,7 @@
       nivm = "nvim";
 
       "refresh-gcloud-credentials" = "gcloud auth print-access-token > /dev/null";
+      gselect = "gcloud config configurations activate";
 
       # Run code inside of a container with the full home context
       drun = "docker run -it --rm -v /home/lotus:/home/lotus -w $(pwd) -u $(id -u):$(id -g) -e HOME=$HOME";
