@@ -1,27 +1,27 @@
 # DO NOT EDIT! This file is generated automatically by update.sh
 _: {
-  version = "3.93.0";
+  version = "3.94.2";
   pulumiPkgs = {
     x86_64-linux = [
       {
-        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.93.0-linux-x64.tar.gz";
-        sha256 = "1s081ak1m55jckgrrcnj918smlx79sywqgqfbvf50hkcrk5pwdsj";
+        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.94.2-linux-x64.tar.gz";
+        sha256 = "1fm35c78nrz55y279gpxdybb6zf1m33k4xabgzfa6j0lqjwsynd1";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-docker-v4.4.5-linux-amd64.tar.gz";
         sha256 = "1m44dwr8q8w60s5clm4n1hini1bm5bqc7p7h1gvbh5zg1482hn5q";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gcp-v7.0.0-linux-amd64.tar.gz";
-        sha256 = "1047qlwrv42llknx25r2iqdchparcrc5krpbjcqq194rpzq73m02";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gcp-v7.1.1-linux-amd64.tar.gz";
+        sha256 = "0ai98sk4g129caz3il9pq8rlmfrms66ppsjg3aahym82kk6ia586";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-github-v5.22.0-linux-amd64.tar.gz";
         sha256 = "0hnaanqg991xy4jmk09rcd5adzx760707133yaax0nx6r1g0lbdc";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gitlab-v6.5.0-linux-amd64.tar.gz";
-        sha256 = "0x22g7rdywxk1crgcf424n6w2h1jslk4fhhh66g642d553jpz1ci";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gitlab-v6.6.0-linux-amd64.tar.gz";
+        sha256 = "10cxlavxvb98207plgrvmf8c8sgp5w2hpnpcj493i033am07g7yc";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-google-native-v0.31.1-linux-amd64.tar.gz";
