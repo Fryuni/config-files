@@ -4,6 +4,8 @@
   lib,
   ...
 }: {
+  services.nordvpn.enable = true;
+
   networking = {
     nameservers = ["127.0.0.1" "::1"];
     enableIPv6 = true;

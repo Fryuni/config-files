@@ -6,6 +6,7 @@
     description = "Void Lotus";
     extraGroups = [
       "networkmanager"
+      "nordvpn"
       "wheel"
       "docker"
       "wireshark"

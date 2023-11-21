@@ -8,6 +8,9 @@
     nixpkgs-master.url = "github:Fryuni/nixpkgs/master";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
+    # https://github.com/NixOS/nixpkgs/pull/220616
+    nixpkgs-pr-nordvpn.url = "github:LuisChDev/nixpkgs/nordvpn-client";
+
     agenix = {
       url = "github:ryantm/agenix";
       inputs = {
@@ -70,7 +73,11 @@
 
         overlays =
           [
-            (_: _: {inherit master stable;})
+            (pkgs: _: {
+              inherit master stable;
+
+              nordvpn = pkgs.callPackage "${attrs.nixpkgs-pr-nordvpn}/pkgs/applications/networking/nordvpn/default.nix" {};
+            })
             fenix.overlays.default
             agenix.overlays.default
             (import "${charm}/overlay.nix")
@@ -93,6 +100,7 @@
 
         modules = [
           agenix.nixosModules.age
+          "${attrs.nixpkgs-pr-nordvpn}/nixos/modules/services/networking/nordvpn.nix"
           ./nixos
           ./nixos/notebook
           # nixos-hardware.nixosModules.dell-g3-3779
