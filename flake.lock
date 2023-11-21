@@ -205,22 +205,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-pr-nordvpn": {
-      "locked": {
-        "lastModified": 1682661038,
-        "narHash": "sha256-imOrSYBa719dAwOmrqHv7tQKk2QThZO0wiOFes0C+bk=",
-        "owner": "LuisChDev",
-        "repo": "nixpkgs",
-        "rev": "daaec93c08fd98a0dbc5a8cec49ee07f3f69fc60",
-        "type": "github"
-      },
-      "original": {
-        "owner": "LuisChDev",
-        "ref": "nordvpn-client",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixpkgs-stable": {
       "locked": {
         "lastModified": 1699596684,
@@ -271,7 +255,6 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
         "nixpkgs-master": "nixpkgs-master",
-        "nixpkgs-pr-nordvpn": "nixpkgs-pr-nordvpn",
         "nixpkgs-stable": "nixpkgs-stable",
         "polymc": "polymc"
       }
