@@ -3,8 +3,7 @@
   pkgs,
   lib,
   ...
-}:
-with lib; {
+}: {
   networking = {
     nameservers = ["127.0.0.1" "::1"];
     enableIPv6 = true;
@@ -40,7 +39,7 @@ with lib; {
     StateDirectory = "dnscrypt-proxy";
   };
 
-  services.openvpn.servers = let
+  services.openvpn.servers = with lib; let
     nordModeNames = builtins.attrNames (builtins.readDir ./nordvpn);
 
     nordModeToFiles = mode: let
