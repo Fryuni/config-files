@@ -45,17 +45,16 @@
     agenix,
     ...
   } @ attrs: let
+    subPkgs = system: flake:
+      import flake {
+        inherit system;
+        config.allowUnfree = true;
+        config.permittedInsecurePackages = [];
+      };
+
     pkgsFun = system: let
-      stable = import attrs.nixpkgs-stable {
-        inherit system;
-        config.allowUnfree = true;
-        config.permittedInsecurePackages = [];
-      };
-      master = import attrs.nixpkgs-master {
-        inherit system;
-        config.allowUnfree = true;
-        config.permittedInsecurePackages = [];
-      };
+      stable = subPkgs system attrs.nixpkgs-stable;
+      master = subPkgs system attrs.nixpkgs-master;
     in
       import nixpkgs {
         inherit system;
