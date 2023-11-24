@@ -21,7 +21,7 @@
       enable = true;
       options = {
         features = "side-by-side line-numbers";
-        delta.navigate = true;
+        navigate = true;
       };
     };
 
