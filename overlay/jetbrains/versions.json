@@ -28,41 +28,41 @@
       "update-channel": "Gateway EAP",
       "url-template": "https://download.jetbrains.com/idea/gateway/JetBrainsGateway-{version}.tar.gz",
       "version": "2023.3 Beta",
-      "sha256": "c1e89fb2415ee91d0bd21b5e78655ff29e39de5de0109e53bd8b58cfedcc4ee9",
-      "url": "https://download.jetbrains.com/idea/gateway/JetBrainsGateway-233.11799.30.tar.gz",
-      "build_number": "233.11799.30"
+      "sha256": "cb0d7d7a4b537b48fa4a0ffd223adadc974ea5a82d44ab5f19e722743830ef7b",
+      "url": "https://download.jetbrains.com/idea/gateway/JetBrainsGateway-233.11799.72.tar.gz",
+      "build_number": "233.11799.72"
     },
     "goland": {
       "update-channel": "GoLand EAP",
       "url-template": "https://download.jetbrains.com/go/goland-{version}.tar.gz",
       "version": "2023.3 Beta",
-      "sha256": "9b1dfa050f1c3d15eed871671d00e76b6348e154aea918f093e0de0d15aaa851",
-      "url": "https://download.jetbrains.com/go/goland-233.11799.38.tar.gz",
-      "build_number": "233.11799.38"
+      "sha256": "6fcbf76271bc4efba5cf2dc0be72294a8a4fb05e2fefd21065d88dd95b1cd06f",
+      "url": "https://download.jetbrains.com/go/goland-233.11799.68.tar.gz",
+      "build_number": "233.11799.68"
     },
     "idea-community": {
       "update-channel": "IntelliJ IDEA EAP",
       "url-template": "https://download.jetbrains.com/idea/ideaIC-{version}.tar.gz",
       "version": "2023.3 Beta",
-      "sha256": "9011df8cc784d38a493846679ab95d8d54646954149dbd5e25c12ac5ba6bf060",
-      "url": "https://download.jetbrains.com/idea/ideaIC-233.11799.30.tar.gz",
-      "build_number": "233.11799.30"
+      "sha256": "6b5c232738a094cce4991b6ef0055ae02b3a2151ade3e9316f22fe4bf7e1fd5b",
+      "url": "https://download.jetbrains.com/idea/ideaIC-233.11799.67.tar.gz",
+      "build_number": "233.11799.67"
     },
     "idea-ultimate": {
       "update-channel": "IntelliJ IDEA EAP",
       "url-template": "https://download.jetbrains.com/idea/ideaIU-{version}.tar.gz",
       "version": "2023.3 Beta",
-      "sha256": "c5db01f201660c9bd3427383f6ae9179293cbdeae7e54e2d708b4d70248d8427",
-      "url": "https://download.jetbrains.com/idea/ideaIU-233.11799.30.tar.gz",
-      "build_number": "233.11799.30"
+      "sha256": "374153baecd8a633fef3fe75fb5fe47e57f3d136e9873f7bd7ce1166f942559e",
+      "url": "https://download.jetbrains.com/idea/ideaIU-233.11799.67.tar.gz",
+      "build_number": "233.11799.67"
     },
     "phpstorm": {
       "update-channel": "PhpStorm EAP",
       "url-template": "https://download.jetbrains.com/webide/PhpStorm-{version}.tar.gz",
       "version": "2023.3 Beta",
-      "sha256": "506da131739dab5fe1b8714ede9ee752ad7129c152b0d3398ca3871ff3b75ddd",
-      "url": "https://download.jetbrains.com/webide/PhpStorm-233.11799.21.tar.gz",
-      "build_number": "233.11799.21",
+      "sha256": "a71e2daafc6286c0a5bf1415c033e0a87a97d7752514abded0d983856aec903c",
+      "url": "https://download.jetbrains.com/webide/PhpStorm-233.11799.55.tar.gz",
+      "build_number": "233.11799.55",
       "version-major-minor": "2022.3"
     },
     "pycharm-community": {
@@ -85,9 +85,9 @@
       "update-channel": "RubyMine EAP",
       "url-template": "https://download.jetbrains.com/ruby/RubyMine-{version}.tar.gz",
       "version": "2023.3 BETA",
-      "sha256": "1c97911197f1ed71bc67cebd0ba73203393a2db592b21d7c1c85a9b2c50c3ffd",
-      "url": "https://download.jetbrains.com/ruby/RubyMine-233.11799.28.tar.gz",
-      "build_number": "233.11799.28"
+      "sha256": "31db54b5c385ad8b1e4a21a518d9a61e02ed5d92420ec0dfad6a568efbe5a423",
+      "url": "https://download.jetbrains.com/ruby/RubyMine-233.11799.62.tar.gz",
+      "build_number": "233.11799.62"
     },
     "rust-rover": {
       "update-channel": "RustRover EAP",
@@ -101,9 +101,9 @@
       "update-channel": "WebStorm EAP",
       "url-template": "https://download.jetbrains.com/webstorm/WebStorm-{version}.tar.gz",
       "version": "2023.3 Beta",
-      "sha256": "3be5d98835a9af4cd028edc0e92d35faab08634077721a569ff2451ec18fb889",
-      "url": "https://download.jetbrains.com/webstorm/WebStorm-233.11799.31.tar.gz",
-      "build_number": "233.11799.31"
+      "sha256": "dfe495759c4fe04461e4c05405d2d786efda47268716d494e58856381cdcf300",
+      "url": "https://download.jetbrains.com/webstorm/WebStorm-233.11799.95.tar.gz",
+      "build_number": "233.11799.95"
     }
   }
 }
