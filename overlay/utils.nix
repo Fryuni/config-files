@@ -39,7 +39,7 @@ final: pkgs: {
       sha256 = "sha256-0pM36rAmwx/P1KAlmVaGoSj8eb9JucYycNC2R867dVo=";
     };
 
-    vendorSha256 = "sha256-veg5B68AQhkSZg8YA/e4FbqJNG0YGwnUQFsAdscz0QI=";
+    vendorHash = "sha256-veg5B68AQhkSZg8YA/e4FbqJNG0YGwnUQFsAdscz0QI=";
   };
 
   pg-schema-diff = pkgs.buildGoModule rec {
@@ -53,7 +53,7 @@ final: pkgs: {
       sha256 = "sha256-JVW2ML+2a9tRXRue0aPXRaPq8vNsgLP0NB7J0g1uMFw=";
     };
 
-    vendorSha256 = "sha256-/pzW7zK7pPo205oio4QcnOXgP7imRQ8VCdt652YCJkg=";
+    vendorHash = "sha256-/pzW7zK7pPo205oio4QcnOXgP7imRQ8VCdt652YCJkg=";
   };
 
   wtf = pkgs.buildGoModule rec {
@@ -68,7 +68,7 @@ final: pkgs: {
       sha256 = "sha256-DFrA4bx+wSOxmt1CVA1oNiYVmcWeW6wpfR5F1tnhyDY=";
     };
 
-    vendorSha256 = "sha256-f82ibPnauUOuZ5D6Rz3Yyt0jiAXvjN8Or3gud+ri6FA=";
+    vendorHash = "sha256-f82ibPnauUOuZ5D6Rz3Yyt0jiAXvjN8Or3gud+ri6FA=";
   };
 
   # Use fix from https://github.com/NixOS/nixpkgs/pull/252058
