@@ -10,7 +10,7 @@
     spotify
     flameshot
     discord-canary
-    obsidian
+    master.obsidian
     vlc
     stremio
     screenkey
