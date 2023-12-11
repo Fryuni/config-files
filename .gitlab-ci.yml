@@ -10,7 +10,8 @@ update:
     - git config user.email "bot@lferraz.com"
     - git config user.name "LFerraz Bot"
     - 'git remote add gitlab_origin https://oauth2:$COMMIT_TOKEN@gitlab.com/Fryuni/ZShutils.git'
-    - 'nix run .#update'
+    - 'nix-env -iA nixpkgs.just'
+    - just update-flake
     # - 'overlay/pulumi/update.sh'
     - 'overlay/jetbrains/update_ides.py'
     - 'git push gitlab_origin HEAD:main -o ci.skip'
