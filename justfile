@@ -5,16 +5,16 @@ default:
   nix flake metadata
 
 why-home dependency:
-  @nix why-depends --derivation "{{homeRoot}}" ".#{{dependency}}"
+  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure --derivation "{{homeRoot}}" ".#{{dependency}}"
 
-why-home-closuje dependency:
-  @nix why-depends "{{homeRoot}}" ".#{{dependency}}"
+why-home-closure dependency:
+  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure "{{homeRoot}}" ".#{{dependency}}"
 
 why-sys dependency:
-  @nix why-depends --derivation "{{sysRoot}}" ".#{{dependency}}"
+  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure --derivation "{{sysRoot}}" ".#{{dependency}}"
 
-why-sys-closuje dependency:
-  @nix why-depends "{{sysRoot}}" ".#{{dependency}}"
+why-sys-closure dependency:
+  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure "{{sysRoot}}" ".#{{dependency}}"
 
 
 build-home:
