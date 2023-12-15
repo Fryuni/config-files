@@ -9,6 +9,8 @@
 
   documentation.dev.enable = true;
 
+  boot.kernelPackages = pkgs.linuxPackages_zen;
+
   environment.systemPackages = with pkgs; [
     neovim
     inotify-tools
