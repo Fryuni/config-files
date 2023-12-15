@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   stdenv,
@@ -16,6 +17,8 @@
     file
     termshark
     wireshark
+
+    config.boot.kernelPackages.perf
 
     docker-compose
   ];
