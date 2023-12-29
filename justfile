@@ -16,12 +16,26 @@ why-sys dependency:
 why-sys-closure dependency:
   @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure "{{sysRoot}}" ".#{{dependency}}"
 
+build:
+  @nix build --no-link --print-out-paths "{{homeRoot}}"
 
-build-home:
-  nix build --no-link --print-out-paths .#homeConfigurations.notebook.activationPackage
+os-build:
+  @nix build --no-link --print-out-paths "{{sysRoot}}"
 
-build-sys:
-  nix build --no-link --print-out-paths .#nixosConfigurations.notebook.config.system.build.toplevel
+
+diff: build
+  nix run .#nvd -- diff \
+    $(nix eval -f ~/.nix-profile/manifest.nix --json | jq -r '.[0]') \
+    $(just build)
+
+os-diff: os-build
+  nix run .#nvd -- diff /run/current-system $(just os-build)
+
+switch:
+  nix run .#switch
+
+os-boot:
+  nix run .#os-boot
 
 
 update: update-flake update-overlays
