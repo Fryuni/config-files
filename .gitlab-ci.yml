@@ -13,7 +13,8 @@ update:
     - 'nix-env -iA nixpkgs.just'
     - just update-flake
     # - 'overlay/pulumi/update.sh'
-    - 'overlay/jetbrains/update_ides.py'
+    - just update-jetbrains
+    - just update-rustCrates
     - 'git push gitlab_origin HEAD:main -o ci.skip'
 
 # build-system-notebook:
