@@ -1,4 +1,4 @@
-#!/usr/bin/env -S nix shell -iv me#bash me#nix me#findutils me#cargo me#alejandra me#ripgrep me#rustCrates.cargo-crate me#jq me#moreutils me#coreutils me#nix-prefetch -c bash --
+#!/usr/bin/env -S nix shell -iv -k HOME me#bash me#nix me#git me#findutils me#cargo me#alejandra me#ripgrep me#rustCrates.cargo-crate me#jq me#moreutils me#coreutils me#nix-prefetch -c bash --
 # shellcheck shell=bash
 
 # set -x
@@ -167,3 +167,4 @@ EOF
 genSrcs
 
 alejandra "${SCRIPT_DIR}/data.nix"
+git commit -m "chore(tools): Update custom Rust crates" -- "${SCRIPT_DIR}/data.nix"

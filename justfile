@@ -36,11 +36,14 @@ update-flake:
   git add flake.lock
   git commit -m "chore: Update flake" -- flake.lock
 
-update-overlays: update-jetbrains update-pulumi
+update-overlays: update-jetbrains update-pulumi update-rustCrates
 
 update-jetbrains:
   overlay/jetbrains/update_ides.py
 
 update-pulumi:
   overlay/pulumi/update.sh
+
+update-rustCrates:
+  overlay/rustPackages/update.sh
 
