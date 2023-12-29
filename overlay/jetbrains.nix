@@ -14,9 +14,7 @@ final: pkgs: let
     # https://www.jetbrains.com/pycharm/nextversion
     pycharm-professional = {};
     # https://www.jetbrains.com/datagrip/nextversion
-    datagrip = {
-      plugins = ["8182-beta"];
-    };
+    datagrip = {};
     # https://www.jetbrains.com/rust/nextversion
     rust-rover = {};
   };
