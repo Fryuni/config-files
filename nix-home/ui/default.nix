@@ -2,10 +2,10 @@
   imports = [
     # ./xfce.nix
     ./xsession.nix
+    ./rofi.nix
   ];
 
   home.packages = with pkgs; [
-    rofi
     calibre
     spotify
     flameshot
