@@ -161,4 +161,4 @@ EOF
 } > "${SCRIPT_DIR}/data.nix"
 
 nix fmt "${SCRIPT_DIR}/data.nix"
-git commit -m "chore(cli): Update pulumi" -- "${SCRIPT_DIR}/data.nix"
+git commit -m "chore(cli): Update pulumi" -- "${SCRIPT_DIR}/data.nix" || true

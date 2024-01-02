@@ -167,4 +167,4 @@ EOF
 genSrcs
 
 alejandra "${SCRIPT_DIR}/data.nix"
-git commit -m "chore(tools): Update custom Rust crates" -- "${SCRIPT_DIR}/data.nix"
+git commit -m "chore(tools): Update custom Rust crates" -- "${SCRIPT_DIR}/data.nix" || true

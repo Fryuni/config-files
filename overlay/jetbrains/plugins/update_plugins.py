@@ -382,7 +382,7 @@ def main():
     # Commit the result
     commitMessage = "chore(ide): Update JetBrains plugins"
     print("#### Committing changes... ####")
-    run(['git', 'commit', f'-m{commitMessage}', '--', f'{PLUGINS_FILE}'], check=True)
+    run(['git', 'commit', f'-m{commitMessage}', '--', f'{PLUGINS_FILE}'])
 
 
 if __name__ == '__main__':
