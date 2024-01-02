@@ -42,7 +42,7 @@ function genLatest() {
 	echo "Retrieving latest version of ${crate}..."
 
 	cargo crate info --json "$crate" |
-		jq '{owners} + (.krate.crate|{id,description,homepage,keywords,version:.max_version})' \
+		jq '{owners} + (.krate.crate|{id,description,homepage,keywords:(.keywords|sort),version:.max_version})' \
 			>"${tmpdir}/${crate}_latest.json"
 
 	local version
