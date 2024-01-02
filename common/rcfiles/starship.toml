@@ -403,7 +403,7 @@ format = "[$symbol$context( \\($namespace\\))]($style) in "
 style = "cyan bold"
 symbol = "☸ "
 
-[kubernetes.context_aliases]
+[kubernetes.context_alias]
 gke_croct-production_southamerica-east1_app = "croct-prod"
 gke_croct-test-wtur_southamerica-east1_app = "croct-wtur"
 
