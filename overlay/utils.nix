@@ -86,4 +86,16 @@ final: pkgs: {
       hash = "sha256-kHv8PU48Le4lG3pf304hXggAtx/I5uBeu4aHmLsbdgw=";
     };
   };
+
+  ulauncher = pkgs.master.ulauncher.overridePythonAttrs {
+    propagatedBuildInputs =
+      pkgs.ulauncher.propagatedBuildInputs
+      ++ (with pkgs.python3Packages; [
+        pint
+        simpleeval
+        parsedatetime
+        pytz
+        babel
+      ]);
+  };
 }
