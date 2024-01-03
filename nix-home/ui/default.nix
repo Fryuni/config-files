@@ -15,6 +15,9 @@
     vlc
     stremio
     screenkey
+
+    master.ulauncher
+    master.zeal
   ];
 
   programs.mpv = {
