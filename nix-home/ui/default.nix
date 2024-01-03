@@ -11,6 +11,7 @@
     flameshot
     discord-canary
     master.obsidian
+    master.jrnl
     vlc
     stremio
     screenkey
