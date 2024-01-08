@@ -274,8 +274,8 @@
     version = "1.0.9";
   };
   cargo-watch = {
-    crateSha256 = "sha256-446pnOnDVXC7kcNMuOW59bVHydqtlOmw5uJXhBuLa48=";
-    depsSha256 = "sha256-0D+aM/zap5UDQ+k9c/p+ZfN1OUjDzFRArvcmqEOcBbM=";
+    crateSha256 = "sha256-39KR4TzQpJ+V8odnmNIPudsKc4XvFr1I2CJx/mZhaxU=";
+    depsSha256 = "sha256-skUG1B6TCFEXeQSRwA6vWjXmNifk5bTR4+JESw7CZMo=";
     description = "Watches over your Cargo project’s source";
     homepage = "https://watchexec.github.io/#cargo-watch";
     id = "cargo-watch";
@@ -300,7 +300,7 @@
         url = "https://github.com/rust-bus";
       }
     ];
-    version = "8.4.1";
+    version = "8.5.2";
   };
   prr = {
     crateSha256 = "sha256-986YT11yGJ6cI7ZXA0BYFnEJRLg5Q2b+5OiANjTlkTs=";
