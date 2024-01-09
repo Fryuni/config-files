@@ -9,16 +9,15 @@
       dimensions.columns = 0;
       dimensions.lines = 0;
 
-      padding.x = 2;
-      paddind.y = 2;
-
       decorations = "full";
       dynamic_title = true;
 
       startup_mode = "Maximized";
     };
 
-    draw_bold_text_with_bright_colors = true;
+    colors = {
+      draw_bold_text_with_bright_colors = true;
+    };
 
     font = let
       family = "JetBrainsMono Nerd Font";
