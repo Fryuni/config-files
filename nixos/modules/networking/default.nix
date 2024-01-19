@@ -5,20 +5,20 @@
   ...
 }: {
   networking = {
-    nameservers = ["127.0.0.1" "::1"];
+    nameservers = ["127.0.0.1" "::1" "1.1.1.1" "8.8.8.8"];
     enableIPv6 = true;
     resolvconf.enable = false;
     dhcpcd.extraConfig = "nohook resolv.conf";
     networkmanager = {
       enable = true;
-      dns = "none";
+      # dns = "none";
     };
   };
 
   services = {
-    resolved.enable = false;
+    resolved.enable = true;
     dnscrypt-proxy2 = {
-      enable = true;
+      enable = false;
       settings = {
         ipv6_servers = true;
         require_dnssec = true;
@@ -30,7 +30,7 @@
         # static.NextDNS.stamp = "sdns://AgEAAAAAAAAAAAAOZG5zLm5leHRkbnMuaW8HL2Y3ZmQ1MQ";
 
         sources = {};
-        # bootstrap_resolvers = [];
+        bootstrap_resolvers = ["1.1.1.1"];
       };
     };
   };
