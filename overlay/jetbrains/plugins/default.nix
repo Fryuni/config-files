@@ -39,13 +39,16 @@
         // specialPluginsInfo."${id}");
 
   selectFile = id: ide: build:
-    if !builtins.elem ide pluginsJson.plugins."${id}".compatible
-    then throw "Plugin with id ${id} does not support IDE ${ide}"
-    else if !pluginsJson.plugins."${id}".builds ? "${build}"
+  let
+    plugin = pluginsJson.plugins."${id}";
+  in
+    if !builtins.elem ide plugin.compatible
+    then throw "Plugin ${plugin.name} with id ${id} does not support IDE ${ide}"
+    else if !plugin.builds ? "${build}"
     then throw "Jetbrains IDEs with build ${build} are not in nixpkgs. Try update_plugins.py with --with-build?"
-    else if pluginsJson.plugins."${id}".builds."${build}" == null
-    then throw "Plugin with id ${id} does not support build ${build}"
-    else pluginsJson.plugins."${id}".builds."${build}";
+    else if plugin.builds."${build}" == null
+    then throw "Plugin ${plugin.name} with id ${id} does not support build ${build} of IDE ${ide}"
+    else plugin.builds."${build}";
 
   byId =
     builtins.listToAttrs
