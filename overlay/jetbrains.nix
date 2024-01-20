@@ -3,7 +3,7 @@ final: pkgs: let
 
   globalPlugins = [
     "164"
-    "17718"
+    "17718-nightly"
   ];
 
   overrides = {
