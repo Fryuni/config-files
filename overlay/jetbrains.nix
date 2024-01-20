@@ -2,20 +2,22 @@ final: pkgs: let
   jetbrains = pkgs.master.callPackage ./jetbrains {};
 
   globalPlugins = [
-    "164"
-    "17718-nightly"
+    "164" # IdeaVIM
+    "17718-nightly" # GitHub Copilot
+    "9836" # Randomness
+    "7425" # Wakatime
+    "7499" # Git Toolbox
   ];
 
   overrides = {
-    # https://www.jetbrains.com/webstorm/nextversion
-    webstorm = {};
-    # https://www.jetbrains.com/go/nextversion
+    webstorm = {
+      plugins = [
+        "20959" # Astro
+      ];
+    };
     goland = {};
-    # https://www.jetbrains.com/pycharm/nextversion
     pycharm-professional = {};
-    # https://www.jetbrains.com/datagrip/nextversion
     datagrip = {};
-    # https://www.jetbrains.com/rust/nextversion
     rust-rover = {};
   };
 
