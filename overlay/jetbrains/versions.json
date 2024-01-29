@@ -44,17 +44,17 @@
       "update-channel": "IntelliJ IDEA EAP",
       "url-template": "https://download.jetbrains.com/idea/ideaIC-{version}.tar.gz",
       "version": "2024.1 EAP",
-      "sha256": "cebf8fe9c9708b661a88c6abdf7bf7c39da3abdea9da17419b2f197fe9170fcd",
-      "url": "https://download.jetbrains.com/idea/ideaIC-241.8102.112.tar.gz",
-      "build_number": "241.8102.112"
+      "sha256": "c3a94f29826a7f5020bacc85806570cb2946ccd5075dc1d60cfc7ca85ad62d57",
+      "url": "https://download.jetbrains.com/idea/ideaIC-241.9959.31.tar.gz",
+      "build_number": "241.9959.31"
     },
     "idea-ultimate": {
       "update-channel": "IntelliJ IDEA EAP",
       "url-template": "https://download.jetbrains.com/idea/ideaIU-{version}.tar.gz",
       "version": "2024.1 EAP",
-      "sha256": "5d4891e1ec5a4ae058921fb56f8332d216e1b6f867d5a1de3d5f08080eeb3deb",
-      "url": "https://download.jetbrains.com/idea/ideaIU-241.8102.112.tar.gz",
-      "build_number": "241.8102.112"
+      "sha256": "45c4484302540def28a0ecec642e3b2924dd69be079fc45313e3f354a2bc3c29",
+      "url": "https://download.jetbrains.com/idea/ideaIU-241.9959.31.tar.gz",
+      "build_number": "241.9959.31"
     },
     "phpstorm": {
       "update-channel": "PhpStorm EAP",
