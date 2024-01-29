@@ -9,8 +9,6 @@ in {
     nvtop-nvidia
   ];
 
-  boot.extraModulePackages = [config.boot.kernelPackages.nvidia_x11];
-
   services.xserver.videoDrivers = ["nvidia"];
   hardware.opengl = {
     enable = true;
@@ -31,7 +29,7 @@ in {
   };
   hardware.nvidia = {
     modesetting.enable = true;
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
 
     prime = {
       sync.enable = true;
