@@ -21,7 +21,7 @@ with lib; let
 
   languageDependencies = with pkgs; {
     nix = {
-      lsp = [rnix-lsp nil];
+      lsp = [nil];
       linter = [
         statix
         deadnix

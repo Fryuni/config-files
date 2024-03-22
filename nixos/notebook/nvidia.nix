@@ -6,7 +6,7 @@
   inherit (pkgs) lib;
 in {
   environment.systemPackages = with pkgs; [
-    nvtop-nvidia
+    nvtopPackages.nvidia
   ];
 
   services.xserver.videoDrivers = ["nvidia"];
