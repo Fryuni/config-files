@@ -27,6 +27,7 @@
 
   home.sessionPath = [
     "$HOME/go/bin"
+    "$HOME/.local/corepack"
     "$HOME/.local/bin"
     "$HOME/.yarn/bin"
   ];
