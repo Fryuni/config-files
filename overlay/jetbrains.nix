@@ -5,16 +5,16 @@ final: pkgs: let
   globalPlugins = [
     "164" # IdeaVIM
     "17718" # GitHub Copilot
-    # "9836" # Randomness
-    # "7425" # Wakatime
-    # "7499" # Git Toolbox
+    "9836" # Randomness
+    "7425" # Wakatime
+    "7499" # Git Toolbox
   ];
 
   overrides = {
     webstorm = {
-      # plugins = [
-      #   "20959" # Astro
-      # ];
+      plugins = [
+        "20959" # Astro
+      ];
     };
     goland = {};
     pycharm-professional = {};
