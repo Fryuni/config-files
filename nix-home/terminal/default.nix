@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   imports = [
     ./cli.nix
-    ./doom-nvim.nix
+    ./neovim.nix
     ./alacritty.nix
   ];
 
