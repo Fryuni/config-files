@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   stdenv,
@@ -8,11 +9,18 @@
 
   documentation.dev.enable = true;
 
+  boot.kernelPackages = pkgs.linuxPackages_zen;
+
   environment.systemPackages = with pkgs; [
     neovim
     inotify-tools
+    gcc-unwrapped.lib
     gcc
     file
+    termshark
+    wireshark
+
+    config.boot.kernelPackages.perf
 
     docker-compose
   ];
@@ -30,6 +38,8 @@
       autoPrune.flags = ["--all"];
     };
   };
+
+  programs.wireshark.enable = true;
 
   services.dgraph = {
     enable = false;

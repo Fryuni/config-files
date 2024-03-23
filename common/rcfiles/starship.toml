@@ -398,16 +398,14 @@ version_format = "v${raw}"
 detect_extensions = []
 detect_files = []
 detect_folders = []
-disabled = false
+disabled = true
 format = "[$symbol$context( \\($namespace\\))]($style) in "
 style = "cyan bold"
 symbol = "☸ "
 
-[kubernetes.context_aliases]
-gke_croct-production_southamerica-east1_app = "croct-prod"
-gke_croct-test-wtur_southamerica-east1_app = "croct-wtur"
-
-[kubernetes.user_aliases]
+[[kubernetes.contexts]]
+context_pattern = "gke_(?P<project>[\\w-]+).*_(?P<cluster>[\\w-]+)"
+context_alias = "gke-$cluster-$project"
 
 [line_break]
 disabled = false

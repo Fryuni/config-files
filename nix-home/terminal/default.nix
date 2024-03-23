@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   imports = [
     ./cli.nix
-    ./doom-nvim.nix
+    ./neovim.nix
     ./alacritty.nix
   ];
 
@@ -31,9 +31,15 @@
 
   programs.zsh = {
     enable = true;
-    enableAutosuggestions = true;
+    autosuggestion.enable = true;
     enableCompletion = true;
     autocd = true;
+
+    initExtraFirst = ''
+      if [ -z "$ZELLIJ" ] && [ -z "$TERMINAL_EMULATOR" ]; then
+        exec zellij
+      fi
+    '';
 
     dirHashes = {
       nix-system = "/run/current-system";
@@ -42,16 +48,24 @@
 
       syscfg = "$HOME/ZShutils";
       oss = "$HOME/IsoWorkspaces/OSS";
+      reviews = "$HOME/IsoWorkspaces/reviews";
 
+      croct-base = "$HOME/IsoWorkspaces/Croct";
       croct-meta = "$HOME/IsoWorkspaces/Croct/metas";
+      croct-infra = "$HOME/IsoWorkspaces/Croct/infra";
     };
 
     shellAliases = {
       ls = "ls --color=auto";
-      ll = "exa -bghHliS --git";
-      la = "exa -bghHliSa --git";
+      ll = "eza -bghHliS --git";
+      la = "eza -bghHliSa --git";
       lg = "lazygit";
+
+      nv = "nvim";
+      nivm = "nvim";
+
       "refresh-gcloud-credentials" = "gcloud auth print-access-token > /dev/null";
+      gselect = "gcloud config configurations activate";
 
       # Run code inside of a container with the full home context
       drun = "docker run -it --rm -v /home/lotus:/home/lotus -w $(pwd) -u $(id -u):$(id -g) -e HOME=$HOME";
@@ -67,7 +81,6 @@
         "dotenv"
         "gcloud"
         "docker"
-        "nvm"
         "node"
         "npm"
         "yarn"

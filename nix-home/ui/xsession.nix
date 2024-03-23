@@ -53,7 +53,7 @@ in {
 
         menu = "${config.programs.rofi.package}/bin/rofi -show drun";
 
-        terminal = "wezterm";
+        terminal = "alacritty";
 
         floating.criteria = [{class = "Pavucontrol";}];
 
@@ -84,7 +84,6 @@ in {
           }
         ];
 
-        # polybar を使うので i3bar は不要
         bars = [];
 
         defaultWorkspace = "workspace number 1";
@@ -102,32 +101,31 @@ in {
 
         colors = {
           focused = {
-            text = colors.primary; # タイトルのテキスト
-            background = colors.background-alt; # タイトルの背景
-            border = colors.primary; # タイトルのボーダー
-            childBorder = colors.primary; # window全体のボーダー
-            indicator = colors.alert; # vertical / horizontal のアレ
+            text = colors.primary;
+            background = colors.background-alt;
+            border = colors.primary;
+            childBorder = colors.primary;
+            indicator = colors.alert;
           };
 
-          # コンテナの中に複数windowがあって, そのなかの最後にフォーカスされてたもの
           focusedInactive = {
-            text = colors.foreground; # タイトルのテキスト
-            background = colors.background-alt; # タイトルの背景
-            border = colors.background-alt; # タイトルのボーダー
-            childBorder = colors.secondary; # window全体のボーダー
-            indicator = colors.alert; # vertical / horizontal のアレ
+            text = colors.foreground;
+            background = colors.background-alt;
+            border = colors.background-alt;
+            childBorder = colors.secondary;
+            indicator = colors.alert;
           };
 
           unfocused = {
-            text = colors.foreground; # タイトルのテキスト
-            inherit (colors) background; # タイトルの背景
-            border = colors.background; # タイトルのボーダー
-            childBorder = colors.background; # window全体のボーダー
-            indicator = colors.alert; # vertical / horizontal のアレ
+            text = colors.foreground;
+            inherit (colors) background;
+            border = colors.background;
+            childBorder = colors.background;
+            indicator = colors.alert;
           };
         };
 
-        window.border = 1; # 新規作成した window にのみ有効
+        window.border = 1;
 
         workspaceOutputAssign = [
           {
@@ -144,112 +142,6 @@ in {
   # picom
   services.picom = {
     enable = false;
-  };
-
-  # rofi
-  programs.rofi = {
-    enable = false;
-
-    package = with pkgs; rofi.override {plugins = [rofi-calc rofi-emoji];};
-    extraConfig = {
-      show-icons = true;
-      modi = "drun,emoji,calc";
-    };
-
-    theme = let
-      mkL = config.lib.formats.rasi.mkLiteral;
-    in {
-      "*" = {
-        bg0 = mkL colors.bg0;
-        bg1 = mkL colors.bg1;
-        bg2 = mkL colors.bg2;
-        fg0 = mkL colors.fg0;
-        fg1 = mkL colors.fg1;
-        fg2 = mkL colors.fg2;
-
-        background-color = mkL "transparent";
-        text-color = mkL "@fg0";
-
-        margin = 0;
-        padding = 0;
-        spacing = 0;
-      };
-
-      window = {
-        background-color = mkL "@bg0";
-        location = mkL "center";
-        width = 640;
-        y-offset = -200;
-        border-radius = 8;
-      };
-
-      inputbar = {
-        padding = mkL "12px";
-        spacing = mkL "12px";
-        children = map mkL ["icon-search" "entry"];
-      };
-
-      icon-search = {
-        expand = false;
-        filename = "search";
-        size = mkL "28px";
-        vertical-align = mkL "0.5";
-      };
-
-      entry = {
-        placeholder = "Search";
-        placeholder-color = mkL "@fg2";
-        vertical-align = mkL "0.5";
-      };
-
-      message = {
-        border = mkL "2px 0 0";
-        border-color = mkL "@bg1";
-        background-color = mkL "@bg1";
-      };
-
-      textbox = {
-        padding = mkL "8px 24px";
-      };
-
-      listview = {
-        lines = 10;
-        columns = 1;
-        fixed-height = false;
-        border = mkL "1px 0 0";
-        border-color = mkL "@bg1";
-      };
-
-      element = {
-        padding = mkL "8px 16px";
-        spacing = mkL "16px";
-        background-color = mkL "transparent";
-      };
-
-      element-icon = {
-        size = mkL "1em";
-        vertical-align = mkL "0.5";
-      };
-
-      element-text = {
-        text-color = mkL "inherit";
-        vertical-align = mkL "0.5";
-      };
-
-      "element normal active" = {
-        text-color = mkL "@bg2";
-      };
-
-      "element selected normal" = {
-        background-color = mkL "@bg2";
-        text-color = mkL "@fg1";
-      };
-
-      "element selected active" = {
-        background-color = mkL "@bg2";
-        text-color = mkL "@fg1";
-      };
-    };
   };
 
   # polybar

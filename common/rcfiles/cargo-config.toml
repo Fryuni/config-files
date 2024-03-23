@@ -1,6 +1,17 @@
+[alias]
+gen = "generate -i ~/.ssh/id_ed25519"
+
+[build]
+target-dir = ".cargo/target"
+incremental = true
+pipelining = true
+
+[cargo-new]
+vcs = "git"
+
+[profile.release]
+opt-level = 3
+
 [net]
 git-fetch-with-cli = true
-
-[unstable]
-sparse-registry = true
 

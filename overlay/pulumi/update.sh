@@ -10,7 +10,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Version of Pulumi from
 # https://www.pulumi.com/docs/get-started/install/versions/
-VERSION="3.53.1"
+VERSION=$(gh api "repos/pulumi/pulumi/releases/latest" --jq '.tag_name | sub("^v"; "")')
 
 # An array of plugin names. The respective repository inside Pulumi's
 # Github organization is called pulumi-$name by convention.
@@ -140,22 +140,25 @@ EOF
   genSrcs "linux" "amd64"
   echo "    ];"
 
-  echo "    x86_64-darwin = ["
-  genMainSrc "darwin" "x64"
-  genSrcs "darwin" "amd64"
-  echo "    ];"
-
-  echo "    aarch64-linux = ["
-  genMainSrc "linux" "arm64"
-  genSrcs "linux" "arm64"
-  echo "    ];"
-
-  echo "    aarch64-darwin = ["
-  genMainSrc "darwin" "arm64"
-  genSrcs "darwin" "arm64"
-  echo "    ];"
+  # echo "    x86_64-darwin = ["
+  # genMainSrc "darwin" "x64"
+  # genSrcs "darwin" "amd64"
+  # echo "    ];"
+  #
+  # echo "    aarch64-linux = ["
+  # genMainSrc "linux" "arm64"
+  # genSrcs "linux" "arm64"
+  # echo "    ];"
+  #
+  # echo "    aarch64-darwin = ["
+  # genMainSrc "darwin" "arm64"
+  # genSrcs "darwin" "arm64"
+  # echo "    ];"
 
   echo "  };"
   echo "}"
 
 } > "${SCRIPT_DIR}/data.nix"
+
+nix fmt "${SCRIPT_DIR}/data.nix"
+git commit -m "chore(cli): Update pulumi" -- "${SCRIPT_DIR}/data.nix" || true

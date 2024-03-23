@@ -9,13 +9,14 @@
     with pkgs; [
       # Rust tooling
       fenix.complete.toolchain
-      rc.cargo-crate
-      cargo-expand
+      # rc.cargo-crate
+      cargo-watch
+      # rc.cargo-expand
       cargo-edit
-      cargo-sort
-      cargo-cache
-      cargo-bootimage
-      # cargo-public-api
+      # rc.cargo-sort
+      # rc.cargo-cache
+      # rc.bootimage
+      # rc.cargo-public-api
       # cargo-semver-checks
       # cargo-feature
       # cargo-tauri

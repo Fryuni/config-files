@@ -1,4 +1,11 @@
-_: {
+{pkgs, ...}: {
+  home.packages = with pkgs; [
+    # Git stuff
+    gh
+    lazygit
+    rustCrates.prr
+  ];
+
   programs.git = {
     enable = true;
 
@@ -14,16 +21,23 @@ _: {
       enable = true;
       options = {
         features = "side-by-side line-numbers";
-        delta.navigate = true;
+        navigate = true;
       };
     };
 
     lfs.enable = true;
 
+    includes = [
+      {
+        condition = "gitdir:~/IsoWorkspaces/Croct/";
+        path = "${../../common/rcfiles/gitconfig_croct}";
+      }
+    ];
+
     extraConfig = {
       url = {
         "ssh://git@github.com/" = {insteadOf = "https://github.com/";};
-        "git@gitlab.com:" = {insteadOf = "https://gitlab.com/";};
+        "ssh://git@gitlab.com/" = {insteadOf = "https://gitlab.com/";};
       };
 
       core.excludesfile = "${../../common/rcfiles/gitignore}";

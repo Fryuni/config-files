@@ -11,16 +11,14 @@
 
   nix = {
     package = pkgs.nix;
-    settings = {
-      nix-path = [
-        "fryuni-pkgs=${inputs.self}"
-        "nixpkgs=${inputs.nixpkgs}"
-        # "nixpkgs-stable=${nixpkgsStablePath}"
-        # "nixpkgs-overlays=${../overlay}"
-        "devshell=${inputs.devshell}"
-        "/nix/var/nix/profiles/per-user/root/channels"
-      ];
-    };
+
+    settings.nix-path = [
+      "fryuni=${inputs.self}"
+      "nixpkgs=${inputs.nixpkgs}"
+      "nixpkgs-stable=${inputs.nixpkgs-stable}"
+      "nixpkgs-master=${inputs.nixpkgs-master}"
+      "/nix/var/nix/profiles/per-user/root/channels"
+    ];
 
     registry = {
       # Register this flake itself on the registry
@@ -31,7 +29,6 @@
       nixpkgs-master.flake = inputs.nixpkgs-master;
       home-manager.flake = inputs.home-manager;
       flake-utils.flake = inputs.flake-utils;
-      devshell.flake = inputs.devshell;
 
       # node.to = {
       #   type = "github";

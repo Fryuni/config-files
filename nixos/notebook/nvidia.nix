@@ -1,13 +1,13 @@
-{pkgs, ...}: let
-  nvidia-offload = pkgs.writeShellScriptBin "nvidia-offload" ''
-    export __NV_PRIME_RENDER_OFFLOAD=1
-    export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
-    export __GLX_VENDOR_LIBRARY_NAME=nvidia
-    export __VK_LAYER_NV_optimus=NVIDIA_only
-    exec "$@"
-  '';
+{
+  pkgs,
+  config,
+  ...
+}: let
+  inherit (pkgs) lib;
 in {
-  environment.systemPackages = [nvidia-offload];
+  environment.systemPackages = with pkgs; [
+    nvtopPackages.nvidia
+  ];
 
   services.xserver.videoDrivers = ["nvidia"];
   hardware.opengl = {
@@ -15,16 +15,38 @@ in {
     driSupport = true;
     driSupport32Bit = true;
     extraPackages = with pkgs; [
+      intel-gmmlib
+      intel-media-driver
+      # intel-ocl
+      libvdpau-va-gl
+      vaapiIntel
+      vaapiVdpau
+
       rocm-opencl-icd
       rocm-opencl-runtime
+      nvidia-vaapi-driver
     ];
   };
-  hardware.nvidia.modesetting.enable = true;
-  hardware.nvidia.prime = {
-    sync.enable = true;
+  hardware.nvidia = {
+    modesetting.enable = true;
+    package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
 
-    intelBusId = "PCI:0:2:0";
+    prime = {
+      sync.enable = true;
 
-    nvidiaBusId = "PCI:1:0:0";
+      intelBusId = "PCI:0:2:0";
+      nvidiaBusId = "PCI:1:0:0";
+    };
+  };
+
+  specialisation = {
+    on-the-go.configuration = {
+      system.nixos.tags = ["on-the-go"];
+      hardware.nvidia = {
+        prime.offload.enable = lib.mkForce true;
+        prime.offload.enableOffloadCmd = lib.mkForce true;
+        prime.sync.enable = lib.mkForce false;
+      };
+    };
   };
 }

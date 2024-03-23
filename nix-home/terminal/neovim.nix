@@ -8,31 +8,19 @@
   programs.neovim = {
     enable = true;
 
-    plugins = with pkgs.vimPlugins; [
-      nvim-tree-lua
-      nvim-treesitter
-
-      vim-nix
-    ];
-
-    coc = {
-      enable = true;
-      settings = {
-        languageserver = {
-          nix = {
-            command = "rnix-lsp";
-            filetypes = ["nix"];
-          };
-        };
-      };
-    };
-
-    vimAlias = true;
-    viAlias = true;
-
-    extraConfig = ''
-      set number relativenumber
-      set shiftwidth=2
-    '';
+    # plugins = with pkgs.vimPlugins; [
+    #   nvim-tree-lua
+    #   nvim-treesitter
+    #
+    #   vim-nix
+    # ];
+    #
+    # vimAlias = true;
+    # viAlias = true;
+    #
+    # extraConfig = ''
+    #   set number relativenumber
+    #   set shiftwidth=2
+    # '';
   };
 }

@@ -3,14 +3,43 @@
   pkgs,
   lib,
   ...
-}:
-with lib; {
-  # Enable networking
-  networking.networkmanager.enable = true;
+}: {
+  networking = {
+    nameservers = ["127.0.0.1" "::1" "1.1.1.1" "8.8.8.8"];
+    enableIPv6 = true;
+    resolvconf.enable = false;
+    dhcpcd.extraConfig = "nohook resolv.conf";
+    networkmanager = {
+      enable = true;
+      # dns = "none";
+    };
+  };
 
-  networking.enableIPv6 = false;
+  services = {
+    resolved.enable = true;
+    dnscrypt-proxy2 = {
+      enable = false;
+      settings = {
+        ipv6_servers = true;
+        require_dnssec = true;
+        listen_addresses = ["127.0.0.1:53" "[::1]:53"];
 
-  services.openvpn.servers = let
+        server_names = ["NextDNS"];
+
+        # Generate stamps with device ID on https://dnscrypt.info/stamps/
+        # static.NextDNS.stamp = "sdns://AgEAAAAAAAAAAAAOZG5zLm5leHRkbnMuaW8HL2Y3ZmQ1MQ";
+
+        sources = {};
+        bootstrap_resolvers = ["1.1.1.1"];
+      };
+    };
+  };
+
+  systemd.services.dnscrypt-proxy2.serviceConfig = {
+    StateDirectory = "dnscrypt-proxy";
+  };
+
+  services.openvpn.servers = with lib; let
     nordModeNames = builtins.attrNames (builtins.readDir ./nordvpn);
 
     nordModeToFiles = mode: let
@@ -34,9 +63,11 @@ with lib; {
       (server: {
         name = "${server.provider}.${server.protocol}.${server.name}";
         value = {
-          # authUserPass.username = "luiz@lferraz.com";
           autoStart = false;
-          config = "config ${server.configFile}";
+          config = ''
+            config ${server.configFile}
+            auth-user-pass ${config.age.secrets.nordvpn-credentials.path}
+          '';
         };
       })
       nordServers;

@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  config,
+  ...
+}: let
   gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (
     with pkgs.google-cloud-sdk.components; [
       docker-credential-gcr
@@ -13,7 +17,7 @@ in {
   home.packages = with pkgs; [
     # Nix
     nix-prefetch
-    nix-visualize
+    # nix-visualize
 
     # Utils
     coreutils
@@ -32,7 +36,7 @@ in {
     httpie
     yq-go
     bat
-    exa
+    eza
     ripgrep
     fd
     sd
@@ -44,10 +48,18 @@ in {
     charm
     glow
     skate
-
-    # Git stuff
-    gh
-    lazygit
+    (symlinkJoin {
+      name = "mods-authenticated";
+      nativeBuildInputs = [makeWrapper coreutils];
+      paths = [mods];
+      postBuild = ''
+        for file in ${mods}/bin/*; do
+          rm -rf "$out/bin/$(basename $file)"
+          makeWrapper $file "$out/bin/$(basename $file)" \
+            --run 'export OPENAI_API_KEY="$(cat ${config.age.secrets.openai-key.path})"'
+        done
+      '';
+    })
 
     # Cloud
     terraform
@@ -56,6 +68,8 @@ in {
 
     grafterm
   ];
+
+  programs.zsh.shellAliases."clear-mods-conversations" = "rm -rf ~/.local/share/mods/conversations";
 
   home.sessionVariables = {
     USE_GKE_GCLOUD_AUTH_PLUGIN = "True";

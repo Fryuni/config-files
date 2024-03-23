@@ -1,11 +1,11 @@
-#!/usr/bin/env nix-shell
-#!nix-shell update-shell.nix -i bash
+#!/usr/bin/env -S nix shell -iv -k HOME me#bash me#nix me#git me#findutils me#cargo me#alejandra me#ripgrep me#rustCrates.cargo-crate me#jq me#moreutils me#coreutils me#nix-prefetch -c bash --
 # shellcheck shell=bash
 
 # set -x
 set -eo pipefail
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+cd "$SCRIPT_DIR"
 
 # An array of plugin names. The respective repository inside Pulumi's
 # Github organization is called pulumi-$name by convention.
@@ -14,16 +14,20 @@ declare -a cargo_crates
 
 if [ $# -eq 0 ]; then
 	cargo_crates=(
-		"bootimage"
-		"cargo-deps"
-		"cargo-expand"
-		"cargo-crate"
-		"cargo-watch"
-		"cargo-lock"
-		"cargo-docs"
-		"toml-merge"
-		"zellij"
-		"prr"
+    "bootimage"
+    "cargo-deps"
+    "cargo-expand"
+    "cargo-watch"
+    "cargo-crate"
+    "cargo-edit"
+    "cargo-sort"
+    "cargo-cache"
+    "cargo-public-api"
+    "cargo-lock"
+    "cargo-docs"
+    "toml-merge"
+    "zellij"
+    "prr"
 	)
 else
 	cargo_crates=("$@")
@@ -37,8 +41,8 @@ function genLatest() {
 
 	echo "Retrieving latest version of ${crate}..."
 
-	cargo crate into --json "$crate" |
-		jq '{owners} + (.krate.crate|{id,description,homepage,keywords,version:.max_version})' \
+	cargo crate info --json "$crate" |
+		jq '{owners} + (.krate.crate|{id,description,homepage,keywords:(.keywords|sort),version:.max_version})' \
 			>"${tmpdir}/${crate}_latest.json"
 
 	local version
@@ -76,6 +80,8 @@ function prefetch() {
 	local version="${2}"
 	local tmpdir="${3}"
 
+  echo "Prefetching crate: ${crate}"
+
 	local crateSha256
 	crateSha256=$(nix-prefetch fetchCrate --pname "$crate" --version "$version" 2>/dev/null)
 
@@ -84,8 +90,9 @@ function prefetch() {
 
 		local depsSha256
 		depsSha256=$(capture_hash nix build --no-link --impure --expr "
-		  with import <nixpkgs> {}; 
-      (pkgs.rustPlatform.buildRustPackage rec {
+		  with builtins.getFlake \"me\"; 
+		  with legacyPackages.\${builtins.currentSystem};
+      (fenixPlatform.buildRustPackage rec {
         pname = \"${crate}\";
         version = \"${version}\";
 		    src = fetchCrate {
@@ -160,3 +167,4 @@ EOF
 genSrcs
 
 alejandra "${SCRIPT_DIR}/data.nix"
+git commit -m "chore(tools): Update custom Rust crates" -- "${SCRIPT_DIR}/data.nix" || true

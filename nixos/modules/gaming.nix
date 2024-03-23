@@ -13,22 +13,25 @@
     minecraft
     mesa-demos
     lutris
-    #nix-gaming.packages.x85_64-linux.wine-tkg
+    dconf
+    bottles
     vulkan-tools
     winetricks
+    # nix-gaming.packages.x86_64-linux.wine-tkg
+    # nix-gaming.packages.x86_64-linux.wine-tkg.dev
+    wine
+    wine64
   ];
-
-  nixpkgs.config.packageOverrides = pkgs: {
-    steam = pkgs.steam.override {
-      extraPkgs = pkgs: with pkgs; [gamemode mangohud];
-    };
-  };
 
   programs.gamemode.enable = true;
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
+
+    package = pkgs.steam.override {
+      extraPkgs = pkgs: with pkgs; [gamemode mangohud];
+    };
   };
 
   services.udev.extraRules = ''

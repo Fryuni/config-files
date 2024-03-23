@@ -16,12 +16,12 @@ with lib; let
   featureDependencies = with pkgs; {
     ranger = [ranger];
     lazygit = [lazygit];
-    neogit = [neogit];
+    neogit = [];
   };
 
   languageDependencies = with pkgs; {
     nix = {
-      lsp = [rnix-lsp nil];
+      lsp = [nil];
       linter = [
         statix
         deadnix
@@ -64,7 +64,7 @@ in {
         description = ''
           Features to be enabled on DOOM Neovim.
           The list of features is documented here:
-          https://github.com/NTBBloodbath/doom-nvim/blob/main/docs/modules.md#features-modules
+          https://github.com/doom-neovim/doom-nvim/blob/main/docs/modules.md#features-modules
         '';
         default = [];
       };
@@ -80,7 +80,7 @@ in {
         description = ''
           Language support to enable.
           The list of supported languages is documented here:
-          https://github.com/NTBBloodbath/doom-nvim/blob/main/docs/modules.md#features-modules
+          https://github.com/doom-neovim/doom-nvim/blob/main/docs/modules.md#features-modules
         '';
         default = [];
       };
@@ -169,10 +169,6 @@ in {
   };
 
   config = let
-    neovimConfig = pkgs.neovimUtils.makeNeovimConfig {
-      inherit (cfg) withNodeJs;
-    };
-
     doom-src = stdenv.mkDerivation {
       pname = "doom-nvim";
       version = cfg.doom-nvim-src.rev;
@@ -186,6 +182,7 @@ in {
 
       installPhase = ''
         mkdir -p $out
+        cp lazy-lock.json $out/lazy-lock.json
         cp init.lua $out/init.lua
         cp -R lua $out/lua
         cp -R doc $out/docs
@@ -236,6 +233,12 @@ in {
       };
 
       home.activation = {
+        "initialize doom-nvim lock" = hm.dag.entryAfter ["writeBoundary"] ''
+          if [ ! -f ${config.xdg.configHome}/nvim/lazy-lock.json ]; then
+            rm -rf ${config.xdg.configHome}/nvim/lazy-lock.json
+            cp ${doom-src}/lazy-lock.json ${config.xdg.configHome}/nvim/lazy-lock.json
+          fi
+        '';
         "mutable doom-nvim" = mkIf cfg.mutableConfig (
           hm.dag.entryAfter ["writeBoundary "]
           (strings.concatStringsSep "\n" ([

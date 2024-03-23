@@ -8,6 +8,7 @@
 
   imports = [
     ./ui
+    ./secrets.nix
     ./nix.nix
   ];
 
@@ -16,4 +17,6 @@
   # ];
 
   services.syncthing.enable = true;
+
+  home.file.".background-image".source = ../common/wallpaper/wallpaper.png;
 }

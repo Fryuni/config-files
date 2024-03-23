@@ -1,18 +1,23 @@
 {pkgs, ...}: {
   imports = [
-    ./xfce.nix
+    # ./xfce.nix
     ./xsession.nix
+    ./rofi.nix
   ];
 
   home.packages = with pkgs; [
-    rofi
     calibre
     spotify
     flameshot
     discord-canary
     obsidian
+    master.jrnl
     vlc
+    stremio
     screenkey
+
+    ulauncher
+    master.zeal
   ];
 
   programs.mpv = {
@@ -25,15 +30,19 @@
     };
   };
 
+  xdg.configFile."mimeapps.list".force = true;
   xdg.mimeApps = import ./xdg-mime.nix {
-    defaultBrowser = "xfce4-web-browser.desktop";
+    defaultBrowser = "google-chrome.desktop";
     defaultVideo = "mpv.desktop";
   };
 
   programs.chromium = {
     enable = true;
-    package = pkgs.google-chrome-beta;
+    package = pkgs.master.google-chrome;
     extensions = builtins.map (id: {inherit id;}) [
+      # LastPass
+      "hdokiejnpimakedhajhdlcegeplioahd"
+      # Dark Reader
       "eimadpbcbfnmbkopoojfekhnkhdbieeh"
     ];
   };
