@@ -148,8 +148,8 @@
     version = "0.12.2";
   };
   cargo-expand = {
-    crateSha256 = "sha256-dIV/r9/NXex3+OdDboERUK92LCMPT3g9u3hgBK9htfI=";
-    depsSha256 = "sha256-6HtAXHOJU1VkAnt5y7Qe/vCAmT2iNRyHNjS7JHlOIbU=";
+    crateSha256 = "sha256-LcU2/fCoAcQ48Am6nN5sPpr5nRLAF+DDUcq3kgjPYLg=";
+    depsSha256 = "sha256-rI5V2EIUEILpgS3Aj7TgpwlD91+9tgTuww3mUc/CFWg=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -165,7 +165,7 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.79";
+    version = "1.0.80";
   };
   cargo-lock = {
     crateSha256 = "sha256-SMxM66qo3Xmst+SVXu4LYZ0Zzn15wqVVNqqHzAkip/s=";
@@ -207,8 +207,8 @@
     version = "9.0.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-poS8s4rfktNKQ0co8G4RLXUJAeUAGcS8YIvb4W0IFNo=";
-    depsSha256 = "sha256-+tmLUxDxI/W2g7cdQD/Ph5wBpW3QbZzH2M/oRXLzsgU=";
+    crateSha256 = "sha256-xD+0eplrtrTlYYnfl1R6zIO259jP18OAp9p8eg1CqbI=";
+    depsSha256 = "sha256-EjMzOilTnPSC7FYxrNBxX+sugYvPIxiCzlwQcl3VMog=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/Enselic/cargo-public-api";
     id = "cargo-public-api";
@@ -242,7 +242,7 @@
         url = "https://github.com/cargo-public-api";
       }
     ];
-    version = "0.33.1";
+    version = "0.34.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-i3Skc3Pc/3SxVCcLdMdxYVpkZZAZ0iew5UUq2tPVae8=";
@@ -303,8 +303,8 @@
     version = "8.5.2";
   };
   prr = {
-    crateSha256 = "sha256-A8tBmfxPUpZRD1cmKN0pHODj2vyJ6lv7Tb9bPfwH4+I=";
-    depsSha256 = "sha256-+v6vdQs2Ml+8Q7IY6lXV3Z5x2qlfwG9xr4hm6tTaBuk=";
+    crateSha256 = "sha256-LsHWzeUUPs1Fjr5q/iUcibW0WlC0AaY1oWvIs2lOtS0=";
+    depsSha256 = "sha256-vCZjgmBYO+I6MZLCOMp50bWEeHwLbZsxSz5gRmBykvI=";
     description = "Mailing list style code reviews for github";
     homepage = null;
     id = "prr";
@@ -320,7 +320,7 @@
         url = "https://github.com/danobi";
       }
     ];
-    version = "0.16.0";
+    version = "0.17.0";
   };
   toml-merge = {
     crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
