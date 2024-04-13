@@ -38,8 +38,7 @@
         }
         // specialPluginsInfo."${id}");
 
-  selectFile = id: ide: build:
-  let
+  selectFile = id: ide: build: let
     plugin = pluginsJson.plugins."${id}";
   in
     if !builtins.elem ide plugin.compatible
