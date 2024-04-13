@@ -2,6 +2,9 @@ pkgs: {
   cargo-doctor = {
     buildInputs = with pkgs; [openssl];
   };
+  cargo-docs = {
+    buildInputs = with pkgs; [openssl];
+  };
   cargo-edit = {
     buildInputs = with pkgs; [openssl];
   };

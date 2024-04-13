@@ -7,24 +7,33 @@
     rc = pkgs.rustCrates;
   in
     with pkgs; [
-      # Rust tooling
+      ## Rust tooling
       fenix.complete.toolchain
-      # rc.cargo-crate
-      cargo-watch
-      # rc.cargo-expand
-      cargo-edit
-      # rc.cargo-sort
+      rc.cargo-lock
+      rc.cargo-expand
+      # rc.cargo-deps
+
+      ## Plumbing tools
+      rc.cargo-crate
       # rc.cargo-cache
-      # rc.bootimage
+      cargo-geiger
+
+      ## DX
+      # rc.cargo-docs
+      cargo-edit
+      cargo-watch
+      # rc.cargo-sort
       # rc.cargo-public-api
-      # cargo-semver-checks
+      # rc.cargo-semver-checks
+
+      # Blog OS project
+      # rc.bootimage
+
       # cargo-feature
       # cargo-tauri
       # cargo-clone
       # cargo-bloat
-      # cargo-geiger
       # cargo-inspect
-      # cargo-deps
       # cargo-wipe
     ];
 

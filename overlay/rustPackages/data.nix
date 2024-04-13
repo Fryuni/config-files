@@ -148,8 +148,8 @@
     version = "0.12.2";
   };
   cargo-expand = {
-    crateSha256 = "sha256-Trw6r8AtOzwaSHVQjKPbx/C6oicEq/ztciMuc1QSlvE=";
-    depsSha256 = "sha256-rlH0WjUZHHT13+cq3Z6sru+ukKCN4OYZYmc6xx29HeE=";
+    crateSha256 = "sha256-DrG8awfiZlhx6okOcS6+4WUv19ob82QM4zagWfUjcRU=";
+    depsSha256 = "sha256-OQ+C9EJGi+NzNzQEoUlaRngRmLCU8vd9LU62N9aQC0k=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -165,7 +165,7 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.81";
+    version = "1.0.82";
   };
   cargo-lock = {
     crateSha256 = "sha256-SMxM66qo3Xmst+SVXu4LYZ0Zzn15wqVVNqqHzAkip/s=";
@@ -207,8 +207,8 @@
     version = "9.0.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-xD+0eplrtrTlYYnfl1R6zIO259jP18OAp9p8eg1CqbI=";
-    depsSha256 = "sha256-EjMzOilTnPSC7FYxrNBxX+sugYvPIxiCzlwQcl3VMog=";
+    crateSha256 = "sha256-fNQ4FfOaS38KGhI/hCRLdtYmb0FXkoXyJsbcT+1K6Ow=";
+    depsSha256 = "sha256-DwhaVn6nuy2KbXaRcIUQN6iS85ONwAbCWX+vxfa0F7U=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/Enselic/cargo-public-api";
     id = "cargo-public-api";
@@ -242,7 +242,27 @@
         url = "https://github.com/cargo-public-api";
       }
     ];
-    version = "0.34.0";
+    version = "0.34.1";
+  };
+  cargo-semver-checks = {
+    crateSha256 = "sha256-uudBhHVop5QcJmTLqczyDF96lqHqTFCaMN8krXNlt04=";
+    depsSha256 = "sha256-GuajrFdPlgneL95eWT3n2MdzfsbuID/pI9ED8TlVOCo=";
+    description = "Scan your Rust crate for semver violations.";
+    homepage = null;
+    id = "cargo-semver-checks";
+    keywords = ["cargo" "check" "crate" "semver"];
+    owners = [
+      {
+        avatar = "https://avatars.githubusercontent.com/u/2348618?v=4";
+        email = null;
+        id = 167649;
+        kind = "user";
+        login = "obi1kenobi";
+        name = "Predrag Gruevski";
+        url = "https://github.com/obi1kenobi";
+      }
+    ];
+    version = "0.30.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-i3Skc3Pc/3SxVCcLdMdxYVpkZZAZ0iew5UUq2tPVae8=";

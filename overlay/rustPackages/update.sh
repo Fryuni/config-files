@@ -14,20 +14,21 @@ declare -a cargo_crates
 
 if [ $# -eq 0 ]; then
 	cargo_crates=(
-    "bootimage"
-    "cargo-deps"
-    "cargo-expand"
-    "cargo-watch"
-    "cargo-crate"
-    "cargo-edit"
-    "cargo-sort"
-    "cargo-cache"
-    "cargo-public-api"
-    "cargo-lock"
-    "cargo-docs"
-    "toml-merge"
-    "zellij"
-    "prr"
+		"bootimage"
+		"cargo-deps"
+		"cargo-expand"
+		"cargo-watch"
+		"cargo-crate"
+		"cargo-edit"
+		"cargo-sort"
+		"cargo-cache"
+		"cargo-public-api"
+		"cargo-semver-checks"
+		"cargo-lock"
+		"cargo-docs"
+		"toml-merge"
+		"zellij"
+		"prr"
 	)
 else
 	cargo_crates=("$@")
@@ -80,7 +81,7 @@ function prefetch() {
 	local version="${2}"
 	local tmpdir="${3}"
 
-  echo "Prefetching crate: ${crate}"
+	echo "Prefetching crate: ${crate}"
 
 	local crateSha256
 	crateSha256=$(nix-prefetch fetchCrate --pname "$crate" --version "$version" 2>/dev/null)
