@@ -36,6 +36,8 @@
     autocd = true;
 
     initExtraFirst = ''
+      setopt cdable_vars
+
       if [ -z "$ZELLIJ" ] && [ -z "$TERMINAL_EMULATOR" ]; then
         exec zellij
       fi
@@ -50,9 +52,12 @@
       oss = "$HOME/IsoWorkspaces/OSS";
       reviews = "$HOME/IsoWorkspaces/reviews";
 
-      croct-base = "$HOME/IsoWorkspaces/Croct";
-      croct-meta = "$HOME/IsoWorkspaces/Croct/metas";
-      croct-infra = "$HOME/IsoWorkspaces/Croct/infra";
+      ct = "$HOME/IsoWorkspaces/Croct";
+      ct-meta = "$HOME/IsoWorkspaces/Croct/metas";
+      ct-infra = "$HOME/IsoWorkspaces/Croct/infra";
+      ct-tf = "$HOME/IsoWorkspaces/Croct/infra/terraformation";
+
+      nvc = "$HOME/.config/nvim";
     };
 
     shellAliases = {
