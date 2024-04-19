@@ -13,7 +13,7 @@
 
     slack
 
-    go_1_21
+    go
     golangci-lint
     gosec
     ngrok
