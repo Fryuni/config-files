@@ -32,6 +32,11 @@
       url = "github:Fryuni/PolyMC/a17c546d3c74d94e58e8deb5bc844a215571977a";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    direnv = {
+      url = "github:direnv/direnv";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
   };
 
   outputs = {
@@ -80,7 +85,7 @@
             agenix.overlays.default
             (import "${charm}/overlay.nix")
           ]
-          ++ (import ./overlay)
+          ++ (import ./overlay attrs)
           ++ [
             attrs.polymc.overlay
           ];

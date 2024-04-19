@@ -29,6 +29,17 @@
   };
   xdg.configFile."starship.toml".source = ../../common/rcfiles/starship.toml;
 
+  programs.direnv = {
+    enable = true;
+    enableZshIntegration = true;
+
+    config = {
+      global = {
+        load_dotenv = true;
+      };
+    };
+  };
+
   programs.zsh = {
     enable = true;
     autosuggestion.enable = true;
@@ -83,7 +94,7 @@
       enable = true;
       plugins = [
         "git"
-        "dotenv"
+        # "dotenv"
         "gcloud"
         "docker"
         "node"
