@@ -148,8 +148,8 @@
     version = "0.12.2";
   };
   cargo-expand = {
-    crateSha256 = "sha256-DrG8awfiZlhx6okOcS6+4WUv19ob82QM4zagWfUjcRU=";
-    depsSha256 = "sha256-OQ+C9EJGi+NzNzQEoUlaRngRmLCU8vd9LU62N9aQC0k=";
+    crateSha256 = "sha256-wcjCX/ujVFpoMQik0+YZsccv/mKF3LU8HdjNXNg5F9U=";
+    depsSha256 = "sha256-iO+Up0eKJW5ngC+uao/Ia/CnE8QRRzR8KHVXt4wQF3M=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -165,7 +165,7 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.82";
+    version = "1.0.85";
   };
   cargo-lock = {
     crateSha256 = "sha256-SMxM66qo3Xmst+SVXu4LYZ0Zzn15wqVVNqqHzAkip/s=";
@@ -363,8 +363,8 @@
     version = "0.1.0";
   };
   zellij = {
-    crateSha256 = "sha256-TnOFFABvel/8I55Z1hO4RcU5ZPZsgFTjIytP1PCqJoM=";
-    depsSha256 = "sha256-nJ+HWUqT5Hz1UXNhHx8t5wXFGp3xBx/jpRzx6m5SR1w=";
+    crateSha256 = "sha256-mrXoR7lbK2yXMDsBAGXd1O92qWhR+dwpauVwyea33TU=";
+    depsSha256 = "sha256-YxdduxeLklWg1g+LI8kbVWeUszFs7NnUNhMeSnlmRXE=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
@@ -417,6 +417,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.39.2";
+    version = "0.40.0";
   };
 }
