@@ -16,7 +16,6 @@
     stremio
     screenkey
 
-    ulauncher
     master.zeal
   ];
 
