@@ -13,6 +13,18 @@ final: pkgs: {
           };
         };
     };
+
+  python311Packages =
+    pkgs.python311Packages
+    // {
+      inherit (pkgs.stable.python311Packages) pyqt6-webengine;
+    };
+
+  stremio = pkgs.stremio.override {
+    inherit (pkgs.stable) qtwebchannel;
+    inherit (pkgs.stable.qt5) qmake qtwebengine wrapQtAppsHook;
+  };
+
   # ksp-ckan = pkgs.callPackage ./ckan.nix {};
 
   # neovim = pkgs.stable.neovim;

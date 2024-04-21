@@ -50,37 +50,48 @@
     agenix,
     ...
   } @ attrs: let
-    pkgsCfg = {
-      allowUnfree = true;
-      permittedInsecurePackages = [
-        "electron-25.9.0"
-      ];
-    };
-
-    subPkgs = system: flake:
-      import flake {
-        inherit system;
-        config = pkgsCfg;
-      };
-
     pkgsFun = system: let
-      stable = subPkgs system attrs.nixpkgs-stable;
-      master = subPkgs system attrs.nixpkgs-master;
+      config = {
+        allowUnfree = true;
+        permittedInsecurePackages = [
+          "electron-25.9.0"
+        ];
+        # https://github.com/NixOS/nixpkgs/pull/258447
+        # https://discourse.nixos.org/t/your-system-configures-nixpkgs-with-an-externally-created-instance/33802
+        pulseaudio = true;
+
+        doCheckByDefault = false;
+      };
     in
       import nixpkgs {
-        inherit system;
-
-        config =
-          pkgsCfg
-          // {
-            # https://github.com/NixOS/nixpkgs/pull/258447
-            # https://discourse.nixos.org/t/your-system-configures-nixpkgs-with-an-externally-created-instance/33802
-            pulseaudio = true;
-          };
+        inherit system config;
 
         overlays =
           [
-            (_: _: {inherit master stable;})
+            (final: _: {
+              master = import attrs.nixpkgs-master {
+                inherit system config;
+                overlays =
+                  [
+                    (_: _: {
+                      unstable = final;
+                      stable = final.stable;
+                    })
+                  ]
+                  ++ (import ./overlay/master.nix attrs);
+              };
+              stable = import attrs.nixpkgs-stable {
+                inherit system config;
+                overlays =
+                  [
+                    (_: _: {
+                      unstable = final;
+                      master = final.master;
+                    })
+                  ]
+                  ++ (import ./overlay/stable.nix attrs);
+              };
+            })
             fenix.overlays.default
             agenix.overlays.default
             (import "${charm}/overlay.nix")
