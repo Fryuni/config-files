@@ -13,18 +13,6 @@ final: pkgs: {
           };
         };
     };
-
-  python311Packages =
-    pkgs.python311Packages
-    // {
-      inherit (pkgs.stable.python311Packages) pyqt6-webengine;
-    };
-
-  stremio = pkgs.stremio.override {
-    inherit (pkgs.stable) qtwebchannel;
-    inherit (pkgs.stable.qt5) qmake qtwebengine wrapQtAppsHook;
-  };
-
   # ksp-ckan = pkgs.callPackage ./ckan.nix {};
 
   # neovim = pkgs.stable.neovim;
@@ -83,21 +71,15 @@ final: pkgs: {
     vendorHash = "sha256-f82ibPnauUOuZ5D6Rz3Yyt0jiAXvjN8Or3gud+ri6FA=";
   };
 
-  # Use fix from https://github.com/NixOS/nixpkgs/pull/252058
-  xorg =
-    pkgs.xorg
-    // {
-      xrandr = pkgs.master.xorg.xrandr;
-    };
-
-  bun = pkgs.master.bun.overrideAttrs rec {
-    version = "1.0.2";
-
-    src = pkgs.fetchurl {
-      url = "https://github.com/oven-sh/bun/releases/download/bun-v${version}/bun-linux-x64.zip";
-      hash = "sha256-kHv8PU48Le4lG3pf304hXggAtx/I5uBeu4aHmLsbdgw=";
-    };
-  };
+  bun = pkgs.master.bun;
+  # bun = pkgs.master.bun.overrideAttrs rec {
+  #   version = "1.0.2";
+  #
+  #   src = pkgs.fetchurl {
+  #     url = "https://github.com/oven-sh/bun/releases/download/bun-v${version}/bun-linux-x64.zip";
+  #     hash = "sha256-kHv8PU48Le4lG3pf304hXggAtx/I5uBeu4aHmLsbdgw=";
+  #   };
+  # };
 
   ulauncher = pkgs.master.ulauncher.overridePythonAttrs {
     propagatedBuildInputs =
