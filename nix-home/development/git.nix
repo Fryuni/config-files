@@ -22,6 +22,7 @@
       options = {
         features = "side-by-side line-numbers";
         navigate = true;
+        dark = true;
       };
     };
 
