@@ -48,11 +48,10 @@
 
     initExtraFirst = ''
       setopt cdable_vars
-
-      if [ -z "$ZELLIJ" ] && [ -z "$TERMINAL_EMULATOR" ]; then
-        exec zellij
-      fi
     '';
+    # if [ -z "$ZELLIJ" ] && [ -z "$TERMINAL_EMULATOR" ]; then
+    #   exec zellij
+    # fi
 
     dirHashes = {
       nix-system = "/run/current-system";
