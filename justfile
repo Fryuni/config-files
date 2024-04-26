@@ -25,7 +25,7 @@ os-build:
 
 diff: build
   nix run .#nvd -- diff \
-    $(nix eval -f ~/.nix-profile/manifest.nix --json | jq -r '.[0]') \
+    $(home-manager generations | head -1 | awk '{print $NF}') \
     $(just build)
 
 os-diff: os-build
