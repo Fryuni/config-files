@@ -11,7 +11,7 @@
     flameshot
     discord-canary
     obsidian
-    jrnl
+    stable.jrnl
     vlc
     stremio
     screenkey
