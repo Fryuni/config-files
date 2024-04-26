@@ -245,12 +245,12 @@
     version = "0.34.1";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-uudBhHVop5QcJmTLqczyDF96lqHqTFCaMN8krXNlt04=";
-    depsSha256 = "sha256-GuajrFdPlgneL95eWT3n2MdzfsbuID/pI9ED8TlVOCo=";
+    crateSha256 = "sha256-5AXdH9QGa7Kupz6kLU22OCjmKkMLlfg/zFIdLftxSmc=";
+    depsSha256 = "sha256-/mrVrbPHi4lo2iu/IWwDYIjqWZYNkm/4lWpRMLKBNpA=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
-    keywords = ["cargo" "check" "crate" "semver"];
+    keywords = ["cargo" "check" "crate" "linter" "semver"];
     owners = [
       {
         avatar = "https://avatars.githubusercontent.com/u/2348618?v=4";
@@ -262,7 +262,7 @@
         url = "https://github.com/obi1kenobi";
       }
     ];
-    version = "0.30.0";
+    version = "0.31.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-i3Skc3Pc/3SxVCcLdMdxYVpkZZAZ0iew5UUq2tPVae8=";
