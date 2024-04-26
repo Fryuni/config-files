@@ -12,8 +12,8 @@ _: {
         sha256 = "1bdmyrfgszqb9rmacq3bj0qqybi4ck336cgdhg8bk4dbjx0x4sah";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gcp-v7.19.0-linux-amd64.tar.gz";
-        sha256 = "0v37929a76ayxyc1cd0j3hs9hp49fzrvf4mis5qqn5855cn6v86f";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gcp-v7.20.0-linux-amd64.tar.gz";
+        sha256 = "14y6fdwf71sh4jg0hrl2kimr6fbs0gf2nsp8p6iyc44s9nqbb4cv";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-github-v6.2.0-linux-amd64.tar.gz";
