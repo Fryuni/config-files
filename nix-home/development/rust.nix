@@ -16,7 +16,7 @@
       ## Plumbing tools
       rc.cargo-crate
       # rc.cargo-cache
-      cargo-geiger
+      stable.cargo-geiger
 
       ## DX
       # rc.cargo-docs
