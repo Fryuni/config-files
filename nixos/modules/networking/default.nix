@@ -27,10 +27,10 @@
         server_names = ["NextDNS"];
 
         # Generate stamps with device ID on https://dnscrypt.info/stamps/
-        # static.NextDNS.stamp = "sdns://AgEAAAAAAAAAAAAOZG5zLm5leHRkbnMuaW8HL2Y3ZmQ1MQ";
+        static.NextDNS.stamp = "sdns://AgEAAAAAAAAAAAAOZG5zLm5leHRkbnMuaW8HL2Y3ZmQ1MQ";
 
         sources = {};
-        bootstrap_resolvers = ["1.1.1.1"];
+        bootstrap_resolvers = ["1.1.1.1" "8.8.8.8"];
       };
     };
   };
@@ -39,38 +39,38 @@
     StateDirectory = "dnscrypt-proxy";
   };
 
-  services.openvpn.servers = with lib; let
-    nordModeNames = builtins.attrNames (builtins.readDir ./nordvpn);
-
-    nordModeToFiles = mode: let
-      modeFiles = builtins.attrNames (builtins.readDir "${./nordvpn}/${mode}");
-    in
-      builtins.map
-      (file: let
-        nameParts = strings.splitString "." file;
-      in {
-        provider = "nord";
-        protocol = builtins.elemAt nameParts 3;
-        name = builtins.elemAt nameParts 0;
-        configFile = "${./nordvpn}/${mode}/${file}";
-      })
-      modeFiles;
-
-    nordServers = lists.flatten (builtins.map nordModeToFiles nordModeNames);
-
-    configs =
-      builtins.map
-      (server: {
-        name = "${server.provider}.${server.protocol}.${server.name}";
-        value = {
-          autoStart = false;
-          config = ''
-            config ${server.configFile}
-            auth-user-pass ${config.age.secrets.nordvpn-credentials.path}
-          '';
-        };
-      })
-      nordServers;
-  in
-    builtins.listToAttrs configs;
+  # services.openvpn.servers = with lib; let
+  #   nordModeNames = builtins.attrNames (builtins.readDir ./nordvpn);
+  #
+  #   nordModeToFiles = mode: let
+  #     modeFiles = builtins.attrNames (builtins.readDir "${./nordvpn}/${mode}");
+  #   in
+  #     builtins.map
+  #     (file: let
+  #       nameParts = strings.splitString "." file;
+  #     in {
+  #       provider = "nord";
+  #       protocol = builtins.elemAt nameParts 3;
+  #       name = builtins.elemAt nameParts 0;
+  #       configFile = "${./nordvpn}/${mode}/${file}";
+  #     })
+  #     modeFiles;
+  #
+  #   nordServers = lists.flatten (builtins.map nordModeToFiles nordModeNames);
+  #
+  #   configs =
+  #     builtins.map
+  #     (server: {
+  #       name = "${server.provider}.${server.protocol}.${server.name}";
+  #       value = {
+  #         autoStart = false;
+  #         config = ''
+  #           config ${server.configFile}
+  #           auth-user-pass ${config.age.secrets.nordvpn-credentials.path}
+  #         '';
+  #       };
+  #     })
+  #     nordServers;
+  # in
+  #   builtins.listToAttrs configs;
 }
