@@ -3,6 +3,7 @@
     ./cli.nix
     ./neovim.nix
     ./alacritty.nix
+    ./tmux.nix
   ];
 
   home.packages = with pkgs; [
