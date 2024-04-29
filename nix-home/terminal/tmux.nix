@@ -8,7 +8,6 @@
     keyMode = "vi";
 
     plugins = with pkgs.tmuxPlugins; [
-      sensible
       session-wizard
     ];
   };
