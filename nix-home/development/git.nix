@@ -53,6 +53,8 @@
 
       init.defaultBranch = "main";
       tag.gpgSign = true;
+
+      push.default = "upstream";
     };
   };
 }
