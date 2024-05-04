@@ -78,6 +78,7 @@
 
       ns = "nix shell";
       nixc = "nix develop -c";
+      tmp = "cd $(mktemp -d)";
     };
 
     oh-my-zsh = {
