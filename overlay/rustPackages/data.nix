@@ -148,8 +148,8 @@
     version = "0.12.2";
   };
   cargo-expand = {
-    crateSha256 = "sha256-wcjCX/ujVFpoMQik0+YZsccv/mKF3LU8HdjNXNg5F9U=";
-    depsSha256 = "sha256-iO+Up0eKJW5ngC+uao/Ia/CnE8QRRzR8KHVXt4wQF3M=";
+    crateSha256 = "sha256-JfBIjR7mXRN3RXJVVxTZfW/IwmGiZ6NKEfYd27WrOI0=";
+    depsSha256 = "sha256-H8ltN58IKqztm7NiQ1Sg40oa47KLxXYEimWEsJZ0uig=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -165,7 +165,7 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.85";
+    version = "1.0.87";
   };
   cargo-lock = {
     crateSha256 = "sha256-SMxM66qo3Xmst+SVXu4LYZ0Zzn15wqVVNqqHzAkip/s=";
@@ -323,8 +323,8 @@
     version = "8.5.2";
   };
   prr = {
-    crateSha256 = "sha256-LsHWzeUUPs1Fjr5q/iUcibW0WlC0AaY1oWvIs2lOtS0=";
-    depsSha256 = "sha256-vCZjgmBYO+I6MZLCOMp50bWEeHwLbZsxSz5gRmBykvI=";
+    crateSha256 = "sha256-I4acnVSEfCbRNcS72b8Tm2Y8VCBDsbrB6TBZpE2HQeM=";
+    depsSha256 = "sha256-W7EfjXiu6hLdyZZh8zEFQ4byN74vUd4BeokPN9Yjioc=";
     description = "Mailing list style code reviews for github";
     homepage = null;
     id = "prr";
@@ -340,7 +340,7 @@
         url = "https://github.com/danobi";
       }
     ];
-    version = "0.17.0";
+    version = "0.18.0";
   };
   toml-merge = {
     crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
@@ -363,8 +363,8 @@
     version = "0.1.0";
   };
   zellij = {
-    crateSha256 = "sha256-mrXoR7lbK2yXMDsBAGXd1O92qWhR+dwpauVwyea33TU=";
-    depsSha256 = "sha256-YxdduxeLklWg1g+LI8kbVWeUszFs7NnUNhMeSnlmRXE=";
+    crateSha256 = "sha256-nyaWu3iMT8hmaAPMvY+axqWg/qscthYYFlRDoBFcVxo=";
+    depsSha256 = "sha256-5XB40fQYvBEmrFXXxiP+85dsljv0aEkvWRgRQImO7d0=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
@@ -417,6 +417,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.40.0";
+    version = "0.40.1";
   };
 }
