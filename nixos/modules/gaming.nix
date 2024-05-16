@@ -10,7 +10,7 @@
   environment.systemPackages = with pkgs; [
     # Gaming
     mangohud
-    minecraft
+    # minecraft
     mesa-demos
     lutris
     dconf
