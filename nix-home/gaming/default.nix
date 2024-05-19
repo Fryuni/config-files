@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
     xboxdrv
-    polymc
+    prismlauncher
   ];
 
   programs.obs-studio = {enable = true;};
