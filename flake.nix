@@ -28,8 +28,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     polymc = {
-      url = "github:Fryuni/PolyMC/a17c546d3c74d94e58e8deb5bc844a215571977a";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:Fryuni/PolyMC/develop";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     direnv = {
       url = "github:direnv/direnv";

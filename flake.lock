@@ -115,11 +115,11 @@
     "flake-compat": {
       "flake": false,
       "locked": {
-        "lastModified": 1650374568,
-        "narHash": "sha256-Z+s0J8/r907g149rllvwhb4pKi8Wam5ij0st8PwAh+E=",
+        "lastModified": 1696426674,
+        "narHash": "sha256-kvjfFW7WAETZlt09AgDn1MrtKzP7t90Vf7vypd3OL1U=",
         "owner": "edolstra",
         "repo": "flake-compat",
-        "rev": "b4a34015c698c7793d592d66adbab377907a2be8",
+        "rev": "0f9255e01c2351cc7d116c072cb317785dd33b33",
         "type": "github"
       },
       "original": {
@@ -276,22 +276,22 @@
         "flake-compat": "flake-compat",
         "libnbtplusplus": "libnbtplusplus",
         "nixpkgs": [
-          "nixpkgs"
+          "nixpkgs-stable"
         ],
         "tomlplusplus": "tomlplusplus"
       },
       "locked": {
-        "lastModified": 1688182079,
-        "narHash": "sha256-s46b7de1zEeaZ10xl3mWRQnGitZHPLyegcbaEo8k5Bk=",
+        "lastModified": 1716136422,
+        "narHash": "sha256-5wI9v0rS6VCUTGJq5qO2d+9aACBrMQaES2PTGrkR7w8=",
         "owner": "Fryuni",
         "repo": "PolyMC",
-        "rev": "a17c546d3c74d94e58e8deb5bc844a215571977a",
+        "rev": "337319601879eadffab769cd2291c9ad0a0eca60",
         "type": "github"
       },
       "original": {
         "owner": "Fryuni",
+        "ref": "develop",
         "repo": "PolyMC",
-        "rev": "a17c546d3c74d94e58e8deb5bc844a215571977a",
         "type": "github"
       }
     },
@@ -360,11 +360,11 @@
     "tomlplusplus": {
       "flake": false,
       "locked": {
-        "lastModified": 1664034574,
-        "narHash": "sha256-EFMAl6tsTvkgK0DWC/pZfOIq06b2e5SnxJa1ngGRIQA=",
+        "lastModified": 1710824845,
+        "narHash": "sha256-A9XuCfVcLle/tMNaH7aqb1leM+t3wwC9ER5RIbMMovo=",
         "owner": "marzer",
         "repo": "tomlplusplus",
-        "rev": "8aa5c8b2a4ff2c440d4630addf64fa4f62146170",
+        "rev": "1f7884e59165e517462f922e7b6de131bd9844f3",
         "type": "github"
       },
       "original": {

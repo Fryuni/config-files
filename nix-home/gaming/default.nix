@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
     xboxdrv
-    # polymc
+    polymc
   ];
 
   programs.obs-studio = {enable = true;};
