@@ -81,8 +81,8 @@
     version = "1.5.1";
   };
   cargo-docs = {
-    crateSha256 = "sha256-kIlz/kT5zFd97OOZ6nOaRw+8VAxNy1Gju21aJd3W3ko=";
-    depsSha256 = "sha256-wLVjywf/cTCVbh39JfokgstNwZtO7mDCn0gvf2Gq6+E=";
+    crateSha256 = "sha256-WT0qpIkJpy7qBlUs8XYVIDoaVHH98yB516Y5k+uJ+jk=";
+    depsSha256 = "sha256-6MiZL4IBPZ3qWl0GsxvG4yJW1b8O/6w+AD0AHDLbKkk=";
     description = "A cargo plugin for serving rust and crate doc locally.";
     homepage = null;
     id = "cargo-docs";
@@ -98,7 +98,7 @@
         url = "https://github.com/btwiuse";
       }
     ];
-    version = "0.1.28";
+    version = "0.1.30";
   };
   cargo-edit = {
     crateSha256 = "sha256-bNM+dpJt/Zfok4H74HdNjqar5xelpK4ckoMo9O+BcNk=";
@@ -207,8 +207,8 @@
     version = "9.0.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-fNQ4FfOaS38KGhI/hCRLdtYmb0FXkoXyJsbcT+1K6Ow=";
-    depsSha256 = "sha256-DwhaVn6nuy2KbXaRcIUQN6iS85ONwAbCWX+vxfa0F7U=";
+    crateSha256 = "sha256-cqFpvhlhgmytv8MzhwKafZYTWwLUXl9o2FQPCY8EN6Y=";
+    depsSha256 = "sha256-HaZqvsM8QsHo5sdMKHrKdTdWgHIXpBiU3eTojqZXIDA=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/Enselic/cargo-public-api";
     id = "cargo-public-api";
@@ -242,7 +242,7 @@
         url = "https://github.com/cargo-public-api";
       }
     ];
-    version = "0.34.1";
+    version = "0.34.2";
   };
   cargo-semver-checks = {
     crateSha256 = "sha256-5AXdH9QGa7Kupz6kLU22OCjmKkMLlfg/zFIdLftxSmc=";
