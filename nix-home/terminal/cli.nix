@@ -21,7 +21,14 @@ in {
 
     # Utils
     coreutils
-    moreutils
+    (symlinkJoin {
+      name = "moreutils-wrapped";
+      paths = [moreutils];
+      nativeBuildInputs = [fd];
+      postBuild = ''
+        fd parallel $out -X rm
+      '';
+    })
     binutils
     pciutils
     parallel
