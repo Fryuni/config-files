@@ -36,6 +36,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    nix-alien.url = "github:thiagokokada/nix-alien";
   };
 
   outputs = {
@@ -47,6 +48,7 @@
     home-manager,
     flake-utils,
     agenix,
+    nix-alien,
     ...
   } @ attrs: let
     pkgsFun = system: let
@@ -93,6 +95,7 @@
             })
             fenix.overlays.default
             agenix.overlays.default
+            nix-alien.overlays.default
             (import "${charm}/overlay.nix")
           ]
           ++ (import ./overlay attrs)
