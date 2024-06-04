@@ -24,6 +24,7 @@ in {
     moreutils
     binutils
     pciutils
+    parallel
     jo
     curl
     wget
