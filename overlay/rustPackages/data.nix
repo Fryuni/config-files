@@ -101,8 +101,8 @@
     version = "0.1.30";
   };
   cargo-edit = {
-    crateSha256 = "sha256-bNM+dpJt/Zfok4H74HdNjqar5xelpK4ckoMo9O+BcNk=";
-    depsSha256 = "sha256-lHwZh4EygM4O0sNcYvuPaMv//6gt7yM73lQxdtTForc=";
+    crateSha256 = "sha256-pmnvZU99qZ9W97uUbRem2gblVKIsgVEho/Zb6XTEOhA=";
+    depsSha256 = "sha256-ycth2PEJuzf9i5yiC+NwwdnhoGfN+mzAvfPKYNdkB40=";
     description = "Cargo commands for modifying a `Cargo.toml` file..";
     homepage = "https://github.com/killercup/cargo-edit";
     id = "cargo-edit";
@@ -145,7 +145,7 @@
         url = "https://github.com/ordian";
       }
     ];
-    version = "0.12.2";
+    version = "0.12.3";
   };
   cargo-expand = {
     crateSha256 = "sha256-gfl7UgSq1bPmp+btxFX5++zZF/WyFf5DZctS0EUdLiE=";
