@@ -8,6 +8,7 @@
       py.pyopenssl
     ]))
     nodejs_20
+    corepack_20
     bun
 
     slack
