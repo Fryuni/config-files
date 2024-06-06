@@ -8,7 +8,6 @@
       py.pyopenssl
     ]))
     nodejs_20
-    nodePackages.yarn
     bun
 
     slack
