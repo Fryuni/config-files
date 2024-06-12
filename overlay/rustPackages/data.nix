@@ -207,8 +207,8 @@
     version = "9.0.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-cqFpvhlhgmytv8MzhwKafZYTWwLUXl9o2FQPCY8EN6Y=";
-    depsSha256 = "sha256-HaZqvsM8QsHo5sdMKHrKdTdWgHIXpBiU3eTojqZXIDA=";
+    crateSha256 = "sha256-NRL+7v1K2Y6lm1yuNZODkMaf2Xeib8KjOvPbn+nvbA4=";
+    depsSha256 = "sha256-/IpSIqZfBliiWzDXoSJMK/B8wDw1eyJ/gecHwd90c+A=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/Enselic/cargo-public-api";
     id = "cargo-public-api";
@@ -242,7 +242,7 @@
         url = "https://github.com/cargo-public-api";
       }
     ];
-    version = "0.34.2";
+    version = "0.35.0";
   };
   cargo-semver-checks = {
     crateSha256 = "sha256-5AXdH9QGa7Kupz6kLU22OCjmKkMLlfg/zFIdLftxSmc=";
