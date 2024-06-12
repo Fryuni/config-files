@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   # TODO: Follow this guide to the end: https://www.youtube.com/watch?v=rUvjkBuKua4
 
   xdg.configFile = {
@@ -22,5 +26,11 @@
     #   set number relativenumber
     #   set shiftwidth=2
     # '';
+  };
+
+  home.activation = {
+    "clear nvim" = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      rm -rf ~/.local/share/nvim ~/.local/state/nvim ~/.cache/nvim
+    '';
   };
 }
