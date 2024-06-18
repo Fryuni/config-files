@@ -37,7 +37,6 @@ switch:
 os-boot:
   nix run .#os-boot
 
-
 update: update-flake update-overlays
 
 update-flake-master:
