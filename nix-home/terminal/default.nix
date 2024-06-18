@@ -74,7 +74,7 @@
       gselect = "gcloud config configurations activate";
 
       # Run code inside of a container with the full home context
-      drun = "docker run -it --rm -v /home/lotus:/home/lotus -w $(pwd) -u $(id -u):$(id -g) -e HOME=$HOME";
+      drun = "docker run -it --rm -v /run/user/$UID:/run/user/$UID -v /home/lotus:/home/lotus -w $(pwd) -u $UID:$GID -e HOME=$HOME";
 
       ns = "nix shell";
       nixc = "nix develop -c";
