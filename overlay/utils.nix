@@ -18,6 +18,14 @@ final: pkgs: {
   # neovim = pkgs.stable.neovim;
   # neovim-unwrapped = pkgs.stable.neovim-unwrapped;
   # wrapNeovimUnstable = pkgs.stable.wrapNeovimUnstable;
+  terraform = pkgs.mkTerraform {
+    version = "1.5.5";
+    hash = "sha256-SBS3a/CIUdyIUJvc+rANIs+oXCQgfZut8b0517QKq64=";
+    vendorHash = "sha256-lQgWNMBf+ioNxzAV7tnTQSIS840XdI9fg9duuwoK+U4=";
+    passthru = {
+      inherit (pkgs.terraform) plugins;
+    };
+  };
 
   # nix-visualize =
   #   import (pkgs.fetchFromGitHub {
