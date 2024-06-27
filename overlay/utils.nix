@@ -13,11 +13,7 @@ final: pkgs: {
           };
         };
     };
-  # ksp-ckan = pkgs.callPackage ./ckan.nix {};
 
-  # neovim = pkgs.stable.neovim;
-  # neovim-unwrapped = pkgs.stable.neovim-unwrapped;
-  # wrapNeovimUnstable = pkgs.stable.wrapNeovimUnstable;
   terraform = pkgs.mkTerraform {
     version = "1.5.5";
     hash = "sha256-SBS3a/CIUdyIUJvc+rANIs+oXCQgfZut8b0517QKq64=";
@@ -80,14 +76,6 @@ final: pkgs: {
   };
 
   bun = pkgs.master.bun;
-  # bun = pkgs.master.bun.overrideAttrs rec {
-  #   version = "1.0.2";
-  #
-  #   src = pkgs.fetchurl {
-  #     url = "https://github.com/oven-sh/bun/releases/download/bun-v${version}/bun-linux-x64.zip";
-  #     hash = "sha256-kHv8PU48Le4lG3pf304hXggAtx/I5uBeu4aHmLsbdgw=";
-  #   };
-  # };
 
   ulauncher = pkgs.master.ulauncher.overridePythonAttrs {
     propagatedBuildInputs =
