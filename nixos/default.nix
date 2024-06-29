@@ -51,9 +51,9 @@
   services.tumbler.enable = true;
 
   # Configure keymap in X11
-  services.xserver = {
+  services.xserver.xkb = {
     layout = "us";
-    xkbVariant = "alt-intl";
+    variant = "alt-intl";
   };
 
   # Configure console keymap
