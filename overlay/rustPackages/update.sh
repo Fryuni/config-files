@@ -14,20 +14,20 @@ declare -a cargo_crates
 
 if [ $# -eq 0 ]; then
 	cargo_crates=(
-		"bootimage"
-		"cargo-deps"
+		# "bootimage"
+		# "cargo-deps"
 		"cargo-expand"
-		"cargo-watch"
+		# "cargo-watch"
 		"cargo-crate"
-		"cargo-edit"
-		"cargo-sort"
-		"cargo-cache"
-		"cargo-public-api"
-		"cargo-semver-checks"
+		# "cargo-edit"
+		# "cargo-sort"
+		# "cargo-cache"
+		# "cargo-public-api"
+		# "cargo-semver-checks"
 		"cargo-lock"
-		"cargo-docs"
-		"toml-merge"
-		"zellij"
+		# "cargo-docs"
+		# "toml-merge"
+		# "zellij"
 		"prr"
 	)
 else
