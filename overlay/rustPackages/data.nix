@@ -41,8 +41,8 @@
     version = "0.8.3";
   };
   cargo-crate = {
-    crateSha256 = "sha256-zhmG76VsjhsC6jUt9SvI2Alb+6IGOQnHiHk9q1NTLdg=";
-    depsSha256 = "sha256-KQ/wy8B4tH7cjeFdRstTdKsi7CIIXHThK2OHgkGFo8k=";
+    crateSha256 = "sha256-laS2qnph3fs7EDrhY+hqYfeZHtWHEeApt8wLICuuwJs=";
+    depsSha256 = "sha256-+xHpSsLUGO2A2LSG+oU0RYXlkHObvoBIGLH0N282OK0=";
     description = "A set of crate related cargo commands. You can for instance get the information about a crate, as text or json, including the owners of a crate and its versions.";
     homepage = "https://github.com/chevdor/cargo-crate";
     id = "cargo-crate";
@@ -58,7 +58,7 @@
         url = "https://github.com/chevdor";
       }
     ];
-    version = "0.2.2";
+    version = "0.2.4";
   };
   cargo-deps = {
     crateSha256 = "sha256-qnSHG4AhBrleYKZ4SJ4AwHdJyiidj8NTeSSphBRo7gg=";
@@ -148,8 +148,8 @@
     version = "0.12.3";
   };
   cargo-expand = {
-    crateSha256 = "sha256-gfl7UgSq1bPmp+btxFX5++zZF/WyFf5DZctS0EUdLiE=";
-    depsSha256 = "sha256-zRE/plAVOpmqWjZjFoPg1XApuhfM/LqCjCKb4arDT9k=";
+    crateSha256 = "sha256-YDGGOxcj5Fg3ticzboGQ8Me/DfqVVyhF11NuqNATkPw=";
+    depsSha256 = "sha256-HUR6B48uGr4psIznFFSAp/of3sIOtdCvA0qGE+vO2D0=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -165,11 +165,11 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.88";
+    version = "1.0.89";
   };
   cargo-lock = {
-    crateSha256 = "sha256-SMxM66qo3Xmst+SVXu4LYZ0Zzn15wqVVNqqHzAkip/s=";
-    depsSha256 = "sha256-wUp4zBY64MvD4anGlVsJrI3pyfwVSQGnn6YuweTeYNk=";
+    crateSha256 = "sha256-pwCfEmhHbOiu+m/qaVOyhUU+HWu53w5Gazl3WrfRWXQ=";
+    depsSha256 = "sha256-gzMWvTA96D1WxvVDKVPu8WppkrSUcAe+EDoLBWH/Nzk=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
@@ -204,7 +204,7 @@
         url = "https://github.com/Shnatsel";
       }
     ];
-    version = "9.0.0";
+    version = "10.0.0-pre.0";
   };
   cargo-public-api = {
     crateSha256 = "sha256-NRL+7v1K2Y6lm1yuNZODkMaf2Xeib8KjOvPbn+nvbA4=";
