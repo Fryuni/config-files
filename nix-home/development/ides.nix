@@ -5,7 +5,7 @@
     # jetbrains.rust-rover
     jetbrains.webstorm
     jetbrains.datagrip
-    # jetbrains.idea-ultimate
+    jetbrains.idea-ultimate
     # android-studio
 
     insomnia

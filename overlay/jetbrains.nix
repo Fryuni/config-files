@@ -21,6 +21,7 @@ final: pkgs: let
     pycharm-professional = {};
     datagrip = {};
     rust-rover = {};
+    idea-ultimate = {};
   };
 
   overrideFn = name: {
