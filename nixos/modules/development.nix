@@ -25,8 +25,6 @@
     docker-compose
   ];
 
-  systemd.enableUnifiedCgroupHierarchy = true;
-
   virtualisation = {
     containerd.enable = true;
 

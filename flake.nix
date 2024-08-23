@@ -34,7 +34,6 @@
     direnv = {
       url = "github:direnv/direnv";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
     nix-alien.url = "github:thiagokokada/nix-alien";
   };
