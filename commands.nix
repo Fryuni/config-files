@@ -58,7 +58,7 @@
       category = "Home";
       help = "Switch home-manager to apply home config changes";
       command = ''
-        ${homeManager} switch --flake '.#notebook' -b bck $@
+        ${homeManager} switch --flake . -b bck $@
       '';
     }
     {

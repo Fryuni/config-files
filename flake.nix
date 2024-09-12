@@ -134,7 +134,30 @@
           inputs = attrs;
         };
         modules = [
-          ./darwin/x86.nix
+          ./nixos/darwin/x86.nix
+            home-manager.darwinModules.home-manager
+            {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = specialArgs;
+              home-manager.sharedModules = [
+                agenix.homeManagerModules.age
+              ];
+            home-manager.users.lotus = import ./nix-home/macbook.nix;
+            }
+        ];
+      };
+
+      homeConfigurations."Fry-MacBook-x86" = home-manager.lib.homeManagerConfiguration {
+        pkgs = pkgsFun flake-utils.lib.system.x86_64-darwin;
+        extraSpecialArgs = {
+          inputs = attrs;
+        };
+
+        modules = [
+          agenix.homeManagerModules.age
+          ./nix-home
+          ./nix-home/macbook.nix
         ];
       };
 
@@ -148,19 +171,6 @@
           agenix.homeManagerModules.age
           ./nix-home
           ./nix-home/notebook.nix
-        ];
-      };
-
-      homeConfigurations.macbook = home-manager.lib.homeManagerConfiguration {
-        pkgs = pkgsFun flake-utils.lib.system.x86_64-darwin;
-        extraSpecialArgs = {
-          inputs = attrs;
-        };
-
-        modules = [
-          agenix.homeManagerModules.age
-          # ./nix-home
-          # ./nix-home/secrets.nix
         ];
       };
     };

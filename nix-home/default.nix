@@ -4,7 +4,6 @@
   programs.home-manager.enable = true;
 
   imports = [
-    ./ui
     ./nix.nix
   ];
 

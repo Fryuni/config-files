@@ -10,7 +10,7 @@
   '';
 
   nix = {
-    package = pkgs.nix;
+    # package = pkgs.nix;
 
     settings.nix-path = [
       "fryuni=${inputs.self}"
