@@ -7,16 +7,14 @@
     pkgs.nix-doc
   ];
 
-  nix.extraOptions = ''
-    plugin-files = ${pkgs.nix-doc}/lib/libnix_doc_plugin.so
-  '';
+  nix.package = pkgs.nix;
+  nix.channel.enable = false;
+
+  # nix.extraOptions = ''
+  #   plugin-files = ${pkgs.nix-doc}/lib/libnix_doc_plugin.so
+  # '';
 
   nix.settings = {
-    trusted-users = ["root" "lotus"];
-
-    cores = 4;
-    max-jobs = 4;
-
     experimental-features = [
       "nix-command"
       "flakes"
@@ -40,12 +38,14 @@
       "fryuni.cachix.org-1:YCNe73zqPG2YLIxxJkTXDz3/VFKcCiZAvHDIjEJIoDQ="
     ];
 
-    plugin-files = [];
+    # plugin-files = [
+    #   "${pkgs.nix-doc}/lib/libnix_doc_plugin.so"
+    # ];
   };
 
   nix.gc = {
     automatic = true;
-    dates = "weekly";
+    # interval = "weekly";
     options = "--delete-older-than 7d";
   };
 }

@@ -3,7 +3,11 @@
     ./gaming
     ./terminal
     ./development
+    ./secrets.nix
   ];
+
+  home.username = "lotus";
+  home.homeDirectory = "/home/lotus";
 
   programs.ssh.enable = true;
   programs.gpg.enable = true;

@@ -7,6 +7,11 @@
     nixpkgs-master.url = "github:Fryuni/nixpkgs/master";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     agenix = {
       url = "github:ryantm/agenix";
       inputs = {
@@ -41,6 +46,7 @@
   outputs = {
     self,
     nixpkgs,
+    nix-darwin,
     fenix,
     charm,
     # nixos-hardware,
@@ -121,6 +127,17 @@
         ];
       };
 
+      darwinConfigurations."Fry-MacBook-x86" = nix-darwin.lib.darwinSystem rec {
+        system = flake-utils.lib.system.x86_64-darwin;
+        pkgs = pkgsFun system;
+        specialArgs = {
+          inputs = attrs;
+        };
+        modules = [
+          ./darwin/x86.nix
+        ];
+      };
+
       homeConfigurations.notebook = home-manager.lib.homeManagerConfiguration {
         pkgs = pkgsFun flake-utils.lib.system.x86_64-linux;
         extraSpecialArgs = {
@@ -131,6 +148,19 @@
           agenix.homeManagerModules.age
           ./nix-home
           ./nix-home/notebook.nix
+        ];
+      };
+
+      homeConfigurations.macbook = home-manager.lib.homeManagerConfiguration {
+        pkgs = pkgsFun flake-utils.lib.system.x86_64-darwin;
+        extraSpecialArgs = {
+          inputs = attrs;
+        };
+
+        modules = [
+          agenix.homeManagerModules.age
+          # ./nix-home
+          # ./nix-home/secrets.nix
         ];
       };
     };

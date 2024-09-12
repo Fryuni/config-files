@@ -3,12 +3,8 @@
   home.stateVersion = "22.05";
   programs.home-manager.enable = true;
 
-  home.username = "lotus";
-  home.homeDirectory = "/home/lotus";
-
   imports = [
     ./ui
-    ./secrets.nix
     ./nix.nix
   ];
 
@@ -16,7 +12,7 @@
   #   inputs.home-manager.packages.${builtins.currentSystem}.docs-html
   # ];
 
-  services.syncthing.enable = true;
+  # services.syncthing.enable = true;
 
-  home.file.".background-image".source = ../common/wallpaper/wallpaper.png;
+  # home.file.".background-image".source = ../common/wallpaper/wallpaper.png;
 }
