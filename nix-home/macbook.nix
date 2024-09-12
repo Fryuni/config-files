@@ -1,8 +1,6 @@
 {...}: {
-  imports = [ ./default.nix ];
-
-  # home.username = "lotus";
-  # home.homeDirectory = "/Users/lotus";
+  imports = [
+  ];
 
   programs.ssh.enable = true;
   programs.gpg.enable = true;

@@ -14,7 +14,7 @@
     description = "Void Lotus";
     isHidden = false;
     createHome = true;
-  home = "/Users/lotus";
+    home = "/Users/lotus";
     shell = pkgs.zsh;
   };
 
@@ -23,4 +23,9 @@
   };
 
   services.nix-daemon.enable = true;
+
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
 }
