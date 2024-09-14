@@ -12,7 +12,7 @@ final: prev: let
     extra = extras.${name} or {};
     safeExtras = builtins.removeAttrs extra ["nativeBuildInputs"];
   in
-    final.rustPlatform.buildRustPackage ({
+    final.stable.rustPlatform.buildRustPackage ({
         pname = name;
         inherit (definition) version;
 

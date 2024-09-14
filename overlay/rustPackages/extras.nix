@@ -19,7 +19,7 @@ pkgs: {
     buildInputs = with pkgs; [openssl];
 
     preCheck = ''
-      HOME=$TMPDIR
+      export HOME=$TMPDIR
     '';
   };
 }
