@@ -23,6 +23,7 @@
     kubectl
     krew
     k9s
+    kubernetes-helm
   ];
 
   home.sessionPath = [

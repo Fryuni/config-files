@@ -71,6 +71,7 @@ in {
 
     # Cloud
     terraform
+    master.k2tf
     pulumi-bin
     gcloud-sdk
 
