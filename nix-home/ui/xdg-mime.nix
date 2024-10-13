@@ -17,7 +17,7 @@
     "image/png" = "org.xfce.ristretto.desktop";
     "image/jpeg" = "org.xfce.ristretto.desktop";
     "applications/zip" = "xarchiver.desktop";
-    "application/pdf" = defaultBrowser;
+    "application/pdf" = "okularApplication_pdf.desktop";
     "application/ogg" = defaultAudio;
     "application/x-ogg" = defaultAudio;
     "application/mxf" = "mpv.desktop";
