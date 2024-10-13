@@ -7,10 +7,6 @@
     pkgs.nix-doc
   ];
 
-  nix.extraOptions = ''
-    plugin-files = ${pkgs.nix-doc}/lib/libnix_doc_plugin.so
-  '';
-
   nix.settings = {
     trusted-users = ["root" "lotus"];
 
