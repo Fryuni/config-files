@@ -168,8 +168,8 @@
     version = "1.0.90";
   };
   cargo-lock = {
-    crateSha256 = "sha256-pwCfEmhHbOiu+m/qaVOyhUU+HWu53w5Gazl3WrfRWXQ=";
-    depsSha256 = "sha256-gzMWvTA96D1WxvVDKVPu8WppkrSUcAe+EDoLBWH/Nzk=";
+    crateSha256 = "sha256-VpKShMvvrACLMwp9P4qvLCzbmh7XDsUlzF5UlqwZkLw=";
+    depsSha256 = "sha256-hJz4gcmyNKdE2PIkPwjhT1sTRFjnzCA4FKyyLlyBzIc=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
@@ -204,7 +204,7 @@
         url = "https://github.com/Shnatsel";
       }
     ];
-    version = "10.0.0-pre.0";
+    version = "10.0.0-rc.0";
   };
   cargo-public-api = {
     crateSha256 = "sha256-NRL+7v1K2Y6lm1yuNZODkMaf2Xeib8KjOvPbn+nvbA4=";
