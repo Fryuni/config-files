@@ -16,8 +16,8 @@ why-sys dependency:
 why-sys-closure dependency:
   @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure "{{sysRoot}}" ".#{{dependency}}"
 
-build:
-  @nix build --no-link --print-out-paths "{{homeRoot}}"
+build *args:
+  @nix build --no-link --print-out-paths "{{homeRoot}}" {{args}}
 
 os-build:
   @nix build --no-link --print-out-paths "{{sysRoot}}"
