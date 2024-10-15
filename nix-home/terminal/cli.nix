@@ -76,6 +76,7 @@ in {
     gcloud-sdk
 
     grafterm
+    python312Packages.habitipy
   ];
 
   programs.zsh.shellAliases."clear-mods-conversations" = "rm -rf ~/.local/share/mods/conversations";
