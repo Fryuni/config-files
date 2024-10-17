@@ -71,10 +71,12 @@ in {
 
     # Cloud
     terraform
+    tfk8s
     pulumi-bin
     gcloud-sdk
 
     grafterm
+    python312Packages.habitipy
   ];
 
   programs.zsh.shellAliases."clear-mods-conversations" = "rm -rf ~/.local/share/mods/conversations";

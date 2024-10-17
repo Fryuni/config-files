@@ -14,4 +14,9 @@
   # services.syncthing.enable = true;
 
   # home.file.".background-image".source = ../common/wallpaper/wallpaper.png;
+
+  manual = {
+    html.enable = true;
+    manpages.enable = true;
+  };
 }

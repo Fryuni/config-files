@@ -7,6 +7,7 @@
 
   home.packages = with pkgs; [
     calibre
+    okular
     spotify
     flameshot
     discord-canary
