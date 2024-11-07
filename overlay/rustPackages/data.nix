@@ -148,8 +148,8 @@
     version = "0.12.3";
   };
   cargo-expand = {
-    crateSha256 = "sha256-Xq6/7KP016PkM+Wf0u+GlxZyD1vZWwnIv6Nfd7KigH8=";
-    depsSha256 = "sha256-nmKP2FYfD3C6XlB5SuaHvw6q9dX8CKQVbzofr5bWQIU=";
+    crateSha256 = "sha256-Pjj1wt2acAYJDxE4/9/gEnz68/YbIA+SosXiSqe5fg8=";
+    depsSha256 = "sha256-CkXmsw0QjUu1zoKl9RYd8iMaxeGPxz+pbhwxrzdxWtA=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -165,11 +165,11 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.90";
+    version = "1.0.95";
   };
   cargo-lock = {
-    crateSha256 = "sha256-VpKShMvvrACLMwp9P4qvLCzbmh7XDsUlzF5UlqwZkLw=";
-    depsSha256 = "sha256-hJz4gcmyNKdE2PIkPwjhT1sTRFjnzCA4FKyyLlyBzIc=";
+    crateSha256 = "sha256-Ui/Z4syhSxemV1R815R+yytDwN2YJBcHGscUYUp/0zE=";
+    depsSha256 = "sha256-5Hg0y723wjV13rdEExK2II7EPpzAR29ZCqVgOeuJpO0=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
@@ -204,7 +204,7 @@
         url = "https://github.com/Shnatsel";
       }
     ];
-    version = "10.0.0-rc.0";
+    version = "10.0.1";
   };
   cargo-public-api = {
     crateSha256 = "sha256-NRL+7v1K2Y6lm1yuNZODkMaf2Xeib8KjOvPbn+nvbA4=";

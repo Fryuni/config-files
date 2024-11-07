@@ -21,8 +21,8 @@ in {
       vaapiIntel
       vaapiVdpau
 
-      rocm-opencl-icd
-      rocm-opencl-runtime
+      # rocm-opencl-icd
+      # rocm-opencl-runtime
       nvidia-vaapi-driver
     ];
   };
