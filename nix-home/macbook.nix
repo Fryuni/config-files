@@ -1,5 +1,9 @@
-{...}: {
+{pkgs, ...}: {
   imports = [
+  ];
+
+  home.packages = with pkgs; [
+    postgresql_16_jit
   ];
 
   programs.ssh.enable = true;
