@@ -5,6 +5,8 @@
     ../registries.nix
   ];
 
+  system.stateVersion = 5;
+
   nixpkgs.hostPlatform = "x86_64-darwin";
   networking.localHostName = "Fry-MacBook-x86";
 
