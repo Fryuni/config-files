@@ -42,7 +42,7 @@
   };
   cargo-crate = {
     crateSha256 = "sha256-laS2qnph3fs7EDrhY+hqYfeZHtWHEeApt8wLICuuwJs=";
-    depsSha256 = "sha256-+xHpSsLUGO2A2LSG+oU0RYXlkHObvoBIGLH0N282OK0=";
+    depsSha256 = "sha256-VyxAgIh3qoOnovDMitxbHqlUNMZ3uvcyJpb2EoIv2VY=";
     description = "A set of crate related cargo commands. You can for instance get the information about a crate, as text or json, including the owners of a crate and its versions.";
     homepage = "https://github.com/chevdor/cargo-crate";
     id = "cargo-crate";
@@ -149,7 +149,7 @@
   };
   cargo-expand = {
     crateSha256 = "sha256-Pjj1wt2acAYJDxE4/9/gEnz68/YbIA+SosXiSqe5fg8=";
-    depsSha256 = "sha256-CkXmsw0QjUu1zoKl9RYd8iMaxeGPxz+pbhwxrzdxWtA=";
+    depsSha256 = "sha256-DD0coKX57VpvMEFCH7FgJkZHmaSWKACBuzpnEWO/f4w=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -169,7 +169,7 @@
   };
   cargo-lock = {
     crateSha256 = "sha256-Ui/Z4syhSxemV1R815R+yytDwN2YJBcHGscUYUp/0zE=";
-    depsSha256 = "sha256-5Hg0y723wjV13rdEExK2II7EPpzAR29ZCqVgOeuJpO0=";
+    depsSha256 = "sha256-C5Lu3fVDe6hRHCkPqw+XJ0KYhm2DbU8gDK5RnCg2fIU=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
@@ -324,7 +324,7 @@
   };
   prr = {
     crateSha256 = "sha256-I4acnVSEfCbRNcS72b8Tm2Y8VCBDsbrB6TBZpE2HQeM=";
-    depsSha256 = "sha256-W7EfjXiu6hLdyZZh8zEFQ4byN74vUd4BeokPN9Yjioc=";
+    depsSha256 = "sha256-rpqxXfeT0O9hre7JajXFA3UiQVsGnXdOpWj/z+MyTIQ=";
     description = "Mailing list style code reviews for github";
     homepage = null;
     id = "prr";
