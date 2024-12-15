@@ -29,8 +29,18 @@
   };
 
   home.activation = {
-    "clear nvim" = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      rm -rf ~/.local/share/nvim ~/.local/state/nvim ~/.cache/nvim
+    "clearNvimState" = lib.hm.dag.entryAfter ["linkGeneration"] ''
+        HASH_TMP="$(mktemp)"
+        echo ${pkgs.neovim} >> "$HASH_TMP"
+        echo ${pkgs.neovim-unwrapped} >> "$HASH_TMP"
+        echo ${pkgs.go} >> "$HASH_TMP"
+
+        if ! diff -q "$HASH_TMP" ~/.local/state/nvim/nix_deps &>/dev/null ; then
+          rm -rf ~/.local/share/nvim ~/.local/state/nvim ~/.cache/nvim
+        fi
+
+        mkdir -p ~/.local/state/nvim
+        mv "$HASH_TMP" ~/.local/state/nvim/nix_deps
     '';
   };
 }
