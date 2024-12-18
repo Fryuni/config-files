@@ -1,0 +1,379 @@
+<script type="text/javascript">
+  RED.nodes.registerType("pg", {
+    category: "storage",
+    color: "#5b85a7",
+    defaults: {
+      name: {
+        value: "",
+      },
+      query: {
+        value: "",
+      },
+      serverKind: {
+        value: "direct",
+      },
+      pgConfig: {
+        type: "pgConfig",
+        required: false,
+      },
+      pgGoogleConfig: {
+        type: "pgGoogleConfig",
+        required: false,
+      },
+      outputFormat: {
+        value: "mul",
+      },
+    },
+    outputs: 2,
+    inputs: 1,
+    icon: "postgresql.png",
+    align: "left",
+    label() {
+      return this.name || "pg";
+    },
+    labelStyle() {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare() {
+      const serverKindElem = $("#node-input-serverKind");
+
+      if (!this.serverKind) {
+        serverKindElem.val("direct").change();
+        this.serverKind = "direct";
+      }
+
+      serverKindElem.on("change", (event) => {
+        this.serverKind = serverKindElem.val();
+        $("div[data-server-kind]").hide();
+        $(`div[data-server-kind="${this.serverKind}"]`).show();
+        $(
+          `div[data-server-kind]:not([data-server-kind="${this.serverKind}"]) select`,
+        ).val("_ADD_");
+      });
+
+      this.editor = RED.editor.createEditor({
+        id: "node-input-editor",
+        mode: "ace/mode/sql",
+        value: $("#node-input-query").val(),
+      });
+      this.editor.focus();
+      $("#node-input-outputFormat").typedInput({
+        types: [
+          {
+            options: [
+              { value: "mul", label: this._("pg.outputFormat.mul") },
+              { value: "single", label: this._("pg.outputFormat.single") },
+            ],
+          },
+        ],
+      });
+    },
+    oneditsave() {
+      const query = this.editor.getValue();
+      $("#node-input-query").val(query);
+      this.editor.destroy();
+      delete this.editor;
+    },
+    oneditcancel() {
+      this.editor.destroy();
+      delete this.editor;
+    },
+  });
+</script>
+
+<script type="text/html" data-template-name="pg">
+  <div class="form-row">
+    <label for="node-input-name">
+      <span>Name:</span>
+    </label>
+    <input type="text" id="node-input-name" placeholder="pg" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-name">
+      <span>Server Kind:</span>
+    </label>
+    <select id="node-input-serverKind" style="width:200px !important">
+      <option value="direct">Generic</option>
+      <option value="google">Google Cloud</option>
+    </select>
+  </div>
+  <div data-server-kind="direct" class="form-row">
+    <label for="node-input-pgConfig">
+      <span>Server:</span>
+    </label>
+    <input type="text" id="node-input-pgConfig" />
+  </div>
+  <div data-server-kind="google" class="form-row">
+    <label for="node-input-pgGoogleConfig">
+      <span>Server:</span>
+    </label>
+    <input type="text" id="node-input-pgGoogleConfig" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-outputFormat">
+      <span>Output format:</span>
+    </label>
+    <input type="text" id="node-input-outputFormat" />
+  </div>
+  <!-- SQL -->
+  <div class="form-row">
+    <label for="node-input-query">
+      <span>Query:</span>
+    </label>
+    <input type="hidden" id="node-input-query" />
+  </div>
+  <div class="form-row node-text-editor-row">
+    <div
+      style="height: 300px; min-height: 150px;"
+      class="node-text-editor"
+      id="node-input-editor"
+    ></div>
+  </div>
+</script>
+
+<script type="text/html" data-template-name="pgConfig">
+  <div class="form-row">
+    <label for="node-config-input-name">
+      <span>Name:</span>
+    </label>
+    <input type="text" id="node-config-input-name" />
+  </div>
+  <div class="form-row">
+    <label style="color: darkgray">
+      <span>Database Connection Config:</span>
+    </label>
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-host">
+      <span>Host:</span>
+    </label>
+    <input type="text" id="node-config-input-host" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-port">
+      <span>Port:</span>
+    </label>
+    <input type="text" id="node-config-input-port" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-dbname">
+      <span>DB Name:</span>
+    </label>
+    <input type="text" id="node-config-input-dbname" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-user">
+      <span>User:</span>
+    </label>
+    <input type="text" id="node-config-input-user" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-password">
+      <span>Password:</span>
+    </label>
+    <input type="password" id="node-config-input-password" />
+  </div>
+  <div class="form-row">
+    <label style="color: darkgray">
+      <span>Pool Config:</span>
+    </label>
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-max">
+      <span>Max connections:</span>
+    </label>
+    <input type="text" id="node-config-input-max" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-idleTimeout">
+      <span>Idle timeout:</span>
+    </label>
+    <input type="text" id="node-config-input-idleTimeout" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-connectionTimeout">
+      <span>Connection timeout:</span>
+    </label>
+    <input type="text" id="node-config-input-connectionTimeout" />
+  </div>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType("pgConfig", {
+    category: "config",
+    defaults: {
+      name: {
+        value: "",
+      },
+      host: {
+        value: "127.0.0.1",
+        required: true,
+      },
+      port: {
+        value: 5432,
+        required: true,
+      },
+      dbname: {
+        value: "",
+        required: true,
+      },
+      max: {
+        value: 10,
+      },
+      idleTimeout: {
+        value: 1000,
+      },
+      connectionTimeout: {
+        value: 10000,
+      },
+      user: {
+        value: "",
+      },
+      password: {
+        value: "",
+      },
+    },
+    credentials: {
+      user: {
+        type: "text",
+        required: true,
+      },
+      password: {
+        type: "password",
+        required: true,
+      },
+    },
+    label() {
+      return (
+        this.name ||
+        this.user + "@" + this.host + ":" + this.port + "/" + this.database
+      );
+    },
+    labelStyle() {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare() {},
+  });
+</script>
+
+<script type="text/html" data-template-name="pgGoogleConfig">
+  <div class="form-row">
+    <label for="node-config-input-name">
+      <span>Name:</span>
+    </label>
+    <input type="text" id="node-config-input-name" />
+  </div>
+  <div class="form-row">
+    <label style="color: darkgray">
+      <span>Database Connection Config:</span>
+    </label>
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-account">
+      <i class="fa fa-user"></i> Credentials:
+    </label>
+    <input type="text" id="node-config-input-account" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-instance">
+      <span>Instance name:</span>
+    </label>
+    <input type="text" id="node-config-input-instance" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-dbname">
+      <span>DB Name:</span>
+    </label>
+    <input type="text" id="node-config-input-dbname" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-user">
+      <span>User:</span>
+    </label>
+    <input type="text" id="node-config-input-user" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-password">
+      <span>Password:</span>
+    </label>
+    <input type="password" id="node-config-input-password" />
+  </div>
+  <div class="form-row">
+    <label style="color: darkgray">
+      <span>Pool Config:</span>
+    </label>
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-max">
+      <span>Max connections:</span>
+    </label>
+    <input type="text" id="node-config-input-max" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-idleTimeout">
+      <span>Idle timeout:</span>
+    </label>
+    <input type="text" id="node-config-input-idleTimeout" />
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-connectionTimeout">
+      <span>Connection timeout:</span>
+    </label>
+    <input type="text" id="node-config-input-connectionTimeout" />
+  </div>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType("pgGoogleConfig", {
+    category: "config",
+    defaults: {
+      name: {
+        value: "",
+      },
+      account: {
+        type: "google-cloud-credentials",
+        required: true,
+      },
+      instance: {
+        value: "",
+        required: true,
+      },
+      dbname: {
+        value: "",
+        required: true,
+      },
+      max: {
+        value: 10,
+      },
+      idleTimeout: {
+        value: 1000,
+      },
+      connectionTimeout: {
+        value: 10000,
+      },
+      user: {
+        value: "",
+      },
+      password: {
+        value: "",
+      },
+    },
+    credentials: {
+      user: {
+        type: "text",
+        required: true,
+      },
+      password: {
+        type: "password",
+        required: true,
+      },
+    },
+    label() {
+      return this.name || this.instance + "/" + this.database;
+    },
+    labelStyle() {
+      return this.name ? "node_label_italic" : "";
+    },
+    oneditprepare() {},
+  });
+</script>

@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   ...
@@ -11,6 +12,7 @@
     corepack_20
     bun
 
+    libnotify
     slack
 
     go
@@ -43,4 +45,22 @@
       };
     })
     (lib.filterAttrs (_: typ: typ == "regular") (builtins.readDir ../../common/shellscripts));
+
+  age.secrets.node-red-key = {
+    file = ../../secrets/node-red-key;
+  };
+
+  services.node-red = {
+    enable = true;
+    configFile = "${config.home.homeDirectory}/ZShutils/common/node-red/config.js";
+    userDir = "${config.home.homeDirectory}/ZShutils/common/node-red";
+    environment = {
+      CREDENTIALS_FILE = config.age.secrets.node-red-key.path;
+      GOOGLE_APPLICATION_CREDENTIALS = "${config.home.homeDirectory}/IsoWorkspaces/Croct/prod-env-deployer.json";
+      CLOUDSDK_ACTIVE_CONFIG_NAME = "croct-sa";
+    };
+    define = {
+      "logging.console.level" = "trace";
+    };
+  };
 }

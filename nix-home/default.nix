@@ -8,6 +8,7 @@
 
   imports = [
     ./ui
+    ./modules
     ./secrets.nix
     ./nix.nix
   ];
@@ -19,6 +20,8 @@
   services.syncthing.enable = true;
 
   home.file.".background-image".source = ../common/wallpaper/wallpaper.png;
+
+  xdg.enable = true;
 
   manual = {
     html.enable = true;

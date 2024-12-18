@@ -1,0 +1,586 @@
+[
+    {
+        "id": "8f43184acbd76a3f",
+        "type": "tab",
+        "label": "Self-Manage",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "85c3aa9be01f20a9",
+        "type": "tab",
+        "label": "Croct Flow",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "ffe778e13350c1aa",
+        "type": "subflow",
+        "name": "Admin Events",
+        "info": "",
+        "category": "",
+        "in": [],
+        "out": [
+            {
+                "x": 1150,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "323ffc4ff0df9244",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 990,
+                "y": 220,
+                "wires": [
+                    {
+                        "id": "b7d8de677a9b86d1",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99",
+        "outputLabels": [
+            "single",
+            "batch"
+        ]
+    },
+    {
+        "id": "534a359020d71f29",
+        "type": "pgGoogleConfig",
+        "z": "ffe778e13350c1aa",
+        "name": "Admin Prod",
+        "account": "e6351c2f69a652cb",
+        "instance": "croct-production:us-east1:admin-data",
+        "dbname": "postgres",
+        "max": "10",
+        "idleTimeout": "1000",
+        "connectionTimeout": "10000",
+        "user": "infra_management",
+        "password": "__PWRD__"
+    },
+    {
+        "id": "e6351c2f69a652cb",
+        "type": "google-cloud-credentials",
+        "z": "ffe778e13350c1aa",
+        "name": "Default",
+        "projectId": ""
+    },
+    {
+        "id": "698af66ff2a833a1",
+        "type": "inject",
+        "z": "ffe778e13350c1aa",
+        "name": "Clock",
+        "props": [
+            {
+                "p": "queryParams[0]",
+                "v": "iso",
+                "vt": "date"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "timed",
+        "x": 100,
+        "y": 60,
+        "wires": [
+            [
+                "69962b6e3ecc7ebe"
+            ]
+        ]
+    },
+    {
+        "id": "b7d8de677a9b86d1",
+        "type": "pg",
+        "z": "ffe778e13350c1aa",
+        "name": "Read Events",
+        "query": "SELECT * FROM events\nWHERE \"timestamp\" >= ($1::timestamp - INTERVAL '1 day')\nAND seq_id > $2;",
+        "serverKind": "google",
+        "pgConfig": "",
+        "pgGoogleConfig": "534a359020d71f29",
+        "outputFormat": "mul",
+        "x": 650,
+        "y": 160,
+        "wires": [
+            [
+                "323ffc4ff0df9244",
+                "304e7fe6941a696e",
+                "71c91468f4d752b6"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "323ffc4ff0df9244",
+        "type": "split",
+        "z": "ffe778e13350c1aa",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload",
+        "x": 990,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "304e7fe6941a696e",
+        "type": "debug",
+        "z": "ffe778e13350c1aa",
+        "d": true,
+        "name": "Debug events",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1020,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "71c91468f4d752b6",
+        "type": "function",
+        "z": "ffe778e13350c1aa",
+        "name": "Store latest timestamp",
+        "func": "const latestSeqId = msg.payload.map(row => row.seq_id)\n    .sort()\n    .at(-1);\n\nif (latestSeqId) {\n    flow.set('latestSeqId', latestSeqId);\n}",
+        "outputs": 0,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1040,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "69962b6e3ecc7ebe",
+        "type": "function",
+        "z": "ffe778e13350c1aa",
+        "name": "Load latest timestamp",
+        "func": "const latestSeqId = flow.get('latestSeqId') || 0;\n\nmsg.queryParams = [new Date().toISOString(), latestSeqId];\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 140,
+        "wires": [
+            [
+                "b7d8de677a9b86d1",
+                "e53e7097ae9fdb69"
+            ]
+        ]
+    },
+    {
+        "id": "e53e7097ae9fdb69",
+        "type": "debug",
+        "z": "ffe778e13350c1aa",
+        "d": true,
+        "name": "Loaded timestamp",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 670,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "ba64371ed5c37d94",
+        "type": "watch",
+        "z": "8f43184acbd76a3f",
+        "name": "Watch Node-RED root",
+        "files": "/home/lotus/ZShutils/common/node-red",
+        "recursive": true,
+        "x": 120,
+        "y": 60,
+        "wires": [
+            [
+                "78f275ba458ed817"
+            ]
+        ]
+    },
+    {
+        "id": "5eb0a73cf224c7c3",
+        "type": "trigger",
+        "z": "8f43184acbd76a3f",
+        "name": "Debounce",
+        "op1": "Node-RED restart queued",
+        "op2": "Node-RED restarting",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "10",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 2,
+        "x": 430,
+        "y": 180,
+        "wires": [
+            [
+                "903279dfbc2943ab"
+            ],
+            [
+                "903279dfbc2943ab",
+                "73b771a371152f51"
+            ]
+        ]
+    },
+    {
+        "id": "6307f8a094f7dd52",
+        "type": "exec",
+        "z": "8f43184acbd76a3f",
+        "command": "systemctl",
+        "addpay": "",
+        "append": "--user restart node-red.service",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Restart Node-RED service",
+        "x": 960,
+        "y": 180,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "78f275ba458ed817",
+        "type": "change",
+        "z": "8f43184acbd76a3f",
+        "name": "Trim path",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "$substring(\t    payload,\t    $length(\"/home/lotus/ZShutils/common/node-red/\")\t)\t",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 100,
+        "y": 120,
+        "wires": [
+            [
+                "a8fe5507c1594708"
+            ]
+        ]
+    },
+    {
+        "id": "a8fe5507c1594708",
+        "type": "switch",
+        "z": "8f43184acbd76a3f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "regex",
+                "v": "^nodes/",
+                "vt": "str",
+                "case": false
+            },
+            {
+                "t": "eq",
+                "v": "package-lock.json",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 90,
+        "y": 180,
+        "wires": [
+            [
+                "5eb0a73cf224c7c3"
+            ],
+            [
+                "5eb0a73cf224c7c3"
+            ]
+        ],
+        "outputLabels": [
+            "nodes/",
+            ""
+        ]
+    },
+    {
+        "id": "0caa42e17f62d436",
+        "type": "inject",
+        "z": "8f43184acbd76a3f",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "Reset",
+        "payloadType": "str",
+        "x": 530,
+        "y": 60,
+        "wires": [
+            [
+                "6307f8a094f7dd52"
+            ]
+        ]
+    },
+    {
+        "id": "903279dfbc2943ab",
+        "type": "notify",
+        "z": "8f43184acbd76a3f",
+        "name": "notify 1",
+        "appName": "Node RED",
+        "appNameType": "str",
+        "message": "payload",
+        "messageType": "msg",
+        "x": 680,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "73b771a371152f51",
+        "type": "delay",
+        "z": "8f43184acbd76a3f",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 680,
+        "y": 180,
+        "wires": [
+            [
+                "6307f8a094f7dd52"
+            ]
+        ]
+    },
+    {
+        "id": "a6e7396781d4f4d8",
+        "type": "debug",
+        "z": "85c3aa9be01f20a9",
+        "name": "Events",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 890,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "83e203ba6965067f",
+        "type": "subflow:ffe778e13350c1aa",
+        "z": "85c3aa9be01f20a9",
+        "name": "",
+        "x": 230,
+        "y": 100,
+        "wires": [
+            [
+                "d0f7567d9f2ff7c2"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d0f7567d9f2ff7c2",
+        "type": "rbe",
+        "z": "85c3aa9be01f20a9",
+        "name": "",
+        "func": "deadband",
+        "gap": "",
+        "start": "",
+        "inout": "in",
+        "septopics": false,
+        "property": "payload.seq_id",
+        "topi": "topic",
+        "x": 440,
+        "y": 100,
+        "wires": [
+            [
+                "a6e7396781d4f4d8",
+                "8b7ba913e13ce079"
+            ]
+        ]
+    },
+    {
+        "id": "8b7ba913e13ce079",
+        "type": "switch",
+        "z": "85c3aa9be01f20a9",
+        "name": "",
+        "property": "payload.type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "userSignedIn",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "experienceDraftSaved",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 770,
+        "y": 180,
+        "wires": [
+            [
+                "b8dd72701d104e6c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "b8dd72701d104e6c",
+        "type": "debug",
+        "z": "85c3aa9be01f20a9",
+        "name": "LogIn",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1110,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "2504beaa3565c3ad",
+        "type": "cdExec",
+        "z": "85c3aa9be01f20a9",
+        "cwd": "/home/lotus/IsoWorkspaces/Croct/infra/terraformation/migrations",
+        "command": "/home/lotus/IsoWorkspaces/Croct/infra/terraformation/migrations/migrate_prod.sh",
+        "addpay": "",
+        "append": "/home/lotus/IsoWorkspaces/Croct/infra/terraformation/migrations/flyway_all migrate",
+        "useSpawn": "true",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Migrate all organizations",
+        "x": 490,
+        "y": 340,
+        "wires": [
+            [
+                "7ab819296553d87d"
+            ],
+            [
+                "7ab819296553d87d"
+            ],
+            [
+                "7ab819296553d87d"
+            ]
+        ]
+    },
+    {
+        "id": "dffc01abf6d7abd3",
+        "type": "inject",
+        "z": "85c3aa9be01f20a9",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 340,
+        "wires": [
+            [
+                "2504beaa3565c3ad"
+            ]
+        ]
+    },
+    {
+        "id": "7ab819296553d87d",
+        "type": "debug",
+        "z": "85c3aa9be01f20a9",
+        "name": "Migrate all out",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 340,
+        "wires": []
+    }
+]
