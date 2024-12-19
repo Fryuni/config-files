@@ -9,7 +9,7 @@
 
   documentation.dev.enable = true;
 
-  boot.kernelPackages = pkgs.linuxPackages_zen;
+  boot.kernelPackages = pkgs.stable.linuxPackages;
 
   environment.systemPackages = with pkgs; [
     neovim

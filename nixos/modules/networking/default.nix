@@ -39,6 +39,8 @@
     StateDirectory = "dnscrypt-proxy";
   };
 
+  # Replace with: https://gist.github.com/myypo/31c52196f7987ef62f54092cb07aefd7
+
   # services.openvpn.servers = with lib; let
   #   nordModeNames = builtins.attrNames (builtins.readDir ./nordvpn);
   #
