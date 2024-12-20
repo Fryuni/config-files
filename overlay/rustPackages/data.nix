@@ -41,8 +41,8 @@
     version = "0.8.3";
   };
   cargo-crate = {
-    crateSha256 = "sha256-laS2qnph3fs7EDrhY+hqYfeZHtWHEeApt8wLICuuwJs=";
-    depsSha256 = "sha256-VyxAgIh3qoOnovDMitxbHqlUNMZ3uvcyJpb2EoIv2VY=";
+    crateSha256 = "sha256-IQZIy+OAzUurfMjvmlQ4NxXY1u6Dt2x+xa0NGeCiqeg=";
+    depsSha256 = "sha256-Va3+2QyoUXURYqzG9G2Hb9/g/RMhBETsZoRPFqGz0Js=";
     description = "A set of crate related cargo commands. You can for instance get the information about a crate, as text or json, including the owners of a crate and its versions.";
     homepage = "https://github.com/chevdor/cargo-crate";
     id = "cargo-crate";
@@ -58,7 +58,7 @@
         url = "https://github.com/chevdor";
       }
     ];
-    version = "0.2.4";
+    version = "0.2.5";
   };
   cargo-deps = {
     crateSha256 = "sha256-qnSHG4AhBrleYKZ4SJ4AwHdJyiidj8NTeSSphBRo7gg=";
