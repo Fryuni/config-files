@@ -31,6 +31,12 @@ function expandEnvVar(txt) {
 const credentialsFile = expandEnvVar(process.env.CREDENTIALS_FILE);
 const credentials = readFileSync(credentialsFile, 'utf-8');
 
+if (!credentials) {
+    console.log({ credentialsFile });
+
+    process.exit(1);
+}
+
 module.exports = {
 
     /*******************************************************************************

@@ -52,15 +52,15 @@
 
   services.node-red = {
     enable = true;
-    configFile = "${config.home.homeDirectory}/ZShutils/common/node-red/config.js";
-    userDir = "${config.home.homeDirectory}/ZShutils/common/node-red";
+    configFile = ../../common/node-red.js;
+    repo = "git@gitlab.com:Fryuni/node-red-config.git";
     environment = {
       CREDENTIALS_FILE = config.age.secrets.node-red-key.path;
       GOOGLE_APPLICATION_CREDENTIALS = "${config.home.homeDirectory}/IsoWorkspaces/Croct/prod-env-deployer.json";
       CLOUDSDK_ACTIVE_CONFIG_NAME = "croct-sa";
     };
-    define = {
-      "logging.console.level" = "trace";
-    };
+    # define = {
+    #   "logging.console.level" = "trace";
+    # };
   };
 }

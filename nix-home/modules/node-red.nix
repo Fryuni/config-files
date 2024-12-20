@@ -92,38 +92,36 @@ in {
       };
 
       Service = {
-        # Path = concatStringsSep ":" (map (p: "${p}/bin") (with pkgs; [
-        #   nodejs
-        #   corepack
-        #   gcc
-        #   git
-        # ]));
-
         Environment = mapAttrsToList (name: value: "${name}=${value}") cfg.environment;
         Restart = "always";
         PrivateTmp = true;
         WorkingDirectory = cfg.userDir;
         StateDirectory = mkIf (cfg.userDir == defaultUserDir) "node-red";
 
-        ExecStartPre = pkgs.writers.writeBash "prepare-node-red-state" ''
-          ${let
+        ExecStartPre = mkIf (cfg.repo != null) (
+          let
             repo = escapeShellArg cfg.repo;
           in
-            optionalString (cfg.repo != null) ''
+            pkgs.writers.writeBash "sync-node-red-config-repo" ''
               if [ "$(git config get remote.origin.url||true)" = ${repo} ]; then
+                echo "Repo configured, syncing..."
                 git add . || true
                 git commit --all --message "service initialization sync" || true
+                git pull --rebase || true
               else
+                echo "Repo not configured, cloning..."
                 rm -rf * .*
                 git clone ${repo} .
               fi
-              echo "node_modules" > .git/info/exclude
-            ''}
 
-          # if [ -f package.json ]; then
-          #   npm update --dev
-          # fi
-        '';
+              echo "node_modules" > .git/info/exclude
+              echo "*.backup" > .git/info/exclude
+
+              if [ -f package.json ]; then
+                corepack install
+              fi
+            ''
+        );
 
         ExecStart = escapeShellArgs ([
             "${cfg.package}/bin/node-red"
