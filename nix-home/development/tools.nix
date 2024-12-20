@@ -35,16 +35,26 @@
     "$HOME/.yarn/bin"
   ];
 
-  home.file =
-    lib.mapAttrs'
-    (name: _: {
-      name = ".local/bin/${name}";
-      value = {
-        source = ../../common/shellscripts/${name};
-        executable = true;
+  home.file = let
+    shellscripts =
+      lib.mapAttrs'
+      (name: _: {
+        name = ".local/bin/${name}";
+        value = {
+          source = ../../common/shellscripts/${name};
+          executable = true;
+        };
+      })
+      (lib.filterAttrs (_: typ: typ == "regular") (builtins.readDir ../../common/shellscripts));
+  in
+    shellscripts
+    // {
+      # Hack to fix SSH warnings/errors due to a file permissions check in some tools
+      ".ssh/config" = {
+        target = ".ssh/config_source";
+        onChange = ''cat .ssh/config_source > .ssh/config && chmod 400 .ssh/config'';
       };
-    })
-    (lib.filterAttrs (_: typ: typ == "regular") (builtins.readDir ../../common/shellscripts));
+    };
 
   age.secrets.node-red-key = {
     file = ../../secrets/node-red-key;
