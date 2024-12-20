@@ -14,13 +14,13 @@
   #   plugin-files = ${pkgs.nix-doc}/lib/libnix_doc_plugin.so
   # '';
 
+  nix.optimise.automatic = true;
+
   nix.settings = {
     experimental-features = [
       "nix-command"
       "flakes"
     ];
-
-    auto-optimise-store = true;
 
     substituters = [
       "https://nix-shell.cachix.org"
