@@ -7,6 +7,11 @@
   ];
 
   programs.ssh.enable = true;
-  programs.gpg.enable = true;
-  programs.gpg.mutableKeys = true;
+  programs.gpg = {
+    enable = true;
+    mutableKeys = true;
+    settings = {
+      keyid-format = "short";
+    };
+  };
 }
