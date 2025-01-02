@@ -13,7 +13,8 @@
     userEmail = "luiz@lferraz.com";
 
     signing = {
-      key = "2B568731DB2447EC";
+      # key = "2B568731DB2447EC";
+      key = "A6810404";
       signByDefault = true;
     };
 
