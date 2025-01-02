@@ -323,8 +323,8 @@
     version = "8.5.2";
   };
   prr = {
-    crateSha256 = "sha256-I4acnVSEfCbRNcS72b8Tm2Y8VCBDsbrB6TBZpE2HQeM=";
-    depsSha256 = "sha256-rpqxXfeT0O9hre7JajXFA3UiQVsGnXdOpWj/z+MyTIQ=";
+    crateSha256 = "sha256-vTpvVHDw45Jko0iJMQrmtltrjF40T+YO4D6U0k2NBkQ=";
+    depsSha256 = "sha256-jqsa0YO8XI+ofN6WL9l2Sb7llQuN0yFKNgGhPNPAtto=";
     description = "Mailing list style code reviews for github";
     homepage = null;
     id = "prr";
@@ -340,7 +340,7 @@
         url = "https://github.com/danobi";
       }
     ];
-    version = "0.18.0";
+    version = "0.19.0";
   };
   toml-merge = {
     crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
