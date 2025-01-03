@@ -77,6 +77,7 @@ in {
 
     grafterm
     python312Packages.habitipy
+    yt-dlp
   ];
 
   programs.zsh.shellAliases."clear-mods-conversations" = "rm -rf ~/.local/share/mods/conversations";
