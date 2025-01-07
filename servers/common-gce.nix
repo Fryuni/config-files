@@ -10,7 +10,6 @@
   imports = [
     ../nixos/nix-settings.nix
     ../nixos/registries.nix
-    ../nixos/users.nix
   ];
 
   environment.systemPackages = with pkgs; [

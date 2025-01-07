@@ -5,7 +5,7 @@
 
   fileSystems."/data" = {
     fsType = "ext4";
-    device = "/dev/disk/by-label/data";
+    device = "/dev/disk/by-id/google-data";
     autoResize = true;
   };
 
