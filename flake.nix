@@ -103,23 +103,31 @@
           ];
       };
 
+    nixosModules = {
+      notebook = [
+        agenix.nixosModules.age
+        ./nixos
+        ./nixos/notebook
+      ];
+      gce-automation = [
+        "${nixpkgs}/nixos/modules/virtualisation/google-compute-image.nix"
+        ./servers/gce-automation
+      ];
+    };
+
     globalConfig = {
       templates = import ./templates attrs;
 
-      nixosConfigurations.notebook = nixpkgs.lib.nixosSystem rec {
-        system = flake-utils.lib.system.x86_64-linux;
-        pkgs = pkgsFun system;
-        specialArgs = {
-          inputs = attrs;
-        };
-
-        modules = [
-          agenix.nixosModules.age
-          ./nixos
-          ./nixos/notebook
-          # nixos-hardware.nixosModules.dell-g3-3779
-        ];
-      };
+      nixosConfigurations = builtins.mapAttrs (_: modules:
+        nixpkgs.lib.nixosSystem rec {
+          inherit modules;
+          system = flake-utils.lib.system.x86_64-linux;
+          pkgs = pkgsFun system;
+          specialArgs = {
+            inputs = attrs;
+          };
+        })
+      nixosModules;
 
       homeConfigurations.notebook = home-manager.lib.homeManagerConfiguration {
         pkgs = pkgsFun flake-utils.lib.system.x86_64-linux;
