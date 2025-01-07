@@ -17,6 +17,7 @@
     curl
     wget
     git
+    jq
     dig
     btop
     gnumake
