@@ -22,6 +22,16 @@
     gnumake
     xarchiver
     cachix
+    (google-cloud-sdk.withExtraComponents (
+      with google-cloud-sdk.components; [
+        docker-credential-gcr
+        beta
+        alpha
+        gsutil
+        gke-gcloud-auth-plugin
+        terraform-tools
+      ]
+    ))
   ];
 
   programs.neovim = {
