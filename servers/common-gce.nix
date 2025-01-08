@@ -13,6 +13,8 @@
   ];
 
   environment.systemPackages = with pkgs; [
+    gcc
+    clang
     curl
     wget
     git
