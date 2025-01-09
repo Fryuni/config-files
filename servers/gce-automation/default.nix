@@ -10,6 +10,7 @@
   };
 
   environment.systemPackages = with pkgs; [
+    ripgrep
     twitch-dl
     twitch-cli
   ];
