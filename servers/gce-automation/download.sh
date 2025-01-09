@@ -30,7 +30,7 @@ for channel in "${CHANNELS[@]}"; do
 
   export OUT_NAME_FORMAT="$channel/clips/{date}_{id}_{channel_login}_{title_slug}.{format}"
 
-  twitch-dl clips "$channel" --limit 50 --json |
+  twitch-dl clips "$channel" --all --json |
     jq '.[].slug' -r |
     tac |
     xargs -P8 -n1 bash ./download-and-store.sh # &>/dev/null
