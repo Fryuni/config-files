@@ -30,8 +30,8 @@ for channel in "${CHANNELS[@]}"; do
 
   export OUT_NAME_FORMAT="$channel/clips/{date}_{id}_{channel_login}_{title_slug}.{format}"
 
-  twitch-dl clips "$channel" --all --json |
-    jq '.[].slug' -r |
+  twitch-dl clips "$channel" --all --json --period last_week |
+    jq '.[]|select(.createdAt > "2025-01-08")|.slug' -r |
     tac |
     xargs -P8 -n1 bash ./download-and-store.sh # &>/dev/null
 done
