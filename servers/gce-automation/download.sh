@@ -24,11 +24,15 @@ for channel in "${CHANNELS[@]}"; do
       tac
   )
 
+  echo "Downloading VODs"
+
   for video_id in $VIDEO_IDS; do
     bash ./download-and-store.sh "$video_id"
   done
 
   export OUT_NAME_FORMAT="$channel/clips/{date}_{id}_{channel_login}_{title_slug}.{format}"
+
+  echo "Downloading clips"
 
   twitch-dl clips "$channel" --all --json --period last_week |
     jq '.[]|select(.createdAt > "2025-01-08")|.slug' -r |

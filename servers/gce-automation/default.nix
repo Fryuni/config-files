@@ -10,6 +10,7 @@
   };
 
   environment.systemPackages = with pkgs; [
+    tmux
     ripgrep
     twitch-dl
     twitch-cli

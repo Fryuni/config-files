@@ -2,7 +2,9 @@
 
 set -eo pipefail
 
-FILE_NAME=$(twitch-dl download "$1" \
+echo "Probing for $1"
+
+FILE_NAME=$(echo "1" | twitch-dl download "$1" \
   --dry-run \
   --output "$OUT_NAME_FORMAT" \
   2>&1 | rg -o 'Target: (.*)' -r'$1' || true)

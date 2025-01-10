@@ -13,6 +13,7 @@
   ];
 
   environment.systemPackages = with pkgs; [
+    tmux
     gcc
     clang
     curl
@@ -22,6 +23,9 @@
     dig
     btop
     gnumake
+    ripgrep
+    duf
+    dua
     xarchiver
     cachix
     (google-cloud-sdk.withExtraComponents (
