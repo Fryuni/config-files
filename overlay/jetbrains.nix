@@ -7,7 +7,7 @@ final: pkgs: let
     "17718" # GitHub Copilot
     # "20540" # Codeium
     "9836" # Randomness
-    "7425" # Wakatime
+    # "7425" # Wakatime
     "7499" # Git Toolbox
   ];
 
