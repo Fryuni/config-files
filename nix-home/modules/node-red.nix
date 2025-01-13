@@ -136,7 +136,7 @@ in {
       };
 
       Install = {
-        WantedBy = ["default.target"];
+        WantedBy = ["timers.target"];
       };
     };
   };
