@@ -21,6 +21,7 @@
     ngrok
     just
     master.turso-cli
+    # zigpkgs.master
 
     kubectl
     krew

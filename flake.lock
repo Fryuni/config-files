@@ -394,7 +394,8 @@
         "nixpkgs-master": "nixpkgs-master",
         "nixpkgs-stable": "nixpkgs-stable",
         "polymc": "polymc",
-        "systems": "systems"
+        "systems": "systems",
+        "zig": "zig"
       }
     },
     "rust-analyzer-src": {
@@ -442,6 +443,29 @@
       "original": {
         "owner": "marzer",
         "repo": "tomlplusplus",
+        "type": "github"
+      }
+    },
+    "zig": {
+      "inputs": {
+        "flake-compat": [
+          "flake-compat"
+        ],
+        "nixpkgs": [
+          "nixpkgs-stable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1736727066,
+        "narHash": "sha256-w1OV1scmw/HzkjKAYvy6GhuxYv0qY+LT9EIZgbjITsI=",
+        "owner": "Fryuni",
+        "repo": "zig-overlay",
+        "rev": "4c87e859569fd8ed17771fb6e8ce8a8eed5de015",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Fryuni",
+        "repo": "zig-overlay",
         "type": "github"
       }
     }

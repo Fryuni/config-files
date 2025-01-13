@@ -33,6 +33,11 @@
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
+    zig = {
+      url = "github:Fryuni/zig-overlay";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.flake-compat.follows = "flake-compat";
+    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -59,6 +64,7 @@
     self,
     nixpkgs,
     fenix,
+    zig,
     charm,
     # nixos-hardware,
     home-manager,
@@ -110,6 +116,7 @@
               };
             })
             fenix.overlays.default
+            zig.overlays.default
             agenix.overlays.default
             nix-alien.overlays.default
             (import "${charm}/overlay.nix")
