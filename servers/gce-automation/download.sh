@@ -2,6 +2,7 @@
 
 set -eo pipefail
 
+export EARLY_CUT_DATE="2025-01-10"
 export BUCKET_NAME="twitch-vods-02057f9"
 
 CHANNELS=(
@@ -20,7 +21,7 @@ for channel in "${CHANNELS[@]}"; do
 
   VIDEO_IDS=$(
     twitch-dl videos "$channel" --all --json |
-      jq '.videos[]|select(.recordedAt > "2025-01-08")|.id' -r |
+      jq ".videos[]|select(.recordedAt > \"${EARLY_CUT_DATE}\")|.id" -r |
       tac
   )
 
@@ -35,7 +36,7 @@ for channel in "${CHANNELS[@]}"; do
   echo "Downloading clips"
 
   twitch-dl clips "$channel" --all --json --period last_week |
-    jq '.[]|select(.createdAt > "2025-01-08")|.slug' -r |
+    jq ".[]|select(.createdAt > \"${EARLY_CUT_DATE}\")|.id" -r |
     tac |
     xargs -P8 -n1 bash ./download-and-store.sh # &>/dev/null
 done
