@@ -14,7 +14,7 @@ final: pkgs: let
   overrides = {
     webstorm = {
       plugins = [
-        "20959" # Astro
+        # "20959" # Astro
       ];
     };
     goland = {};
