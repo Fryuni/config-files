@@ -2,6 +2,7 @@
   imports = [
     ./cli.nix
     ./neovim.nix
+    ./alacritty.nix
     ./ghostty.nix
     ./tmux.nix
   ];
