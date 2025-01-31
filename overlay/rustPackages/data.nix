@@ -41,8 +41,8 @@
     version = "0.8.3";
   };
   cargo-crate = {
-    crateSha256 = "sha256-laS2qnph3fs7EDrhY+hqYfeZHtWHEeApt8wLICuuwJs=";
-    depsSha256 = "sha256-VyxAgIh3qoOnovDMitxbHqlUNMZ3uvcyJpb2EoIv2VY=";
+    crateSha256 = "sha256-IQZIy+OAzUurfMjvmlQ4NxXY1u6Dt2x+xa0NGeCiqeg=";
+    depsSha256 = "sha256-Va3+2QyoUXURYqzG9G2Hb9/g/RMhBETsZoRPFqGz0Js=";
     description = "A set of crate related cargo commands. You can for instance get the information about a crate, as text or json, including the owners of a crate and its versions.";
     homepage = "https://github.com/chevdor/cargo-crate";
     id = "cargo-crate";
@@ -58,7 +58,7 @@
         url = "https://github.com/chevdor";
       }
     ];
-    version = "0.2.4";
+    version = "0.2.5";
   };
   cargo-deps = {
     crateSha256 = "sha256-qnSHG4AhBrleYKZ4SJ4AwHdJyiidj8NTeSSphBRo7gg=";
@@ -148,8 +148,8 @@
     version = "0.12.3";
   };
   cargo-expand = {
-    crateSha256 = "sha256-Pjj1wt2acAYJDxE4/9/gEnz68/YbIA+SosXiSqe5fg8=";
-    depsSha256 = "sha256-DD0coKX57VpvMEFCH7FgJkZHmaSWKACBuzpnEWO/f4w=";
+    crateSha256 = "sha256-S+DaN8Ac9Llki3cayoXgoqGVIz2VsRcyT8yf8efc3pM=";
+    depsSha256 = "sha256-naS2W/iByDOzhlICuzXGN2pzrrOxkZX9hnlJfVXJx74=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -165,11 +165,11 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.95";
+    version = "1.0.100";
   };
   cargo-lock = {
-    crateSha256 = "sha256-Ui/Z4syhSxemV1R815R+yytDwN2YJBcHGscUYUp/0zE=";
-    depsSha256 = "sha256-C5Lu3fVDe6hRHCkPqw+XJ0KYhm2DbU8gDK5RnCg2fIU=";
+    crateSha256 = "sha256-D5DpUgvKxJSVQwsLzpwX3AA/qIG5lcX7catc1O0oxX4=";
+    depsSha256 = "sha256-gV2XsVvODQuVlrh7kp7BQsNwdjmnk60ojHDm3rt2laY=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
@@ -204,7 +204,7 @@
         url = "https://github.com/Shnatsel";
       }
     ];
-    version = "10.0.1";
+    version = "10.1.0";
   };
   cargo-public-api = {
     crateSha256 = "sha256-NRL+7v1K2Y6lm1yuNZODkMaf2Xeib8KjOvPbn+nvbA4=";
@@ -323,8 +323,8 @@
     version = "8.5.2";
   };
   prr = {
-    crateSha256 = "sha256-I4acnVSEfCbRNcS72b8Tm2Y8VCBDsbrB6TBZpE2HQeM=";
-    depsSha256 = "sha256-rpqxXfeT0O9hre7JajXFA3UiQVsGnXdOpWj/z+MyTIQ=";
+    crateSha256 = "sha256-q8HC6l+SswZLLn3LFulnyIkrSAQ6fGS8NREVKX6UYII=";
+    depsSha256 = "sha256-iGUI1n6EU1LTjgCQH+bPgwrE760ho7vgTiqXuHreprc=";
     description = "Mailing list style code reviews for github";
     homepage = null;
     id = "prr";
@@ -340,7 +340,7 @@
         url = "https://github.com/danobi";
       }
     ];
-    version = "0.18.0";
+    version = "0.20.0";
   };
   toml-merge = {
     crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";

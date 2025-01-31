@@ -15,6 +15,8 @@
 
   # home.file.".background-image".source = ../common/wallpaper/wallpaper.png;
 
+  xdg.enable = true;
+
   manual = {
     html.enable = true;
     manpages.enable = true;

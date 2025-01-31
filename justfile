@@ -4,17 +4,17 @@ sysRoot := ".#nixosConfigurations.notebook.config.system.build.toplevel"
 default:
   nix flake metadata
 
-why-home dependency:
-  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure --derivation "{{homeRoot}}" ".#{{dependency}}"
+why-home dependency *args:
+  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure --derivation "{{homeRoot}}" ".#{{dependency}}" {{args}}
 
-why-home-closure dependency:
-  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure "{{homeRoot}}" ".#{{dependency}}"
+why-home-closure dependency *args:
+  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure "{{homeRoot}}" ".#{{dependency}}" {{args}}
 
-why-sys dependency:
-  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure --derivation "{{sysRoot}}" ".#{{dependency}}"
+why-sys dependency *args:
+  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure --derivation "{{sysRoot}}" ".#{{dependency}}" {{args}}
 
-why-sys-closure dependency:
-  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure "{{sysRoot}}" ".#{{dependency}}"
+why-sys-closure dependency *args:
+  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure "{{sysRoot}}" ".#{{dependency}}" {{args}}
 
 build *args:
   @nix build --no-link --print-out-paths "{{homeRoot}}" {{args}}

@@ -17,6 +17,8 @@
   nix.optimise.automatic = true;
 
   nix.settings = {
+    trusted-users = ["root" "lotus"];
+
     experimental-features = [
       "nix-command"
       "flakes"

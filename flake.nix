@@ -11,13 +11,23 @@
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    systems.url = "github:nix-systems/default";
+    flake-compat.url = "github:edolstra/flake-compat";
+    flake-utils = {
+      url = "github:numtide/flake-utils";
+      inputs.systems.follows = "systems";
+    };
+    gomod2nix = {
+      url = "github:nix-community/gomod2nix";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.flake-utils.follows = "flake-utils";
+    };
 
     agenix = {
       url = "github:ryantm/agenix";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        home-manager.follows = "home-manager";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+      inputs.systems.follows = "systems";
     };
     charm = {
       url = "github:charmbracelet/nur";
@@ -25,9 +35,13 @@
     };
     fenix = {
       url = "github:nix-community/fenix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
     };
-    flake-utils.url = "github:numtide/flake-utils";
+    zig = {
+      url = "github:Fryuni/zig-overlay";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.flake-compat.follows = "flake-compat";
+    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -35,12 +49,19 @@
     polymc = {
       url = "github:Fryuni/PolyMC/develop";
       inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.flake-compat.follows = "flake-compat";
     };
     direnv = {
       url = "github:direnv/direnv";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.gomod2nix.follows = "gomod2nix";
+      inputs.systems.follows = "systems";
     };
-    nix-alien.url = "github:thiagokokada/nix-alien";
+    nix-alien = {
+      url = "github:thiagokokada/nix-alien";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.flake-compat.follows = "flake-compat";
+    };
   };
 
   outputs = {
@@ -48,6 +69,7 @@
     nixpkgs,
     nix-darwin,
     fenix,
+    zig,
     charm,
     # nixos-hardware,
     home-manager,
@@ -99,6 +121,7 @@
               };
             })
             fenix.overlays.default
+            zig.overlays.default
             agenix.overlays.default
             nix-alien.overlays.default
             (import "${charm}/overlay.nix")
@@ -109,23 +132,31 @@
           ];
       };
 
+    nixosModules = {
+      notebook = [
+        agenix.nixosModules.age
+        ./nixos
+        ./nixos/notebook
+      ];
+      gce-automation = [
+        "${nixpkgs}/nixos/modules/virtualisation/google-compute-image.nix"
+        ./servers/gce-automation
+      ];
+    };
+
     globalConfig = {
       templates = import ./templates attrs;
 
-      nixosConfigurations.notebook = nixpkgs.lib.nixosSystem rec {
-        system = flake-utils.lib.system.x86_64-linux;
-        pkgs = pkgsFun system;
-        specialArgs = {
-          inputs = attrs;
-        };
-
-        modules = [
-          agenix.nixosModules.age
-          ./nixos
-          ./nixos/notebook
-          # nixos-hardware.nixosModules.dell-g3-3779
-        ];
-      };
+      nixosConfigurations = builtins.mapAttrs (_: modules:
+        nixpkgs.lib.nixosSystem rec {
+          inherit modules;
+          system = flake-utils.lib.system.x86_64-linux;
+          pkgs = pkgsFun system;
+          specialArgs = {
+            inputs = attrs;
+          };
+        })
+      nixosModules;
 
       darwinConfigurations."Fry-MacBook-x86" = nix-darwin.lib.darwinSystem rec {
         system = flake-utils.lib.system.x86_64-darwin;

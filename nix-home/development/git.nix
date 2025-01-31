@@ -1,4 +1,9 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}: {
   home.packages = with pkgs; [
     # Git stuff
     gh
@@ -58,4 +63,14 @@
       push.default = "upstream";
     };
   };
+
+  home.activation."fixGitMaintenance" = lib.hm.dag.entryAfter ["linkGeneration"] ''
+    ${lib.escapeShellArgs [
+      "${pkgs.sd}/bin/sd"
+      "/nix/store/\\w+-git-[\\d.]+/"
+      "${pkgs.git}/"
+      "${config.home.homeDirectory}/.config/systemd/user/git-maintenance@.service"
+    ]} || true
+    systemctl --user daemon-reload
+  '';
 }
