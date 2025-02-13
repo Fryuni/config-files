@@ -55,6 +55,9 @@
         target = ".ssh/config_source";
         onChange = ''cat .ssh/config_source > .ssh/config && chmod 400 .ssh/config'';
       };
+
+      ".jvm/jdk11".source = "${pkgs.jdk11}";
+      ".jvm/jdk21".source = "${pkgs.jdk21}";
     };
 
   age.secrets.node-red-key = {
