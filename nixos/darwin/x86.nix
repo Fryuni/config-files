@@ -24,8 +24,6 @@
     trusted-users = ["root" "lotus" "@admin"];
   };
 
-  services.nix-daemon.enable = true;
-
   programs.direnv = {
     enable = true;
     silent = true;
