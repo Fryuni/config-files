@@ -55,7 +55,6 @@
     };
     nix-alien = {
       url = "github:thiagokokada/nix-alien";
-      inputs.flake-utils.follows = "flake-utils";
       inputs.flake-compat.follows = "flake-compat";
     };
   };
@@ -128,24 +127,36 @@
       };
 
     nixosModules = {
-      notebook = [
+      notebook = {
+          system = flake-utils.lib.system.x86_64-linux;
+          modules = [
         agenix.nixosModules.age
         ./nixos
         ./nixos/notebook
       ];
-      gce-automation = [
+        };
+      gce-automation = {
+          system = flake-utils.lib.system.x86_64-linux;
+          modules = [
         "${nixpkgs}/nixos/modules/virtualisation/google-compute-image.nix"
         ./servers/gce-automation
       ];
+        };
+        rpi3 = {
+          system = flake-utils.lib.system.aarch64-linux;
+          modules = [
+        "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+          ./servers/rpi/one
+        ];
+        };
     };
 
     globalConfig = {
       templates = import ./templates attrs;
 
-      nixosConfigurations = builtins.mapAttrs (_: modules:
+      nixosConfigurations = builtins.mapAttrs (_: {modules, system}:
         nixpkgs.lib.nixosSystem rec {
-          inherit modules;
-          system = flake-utils.lib.system.x86_64-linux;
+          inherit system modules;
           pkgs = pkgsFun system;
           specialArgs = {
             inputs = attrs;
