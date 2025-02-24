@@ -168,8 +168,8 @@
     version = "1.0.100";
   };
   cargo-lock = {
-    crateSha256 = "sha256-Ui/Z4syhSxemV1R815R+yytDwN2YJBcHGscUYUp/0zE=";
-    depsSha256 = "sha256-C5Lu3fVDe6hRHCkPqw+XJ0KYhm2DbU8gDK5RnCg2fIU=";
+    crateSha256 = "sha256-D5DpUgvKxJSVQwsLzpwX3AA/qIG5lcX7catc1O0oxX4=";
+    depsSha256 = "sha256-gV2XsVvODQuVlrh7kp7BQsNwdjmnk60ojHDm3rt2laY=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
@@ -204,7 +204,7 @@
         url = "https://github.com/Shnatsel";
       }
     ];
-    version = "10.0.1";
+    version = "10.1.0";
   };
   cargo-public-api = {
     crateSha256 = "sha256-NRL+7v1K2Y6lm1yuNZODkMaf2Xeib8KjOvPbn+nvbA4=";
@@ -323,8 +323,8 @@
     version = "8.5.2";
   };
   prr = {
-    crateSha256 = "sha256-vTpvVHDw45Jko0iJMQrmtltrjF40T+YO4D6U0k2NBkQ=";
-    depsSha256 = "sha256-jqsa0YO8XI+ofN6WL9l2Sb7llQuN0yFKNgGhPNPAtto=";
+    crateSha256 = "sha256-q8HC6l+SswZLLn3LFulnyIkrSAQ6fGS8NREVKX6UYII=";
+    depsSha256 = "sha256-iGUI1n6EU1LTjgCQH+bPgwrE760ho7vgTiqXuHreprc=";
     description = "Mailing list style code reviews for github";
     homepage = null;
     id = "prr";
@@ -340,7 +340,7 @@
         url = "https://github.com/danobi";
       }
     ];
-    version = "0.19.0";
+    version = "0.20.0";
   };
   toml-merge = {
     crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";

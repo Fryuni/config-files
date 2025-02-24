@@ -9,8 +9,8 @@
     with pkgs; [
       ## Rust tooling
       fenix.complete.toolchain
-      rc.cargo-lock
-      rc.cargo-expand
+      # rc.cargo-lock
+      # rc.cargo-expand
       # rc.cargo-deps
 
       ## Plumbing tools
