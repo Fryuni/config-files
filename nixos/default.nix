@@ -65,6 +65,7 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
+  boot.tmp.cleanOnBoot = true;
   environment.systemPackages = with pkgs; [
     curl
     wget

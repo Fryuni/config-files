@@ -60,3 +60,14 @@ update-pulumi:
 update-rustCrates:
   overlay/rustPackages/update.sh
 
+## Raspberry Pi
+
+# Build a Raspberry Pi image and burn it into an SD card
+burn-rpi-image node device:
+  #!/usr/bin/env bash
+  set -euxo pipefail
+  BUILT_IMAGE_STORE_PATH="$(nix build --no-link --print-out-paths .#nixosConfigurations.{{node}}.config.system.build.sdImage)"
+  IMAGE_PATH="${BUILT_IMAGE_STORE_PATH}/sd-image/nixos-rpi.img"
+
+  sudo dd status=progress if="$IMAGE_PATH" of="{{device}}"
+

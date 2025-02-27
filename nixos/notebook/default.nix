@@ -17,7 +17,7 @@
   boot.blacklistedKernelModules = ["ideapad_laptop"];
   boot.extraModulePackages = with config.boot.kernelPackages; [zenpower];
 
-  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+  boot.binfmt.emulatedSystems = ["aarch64-linux"];
 
   networking.hostName = "lotus-notebook";
 

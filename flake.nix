@@ -72,7 +72,7 @@
     nix-alien,
     ...
   } @ attrs: let
-    pkgsFun = system: let
+    pkgsFun = system: systemOverlay: let
       config = {
         allowUnfree = true;
         permittedInsecurePackages = [
@@ -123,41 +123,48 @@
           ++ (import ./overlay attrs)
           ++ [
             attrs.polymc.overlay
-          ];
+          ]
+          ++ systemOverlay;
       };
 
     nixosModules = {
       notebook = {
-          system = flake-utils.lib.system.x86_64-linux;
-          modules = [
-        agenix.nixosModules.age
-        ./nixos
-        ./nixos/notebook
-      ];
-        };
-      gce-automation = {
-          system = flake-utils.lib.system.x86_64-linux;
-          modules = [
-        "${nixpkgs}/nixos/modules/virtualisation/google-compute-image.nix"
-        ./servers/gce-automation
-      ];
-        };
-        rpi3 = {
-          system = flake-utils.lib.system.aarch64-linux;
-          modules = [
-        "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-          ./servers/rpi/one
+        system = flake-utils.lib.system.x86_64-linux;
+        modules = [
+          agenix.nixosModules.age
+          ./nixos
+          ./nixos/notebook
         ];
-        };
+        overlay = [];
+      };
+      gce-automation = {
+        system = flake-utils.lib.system.x86_64-linux;
+        modules = [
+          "${nixpkgs}/nixos/modules/virtualisation/google-compute-image.nix"
+          ./nixos/servers/gce-automation
+        ];
+        overlay = [];
+      };
+      rpi3 = {
+        system = flake-utils.lib.system.aarch64-linux;
+        modules = [
+          ./nixos/servers/rpi/one
+        ];
+        overlay = [(import ./overlay/rpi3.nix)];
+      };
     };
 
     globalConfig = {
       templates = import ./templates attrs;
 
-      nixosConfigurations = builtins.mapAttrs (_: {modules, system}:
+      nixosConfigurations = builtins.mapAttrs (_: {
+        modules,
+        system,
+        overlay,
+      }:
         nixpkgs.lib.nixosSystem rec {
           inherit system modules;
-          pkgs = pkgsFun system;
+          pkgs = pkgsFun system overlay;
           specialArgs = {
             inputs = attrs;
           };
@@ -165,7 +172,7 @@
       nixosModules;
 
       homeConfigurations.notebook = home-manager.lib.homeManagerConfiguration {
-        pkgs = pkgsFun flake-utils.lib.system.x86_64-linux;
+        pkgs = pkgsFun flake-utils.lib.system.x86_64-linux [];
         extraSpecialArgs = {
           inputs = attrs;
         };
@@ -179,7 +186,7 @@
     };
 
     perSystemConfig = flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = pkgsFun system;
+      pkgs = pkgsFun system [];
     in {
       legacyPackages = pkgs;
 
