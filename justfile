@@ -71,3 +71,13 @@ burn-rpi-image node device:
 
   sudo dd status=progress if="$IMAGE_PATH" of="{{device}}"
 
+run-rpi-image node:
+  qemu-system-aarch64 \
+    -machine raspi3b \
+    -cpu cortex-a72 \
+    -smp 4 -m 1G \
+    -dtb treeblob.dtb \
+    -drive "file=$(nix build --no-link --print-out-paths .#nixosConfigurations.{{node}}.config.system.build.sdImage)/sd-image/nixos-rpi.img,format=raw,index=0,if=sd" \
+    -device usb-net,netdev=net0 -netdev user,id=net0,hostfwd=tcp::50022-:22 \
+    -monitor tcp:127.0.0.1:50021,server,nowait \
+    -nographic

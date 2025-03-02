@@ -1,7 +1,7 @@
 {...}: {
   imports = [
     ../common.nix
-    # ../modules/rpi3.nix
+    ../modules/rpi3.nix
   ];
 
   networking = {
