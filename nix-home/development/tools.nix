@@ -22,6 +22,7 @@
     just
     master.turso-cli
     zigpkgs.master
+    zigpkgs.master.zls
 
     kubectl
     krew

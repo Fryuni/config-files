@@ -437,11 +437,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1740962521,
-        "narHash": "sha256-VzAWOEFnxJQ/7548UQ/2mKIYdMeygqsRTh+KtkRG6bM=",
+        "lastModified": 1740971482,
+        "narHash": "sha256-o7V7eNaXwsPnEPEiBWOL//na8vOOzPeA2bW30waQXuE=",
         "owner": "Fryuni",
         "repo": "zig-overlay",
-        "rev": "1dfd21363c733becc5f671dd82d9108465056c64",
+        "rev": "ed3cafbdc890093fc930d32c7c86a5b7db68849f",
         "type": "github"
       },
       "original": {
