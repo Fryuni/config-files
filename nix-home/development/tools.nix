@@ -8,8 +8,8 @@
     (python310.withPackages (py: [
       py.pyopenssl
     ]))
-    nodejs_20
-    corepack_20
+    stable.nodejs_22
+    stable.corepack_22
     bun
 
     libnotify
