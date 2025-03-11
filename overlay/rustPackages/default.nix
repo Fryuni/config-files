@@ -28,7 +28,7 @@ final: prev: let
           sha256 = definition.crateSha256;
         };
 
-        cargoSha256 = definition.depsSha256;
+        cargoHash = definition.depsHash;
         meta = {
           inherit (definition) description keywords;
           homepage = definition.homepage or "https://crates.io/crates/${name}";

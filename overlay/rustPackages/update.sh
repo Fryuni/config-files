@@ -15,19 +15,19 @@ declare -a cargo_crates
 if [ $# -eq 0 ]; then
 	cargo_crates=(
 		# "bootimage"
-		# "cargo-deps"
+		"cargo-deps"
 		"cargo-expand"
 		# "cargo-watch"
 		"cargo-crate"
-		# "cargo-edit"
+		"cargo-edit"
 		# "cargo-sort"
 		# "cargo-cache"
 		# "cargo-public-api"
 		# "cargo-semver-checks"
 		"cargo-lock"
-		# "cargo-docs"
+		"cargo-docs"
 		# "toml-merge"
-		# "zellij"
+		"zellij"
 		"prr"
 	)
 else
@@ -89,8 +89,8 @@ function prefetch() {
 	if [ -n "$crateSha256" ]; then
 		echo "Captured crate hash for ${crate}@${version}: ${crateSha256}"
 
-		local depsSha256
-		depsSha256=$(capture_hash nix build --no-link --impure --expr "
+		local depsHash
+		depsHash=$(capture_hash nix build --no-link --impure --expr "
 		  with builtins.getFlake \"me\"; 
 		  with legacyPackages.\${builtins.currentSystem};
       (fenixPlatform.buildRustPackage rec {
@@ -100,10 +100,10 @@ function prefetch() {
 		      inherit pname version;
           sha256 = \"${crateSha256}\";
         };
-        cargoSha256 = \"\";
+        cargoHash = \"\";
       }).cargoDeps")
 
-		echo "Captured dependencies hash for ${crate}@${version}: ${depsSha256}"
+		echo "Captured dependencies hash for ${crate}@${version}: ${depsHash}"
 
 		{
 			if [[ -f $out_file ]]; then
@@ -112,14 +112,14 @@ function prefetch() {
 				// (builtins.fromJSON (builtins.readFile ${tmpdir}/${crate}_${version}.json)
 				// {
 			    crateSha256 = \"${crateSha256}\";
-			    depsSha256 = \"${depsSha256}\";
+			    depsHash = \"${depsHash}\";
 			  })
 			);"
 			else
 				echo -n "${crate} = (
 				builtins.fromJSON (builtins.readFile ${tmpdir}/${crate}_${version}.json) // {
 			    crateSha256 = \"${crateSha256}\";
-			    depsSha256 = \"${depsSha256}\";
+			    depsHash = \"${depsHash}\";
 			  }
 			);"
 			fi
