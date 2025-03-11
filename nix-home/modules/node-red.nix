@@ -58,7 +58,7 @@ in {
     };
 
     repo = mkOption {
-      type = types.nullOr types.str;
+      type = types.nullOr types.string;
       default = null;
     };
 
