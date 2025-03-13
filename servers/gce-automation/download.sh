@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-export EARLY_CUT_DATE="2025-02-08"
+export EARLY_CUT_DATE="2025-02-23"
 export BUCKET_NAME="twitch-vods-02057f9"
 
 CHANNELS=(
