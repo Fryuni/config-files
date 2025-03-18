@@ -1,4 +1,4 @@
-#!/usr/bin/env -S nix shell -iv -k HOME me#bash me#nix me#git me#findutils me#cargo me#alejandra me#ripgrep me#rustCrates.cargo-crate me#jq me#moreutils me#coreutils me#nix-prefetch -c bash --
+#!/usr/bin/env -S nix shell -iv -k HOME .#bash .#nix .#git .#findutils .#cargo .#alejandra .#ripgrep .#rustCrates.cargo-crate .#jq .#moreutils .#coreutils .#nix-prefetch -c bash --
 # shellcheck shell=bash
 
 # set -x
@@ -6,6 +6,8 @@ set -eo pipefail
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 cd "$SCRIPT_DIR"
+
+REPO_DIR="$(git rev-parse --show-toplevel)"
 
 # An array of plugin names. The respective repository inside Pulumi's
 # Github organization is called pulumi-$name by convention.
@@ -91,7 +93,7 @@ function prefetch() {
 
 		local depsHash
 		depsHash=$(capture_hash nix build --no-link --impure --expr "
-		  with builtins.getFlake \"me\"; 
+		  with builtins.getFlake \"${REPO_DIR}\"; 
 		  with legacyPackages.\${builtins.currentSystem};
       (fenixPlatform.buildRustPackage rec {
         pname = \"${crate}\";

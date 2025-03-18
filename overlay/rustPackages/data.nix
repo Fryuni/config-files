@@ -99,8 +99,8 @@
     version = "0.1.34";
   };
   cargo-edit = {
-    crateSha256 = "sha256-P29M5XzWxAs0moWM6ttVCIQD7AsDR+1r7UkdW3QGT88=";
-    depsHash = "sha256-kEB794IGvKgo4Q+HFqmawQavni9NijgzYcqLA8A1Tx8=";
+    crateSha256 = "sha256-rLj3+CkHtZPc5cAAj+k7DBrkdxbor1JUhcUkcXnwBEI=";
+    depsHash = "sha256-iCRsD9UrjxZi8u0gN3+5SXXXvLyAwtLxhOqLNY2kFKU=";
     description = "Cargo commands for modifying a `Cargo.toml` file..";
     homepage = "https://github.com/killercup/cargo-edit";
     id = "cargo-edit";
@@ -143,11 +143,11 @@
         url = "https://github.com/ordian";
       }
     ];
-    version = "0.13.1";
+    version = "0.13.2";
   };
   cargo-expand = {
-    crateSha256 = "sha256-YPXTtTWJ5P2yf1gJN+JYt7m15jHRUW1wIT/7m8SrUXM=";
-    depsHash = "sha256-n4CuhGtO5j8ZCyjGsOwphoWmOIiEUJv0W8VlLz0ZZeM=";
+    crateSha256 = "sha256-575SRKwAnhMalLgPPK8ieOLkd3in4Ypze+EpKe8mLZ8=";
+    depsHash = "sha256-qtGDkFvubIBolHL1Di2Q4IxX4UQBtDM/oHjy0ob5XZ4=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -163,7 +163,7 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.101";
+    version = "1.0.102";
   };
   cargo-lock = {
     crateSha256 = "sha256-D5DpUgvKxJSVQwsLzpwX3AA/qIG5lcX7catc1O0oxX4=";
@@ -356,8 +356,8 @@
     version = "0.1.0";
   };
   zellij = {
-    crateSha256 = "sha256-F/TMxfWH77su+Cs4tZU83RT2MGH6FUNBswQl7aPR/E8=";
-    depsHash = "sha256-Fwh4kgUrC1ZBkE8MZ/jlVRKu2X/S6XHZi2ay3tSAm84=";
+    crateSha256 = "sha256-8EFkun0wvaQivCC6A4CzrygBfKhzYsX8sqThYgTJON4=";
+    depsHash = "sha256-hk/bGSXjZmZdYMGHAJc+iHsW7hcR9hmvvUR/abLLBZs=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
@@ -396,9 +396,9 @@
         email = null;
         id = 101386;
         kind = "user";
-        login = "henil";
-        name = "Henil Dedania";
-        url = "https://github.com/henil";
+        login = "h3nill";
+        name = "Henil";
+        url = "https://github.com/h3nill";
       }
       {
         avatar = "https://avatars.githubusercontent.com/u/99636919?v=4";
@@ -410,6 +410,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.41.2";
+    version = "0.42.0";
   };
 }
