@@ -1,9 +1,14 @@
 final: prev: let
   inherit (final.fenix.complete) toolchain;
-  rustPlatform = final.makeRustPlatform {
-    cargo = toolchain;
-    rustc = toolchain;
-  };
+  rustPlatform =
+    final.makeRustPlatform {
+      cargo = toolchain;
+      rustc = toolchain;
+    }
+    // {
+      cargo = toolchain;
+      rustc = toolchain;
+    };
 
   generated = import ./data.nix;
   extras = import ./extras.nix final;
@@ -28,7 +33,7 @@ final: prev: let
           sha256 = definition.crateSha256;
         };
 
-        cargoSha256 = definition.depsSha256;
+        cargoHash = definition.depsHash;
         meta = {
           inherit (definition) description keywords;
           homepage = definition.homepage or "https://crates.io/crates/${name}";

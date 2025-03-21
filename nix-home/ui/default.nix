@@ -7,7 +7,7 @@
 
   home.packages = with pkgs; [
     calibre
-    okular
+    kdePackages.okular
     spotify
     flameshot
     discord-canary
