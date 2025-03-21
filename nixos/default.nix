@@ -35,13 +35,10 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  services.xserver.displayManager.lightdm.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.displayManager.defaultSession = "plasmax11";
+  services.desktopManager.plasma6.enable = true;
 
-  # services.xserver.desktopManager.cinnamon.enable = true;
-  # services.xserver.desktopManager.deepin.enable = true;
-  # services.xserver.desktopManager.gnome.enable = true;
-  # services.xserver.desktopManager.lxqt.enable = true;
-  services.xserver.desktopManager.plasma5.enable = true;
   # services.xserver.desktopManager.xfce.enable = true;
   # programs.thunar.plugins = with pkgs.xfce; [
   #   thunar-archive-plugin

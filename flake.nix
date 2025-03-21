@@ -59,7 +59,6 @@
     };
     nix-alien = {
       url = "github:thiagokokada/nix-alien";
-      inputs.flake-utils.follows = "flake-utils";
       inputs.flake-compat.follows = "flake-compat";
     };
   };

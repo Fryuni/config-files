@@ -1,4 +1,4 @@
-#!/usr/bin/env -S nix shell -iv -k HOME me#bash me#nix me#git me#findutils me#cargo me#alejandra me#ripgrep me#rustCrates.cargo-crate me#jq me#moreutils me#coreutils me#nix-prefetch -c bash --
+#!/usr/bin/env -S nix shell -iv -k HOME .#bash .#nix .#git .#findutils .#cargo .#alejandra .#ripgrep .#rustCrates.cargo-crate .#jq .#moreutils .#coreutils .#nix-prefetch -c bash --
 # shellcheck shell=bash
 
 # set -x
@@ -6,6 +6,8 @@ set -eo pipefail
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 cd "$SCRIPT_DIR"
+
+REPO_DIR="$(git rev-parse --show-toplevel)"
 
 # An array of plugin names. The respective repository inside Pulumi's
 # Github organization is called pulumi-$name by convention.
@@ -15,19 +17,19 @@ declare -a cargo_crates
 if [ $# -eq 0 ]; then
 	cargo_crates=(
 		# "bootimage"
-		# "cargo-deps"
+		"cargo-deps"
 		"cargo-expand"
 		# "cargo-watch"
 		"cargo-crate"
-		# "cargo-edit"
+		"cargo-edit"
 		# "cargo-sort"
 		# "cargo-cache"
 		# "cargo-public-api"
 		# "cargo-semver-checks"
 		"cargo-lock"
-		# "cargo-docs"
+		"cargo-docs"
 		# "toml-merge"
-		# "zellij"
+		"zellij"
 		"prr"
 	)
 else
@@ -89,9 +91,9 @@ function prefetch() {
 	if [ -n "$crateSha256" ]; then
 		echo "Captured crate hash for ${crate}@${version}: ${crateSha256}"
 
-		local depsSha256
-		depsSha256=$(capture_hash nix build --no-link --impure --expr "
-		  with builtins.getFlake \"me\"; 
+		local depsHash
+		depsHash=$(capture_hash nix build --no-link --impure --expr "
+		  with builtins.getFlake \"${REPO_DIR}\"; 
 		  with legacyPackages.\${builtins.currentSystem};
       (fenixPlatform.buildRustPackage rec {
         pname = \"${crate}\";
@@ -100,10 +102,10 @@ function prefetch() {
 		      inherit pname version;
           sha256 = \"${crateSha256}\";
         };
-        cargoSha256 = \"\";
+        cargoHash = \"\";
       }).cargoDeps")
 
-		echo "Captured dependencies hash for ${crate}@${version}: ${depsSha256}"
+		echo "Captured dependencies hash for ${crate}@${version}: ${depsHash}"
 
 		{
 			if [[ -f $out_file ]]; then
@@ -112,14 +114,14 @@ function prefetch() {
 				// (builtins.fromJSON (builtins.readFile ${tmpdir}/${crate}_${version}.json)
 				// {
 			    crateSha256 = \"${crateSha256}\";
-			    depsSha256 = \"${depsSha256}\";
+			    depsHash = \"${depsHash}\";
 			  })
 			);"
 			else
 				echo -n "${crate} = (
 				builtins.fromJSON (builtins.readFile ${tmpdir}/${crate}_${version}.json) // {
 			    crateSha256 = \"${crateSha256}\";
-			    depsSha256 = \"${depsSha256}\";
+			    depsHash = \"${depsHash}\";
 			  }
 			);"
 			fi
