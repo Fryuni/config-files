@@ -19,7 +19,7 @@
     };
     gomod2nix = {
       url = "github:nix-community/gomod2nix";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.nixpkgs.follows = "nixpkgs-master";
       inputs.flake-utils.follows = "flake-utils";
     };
 
@@ -53,7 +53,7 @@
     };
     direnv = {
       url = "github:direnv/direnv";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-master";
       inputs.gomod2nix.follows = "gomod2nix";
       inputs.systems.follows = "systems";
     };
