@@ -6,6 +6,7 @@
   (import ./pulumi)
   (import ./rustPackages)
   (final: pkgs: {
-    direnv = direnv.packages.${pkgs.system}.default;
+    direnv = final.master.direnv;
+    # direnv = direnv.packages.${pkgs.system}.default;
   })
 ]

@@ -40,7 +40,7 @@ os-boot:
 update: update-flake update-overlays
 
 update-flake-master:
-  nix flake lock --update-input nixpkgs-master
+  nix flake update nixpkgs-master
   git add flake.lock
   git commit -m "chore: Update flake" -- flake.lock
 
