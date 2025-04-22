@@ -41,6 +41,15 @@ for channel in "${CHANNELS[@]}"; do
     bash ./download-and-store.sh "$video_id"
   done
 
+  EARLY_CUT_DATE="$(
+    gcloud storage objects list \
+      "gs://twitch-vods-02057f9/${channel}/clips/*" \
+      --limit 1 \
+      --sort-by '~name' \
+      --format 'get(name)' |
+      awk -F'/' '{split($NF, a, "_"); print a[1]}'
+  )"
+  export EARLY_CUT_DATE
   export OUT_NAME_FORMAT="$channel/clips/{date}_{id}_{channel_login}_{title_slug}.{format}"
 
   echo "Downloading clips"
