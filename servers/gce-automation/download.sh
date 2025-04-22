@@ -46,7 +46,7 @@ for channel in "${CHANNELS[@]}"; do
   echo "Downloading clips"
 
   twitch-dl clips "$channel" --all --json --period last_week |
-    jq ".[]|select(.createdAt > \"${EARLY_CUT_DATE}\")|.id" -r |
+    jq ".[]|select(.createdAt > \"${EARLY_CUT_DATE}\")|.slug" -r |
     tac |
     xargs -P8 -n1 bash ./download-and-store.sh # &>/dev/null
 done
