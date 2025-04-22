@@ -2,15 +2,6 @@
 
 set -eo pipefail
 
-EARLY_CUT_DATE="$(
-  gcloud storage objects list \
-    'gs://twitch-vods-02057f9/*/vods/*' \
-    --limit 1 \
-    --sort-by '~creation_time' \
-    --format 'get(name)' |
-    awk -F'/' '{split($NF, a, "_"); print a[1]}'
-)"
-export EARLY_CUT_DATE
 export BUCKET_NAME="twitch-vods-02057f9"
 
 CHANNELS=(
@@ -20,7 +11,18 @@ CHANNELS=(
 for channel in "${CHANNELS[@]}"; do
   echo "Downloading data for channel: $channel"
 
+  EARLY_CUT_DATE="$(
+    gcloud storage objects list \
+      "gs://twitch-vods-02057f9/${channel}/vods/*" \
+      --limit 1 \
+      --sort-by '~name' \
+      --format 'get(name)' |
+      awk -F'/' '{split($NF, a, "_"); print a[1]}'
+  )"
+  export EARLY_CUT_DATE
   export OUT_NAME_FORMAT="$channel/vods/{date}_{id}_{channel_login}_{title_slug}.{format}"
+
+  echo "Early cut date: $EARLY_CUT_DATE"
 
   rm -rf ~/.cache/twitch-dl
   rm -rf "$channel"
