@@ -5,7 +5,7 @@
   ...
 }: {
   home.packages = with pkgs; [
-    (python310.withPackages (py: [
+    (python313.withPackages (py: [
       py.pyopenssl
     ]))
     stable.nodejs_22
