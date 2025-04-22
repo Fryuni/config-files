@@ -2,7 +2,15 @@
 
 set -eo pipefail
 
-export EARLY_CUT_DATE="2025-02-23"
+EARLY_CUT_DATE="$(
+  gcloud storage objects list \
+    'gs://twitch-vods-02057f9/*/vods/*' \
+    --limit 1 \
+    --sort-by '~creation_time' \
+    --format 'get(name)' |
+    awk -F'/' '{split($NF, a, "_"); print a[1]}'
+)"
+export EARLY_CUT_DATE
 export BUCKET_NAME="twitch-vods-02057f9"
 
 CHANNELS=(
