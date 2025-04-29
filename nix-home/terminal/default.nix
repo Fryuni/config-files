@@ -39,7 +39,7 @@
     enableCompletion = true;
     autocd = true;
 
-    initExtraFirst = ''
+    initContent = pkgs.lib.mkBefore ''
       setopt cdable_vars
     '';
     # if [ -z "$ZELLIJ" ] && [ -z "$TERMINAL_EMULATOR" ]; then
