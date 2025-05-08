@@ -1,4 +1,4 @@
-#!/usr/bin/env -S nix shell -iv -k HOME .#bash .#nix .#git .#findutils .#cargo .#alejandra .#ripgrep .#rustCrates.cargo-crate .#jq .#moreutils .#coreutils .#nix-prefetch -c bash --
+#!/usr/bin/env -S nix shell -iv -k HOME me#bash me#nix me#git me#findutils me#cargo me#alejandra me#ripgrep me#rustCrates.cargo-crate me#jq me#moreutils me#coreutils me#nix-prefetch -c bash --
 # shellcheck shell=bash
 
 # set -x
