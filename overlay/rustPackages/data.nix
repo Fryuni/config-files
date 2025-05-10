@@ -1,7 +1,8 @@
-# DO NOT EDIT! This file is generated automatically by update.sh
+# DO NOT EDIT! This file is generated automatically by update.mjs
 {
   bootimage = {
     crateSha256 = "sha256-4WEpNrrGqmkyKbRRLmTe7Z7GnXyk635sniTfn99wN+g=";
+    depsHash = "sha256-XXiZ0qfAS+SXOsiRAU/xBDShpPOr18JSGQfLh3mNXQ4=";
     description = "Tool to create a bootable OS image from a kernel binary.";
     homepage = null;
     id = "bootimage";
@@ -21,6 +22,7 @@
   };
   cargo-cache = {
     crateSha256 = "sha256-aJoT3jIVpbs4GKiBHcApXTVY4EB11jyjcligV/IdQik=";
+    depsHash = "sha256-275QREIcncgBk4ah/CivSz5N2m6s/XPCfp6JGChpr38=";
     description = "Manage cargo cache ($CARGO_HOME or ~/.cargo/), show sizes and remove directories selectively";
     homepage = "https://github.com/matthiaskrgr/cargo-cache";
     id = "cargo-cache";
@@ -60,7 +62,7 @@
   };
   cargo-deps = {
     crateSha256 = "sha256-qnSHG4AhBrleYKZ4SJ4AwHdJyiidj8NTeSSphBRo7gg=";
-    depsHash = "sha256-cVi1mDlxUIO2R5aOCtcPWr24/kdq36lk1uEiKaBadmc=";
+    depsHash = "sha256-dpCbFA9AZmIFPx69tw0CqHF+lVw7uhUlwAeVX1+lIK8=";
     description = "Cargo subcommand for building dependency graphs of Rust projects.";
     homepage = "https://github.com/mrcnski/cargo-deps";
     id = "cargo-deps";
@@ -80,7 +82,7 @@
   };
   cargo-docs = {
     crateSha256 = "sha256-M+IkxIr8HG/Us1wWnPR6V+/JI4lMNCDh3pm47YyH9gU=";
-    depsHash = "sha256-AtsUBGPhOzXNyZyvTZ8EE47OpEmaHJlrik1XwPuTGEY=";
+    depsHash = "sha256-BHh05IQWcf8xj3Na9J5BoMT87X8vQRMvS2uK48UdXTE=";
     description = "A cargo plugin for serving rust and crate doc locally.";
     homepage = null;
     id = "cargo-docs";
@@ -98,56 +100,9 @@
     ];
     version = "0.1.34";
   };
-  cargo-edit = {
-    crateSha256 = "sha256-rLj3+CkHtZPc5cAAj+k7DBrkdxbor1JUhcUkcXnwBEI=";
-    depsHash = "sha256-ebrjEnLOvkAMICcreJu+jOze9R/crtAFfRDa6kqLNnA=";
-    description = "Cargo commands for modifying a `Cargo.toml` file..";
-    homepage = "https://github.com/killercup/cargo-edit";
-    id = "cargo-edit";
-    keywords = ["cargo" "cargo-subcommand" "cli" "crates" "dependencies"];
-    owners = [
-      {
-        avatar = "https://avatars.githubusercontent.com/u/20063?v=4";
-        email = null;
-        id = 58;
-        kind = "user";
-        login = "killercup";
-        name = "Pascal Hertleif";
-        url = "https://github.com/killercup";
-      }
-      {
-        avatar = "https://avatars.githubusercontent.com/u/60961?v=4";
-        email = null;
-        id = 6743;
-        kind = "user";
-        login = "epage";
-        name = "Ed Page";
-        url = "https://github.com/epage";
-      }
-      {
-        avatar = "https://avatars3.githubusercontent.com/u/15256121?v=4";
-        email = null;
-        id = 7026;
-        kind = "user";
-        login = "bjgill";
-        name = "Benjamin Gill";
-        url = "https://github.com/bjgill";
-      }
-      {
-        avatar = "https://avatars.githubusercontent.com/u/4211399?v=4";
-        email = null;
-        id = 7434;
-        kind = "user";
-        login = "ordian";
-        name = null;
-        url = "https://github.com/ordian";
-      }
-    ];
-    version = "0.13.2";
-  };
   cargo-expand = {
     crateSha256 = "sha256-On2r+ntwPIn5eTGaVkadMzhCs5S7XKY5XVvjOZTRqjY=";
-    depsHash = "sha256-tVSRBJm0eWURQtYQ2fem00CJDNEvzzOzYuVDhcuf8AQ=";
+    depsHash = "sha256-XxznEabKj2t35XHPqXpRc6h++EpiMpIwRhTn/bOipMs=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -167,7 +122,7 @@
   };
   cargo-lock = {
     crateSha256 = "sha256-D5DpUgvKxJSVQwsLzpwX3AA/qIG5lcX7catc1O0oxX4=";
-    depsHash = "sha256-GT+tBLB2KuT41qtj0vYKGg24MovDMOR2UBTRYb0haoc=";
+    depsHash = "sha256-Yn2cuuBB5T/SSFr4EzSpwF5jL0Uimz1EuYtodIczy2M=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
@@ -205,9 +160,10 @@
     version = "10.1.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-NRL+7v1K2Y6lm1yuNZODkMaf2Xeib8KjOvPbn+nvbA4=";
+    crateSha256 = "sha256-g0kaJ3HPFeS5PvWQfUTanxCgm9sduW9nBx/N61kt3ZI=";
+    depsHash = "sha256-wYeMe5ljylcB47ixGzQbKZBqXjjCj8cOF3/II6OL1vM=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
-    homepage = "https://github.com/Enselic/cargo-public-api";
+    homepage = "https://github.com/cargo-public-api/cargo-public-api";
     id = "cargo-public-api";
     keywords = ["cargo-subcommand" "diff" "rustdoc-json" "semver"];
     owners = [
@@ -239,10 +195,11 @@
         url = "https://github.com/cargo-public-api";
       }
     ];
-    version = "0.35.0";
+    version = "0.47.0";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-5AXdH9QGa7Kupz6kLU22OCjmKkMLlfg/zFIdLftxSmc=";
+    crateSha256 = "sha256-uMZ31UK1eZevSOXSOEx3t1PdNQI74R5To+sjJl/eWd8=";
+    depsHash = "sha256-lP8WAWlgXZhVf+Dy5bBfyd/+Phl+IPtxdkw7ftMf5ls=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
@@ -258,10 +215,11 @@
         url = "https://github.com/obi1kenobi";
       }
     ];
-    version = "0.31.0";
+    version = "0.41.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-i3Skc3Pc/3SxVCcLdMdxYVpkZZAZ0iew5UUq2tPVae8=";
+    depsHash = "sha256-JON6cE1ZHeI+0vU9AJp0e1TIbiH3AWjHyn0jd9PNqQU=";
     description = "Check if tables and items in a .toml file are lexically sorted";
     homepage = null;
     id = "cargo-sort";
@@ -289,7 +247,8 @@
     version = "1.0.9";
   };
   cargo-watch = {
-    crateSha256 = "sha256-39KR4TzQpJ+V8odnmNIPudsKc4XvFr1I2CJx/mZhaxU=";
+    crateSha256 = "sha256-RKUf3sL3Q0iKl1vHPWNL1jG5OwKk+s28PK9RADEBqBc=";
+    depsHash = "sha256-oqGc5haN8Jyi0eQf8egrRXWxi0RGVdIFhpGKgmFB8DI=";
     description = "Watches over your Cargo project’s source";
     homepage = "https://watchexec.github.io/#cargo-watch";
     id = "cargo-watch";
@@ -314,7 +273,7 @@
         url = "https://github.com/rust-bus";
       }
     ];
-    version = "8.5.2";
+    version = "8.5.3";
   };
   prr = {
     crateSha256 = "sha256-q8HC6l+SswZLLn3LFulnyIkrSAQ6fGS8NREVKX6UYII=";
@@ -338,6 +297,7 @@
   };
   toml-merge = {
     crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
+    depsHash = "sha256-bNZzXLgXF9GWzl8yThZxUZKR/US1Gbgq7Yc3iVFcMtY=";
     description = "Simple CLI utility which merges TOML files.";
     homepage = null;
     id = "toml-merge";
@@ -357,7 +317,7 @@
   };
   zellij = {
     crateSha256 = "sha256-dulrNkDsVo496ufXGOPOu0myrog3TzGqZiwc4UZM+Og=";
-    depsHash = "sha256-VND5M5tLx3UrHyfiR9hGn/T5M2K2ZDKOX0vcSvKPL04=";
+    depsHash = "sha256-5qkieOVJSl5LK66LfykRtwhx0LTazKujGD/16SgFb4U=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";

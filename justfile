@@ -58,5 +58,5 @@ update-pulumi:
   overlay/pulumi/update.sh
 
 update-rustCrates:
-  overlay/rustPackages/update.sh
+  overlay/rustPackages/update.mjs
 
