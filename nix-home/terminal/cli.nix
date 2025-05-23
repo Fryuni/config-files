@@ -87,6 +87,7 @@ in {
   };
 
   programs.jq.enable = true;
+  programs.pgcli.enable = true;
 
   programs.fzf = {
     enable = true;
