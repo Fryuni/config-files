@@ -218,8 +218,8 @@
     version = "0.41.0";
   };
   cargo-sort = {
-    crateSha256 = "sha256-i3Skc3Pc/3SxVCcLdMdxYVpkZZAZ0iew5UUq2tPVae8=";
-    depsHash = "sha256-JON6cE1ZHeI+0vU9AJp0e1TIbiH3AWjHyn0jd9PNqQU=";
+    crateSha256 = "sha256-B+pzzoLz3cs3WWJLidlvssU3KeQpsEoJVrK9n8EEAtQ=";
+    depsHash = "sha256-yRe0InNt28Cfl0LeEVviRYBx/DXXe27sgTl6Dqr4u+w=";
     description = "Check if tables and items in a .toml file are lexically sorted";
     homepage = null;
     id = "cargo-sort";
@@ -244,7 +244,7 @@
         url = "https://github.com/DevinR528";
       }
     ];
-    version = "1.0.9";
+    version = "2.0.0";
   };
   cargo-watch = {
     crateSha256 = "sha256-RKUf3sL3Q0iKl1vHPWNL1jG5OwKk+s28PK9RADEBqBc=";
