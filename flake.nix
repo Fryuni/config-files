@@ -127,7 +127,7 @@
       };
 
     nixosModules = {
-      notebook = [
+      lotus-notebook = [
         agenix.nixosModules.age
         ./nixos
         ./nixos/notebook
@@ -152,7 +152,7 @@
         })
       nixosModules;
 
-      homeConfigurations.notebook = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations."lotus@lotus-notebook" = home-manager.lib.homeManagerConfiguration {
         pkgs = pkgsFun flake-utils.lib.system.x86_64-linux;
         extraSpecialArgs = {
           inputs = attrs;
