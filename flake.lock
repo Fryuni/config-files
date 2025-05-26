@@ -287,11 +287,11 @@
     },
     "nixpkgs-master": {
       "locked": {
-        "lastModified": 1747961032,
-        "narHash": "sha256-A5O+VUSTAtVbEcywsoxmzbThuJApZ0nlbQZsyOrVS04=",
+        "lastModified": 1748234722,
+        "narHash": "sha256-QM7W47fGWaWcapd4j28yyQdnKculvEDUeenfYAQRKNQ=",
         "owner": "Fryuni",
         "repo": "nixpkgs",
-        "rev": "8535bb0dd6d822cf242d7d8903c083a54687dbaa",
+        "rev": "08237d701e8d1913d67c7ec10285ade548b64726",
         "type": "github"
       },
       "original": {
