@@ -160,8 +160,8 @@
     version = "10.1.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-g0kaJ3HPFeS5PvWQfUTanxCgm9sduW9nBx/N61kt3ZI=";
-    depsHash = "sha256-wYeMe5ljylcB47ixGzQbKZBqXjjCj8cOF3/II6OL1vM=";
+    crateSha256 = "sha256-xDMOrL9yyaEEwPhcrkPugVMTyKW4T6X1yE4tN9dmPas=";
+    depsHash = "sha256-VLDQXICluFLfv7r8QTI01KbM3EMJ+ke3/EwHbIXWy2I=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/cargo-public-api/cargo-public-api";
     id = "cargo-public-api";
@@ -185,17 +185,8 @@
         name = "Martin Nordholts";
         url = "https://github.com/Enselic";
       }
-      {
-        avatar = "https://avatars.githubusercontent.com/u/102732092?v=4";
-        email = null;
-        id = 5657;
-        kind = "team";
-        login = "github:cargo-public-api:owners";
-        name = "owners";
-        url = "https://github.com/cargo-public-api";
-      }
     ];
-    version = "0.47.0";
+    version = "0.47.1";
   };
   cargo-semver-checks = {
     crateSha256 = "sha256-uMZ31UK1eZevSOXSOEx3t1PdNQI74R5To+sjJl/eWd8=";
@@ -218,8 +209,8 @@
     version = "0.41.0";
   };
   cargo-sort = {
-    crateSha256 = "sha256-B+pzzoLz3cs3WWJLidlvssU3KeQpsEoJVrK9n8EEAtQ=";
-    depsHash = "sha256-yRe0InNt28Cfl0LeEVviRYBx/DXXe27sgTl6Dqr4u+w=";
+    crateSha256 = "sha256-FtsdwNSxSj6dxsSfL39MzoVqALeMjnn2QuHhInW8WXI=";
+    depsHash = "sha256-zwoqjl0Pl1AgaDJryGn9j+b3YDBddFg2x5EVs1YsMTU=";
     description = "Check if tables and items in a .toml file are lexically sorted";
     homepage = null;
     id = "cargo-sort";
@@ -244,7 +235,7 @@
         url = "https://github.com/DevinR528";
       }
     ];
-    version = "2.0.0";
+    version = "2.0.1";
   };
   cargo-watch = {
     crateSha256 = "sha256-RKUf3sL3Q0iKl1vHPWNL1jG5OwKk+s28PK9RADEBqBc=";
