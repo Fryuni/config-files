@@ -9,7 +9,7 @@ final: pkgs: let
     "9836"  # Randomness
     "7425"  # Wakatime
     "7499"  # Git Toolbox
-    "22282" # JetBrains AI Assist
+    # "22282" # JetBrains AI Assist
   ];
 
   overrides = {
