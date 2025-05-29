@@ -18,6 +18,7 @@
     go
     golangci-lint
     gosec
+    gopls
     ngrok
     just
     master.turso-cli
