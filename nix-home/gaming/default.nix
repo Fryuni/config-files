@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
     prismlauncher
-    parsecgaming
+    parsec-bin
   ];
 
   programs.obs-studio = {enable = true;};
