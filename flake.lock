@@ -333,6 +333,26 @@
         "type": "github"
       }
     },
+    "parsecgaming": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs-stable"
+        ]
+      },
+      "locked": {
+        "lastModified": 1700933580,
+        "narHash": "sha256-SKp4AepkFaRgC4rEEzl/UepyiCEe7u3k+l80wZqYRyo=",
+        "owner": "DarthPJB",
+        "repo": "parsec-gaming-nix",
+        "rev": "9f707d05d4061629d0a7b0628765ca1df5db31c9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "DarthPJB",
+        "repo": "parsec-gaming-nix",
+        "type": "github"
+      }
+    },
     "polymc": {
       "inputs": {
         "flake-compat": [
@@ -374,6 +394,7 @@
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-master": "nixpkgs-master",
         "nixpkgs-stable": "nixpkgs-stable",
+        "parsecgaming": "parsecgaming",
         "polymc": "polymc",
         "systems": "systems",
         "zig": "zig"
