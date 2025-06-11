@@ -27,8 +27,11 @@
 
     kubectl
     krew
+    kubectl-view-allocations
     k9s
     kubernetes-helm
+    tfk8s
+    kubie
   ];
 
   home.sessionPath = [
