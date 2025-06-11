@@ -4,11 +4,12 @@ final: pkgs: let
 
   globalPlugins = [
     "164" # IdeaVIM
-    "17718" # GitHub Copilot
+    # "17718" # GitHub Copilot
     # "20540" # Codeium
     "9836" # Randomness
-    # "7425" # Wakatime
+    "7425" # Wakatime
     "7499" # Git Toolbox
+    # "22282" # JetBrains AI Assist
   ];
 
   overrides = {

@@ -51,6 +51,10 @@
       inputs.nixpkgs.follows = "nixpkgs-stable";
       inputs.flake-compat.follows = "flake-compat";
     };
+    parsecgaming = {
+      url = "github:DarthPJB/parsec-gaming-nix";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+    };
     direnv = {
       url = "github:direnv/direnv";
       inputs.nixpkgs.follows = "nixpkgs-master";
@@ -132,7 +136,7 @@
       };
 
     nixosModules = {
-      notebook = [
+      lotus-notebook = [
         agenix.nixosModules.age
         ./nixos
         ./nixos/notebook
@@ -179,7 +183,7 @@
         ];
       };
 
-      homeConfigurations.notebook = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations."lotus@lotus-notebook" = home-manager.lib.homeManagerConfiguration {
         pkgs = pkgsFun flake-utils.lib.system.x86_64-linux;
         extraSpecialArgs = {
           inputs = attrs;

@@ -1,6 +1,7 @@
 {
   direnv,
   nix-darwin,
+  parsecgaming,
   ...
 }: [
   (import ./utils.nix)
@@ -10,7 +11,9 @@
   (import ./pulumi)
   (import ./rustPackages)
   (final: pkgs: {
-    direnv = direnv.packages.${pkgs.system}.default;
+    direnv = final.master.direnv;
+    # direnv = direnv.packages.${pkgs.system}.default;
     nix-darwin = nix-darwin.packages.${pkgs.system}.default;
+    parsecgaming = parsecgaming.packages.${pkgs.system}.parsecgaming;
   })
 ]
