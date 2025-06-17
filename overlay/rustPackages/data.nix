@@ -101,8 +101,8 @@
     version = "0.1.34";
   };
   cargo-expand = {
-    crateSha256 = "sha256-On2r+ntwPIn5eTGaVkadMzhCs5S7XKY5XVvjOZTRqjY=";
-    depsHash = "sha256-XxznEabKj2t35XHPqXpRc6h++EpiMpIwRhTn/bOipMs=";
+    crateSha256 = "sha256-gq4BAFUd8vmGgQ8TUYsJ1E5DoY0btfTdTE6+QBIkXE4=";
+    depsHash = "sha256-+oRlCBvkfMbWznRkkec4aOb4CZGf9nwQQjCjYa+p/0I=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -118,7 +118,7 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.106";
+    version = "1.0.109";
   };
   cargo-lock = {
     crateSha256 = "sha256-D5DpUgvKxJSVQwsLzpwX3AA/qIG5lcX7catc1O0oxX4=";
@@ -155,6 +155,15 @@
         login = "Shnatsel";
         name = "Sergey \"Shnatsel\" Davidoff";
         url = "https://github.com/Shnatsel";
+      }
+      {
+        avatar = "https://avatars.githubusercontent.com/u/25397242?v=4";
+        email = null;
+        id = 12033;
+        kind = "team";
+        login = "github:rustsec:working-group";
+        name = "Working Group";
+        url = "https://github.com/rustsec";
       }
     ];
     version = "10.1.0";
