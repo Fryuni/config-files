@@ -47,7 +47,7 @@
       inputs.nixpkgs.follows = "nixpkgs-stable";
       inputs.flake-compat.follows = "flake-compat";
     };
-parsecgaming = {
+    parsecgaming = {
       url = "github:DarthPJB/parsec-gaming-nix";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };

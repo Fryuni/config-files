@@ -1,4 +1,8 @@
-{direnv, parsecgaming, ...}: [
+{
+  direnv,
+  parsecgaming,
+  ...
+}: [
   (import ./utils.nix)
   (import ./patches.nix)
   (import ./jetbrains.nix)
