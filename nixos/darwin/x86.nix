@@ -11,6 +11,7 @@
   networking.localHostName = "Fry-MacBook-x86";
 
   programs.zsh.enable = true;
+  system.primaryUser = "lotus";
   users.users.lotus = {
     uid = 401;
     description = "Void Lotus";
