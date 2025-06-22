@@ -1,6 +1,6 @@
 {inputs, ...}: {
   # Let home-manager manage itself.
-  home.stateVersion = "22.05";
+  home.stateVersion = "24.11";
   programs.home-manager.enable = true;
 
   imports = [

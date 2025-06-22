@@ -71,6 +71,6 @@
       "${pkgs.git}/"
       "${config.home.homeDirectory}/.config/systemd/user/git-maintenance@.service"
     ]} || true
-    systemctl --user daemon-reload
+    systemctl --user daemon-reload || true
   '';
 }

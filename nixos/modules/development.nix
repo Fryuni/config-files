@@ -18,7 +18,6 @@
     gcc
     file
     termshark
-    wireshark
 
     config.boot.kernelPackages.perf
 
