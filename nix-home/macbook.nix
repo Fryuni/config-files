@@ -4,6 +4,7 @@
 
   home.packages = with pkgs; [
     postgresql_16_jit
+    calibre
   ];
 
   programs.ssh.enable = true;
