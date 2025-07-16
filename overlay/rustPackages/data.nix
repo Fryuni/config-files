@@ -2,7 +2,7 @@
 {
   bootimage = {
     crateSha256 = "sha256-4WEpNrrGqmkyKbRRLmTe7Z7GnXyk635sniTfn99wN+g=";
-    depsHash = "sha256-XXiZ0qfAS+SXOsiRAU/xBDShpPOr18JSGQfLh3mNXQ4=";
+    depsHash = "sha256-CkFJHW7yrIJi/KMGJgyhnLTMkrxnDwO3X4M1aml9cuM=";
     description = "Tool to create a bootable OS image from a kernel binary.";
     homepage = null;
     id = "bootimage";
@@ -22,7 +22,7 @@
   };
   cargo-cache = {
     crateSha256 = "sha256-aJoT3jIVpbs4GKiBHcApXTVY4EB11jyjcligV/IdQik=";
-    depsHash = "sha256-275QREIcncgBk4ah/CivSz5N2m6s/XPCfp6JGChpr38=";
+    depsHash = "sha256-cwTHJ5Cd17ur8AhEQb8FTS0mcgqg83VGjvCQP00JY6s=";
     description = "Manage cargo cache ($CARGO_HOME or ~/.cargo/), show sizes and remove directories selectively";
     homepage = "https://github.com/matthiaskrgr/cargo-cache";
     id = "cargo-cache";
@@ -42,7 +42,7 @@
   };
   cargo-crate = {
     crateSha256 = "sha256-IQZIy+OAzUurfMjvmlQ4NxXY1u6Dt2x+xa0NGeCiqeg=";
-    depsHash = "sha256-iObPjIo2PDft2Md9x+SjeSBJ5sHnnuamZhieLBbySCo=";
+    depsHash = "sha256-hMWNd0J2AnXlt26/fgOY35q1Sp5xzS263vQRgnep7OM=";
     description = "A set of crate related cargo commands. You can for instance get the information about a crate, as text or json, including the owners of a crate and its versions.";
     homepage = "https://github.com/chevdor/cargo-crate";
     id = "cargo-crate";
@@ -62,7 +62,7 @@
   };
   cargo-deps = {
     crateSha256 = "sha256-qnSHG4AhBrleYKZ4SJ4AwHdJyiidj8NTeSSphBRo7gg=";
-    depsHash = "sha256-dpCbFA9AZmIFPx69tw0CqHF+lVw7uhUlwAeVX1+lIK8=";
+    depsHash = "sha256-cVi1mDlxUIO2R5aOCtcPWr24/kdq36lk1uEiKaBadmc=";
     description = "Cargo subcommand for building dependency graphs of Rust projects.";
     homepage = "https://github.com/mrcnski/cargo-deps";
     id = "cargo-deps";
@@ -82,7 +82,7 @@
   };
   cargo-docs = {
     crateSha256 = "sha256-M+IkxIr8HG/Us1wWnPR6V+/JI4lMNCDh3pm47YyH9gU=";
-    depsHash = "sha256-BHh05IQWcf8xj3Na9J5BoMT87X8vQRMvS2uK48UdXTE=";
+    depsHash = "sha256-AtsUBGPhOzXNyZyvTZ8EE47OpEmaHJlrik1XwPuTGEY=";
     description = "A cargo plugin for serving rust and crate doc locally.";
     homepage = null;
     id = "cargo-docs";
@@ -101,8 +101,8 @@
     version = "0.1.34";
   };
   cargo-expand = {
-    crateSha256 = "sha256-gq4BAFUd8vmGgQ8TUYsJ1E5DoY0btfTdTE6+QBIkXE4=";
-    depsHash = "sha256-+oRlCBvkfMbWznRkkec4aOb4CZGf9nwQQjCjYa+p/0I=";
+    crateSha256 = "sha256-akSd9pbD3XJAABodTDiJnPqPkPHN40N1YgC9sNgfDXg=";
+    depsHash = "sha256-AwqPI2jDVhTrMR7+pQKuWT9XC8FziXeEQHOxBPTLp1s=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -118,11 +118,11 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.109";
+    version = "1.0.113";
   };
   cargo-lock = {
     crateSha256 = "sha256-D5DpUgvKxJSVQwsLzpwX3AA/qIG5lcX7catc1O0oxX4=";
-    depsHash = "sha256-Yn2cuuBB5T/SSFr4EzSpwF5jL0Uimz1EuYtodIczy2M=";
+    depsHash = "sha256-GT+tBLB2KuT41qtj0vYKGg24MovDMOR2UBTRYb0haoc=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
@@ -169,8 +169,8 @@
     version = "10.1.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-xDMOrL9yyaEEwPhcrkPugVMTyKW4T6X1yE4tN9dmPas=";
-    depsHash = "sha256-VLDQXICluFLfv7r8QTI01KbM3EMJ+ke3/EwHbIXWy2I=";
+    crateSha256 = "sha256-QNv1aVdGZUSgiq4nJ5epuioZOJCKsss7GKYlsf98CJc=";
+    depsHash = "sha256-XzMNQbDP1dCs1vCEGgOBLR0xw8RSXupMdX5V0SPtvy4=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/cargo-public-api/cargo-public-api";
     id = "cargo-public-api";
@@ -195,11 +195,11 @@
         url = "https://github.com/Enselic";
       }
     ];
-    version = "0.47.1";
+    version = "0.48.0";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-uMZ31UK1eZevSOXSOEx3t1PdNQI74R5To+sjJl/eWd8=";
-    depsHash = "sha256-lP8WAWlgXZhVf+Dy5bBfyd/+Phl+IPtxdkw7ftMf5ls=";
+    crateSha256 = "sha256-pGjdTtr66b+MFSelGiW0NjWtnBD+rPs8YWd7SgZvXGY=";
+    depsHash = "sha256-ACTrtJ/iwCFZf8kH2Sdxx1B8ZKDIiu6elAGJOYbxqs0=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
@@ -215,11 +215,11 @@
         url = "https://github.com/obi1kenobi";
       }
     ];
-    version = "0.41.0";
+    version = "0.42.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-FtsdwNSxSj6dxsSfL39MzoVqALeMjnn2QuHhInW8WXI=";
-    depsHash = "sha256-zwoqjl0Pl1AgaDJryGn9j+b3YDBddFg2x5EVs1YsMTU=";
+    depsHash = "sha256-nQ1g0rBWx7yHQO9U/J0/XI76quEAvpCyhZDcTJKYYXo=";
     description = "Check if tables and items in a .toml file are lexically sorted";
     homepage = null;
     id = "cargo-sort";
@@ -248,7 +248,7 @@
   };
   cargo-watch = {
     crateSha256 = "sha256-RKUf3sL3Q0iKl1vHPWNL1jG5OwKk+s28PK9RADEBqBc=";
-    depsHash = "sha256-oqGc5haN8Jyi0eQf8egrRXWxi0RGVdIFhpGKgmFB8DI=";
+    depsHash = "sha256-4AVZ747d6lOjxHN+co0A7APVB5Xj6g5p/Al5fLbgPnc=";
     description = "Watches over your Cargo project’s source";
     homepage = "https://watchexec.github.io/#cargo-watch";
     id = "cargo-watch";
@@ -277,7 +277,7 @@
   };
   prr = {
     crateSha256 = "sha256-q8HC6l+SswZLLn3LFulnyIkrSAQ6fGS8NREVKX6UYII=";
-    depsHash = "sha256-PuPCm6IyX/dBcigBhroNaKDwY4TypUDjVODy+2iUix0=";
+    depsHash = "sha256-W66kbTk0IAThl2H35EYuXr6UAyWfhmV0DxpnABhppSQ=";
     description = "Mailing list style code reviews for github";
     homepage = null;
     id = "prr";
@@ -297,7 +297,7 @@
   };
   toml-merge = {
     crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
-    depsHash = "sha256-bNZzXLgXF9GWzl8yThZxUZKR/US1Gbgq7Yc3iVFcMtY=";
+    depsHash = "sha256-yrkKaeMQJ3lwypBcP8LTPl6mNjW3fFZlbHlrwsPygBg=";
     description = "Simple CLI utility which merges TOML files.";
     homepage = null;
     id = "toml-merge";
@@ -317,7 +317,7 @@
   };
   zellij = {
     crateSha256 = "sha256-dulrNkDsVo496ufXGOPOu0myrog3TzGqZiwc4UZM+Og=";
-    depsHash = "sha256-5qkieOVJSl5LK66LfykRtwhx0LTazKujGD/16SgFb4U=";
+    depsHash = "sha256-VND5M5tLx3UrHyfiR9hGn/T5M2K2ZDKOX0vcSvKPL04=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
