@@ -17,7 +17,7 @@ final: prev: let
     extra = extras.${name} or {};
     safeExtras = builtins.removeAttrs extra ["nativeBuildInputs"];
   in
-    final.stable.rustPlatform.buildRustPackage ({
+    rustPlatform.buildRustPackage ({
         pname = name;
         inherit (definition) version;
 

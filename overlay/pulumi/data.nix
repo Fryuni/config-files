@@ -1,19 +1,19 @@
 # DO NOT EDIT! This file is generated automatically by update.sh
 _: {
-  version = "3.178.0";
+  version = "3.182.0";
   pulumiPkgs = {
     x86_64-linux = [
       {
-        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.178.0-linux-x64.tar.gz";
-        sha256 = "0rdsk0qfjw15528532d26c0qb6y1lw25wk6m24k64wmg4jd3lvaq";
+        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.182.0-linux-x64.tar.gz";
+        sha256 = "032drma9jfd17i61npycls09b2wq2m2879ffz9b2klkd9k17x54g";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-docker-v4.8.0-linux-amd64.tar.gz";
         sha256 = "1r4pdqhixlh1hdxj22smj88mrh490p34bsh9dxkqiw2gln1zf1g0";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gcp-v8.35.0-linux-amd64.tar.gz";
-        sha256 = "032dlb2h2sa6lm3cns2q13j1sbbsinad13vd7md1lcp0xqarxa49";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gcp-v8.38.0-linux-amd64.tar.gz";
+        sha256 = "13s55pl27q8lxlizzdz73i1h4cvi4pvszfns9jk8wsh2kc1h1qxz";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-github-v6.7.2-linux-amd64.tar.gz";
@@ -44,8 +44,8 @@ _: {
         sha256 = "04lwij6x37ly0lxvcv7nd5r9l54y6s5ajiyz6nkj4y8x8qdifsrx";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-vault-v6.7.1-linux-amd64.tar.gz";
-        sha256 = "15p2wc0dipgqwj9qdsl6420bxx61vmmfbz487yk74kw7vp3kpr36";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-vault-v7.1.0-linux-amd64.tar.gz";
+        sha256 = "041svni5yqmymfx0kxqm9l4amvnla6sxfvlp1p2fpgw77mdwp98m";
       }
     ];
   };

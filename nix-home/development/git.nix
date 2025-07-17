@@ -64,6 +64,10 @@
     };
   };
 
+  programs.zsh.shellAliases = {
+    gcpr = "gh pr list | cut -f1,2 | gum filter --height=10 --limit=1 --select-if-one | cut -f1 | xargs gh pr checkout";
+  };
+
   home.activation."fixGitMaintenance" = lib.hm.dag.entryAfter ["linkGeneration"] ''
     ${lib.escapeShellArgs [
       "${pkgs.sd}/bin/sd"
