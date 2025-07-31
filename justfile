@@ -16,6 +16,12 @@ why-sys dependency *args:
 why-sys-closure dependency *args:
   @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure "{{sysRoot}}" ".#{{dependency}}" {{args}}
 
+tree-home:
+  nix-tree --derivation "{{homeRoot}}"
+
+tree-sys:
+  nix-tree --derivation "{{sysRoot}}"
+
 update: update-flake update-overlays
 
 update-flake-master:
