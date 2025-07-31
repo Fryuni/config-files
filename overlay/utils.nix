@@ -14,6 +14,9 @@ final: pkgs: {
         };
     };
 
+  electron = pkgs.stable.electron;
+  electron_36 = pkgs.stable.electron_36;
+
   terraform = pkgs.mkTerraform {
     version = "1.5.5";
     hash = "sha256-SBS3a/CIUdyIUJvc+rANIs+oXCQgfZut8b0517QKq64=";
