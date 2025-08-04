@@ -25,8 +25,8 @@
       inputs.home-manager.follows = "home-manager";
       inputs.systems.follows = "systems";
     };
-    charm = {
-      url = "github:charmbracelet/nur";
+    nur = {
+      url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     fenix = {
@@ -66,14 +66,10 @@
   outputs = {
     self,
     nixpkgs,
-    fenix,
-    zig,
-    charm,
     # nixos-hardware,
     home-manager,
     flake-utils,
     agenix,
-    nix-alien,
     ...
   } @ attrs: let
     pkgsFun = system: let
@@ -118,11 +114,11 @@
                   ++ (import ./overlay/stable.nix attrs);
               };
             })
-            fenix.overlays.default
-            zig.overlays.default
-            agenix.overlays.default
-            nix-alien.overlays.default
-            (import "${charm}/overlay.nix")
+            attrs.fenix.overlays.default
+            attrs.zig.overlays.default
+            attrs.agenix.overlays.default
+            attrs.nix-alien.overlays.default
+            attrs.nur.overlays.default
           ]
           ++ (import ./overlay attrs)
           ++ [
