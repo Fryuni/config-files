@@ -4,4 +4,6 @@
 
 # Nested Worktrees
 .wt/
+.crush/
+CRUSH.md
 
