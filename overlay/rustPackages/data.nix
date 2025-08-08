@@ -169,8 +169,8 @@
     version = "10.1.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-OUWTRnV1cH+a0LtYau5v4kt+1Br8Yn8RPMIPlGNcvHc=";
-    depsHash = "sha256-UPtD5udR/avho3Sw3dyRjNGS5UmdwWWJJHkdSY92g8s=";
+    crateSha256 = "sha256-npSZT8ivdG1e+8mcRKlFHgjjwgLPOOGRqLHsPcu4vu0=";
+    depsHash = "sha256-VHZsUWyUEGMVOJkAuIRGVmej4KdAtAiTjagAvv+k/Os=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/cargo-public-api/cargo-public-api";
     id = "cargo-public-api";
@@ -195,7 +195,7 @@
         url = "https://github.com/Enselic";
       }
     ];
-    version = "0.49.0";
+    version = "0.50.1";
   };
   cargo-semver-checks = {
     crateSha256 = "sha256-pGjdTtr66b+MFSelGiW0NjWtnBD+rPs8YWd7SgZvXGY=";
@@ -316,8 +316,8 @@
     version = "0.1.0";
   };
   zellij = {
-    crateSha256 = "sha256-dulrNkDsVo496ufXGOPOu0myrog3TzGqZiwc4UZM+Og=";
-    depsHash = "sha256-VND5M5tLx3UrHyfiR9hGn/T5M2K2ZDKOX0vcSvKPL04=";
+    crateSha256 = "sha256-eCH5jmqErLGJyf0+BKM57xz6AiCGNvhMlyl76IC+ivU=";
+    depsHash = "sha256-WZDTWItYiMn6a5zIaABkWviOhthAW4SgT2vM3vgajmI=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
@@ -370,6 +370,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.42.2";
+    version = "0.43.0";
   };
 }
