@@ -17,7 +17,8 @@ in {
   home.packages = with pkgs; [
     # Nix
     nix-prefetch
-    # nix-visualize
+    nix-visualize
+    nix-tree
 
     # Utils
     coreutils
@@ -52,16 +53,17 @@ in {
     dua
 
     # Charm.sh pretty binaries
-    gum
-    charm
-    glow
-    skate
+    nur.repos.charmbracelet.gum
+    nur.repos.charmbracelet.charm
+    nur.repos.charmbracelet.glow
+    nur.repos.charmbracelet.skate
+    nur.repos.charmbracelet.crush
     (symlinkJoin {
       name = "mods-authenticated";
       nativeBuildInputs = [makeWrapper coreutils];
-      paths = [mods];
+      paths = [nur.repos.charmbracelet.mods];
       postBuild = ''
-        for file in ${mods}/bin/*; do
+        for file in ${nur.repos.charmbracelet.mods}/bin/*; do
           rm -rf "$out/bin/$(basename $file)"
           makeWrapper $file "$out/bin/$(basename $file)" \
             --run 'export OPENAI_API_KEY="$(cat ${config.age.secrets.openai-key.path})"'
@@ -74,6 +76,7 @@ in {
     tfk8s
     pulumi-bin
     gcloud-sdk
+    google-cloud-sql-proxy
 
     grafterm
     python312Packages.habitipy
