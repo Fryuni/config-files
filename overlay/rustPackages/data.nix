@@ -275,26 +275,6 @@
     ];
     version = "8.5.3";
   };
-  prr = {
-    crateSha256 = "sha256-q8HC6l+SswZLLn3LFulnyIkrSAQ6fGS8NREVKX6UYII=";
-    depsHash = "sha256-W66kbTk0IAThl2H35EYuXr6UAyWfhmV0DxpnABhppSQ=";
-    description = "Mailing list style code reviews for github";
-    homepage = null;
-    id = "prr";
-    keywords = [];
-    owners = [
-      {
-        avatar = "https://avatars.githubusercontent.com/u/824615?v=4";
-        email = null;
-        id = 85490;
-        kind = "user";
-        login = "danobi";
-        name = "Daniel Xu";
-        url = "https://github.com/danobi";
-      }
-    ];
-    version = "0.20.0";
-  };
   toml-merge = {
     crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
     depsHash = "sha256-yrkKaeMQJ3lwypBcP8LTPl6mNjW3fFZlbHlrwsPygBg=";
