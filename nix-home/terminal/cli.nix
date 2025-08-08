@@ -57,6 +57,16 @@ in {
     nur.repos.charmbracelet.charm
     nur.repos.charmbracelet.glow
     nur.repos.charmbracelet.skate
+
+    # Cloud
+    terraform
+    tfk8s
+    pulumi-bin
+    gcloud-sdk
+    google-cloud-sql-proxy
+
+    # AI
+    master.opencode
     nur.repos.charmbracelet.crush
     (symlinkJoin {
       name = "mods-authenticated";
@@ -70,13 +80,6 @@ in {
         done
       '';
     })
-
-    # Cloud
-    terraform
-    tfk8s
-    pulumi-bin
-    gcloud-sdk
-    google-cloud-sql-proxy
 
     grafterm
     python312Packages.habitipy
