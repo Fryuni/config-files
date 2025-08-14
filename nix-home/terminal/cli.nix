@@ -52,6 +52,7 @@ in {
     xplr
     dua
     jqp
+    gojq
 
     # Charm.sh pretty binaries
     nur.repos.charmbracelet.gum
@@ -92,10 +93,7 @@ in {
     USE_GKE_GCLOUD_AUTH_PLUGIN = "True";
   };
 
-  programs.jq = {
-    enable = true;
-    package = pkgs.gojq;
-  };
+  programs.jq.enable = true;
   programs.pgcli.enable = true;
 
   programs.fzf = {
