@@ -66,7 +66,6 @@ in {
     google-cloud-sql-proxy
 
     # AI
-    master.opencode
     nur.repos.charmbracelet.crush
     (symlinkJoin {
       name = "mods-authenticated";
