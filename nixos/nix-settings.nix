@@ -7,6 +7,12 @@
     pkgs.nix-doc
   ];
 
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+    package = pkgs.appimage-run;
+  };
+
   nix.settings = {
     trusted-users = ["root" "lotus"];
 
