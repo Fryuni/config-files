@@ -198,8 +198,8 @@
     version = "0.50.1";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-pGjdTtr66b+MFSelGiW0NjWtnBD+rPs8YWd7SgZvXGY=";
-    depsHash = "sha256-ACTrtJ/iwCFZf8kH2Sdxx1B8ZKDIiu6elAGJOYbxqs0=";
+    crateSha256 = "sha256-8AFlgzvdoxNELKW59x2Wvh1EWb7OQCIBVLmOqxnUVqM=";
+    depsHash = "sha256-OD3N1rtgXQhWNfFjnLLrkBvC9Ra9EBNv6GqtX0ai4Gs=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
@@ -215,7 +215,7 @@
         url = "https://github.com/obi1kenobi";
       }
     ];
-    version = "0.42.0";
+    version = "0.43.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-FtsdwNSxSj6dxsSfL39MzoVqALeMjnn2QuHhInW8WXI=";
@@ -296,8 +296,8 @@
     version = "0.1.0";
   };
   zellij = {
-    crateSha256 = "sha256-eCH5jmqErLGJyf0+BKM57xz6AiCGNvhMlyl76IC+ivU=";
-    depsHash = "sha256-WZDTWItYiMn6a5zIaABkWviOhthAW4SgT2vM3vgajmI=";
+    crateSha256 = "sha256-7SjlPYa/CkQSNu0SyIjYycJuKaJ6RcGInSPVe3+xNMw=";
+    depsHash = "sha256-xfNX5ccDWqnAn5n4/QyLHtvce1ZfXZg9iNNaR/5tjAs=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
@@ -350,6 +350,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.43.0";
+    version = "0.43.1";
   };
 }
