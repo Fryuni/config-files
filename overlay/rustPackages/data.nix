@@ -182,7 +182,7 @@
         id = 5417;
         kind = "user";
         login = "Emilgardis";
-        name = "Emil Gardström";
+        name = null;
         url = "https://github.com/Emilgardis";
       }
       {
