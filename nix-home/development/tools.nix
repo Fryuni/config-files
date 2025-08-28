@@ -36,7 +36,6 @@
     htmx-lsp2
     just-lsp
     postgres-lsp
-    textlsp # Grammar and LSP for text files
     astro-language-server
     bash-language-server
     java-language-server
