@@ -14,7 +14,6 @@
     master.obsidian
     stable.jrnl
     vlc
-    stremio
     screenkey
 
     master.zeal
