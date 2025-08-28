@@ -12,9 +12,12 @@
     master.goldwarden
   ];
 
-  programs.ssh.enable = true;
   programs.gpg.enable = true;
   programs.gpg.mutableKeys = true;
+  programs.ssh = {
+    enable = true;
+    enableDefaultConfig = false;
+  };
 
   services.gpg-agent.enable = true;
   services.gpg-agent.pinentry.package = pkgs.pinentry-rofi;
