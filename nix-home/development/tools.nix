@@ -29,6 +29,8 @@
     gopls # Go LSP
     marksman # Markdown LSP
     nil # Nix LSP
+    nixd # Nix LSP - Daemon
+    deadnix
     selene # Lua LSP - Linter
     sqls
     ty # Python LSP
