@@ -173,6 +173,10 @@
 
       formatter = pkgs.alejandra;
 
+      devShells.default = pkgs.mkShell {
+        packages = [];
+      };
+
       apps = import ./commands.nix {
         inherit self pkgs;
         homeManagerBin = "${home-manager.packages.${system}.home-manager}/bin/home-manager";
