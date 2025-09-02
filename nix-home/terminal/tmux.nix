@@ -23,7 +23,7 @@
     if [[ -z "$TMUX" ]]; then
       set -euo pipefail
       cd "$HOME"
-      TMUX_TARGET=$(echo "$HOME/$(fd -HI -td -d 4 -E 'node_modules' . . | fzf)" || echo "$HOME")
+      TMUX_TARGET=$(echo "$HOME/$(fd -HI -td -d 6 -E 'node_modules' -E 'Games' -E 'Calibre' . . | fzf)" || echo "$HOME")
       exec "${pkgs.tmuxPlugins.session-wizard}/share/tmux-plugins/session-wizard/bin/t" "$TMUX_TARGET"
     fi
   '';
