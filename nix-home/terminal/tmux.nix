@@ -1,4 +1,9 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  tpkg = pkgs.runCommand "t" {} ''
+    mkdir -p "$out/bin"
+    ln -s ${pkgs.tmuxPlugins.t-smart-tmux-session-manager}/share/tmux-plugins/*/bin/t "$out/bin/t"
+  '';
+in {
   programs.tmux = {
     enable = true;
     package = pkgs.master.tmux;
@@ -15,16 +20,20 @@
     tmuxp.enable = true;
 
     plugins = with pkgs.tmuxPlugins; [
-      session-wizard
+      sensible
+      t-smart-tmux-session-manager
+      fuzzback
+      tmux-thumbs
+      tmux-which-key
+      extrakto
     ];
   };
 
+  home.packages = [tpkg];
+
   programs.zsh.initContent = ''
     if [[ -z "$TMUX" ]]; then
-      set -euo pipefail
-      cd "$HOME"
-      TMUX_TARGET=$(echo "$HOME/$(fd -HI -td -d 6 -E 'node_modules' -E 'Games' -E 'Calibre' . . | fzf)" || echo "$HOME")
-      exec "${pkgs.tmuxPlugins.session-wizard}/share/tmux-plugins/session-wizard/bin/t" "$TMUX_TARGET"
+      exec "${tpkg}/bin/t"
     fi
   '';
 
