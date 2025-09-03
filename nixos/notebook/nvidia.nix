@@ -28,6 +28,7 @@ in {
   };
   hardware.nvidia = {
     modesetting.enable = true;
+    open = true;
     package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
 
     prime = {
