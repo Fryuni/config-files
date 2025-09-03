@@ -15,6 +15,13 @@ in {
 
     extraConfig = ''
       set-option -g detach-on-destroy off
+      # Use vim keybindings in copy mode
+      setw -g mode-keys vi
+      unbind -T copy-mode-vi MouseDragEnd1Pane
+
+      # Make `y` copy the selected text, not exiting the copy mode. For copy-and-exit
+      # use ordinary `Enter`
+      bind -T copy-mode-vi y send-keys -X copy-pipe  # Only copy, no cancel
     '';
 
     tmuxp.enable = true;
