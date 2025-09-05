@@ -1,4 +1,4 @@
-#!/usr/bin/env -S nix shell -iv -k HOME me#nodejs me#nix me#git me#cargo me#rustCrates.cargo-crate -c node --
+#!/usr/bin/env -S nix shell -iv -k HOME me#nodejs me#nix me#git me#fd me#bash me#cargo me#rustCrates.cargo-crate -c node --
 
 import * as fs from 'node:fs';
 import * as cp from 'node:child_process';
