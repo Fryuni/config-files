@@ -6,7 +6,6 @@
   ];
 
   home.packages = with pkgs; [
-    master.bitwarden-desktop
     master.bitwarden-cli
     master.bitwarden-menu
     master.goldwarden
