@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1";
     nixpkgs-stable.url = "https://flakehub.com/f/NixOS/nixpkgs/*";
-    nixpkgs-master.url = "github:Fryuni/nixpkgs/master";
+    nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     nixos-hardware.url = "https://flakehub.com/f/NixOS/nixos-hardware/0.1";
 
     determinate = {
@@ -26,7 +26,7 @@
     };
 
     agenix = {
-      url = "https://flakehub.com/f/ryantm/agenix/0.15.0.tar.gz";
+      url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
       inputs.systems.follows = "systems";
