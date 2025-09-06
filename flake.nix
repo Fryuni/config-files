@@ -76,7 +76,7 @@
   outputs = {
     self,
     nixpkgs,
-    # nixos-hardware,
+    nix-darwin,
     home-manager,
     flake-utils,
     agenix,
@@ -169,8 +169,12 @@
         };
         modules = [
           ./nixos/darwin/x86.nix
+        attrs.determinate.darwinModules.default
           home-manager.darwinModules.home-manager
-          {
+          ({...}: {
+          # Let Determinate Nix handle Nix configuration rather than nix-darwin
+              nix.enable = false;
+
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = specialArgs;
@@ -179,7 +183,7 @@
               ./nix-home
             ];
             home-manager.users.lotus = import ./nix-home/macbook.nix;
-          }
+          })
         ];
       };
 
