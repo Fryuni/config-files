@@ -101,8 +101,8 @@
     version = "0.1.34";
   };
   cargo-expand = {
-    crateSha256 = "sha256-tguQRzXaq+Iqso4hNpbYcNUmp4i3nq4Ysm1ScrJ3Kas=";
-    depsHash = "sha256-wLjWAEbOYAApwckS+HzrdvyI95QtCAStB2Tv2nCxaMM=";
+    crateSha256 = "sha256-UGQ4f0AChLZdiwb0K9Zqwvwq3VMZlgoojGRI2O6tZmg=";
+    depsHash = "sha256-i156Qd4lVb7WYcLoj+cIUV4eLia1MDxtOLUujwib3b0=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -118,7 +118,7 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.114";
+    version = "1.0.116";
   };
   cargo-lock = {
     crateSha256 = "sha256-D5DpUgvKxJSVQwsLzpwX3AA/qIG5lcX7catc1O0oxX4=";
@@ -218,8 +218,8 @@
     version = "0.43.0";
   };
   cargo-sort = {
-    crateSha256 = "sha256-FtsdwNSxSj6dxsSfL39MzoVqALeMjnn2QuHhInW8WXI=";
-    depsHash = "sha256-nQ1g0rBWx7yHQO9U/J0/XI76quEAvpCyhZDcTJKYYXo=";
+    crateSha256 = "sha256-U/LakNUSPqj6FmYimi5ZNVJCRiS7zM4Vzvu4Gb3w38Q=";
+    depsHash = "sha256-FoFzBf24mNDTRBfFyTEr9Q7sJjUhs0X/XWRGEoierQ4=";
     description = "Check if tables and items in a .toml file are lexically sorted";
     homepage = null;
     id = "cargo-sort";
@@ -244,7 +244,7 @@
         url = "https://github.com/DevinR528";
       }
     ];
-    version = "2.0.1";
+    version = "2.0.2";
   };
   cargo-watch = {
     crateSha256 = "sha256-RKUf3sL3Q0iKl1vHPWNL1jG5OwKk+s28PK9RADEBqBc=";

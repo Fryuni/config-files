@@ -11,7 +11,6 @@
   home.homeDirectory = "/home/lotus";
 
   home.packages = with pkgs; [
-    master.bitwarden-desktop
     master.bitwarden-cli
   ];
 
