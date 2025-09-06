@@ -14,6 +14,7 @@
 
     libnotify
     slack
+    insomnia
 
     # GoLang
     go

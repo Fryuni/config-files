@@ -7,7 +7,5 @@
     jetbrains.datagrip
     jetbrains.idea-ultimate
     # android-studio
-
-    insomnia
   ];
 }
