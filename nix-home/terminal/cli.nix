@@ -51,12 +51,23 @@ in {
     sd
     xplr
     dua
+    jqp
+    gojq
 
     # Charm.sh pretty binaries
     nur.repos.charmbracelet.gum
     nur.repos.charmbracelet.charm
     nur.repos.charmbracelet.glow
     nur.repos.charmbracelet.skate
+
+    # Cloud
+    terraform
+    tfk8s
+    pulumi-bin
+    gcloud-sdk
+    google-cloud-sql-proxy
+
+    # AI
     nur.repos.charmbracelet.crush
     (symlinkJoin {
       name = "mods-authenticated";
@@ -70,13 +81,6 @@ in {
         done
       '';
     })
-
-    # Cloud
-    terraform
-    tfk8s
-    pulumi-bin
-    gcloud-sdk
-    google-cloud-sql-proxy
 
     grafterm
     python312Packages.habitipy

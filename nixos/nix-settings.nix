@@ -7,7 +7,6 @@
     pkgs.nix-doc
   ];
 
-  nix.package = pkgs.nix;
   nix.channel.enable = false;
 
   # nix.extraOptions = ''

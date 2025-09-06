@@ -3,19 +3,36 @@ image: nixpkgs/nix-flakes:latest
 variables:
   NIX_PATH: nixpkgs=channel:nixos-unstable
 
-update:
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
-  script:
-    - git config user.email "bot@lferraz.com"
-    - git config user.name "LFerraz Bot"
-    - 'git remote add gitlab_origin https://oauth2:$COMMIT_TOKEN@gitlab.com/Fryuni/ZShutils.git'
-    - 'nix-env -iA nixpkgs.just'
-    - just update-flake
-    # - 'overlay/pulumi/update.sh'
-    - just update-jetbrains
-    - just update-rustCrates
-    - 'git push gitlab_origin HEAD:main -o ci.skip'
+stages:
+  - release
+
+include:
+  - component: "gitlab.com/DeterminateSystems/flakehub-push/component@main"
+    inputs:
+      stage: "release"
+      visibility: "unlisted"
+      rolling: true
+
+# update:
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+#   script:
+#     # Install Nix
+#     - |
+#       if ! hash nix ; then
+#         curl \
+#           --proto '=https' --tlsv1.2 -sSf -L \
+#           https://install.determinate.systems/nix | \
+#           sh -s -- install linux --no-confirm --init none
+#         . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+#       fi
+#     - git config user.email "bot@lferraz.com"
+#     - git config user.name "LFerraz Bot"
+#     - "git remote add gitlab_origin https://oauth2:$COMMIT_TOKEN@gitlab.com/Fryuni/ZShutils.git"
+#     - nix run nixpkgs#just update-flake
+#     - nix run nixpkgs#just update-jetbrains
+#     - nix run nixpkgs#just update-rustCrates
+#     - "git push gitlab_origin HEAD:main -o ci.skip"
 
 # build-system-notebook:
 #   stage: build

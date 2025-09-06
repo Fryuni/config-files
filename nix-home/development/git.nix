@@ -8,7 +8,6 @@
     # Git stuff
     gh
     lazygit
-    rustCrates.prr
   ];
 
   programs.git = {

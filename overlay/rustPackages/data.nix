@@ -169,8 +169,8 @@
     version = "10.1.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-OUWTRnV1cH+a0LtYau5v4kt+1Br8Yn8RPMIPlGNcvHc=";
-    depsHash = "sha256-UPtD5udR/avho3Sw3dyRjNGS5UmdwWWJJHkdSY92g8s=";
+    crateSha256 = "sha256-npSZT8ivdG1e+8mcRKlFHgjjwgLPOOGRqLHsPcu4vu0=";
+    depsHash = "sha256-VHZsUWyUEGMVOJkAuIRGVmej4KdAtAiTjagAvv+k/Os=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/cargo-public-api/cargo-public-api";
     id = "cargo-public-api";
@@ -182,7 +182,7 @@
         id = 5417;
         kind = "user";
         login = "Emilgardis";
-        name = "Emil Gardström";
+        name = null;
         url = "https://github.com/Emilgardis";
       }
       {
@@ -195,11 +195,11 @@
         url = "https://github.com/Enselic";
       }
     ];
-    version = "0.49.0";
+    version = "0.50.1";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-pGjdTtr66b+MFSelGiW0NjWtnBD+rPs8YWd7SgZvXGY=";
-    depsHash = "sha256-ACTrtJ/iwCFZf8kH2Sdxx1B8ZKDIiu6elAGJOYbxqs0=";
+    crateSha256 = "sha256-8AFlgzvdoxNELKW59x2Wvh1EWb7OQCIBVLmOqxnUVqM=";
+    depsHash = "sha256-OD3N1rtgXQhWNfFjnLLrkBvC9Ra9EBNv6GqtX0ai4Gs=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
@@ -215,7 +215,7 @@
         url = "https://github.com/obi1kenobi";
       }
     ];
-    version = "0.42.0";
+    version = "0.43.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-FtsdwNSxSj6dxsSfL39MzoVqALeMjnn2QuHhInW8WXI=";
@@ -275,26 +275,6 @@
     ];
     version = "8.5.3";
   };
-  prr = {
-    crateSha256 = "sha256-q8HC6l+SswZLLn3LFulnyIkrSAQ6fGS8NREVKX6UYII=";
-    depsHash = "sha256-W66kbTk0IAThl2H35EYuXr6UAyWfhmV0DxpnABhppSQ=";
-    description = "Mailing list style code reviews for github";
-    homepage = null;
-    id = "prr";
-    keywords = [];
-    owners = [
-      {
-        avatar = "https://avatars.githubusercontent.com/u/824615?v=4";
-        email = null;
-        id = 85490;
-        kind = "user";
-        login = "danobi";
-        name = "Daniel Xu";
-        url = "https://github.com/danobi";
-      }
-    ];
-    version = "0.20.0";
-  };
   toml-merge = {
     crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
     depsHash = "sha256-yrkKaeMQJ3lwypBcP8LTPl6mNjW3fFZlbHlrwsPygBg=";
@@ -316,8 +296,8 @@
     version = "0.1.0";
   };
   zellij = {
-    crateSha256 = "sha256-dulrNkDsVo496ufXGOPOu0myrog3TzGqZiwc4UZM+Og=";
-    depsHash = "sha256-VND5M5tLx3UrHyfiR9hGn/T5M2K2ZDKOX0vcSvKPL04=";
+    crateSha256 = "sha256-7SjlPYa/CkQSNu0SyIjYycJuKaJ6RcGInSPVe3+xNMw=";
+    depsHash = "sha256-xfNX5ccDWqnAn5n4/QyLHtvce1ZfXZg9iNNaR/5tjAs=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
@@ -370,6 +350,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.42.2";
+    version = "0.43.1";
   };
 }

@@ -9,6 +9,8 @@
     }
   '';
 
+  home.packages = with pkgs; [fh];
+
   programs.nh.enable = true;
 
   programs.nix-index = {

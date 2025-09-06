@@ -2,19 +2,25 @@
   description = "Fryuni's NixOS configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1";
+    nixpkgs-stable.url = "https://flakehub.com/f/NixOS/nixpkgs/*";
     nixpkgs-master.url = "github:Fryuni/nixpkgs/master";
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    nixos-hardware.url = "https://flakehub.com/f/NixOS/nixos-hardware/0.1";
+
+    determinate = {
+      url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    flakehub.url = "https://flakehub.com/f/DeterminateSystems/fh/*";
 
     nix-darwin = {
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     systems.url = "github:nix-systems/default";
-    flake-compat.url = "github:edolstra/flake-compat";
+    flake-compat.url = "https://flakehub.com/f/edolstra/flake-compat/1";
     flake-utils = {
-      url = "github:numtide/flake-utils";
+      url = "https://flakehub.com/f/numtide/flake-utils/0.1";
       inputs.systems.follows = "systems";
     };
     gomod2nix = {
@@ -24,7 +30,7 @@
     };
 
     agenix = {
-      url = "github:ryantm/agenix";
+      url = "https://flakehub.com/f/ryantm/agenix/0.15.0.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
       inputs.systems.follows = "systems";
@@ -34,16 +40,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     fenix = {
-      url = "github:nix-community/fenix";
+      url = "https://flakehub.com/f/nix-community/fenix/0.1";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     zig = {
-      url = "github:Fryuni/zig-overlay";
+      url = "https://flakehub.com/f/Fryuni/zig-overlay/0.1";
       inputs.nixpkgs.follows = "nixpkgs-stable";
       inputs.flake-compat.follows = "flake-compat";
     };
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "https://flakehub.com/f/nix-community/home-manager/0.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     polymc = {
@@ -62,7 +68,7 @@
       inputs.systems.follows = "systems";
     };
     nix-alien = {
-      url = "github:thiagokokada/nix-alien";
+      url = "https://flakehub.com/f/thiagokokada/nix-alien/0.1";
       inputs.flake-compat.follows = "flake-compat";
     };
   };
@@ -118,16 +124,8 @@
                   ++ (import ./overlay/stable.nix attrs);
               };
             })
-            attrs.fenix.overlays.default
-            attrs.zig.overlays.default
-            attrs.agenix.overlays.default
-            attrs.nix-alien.overlays.default
-            attrs.nur.overlays.default
           ]
-          ++ (import ./overlay attrs)
-          ++ [
-            attrs.polymc.overlay
-          ];
+          ++ (import ./overlay attrs);
       };
 
     nixosModules = {
@@ -145,10 +143,17 @@
     globalConfig = {
       templates = import ./templates attrs;
 
-      nixosConfigurations = builtins.mapAttrs (_: modules:
-        nixpkgs.lib.nixosSystem rec {
-          inherit modules;
-          system = flake-utils.lib.system.x86_64-linux;
+      nixosConfigurations = builtins.mapAttrs (_: modules: let
+        system = flake-utils.lib.system.x86_64-linux;
+      in
+        nixpkgs.lib.nixosSystem
+        {
+          inherit system;
+          modules =
+            modules
+            ++ [
+              attrs.determinate.nixosModules.default
+            ];
           pkgs = pkgsFun system;
           specialArgs = {
             inputs = attrs;
@@ -198,6 +203,10 @@
       legacyPackages = pkgs;
 
       formatter = pkgs.alejandra;
+
+      devShells.default = pkgs.mkShell {
+        packages = [];
+      };
 
       apps = import ./commands.nix {
         inherit self pkgs;
