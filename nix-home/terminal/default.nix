@@ -38,6 +38,10 @@
     enableZshIntegration = true;
   };
 
+  home.sessionVariables = {
+    _ZO_EXCLUDE_DIRS = "/tmp/*";
+  };
+
   programs.zsh = {
     enable = true;
     autosuggestion.enable = true;
@@ -54,6 +58,7 @@
         bash -c "exec $SHELL"
         local EXIT_CODE=$?
         rm -rf "$EPHEMERAL_DIR"
+        zoxide remove "$EPHEMERAL_DIR" &> /dev/null || true
         exit $EXIT_CODE
       }
     '';
