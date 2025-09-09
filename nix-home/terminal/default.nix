@@ -46,6 +46,16 @@
 
     initContent = pkgs.lib.mkBefore ''
       setopt cdable_vars
+
+      function tmp() {
+        local RETURN_DIR=$(pwd)
+        local EPHEMERAL_DIR=$(realpath $(mktemp -d))
+        cd "$EPHEMERAL_DIR"
+        bash -c "exec $SHELL"
+        local EXIT_CODE=$?
+        rm -rf "$EPHEMERAL_DIR"
+        exit $EXIT_CODE
+      }
     '';
 
     dirHashes = {
@@ -82,7 +92,6 @@
 
       ns = "nix shell";
       nixc = "nix develop -c";
-      tmp = "cd $(mktemp -d)";
     };
 
     oh-my-zsh = {
