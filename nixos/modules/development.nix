@@ -33,6 +33,10 @@
       autoPrune.enable = true;
       autoPrune.dates = "weekly";
       autoPrune.flags = ["--all"];
+
+      daemon.settings = {
+        registry-mirrors = ["https://mirror.gcr.io"];
+      };
     };
   };
 
