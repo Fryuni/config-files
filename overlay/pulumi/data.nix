@@ -1,11 +1,11 @@
 # DO NOT EDIT! This file is generated automatically by update.sh
 _: {
-  version = "3.193.0";
+  version = "3.194.0";
   pulumiPkgs = {
     x86_64-linux = [
       {
-        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.193.0-linux-x64.tar.gz";
-        sha256 = "1ssm227zph1ysi2dz1biash90xxdbs5advdb5x8j4qw1523rl40m";
+        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.194.0-linux-x64.tar.gz";
+        sha256 = "1v5mfjwxv6ajqcbvkxrim5nnijwx0jrjd7lz6ayh20plnal9imlm";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-docker-v4.8.2-linux-amd64.tar.gz";
@@ -44,8 +44,8 @@ _: {
         sha256 = "1vh28r2gk85a82c7jsa95n21my19hzavkyc9pjdpw517r63gvyjw";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-vault-v7.2.1-linux-amd64.tar.gz";
-        sha256 = "14wz8fjkv52z0p2bdh4c6ay6sh8ja0jvzyw3yi4j106b2wq2bvxc";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-vault-v7.3.0-linux-amd64.tar.gz";
+        sha256 = "0vdrh5ss7vlmyv0a0mvrj2w9mrsazqrl7hcvwn5riym4ba0daq03";
       }
     ];
   };
