@@ -8,7 +8,6 @@
   home.packages = with pkgs; [
     master.bitwarden-cli
     master.bitwarden-menu
-    master.goldwarden
   ];
 
   programs.gpg.enable = true;
