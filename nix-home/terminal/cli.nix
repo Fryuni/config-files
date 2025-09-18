@@ -3,14 +3,14 @@
   config,
   ...
 }: let
-  gcloud-sdk = pkgs.google-cloud-sdk.withExtraComponents (
-    with pkgs.google-cloud-sdk.components; [
+  gcloud-sdk = pkgs.master.google-cloud-sdk.withExtraComponents (
+    with pkgs.master.google-cloud-sdk.components; [
       docker-credential-gcr
       beta
       alpha
       gsutil
       gke-gcloud-auth-plugin
-      terraform-tools
+      # terraform-tools
     ]
   );
 in {
