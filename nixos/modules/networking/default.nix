@@ -13,9 +13,12 @@
       enable = true;
       # dns = "none";
     };
+
+    firewall = {enable = true;};
   };
 
   services = {
+    fail2ban.enable = false;
     resolved.enable = true;
     dnscrypt-proxy = {
       enable = false;

@@ -38,7 +38,6 @@
     max-jobs = 4;
   };
 
-  services.fail2ban.enable = true;
   services.openssh = {
     enable = true;
     startWhenNeeded = true;
