@@ -13,21 +13,9 @@
   programs.git = {
     enable = true;
 
-    userName = "Luiz Ferraz";
-    userEmail = "luiz@lferraz.com";
-
     signing = {
       key = "2B568731DB2447EC";
       signByDefault = true;
-    };
-
-    delta = {
-      enable = true;
-      options = {
-        features = "side-by-side line-numbers";
-        navigate = true;
-        dark = true;
-      };
     };
 
     lfs.enable = true;
@@ -39,7 +27,10 @@
       }
     ];
 
-    extraConfig = {
+    settings = {
+      user.name = "Luiz Ferraz";
+      user.email = "luiz@lferraz.com";
+
       url = {
         "ssh://git@github.com/" = {insteadOf = "https://github.com/";};
         "ssh://git@gitlab.com/" = {insteadOf = "https://gitlab.com/";};
@@ -59,6 +50,16 @@
       tag.gpgSign = true;
 
       push.default = "upstream";
+    };
+  };
+
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options = {
+      features = "side-by-side line-numbers";
+      navigate = true;
+      dark = true;
     };
   };
 
