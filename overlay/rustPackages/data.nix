@@ -276,8 +276,8 @@
     version = "8.5.3";
   };
   toml-merge = {
-    crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
-    depsHash = "sha256-yrkKaeMQJ3lwypBcP8LTPl6mNjW3fFZlbHlrwsPygBg=";
+    crateSha256 = "sha256-ZRfTxA5xjA/V6VtecwdyyGkMC6o+kd2ipRCwJ19Zvfg=";
+    depsHash = "sha256-xZmPC+rqQVikIhbRZ0U2gQx9MvBfdSbALIUBJObtpiE=";
     description = "Simple CLI utility which merges TOML files.";
     homepage = null;
     id = "toml-merge";
@@ -288,12 +288,12 @@
         email = null;
         id = 82703;
         kind = "user";
-        login = "reidrankin";
+        login = "mrnerdhair";
         name = "Reid Rankin";
-        url = "https://github.com/reidrankin";
+        url = "https://github.com/mrnerdhair";
       }
     ];
-    version = "0.1.0";
+    version = "0.2.0";
   };
   zellij = {
     crateSha256 = "sha256-7SjlPYa/CkQSNu0SyIjYycJuKaJ6RcGInSPVe3+xNMw=";
