@@ -48,11 +48,11 @@ in {
 
   home.packages = [tpkg];
 
-  programs.zsh.initContent = ''
-    if [[ -z "$TMUX" ]]; then
-      exec "${tpkg}/bin/t"
-    fi
-  '';
+  # programs.zsh.initContent = ''
+  #   if [[ -z "$TMUX" ]]; then
+  #     exec "${tpkg}/bin/t"
+  #   fi
+  # '';
 
   programs.fzf.tmux.enableShellIntegration = true;
 }
