@@ -8,7 +8,7 @@ in {
     enable = true;
     package = pkgs.master.tmux;
     terminal = "screen-256color";
-    newSession = true;
+    newSession = false;
     baseIndex = 1;
     clock24 = true;
     keyMode = "vi";
@@ -41,7 +41,7 @@ in {
       t-smart-tmux-session-manager
       fuzzback
       tmux-thumbs
-      tmux-which-key
+      # tmux-which-key
       extrakto
     ];
   };
