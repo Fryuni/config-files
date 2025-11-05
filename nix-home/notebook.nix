@@ -8,6 +8,7 @@
   home.packages = with pkgs; [
     master.bitwarden-cli
     master.bitwarden-menu
+    master.qbittorrent
   ];
 
   programs.gpg.enable = true;
