@@ -82,7 +82,6 @@
       config = {
         allowUnfree = true;
         permittedInsecurePackages = [
-          "electron-25.9.0"
         ];
         # https://github.com/NixOS/nixpkgs/pull/258447
         # https://discourse.nixos.org/t/your-system-configures-nixpkgs-with-an-externally-created-instance/33802
