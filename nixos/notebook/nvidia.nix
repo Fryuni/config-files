@@ -18,8 +18,8 @@ in {
       intel-media-driver
       # intel-ocl
       libvdpau-va-gl
-      vaapiIntel
-      vaapiVdpau
+      intel-vaapi-driver
+      libva-vdpau-driver
 
       # rocm-opencl-icd
       # rocm-opencl-runtime

@@ -1,10 +1,4 @@
-{
-  config,
-  pkgs,
-  lib,
-  stdenv,
-  ...
-}: {
+{pkgs, ...}: {
   environment.variables.EDITOR = "nvim";
 
   documentation.dev.enable = true;
@@ -18,9 +12,7 @@
     gcc
     file
     termshark
-
-    config.boot.kernelPackages.perf
-
+    perf
     docker-compose
   ];
 
