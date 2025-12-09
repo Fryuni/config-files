@@ -3,8 +3,8 @@
   config,
   ...
 }: let
-  gcloud-sdk = pkgs.master.google-cloud-sdk.withExtraComponents (
-    with pkgs.master.google-cloud-sdk.components; [
+  gcloud-sdk = pkgs.stable.google-cloud-sdk.withExtraComponents (
+    with pkgs.stable.google-cloud-sdk.components; [
       docker-credential-gcr
       beta
       alpha
