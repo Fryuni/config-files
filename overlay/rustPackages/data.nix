@@ -121,8 +121,8 @@
     version = "1.0.118";
   };
   cargo-lock = {
-    crateSha256 = "sha256-D5DpUgvKxJSVQwsLzpwX3AA/qIG5lcX7catc1O0oxX4=";
-    depsHash = "sha256-GT+tBLB2KuT41qtj0vYKGg24MovDMOR2UBTRYb0haoc=";
+    crateSha256 = "sha256-Gz459c2IWD19RGBg2TyHbI/VNCelha+R0FeNkAaHksU=";
+    depsHash = "sha256-Kw1LWu/DYfeuf5aMaNslnDyEoaRj0J+yxWs7sKHyWlU=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
@@ -166,7 +166,7 @@
         url = "https://github.com/rustsec";
       }
     ];
-    version = "10.1.0";
+    version = "11.0.0";
   };
   cargo-public-api = {
     crateSha256 = "sha256-npSZT8ivdG1e+8mcRKlFHgjjwgLPOOGRqLHsPcu4vu0=";
@@ -198,8 +198,8 @@
     version = "0.50.1";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-qFkn4FXbvhKy6DsMGU1Fn2e/6fk29BKDyI29duFutLU=";
-    depsHash = "sha256-0oPAIhhBcCwZT8sD2PWJ5ZDuMMFvmwxhyOXJWA9+jZg=";
+    crateSha256 = "sha256-RyA/PS7qsODAVacTvIAL4hvGPeufpvGXX5nh4xKw/co=";
+    depsHash = "sha256-meF1qnISB60JXKZyYfnwE2LywGqKEVgZbwzZQEZ1Cmc=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
@@ -215,7 +215,7 @@
         url = "https://github.com/obi1kenobi";
       }
     ];
-    version = "0.44.0";
+    version = "0.45.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-U/LakNUSPqj6FmYimi5ZNVJCRiS7zM4Vzvu4Gb3w38Q=";
