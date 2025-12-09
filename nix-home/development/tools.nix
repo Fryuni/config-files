@@ -38,7 +38,7 @@
     zigpkgs.master.zls
     htmx-lsp2
     just-lsp
-    postgres-lsp
+    postgres-language-server
     astro-language-server
     bash-language-server
     java-language-server
