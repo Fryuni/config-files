@@ -19,9 +19,11 @@ in [
   (import ./croct.nix)
   (import ./pulumi)
   (import ./rustPackages)
-  (final: pkgs: {
+  (final: pkgs: let
+    system = pkgs.stdenv.hostPlatform.system;
+  in {
     direnv = final.master.direnv;
-    # direnv = direnv.packages.${pkgs.system}.default;
-    parsecgaming = parsecgaming.packages.${pkgs.system}.parsecgaming;
+    # direnv = direnv.packages.${system}.default;
+    parsecgaming = parsecgaming.packages.${system}.parsecgaming;
   })
 ]
