@@ -4,6 +4,6 @@
     ./rust.nix
     ./git.nix
     ./fonts.nix
-    # ./ides.nix
+    ./ides.nix
   ];
 }
