@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }: {
   imports = [
@@ -18,11 +19,21 @@
   boot.extraModulePackages = with config.boot.kernelPackages; [zenpower];
 
   networking.hostName = "lotus-notebook";
+  networking.nameservers = lib.mkForce [
+    "45.90.28.0#G5--Note-f7fd51.dns.nextdns.io"
+    "2a07:a8c0::#G5--Note-f7fd51.dns.nextdns.io"
+    "45.90.30.0#G5--Note-f7fd51.dns.nextdns.io"
+    "2a07:a8c1::#G5--Note-f7fd51.dns.nextdns.io"
+  ];
+  services.resolved.domains = lib.mkForce [
+    "45.90.28.0#G5--Note-f7fd51.dns.nextdns.io"
+    "2a07:a8c0::#G5--Note-f7fd51.dns.nextdns.io"
+    "45.90.30.0#G5--Note-f7fd51.dns.nextdns.io"
+    "2a07:a8c1::#G5--Note-f7fd51.dns.nextdns.io"
+  ];
 
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
-
-  services.dnscrypt-proxy.settings.static.NextDNS.stamp = "sdns://AgEAAAAAAAAAAAAOZG5zLm5leHRkbnMuaW8TL2Y3ZmQ1MS9HNS1Ob3RlYm9vaw";
 
   users.mutableUsers = false;
   users.users.lotus.hashedPassword = "$6$5dd95KPYAytsdzt1$7auK5wgcz3xGilTjmUw./Acr9tNHQDBJn6n9Ob5bgBiL.vXOQQau.5tFhuF0uGkrI.36c8SK61m/P4kBFKoy60";
