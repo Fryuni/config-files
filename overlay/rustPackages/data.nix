@@ -1,7 +1,8 @@
-# DO NOT EDIT! This file is generated automatically by update.sh
+# DO NOT EDIT! This file is generated automatically by update.mjs
 {
   bootimage = {
     crateSha256 = "sha256-4WEpNrrGqmkyKbRRLmTe7Z7GnXyk635sniTfn99wN+g=";
+    depsHash = "sha256-CkFJHW7yrIJi/KMGJgyhnLTMkrxnDwO3X4M1aml9cuM=";
     description = "Tool to create a bootable OS image from a kernel binary.";
     homepage = null;
     id = "bootimage";
@@ -21,6 +22,7 @@
   };
   cargo-cache = {
     crateSha256 = "sha256-aJoT3jIVpbs4GKiBHcApXTVY4EB11jyjcligV/IdQik=";
+    depsHash = "sha256-cwTHJ5Cd17ur8AhEQb8FTS0mcgqg83VGjvCQP00JY6s=";
     description = "Manage cargo cache ($CARGO_HOME or ~/.cargo/), show sizes and remove directories selectively";
     homepage = "https://github.com/matthiaskrgr/cargo-cache";
     id = "cargo-cache";
@@ -98,56 +100,9 @@
     ];
     version = "0.1.34";
   };
-  cargo-edit = {
-    crateSha256 = "sha256-rLj3+CkHtZPc5cAAj+k7DBrkdxbor1JUhcUkcXnwBEI=";
-    depsHash = "sha256-ebrjEnLOvkAMICcreJu+jOze9R/crtAFfRDa6kqLNnA=";
-    description = "Cargo commands for modifying a `Cargo.toml` file..";
-    homepage = "https://github.com/killercup/cargo-edit";
-    id = "cargo-edit";
-    keywords = ["cargo" "cargo-subcommand" "cli" "crates" "dependencies"];
-    owners = [
-      {
-        avatar = "https://avatars.githubusercontent.com/u/20063?v=4";
-        email = null;
-        id = 58;
-        kind = "user";
-        login = "killercup";
-        name = "Pascal Hertleif";
-        url = "https://github.com/killercup";
-      }
-      {
-        avatar = "https://avatars.githubusercontent.com/u/60961?v=4";
-        email = null;
-        id = 6743;
-        kind = "user";
-        login = "epage";
-        name = "Ed Page";
-        url = "https://github.com/epage";
-      }
-      {
-        avatar = "https://avatars3.githubusercontent.com/u/15256121?v=4";
-        email = null;
-        id = 7026;
-        kind = "user";
-        login = "bjgill";
-        name = "Benjamin Gill";
-        url = "https://github.com/bjgill";
-      }
-      {
-        avatar = "https://avatars.githubusercontent.com/u/4211399?v=4";
-        email = null;
-        id = 7434;
-        kind = "user";
-        login = "ordian";
-        name = null;
-        url = "https://github.com/ordian";
-      }
-    ];
-    version = "0.13.2";
-  };
   cargo-expand = {
-    crateSha256 = "sha256-On2r+ntwPIn5eTGaVkadMzhCs5S7XKY5XVvjOZTRqjY=";
-    depsHash = "sha256-tVSRBJm0eWURQtYQ2fem00CJDNEvzzOzYuVDhcuf8AQ=";
+    crateSha256 = "sha256-v1Yk6zY9TWEYwGDJP8rokrQYeoJiPL4Ev2lKnbp/WOY=";
+    depsHash = "sha256-g22WS6aDam45/GUFNZ7dHGlxh/XDjVvyoInGjF33UYQ=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -163,11 +118,11 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.106";
+    version = "1.0.118";
   };
   cargo-lock = {
-    crateSha256 = "sha256-D5DpUgvKxJSVQwsLzpwX3AA/qIG5lcX7catc1O0oxX4=";
-    depsHash = "sha256-GT+tBLB2KuT41qtj0vYKGg24MovDMOR2UBTRYb0haoc=";
+    crateSha256 = "sha256-Gz459c2IWD19RGBg2TyHbI/VNCelha+R0FeNkAaHksU=";
+    depsHash = "sha256-Kw1LWu/DYfeuf5aMaNslnDyEoaRj0J+yxWs7sKHyWlU=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
@@ -201,13 +156,23 @@
         name = "Sergey \"Shnatsel\" Davidoff";
         url = "https://github.com/Shnatsel";
       }
+      {
+        avatar = "https://avatars.githubusercontent.com/u/25397242?v=4";
+        email = null;
+        id = 12033;
+        kind = "team";
+        login = "github:rustsec:working-group";
+        name = "Working Group";
+        url = "https://github.com/rustsec";
+      }
     ];
-    version = "10.1.0";
+    version = "11.0.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-NRL+7v1K2Y6lm1yuNZODkMaf2Xeib8KjOvPbn+nvbA4=";
+    crateSha256 = "sha256-npSZT8ivdG1e+8mcRKlFHgjjwgLPOOGRqLHsPcu4vu0=";
+    depsHash = "sha256-VHZsUWyUEGMVOJkAuIRGVmej4KdAtAiTjagAvv+k/Os=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
-    homepage = "https://github.com/Enselic/cargo-public-api";
+    homepage = "https://github.com/cargo-public-api/cargo-public-api";
     id = "cargo-public-api";
     keywords = ["cargo-subcommand" "diff" "rustdoc-json" "semver"];
     owners = [
@@ -217,7 +182,7 @@
         id = 5417;
         kind = "user";
         login = "Emilgardis";
-        name = "Emil Gardström";
+        name = null;
         url = "https://github.com/Emilgardis";
       }
       {
@@ -229,20 +194,12 @@
         name = "Martin Nordholts";
         url = "https://github.com/Enselic";
       }
-      {
-        avatar = "https://avatars.githubusercontent.com/u/102732092?v=4";
-        email = null;
-        id = 5657;
-        kind = "team";
-        login = "github:cargo-public-api:owners";
-        name = "owners";
-        url = "https://github.com/cargo-public-api";
-      }
     ];
-    version = "0.35.0";
+    version = "0.50.1";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-5AXdH9QGa7Kupz6kLU22OCjmKkMLlfg/zFIdLftxSmc=";
+    crateSha256 = "sha256-RyA/PS7qsODAVacTvIAL4hvGPeufpvGXX5nh4xKw/co=";
+    depsHash = "sha256-meF1qnISB60JXKZyYfnwE2LywGqKEVgZbwzZQEZ1Cmc=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
@@ -258,10 +215,11 @@
         url = "https://github.com/obi1kenobi";
       }
     ];
-    version = "0.31.0";
+    version = "0.45.0";
   };
   cargo-sort = {
-    crateSha256 = "sha256-i3Skc3Pc/3SxVCcLdMdxYVpkZZAZ0iew5UUq2tPVae8=";
+    crateSha256 = "sha256-U/LakNUSPqj6FmYimi5ZNVJCRiS7zM4Vzvu4Gb3w38Q=";
+    depsHash = "sha256-FoFzBf24mNDTRBfFyTEr9Q7sJjUhs0X/XWRGEoierQ4=";
     description = "Check if tables and items in a .toml file are lexically sorted";
     homepage = null;
     id = "cargo-sort";
@@ -286,10 +244,11 @@
         url = "https://github.com/DevinR528";
       }
     ];
-    version = "1.0.9";
+    version = "2.0.2";
   };
   cargo-watch = {
-    crateSha256 = "sha256-39KR4TzQpJ+V8odnmNIPudsKc4XvFr1I2CJx/mZhaxU=";
+    crateSha256 = "sha256-RKUf3sL3Q0iKl1vHPWNL1jG5OwKk+s28PK9RADEBqBc=";
+    depsHash = "sha256-4AVZ747d6lOjxHN+co0A7APVB5Xj6g5p/Al5fLbgPnc=";
     description = "Watches over your Cargo project’s source";
     homepage = "https://watchexec.github.io/#cargo-watch";
     id = "cargo-watch";
@@ -314,30 +273,11 @@
         url = "https://github.com/rust-bus";
       }
     ];
-    version = "8.5.2";
-  };
-  prr = {
-    crateSha256 = "sha256-q8HC6l+SswZLLn3LFulnyIkrSAQ6fGS8NREVKX6UYII=";
-    depsHash = "sha256-PuPCm6IyX/dBcigBhroNaKDwY4TypUDjVODy+2iUix0=";
-    description = "Mailing list style code reviews for github";
-    homepage = null;
-    id = "prr";
-    keywords = [];
-    owners = [
-      {
-        avatar = "https://avatars.githubusercontent.com/u/824615?v=4";
-        email = null;
-        id = 85490;
-        kind = "user";
-        login = "danobi";
-        name = "Daniel Xu";
-        url = "https://github.com/danobi";
-      }
-    ];
-    version = "0.20.0";
+    version = "8.5.3";
   };
   toml-merge = {
-    crateSha256 = "sha256-0rB/6XpZSFEdBPTa6nt/EFSPncQso+w8syXHUYoYfaA=";
+    crateSha256 = "sha256-ZRfTxA5xjA/V6VtecwdyyGkMC6o+kd2ipRCwJ19Zvfg=";
+    depsHash = "sha256-xZmPC+rqQVikIhbRZ0U2gQx9MvBfdSbALIUBJObtpiE=";
     description = "Simple CLI utility which merges TOML files.";
     homepage = null;
     id = "toml-merge";
@@ -348,16 +288,16 @@
         email = null;
         id = 82703;
         kind = "user";
-        login = "reidrankin";
+        login = "mrnerdhair";
         name = "Reid Rankin";
-        url = "https://github.com/reidrankin";
+        url = "https://github.com/mrnerdhair";
       }
     ];
-    version = "0.1.0";
+    version = "0.2.0";
   };
   zellij = {
-    crateSha256 = "sha256-dulrNkDsVo496ufXGOPOu0myrog3TzGqZiwc4UZM+Og=";
-    depsHash = "sha256-VND5M5tLx3UrHyfiR9hGn/T5M2K2ZDKOX0vcSvKPL04=";
+    crateSha256 = "sha256-7SjlPYa/CkQSNu0SyIjYycJuKaJ6RcGInSPVe3+xNMw=";
+    depsHash = "sha256-xfNX5ccDWqnAn5n4/QyLHtvce1ZfXZg9iNNaR/5tjAs=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
@@ -410,6 +350,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.42.2";
+    version = "0.43.1";
   };
 }

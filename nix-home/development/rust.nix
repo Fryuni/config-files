@@ -8,7 +8,10 @@
   in
     with pkgs; [
       ## Rust tooling
-      fenix.complete.toolchain
+      (fenix.combine [
+        fenix.complete.toolchain
+        fenix.targets.wasm32-unknown-unknown.latest.rust-std
+      ])
       # rc.cargo-lock
       # rc.cargo-expand
       # rc.cargo-deps

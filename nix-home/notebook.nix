@@ -5,10 +5,19 @@
     ./development
   ];
 
-  programs.ssh.enable = true;
+  home.packages = with pkgs; [
+    master.bitwarden-cli
+    master.bitwarden-menu
+    master.qbittorrent
+  ];
+
   programs.gpg.enable = true;
   programs.gpg.mutableKeys = true;
+  programs.ssh = {
+    enable = true;
+    enableDefaultConfig = false;
+  };
 
   services.gpg-agent.enable = true;
-  services.gpg-agent.pinentryPackage = pkgs.pinentry-rofi;
+  services.gpg-agent.pinentry.package = pkgs.pinentry-rofi;
 }

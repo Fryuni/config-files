@@ -18,8 +18,8 @@ in {
       intel-media-driver
       # intel-ocl
       libvdpau-va-gl
-      vaapiIntel
-      vaapiVdpau
+      intel-vaapi-driver
+      libva-vdpau-driver
 
       # rocm-opencl-icd
       # rocm-opencl-runtime
@@ -28,6 +28,7 @@ in {
   };
   hardware.nvidia = {
     modesetting.enable = true;
+    open = true;
     package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
 
     prime = {

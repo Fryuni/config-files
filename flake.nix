@@ -2,15 +2,21 @@
   description = "Fryuni's NixOS configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.11";
-    nixpkgs-master.url = "github:Fryuni/nixpkgs/master";
-    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1";
+    nixpkgs-stable.url = "https://flakehub.com/f/NixOS/nixpkgs/*";
+    nixpkgs-master.url = "github:NixOS/nixpkgs/master";
+    nixos-hardware.url = "https://flakehub.com/f/NixOS/nixos-hardware/0.1";
+
+    determinate = {
+      url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    flakehub.url = "https://flakehub.com/f/DeterminateSystems/fh/*";
 
     systems.url = "github:nix-systems/default";
-    flake-compat.url = "github:edolstra/flake-compat";
+    flake-compat.url = "https://flakehub.com/f/edolstra/flake-compat/1";
     flake-utils = {
-      url = "github:numtide/flake-utils";
+      url = "https://flakehub.com/f/numtide/flake-utils/0.1";
       inputs.systems.follows = "systems";
     };
     gomod2nix = {
@@ -25,27 +31,31 @@
       inputs.home-manager.follows = "home-manager";
       inputs.systems.follows = "systems";
     };
-    charm = {
-      url = "github:charmbracelet/nur";
+    nur = {
+      url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     fenix = {
-      url = "github:nix-community/fenix";
+      url = "https://flakehub.com/f/nix-community/fenix/0.1";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     zig = {
-      url = "github:Fryuni/zig-overlay";
+      url = "https://flakehub.com/f/Fryuni/zig-overlay/0.1";
       inputs.nixpkgs.follows = "nixpkgs-stable";
       inputs.flake-compat.follows = "flake-compat";
     };
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "https://flakehub.com/f/nix-community/home-manager/0.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     polymc = {
       url = "github:Fryuni/PolyMC/develop";
       inputs.nixpkgs.follows = "nixpkgs-stable";
       inputs.flake-compat.follows = "flake-compat";
+    };
+    parsecgaming = {
+      url = "github:DarthPJB/parsec-gaming-nix";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     direnv = {
       url = "github:direnv/direnv";
@@ -54,7 +64,7 @@
       inputs.systems.follows = "systems";
     };
     nix-alien = {
-      url = "github:thiagokokada/nix-alien";
+      url = "https://flakehub.com/f/thiagokokada/nix-alien/0.1";
       inputs.flake-compat.follows = "flake-compat";
     };
   };
@@ -62,21 +72,16 @@
   outputs = {
     self,
     nixpkgs,
-    fenix,
-    zig,
-    charm,
     # nixos-hardware,
     home-manager,
     flake-utils,
     agenix,
-    nix-alien,
     ...
   } @ attrs: let
     pkgsFun = system: let
       config = {
         allowUnfree = true;
         permittedInsecurePackages = [
-          "electron-25.9.0"
         ];
         # https://github.com/NixOS/nixpkgs/pull/258447
         # https://discourse.nixos.org/t/your-system-configures-nixpkgs-with-an-externally-created-instance/33802
@@ -114,20 +119,12 @@
                   ++ (import ./overlay/stable.nix attrs);
               };
             })
-            fenix.overlays.default
-            zig.overlays.default
-            agenix.overlays.default
-            nix-alien.overlays.default
-            (import "${charm}/overlay.nix")
           ]
-          ++ (import ./overlay attrs)
-          ++ [
-            attrs.polymc.overlay
-          ];
+          ++ (import ./overlay attrs);
       };
 
     nixosModules = {
-      notebook = [
+      lotus-notebook = [
         agenix.nixosModules.age
         ./nixos
         ./nixos/notebook
@@ -141,10 +138,17 @@
     globalConfig = {
       templates = import ./templates attrs;
 
-      nixosConfigurations = builtins.mapAttrs (_: modules:
-        nixpkgs.lib.nixosSystem rec {
-          inherit modules;
-          system = flake-utils.lib.system.x86_64-linux;
+      nixosConfigurations = builtins.mapAttrs (_: modules: let
+        system = flake-utils.lib.system.x86_64-linux;
+      in
+        nixpkgs.lib.nixosSystem
+        {
+          inherit system;
+          modules =
+            modules
+            ++ [
+              attrs.determinate.nixosModules.default
+            ];
           pkgs = pkgsFun system;
           specialArgs = {
             inputs = attrs;
@@ -152,7 +156,7 @@
         })
       nixosModules;
 
-      homeConfigurations.notebook = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations."lotus@lotus-notebook" = home-manager.lib.homeManagerConfiguration {
         pkgs = pkgsFun flake-utils.lib.system.x86_64-linux;
         extraSpecialArgs = {
           inputs = attrs;
@@ -172,6 +176,10 @@
       legacyPackages = pkgs;
 
       formatter = pkgs.alejandra;
+
+      devShells.default = pkgs.mkShell {
+        packages = [];
+      };
 
       apps = import ./commands.nix {
         inherit self pkgs;

@@ -3,20 +3,78 @@ final: pkgs: let
   # jetbrains = pkgs.master.callPackage ./jetbrains {};
 
   globalPlugins = [
-    "164" # IdeaVIM
-    # "17718" # GitHub Copilot
-    # "20540" # Codeium
-    "9836" # Randomness
-    # "7425" # Wakatime
-    "7499" # Git Toolbox
+    # "acejump"
+    # "ansi-highlighter-premium"
+    # "asciidoc"
+    # "aws-toolkit"
+    # "better-direnv"
+    # "catppuccin-icons"
+    # "catppuccin-theme"
+    # "code-complexity"
+    # "codeglance-pro"
+    # "cognitivecomplexity"
+    # "continue"
+    # "csv-editor"
+    # "cucumber-for-java"
+    # "darcula-pitch-black"
+    # "dev-containers"
+    # "developer-tools"
+    "docker"
+    # "dot-language"
+    # "eclipse-keymap"
+    # "extra-icons"
+    # "extra-ide-tweaks"
+    # "extra-tools-pack"
+    # "extra-toolwindow-colorful-icons"
+    # "ferris"
+    # "file-watchers"
+    # "gerry-themes"
+    "gherkin"
+    # "github-copilot"
+    # "gitlab"
+    "gittoolbox"
+    # "go"
+    # "go-template"
+    "graphql"
+    # "grep-console"
+    # "handlebars-mustache"
+    # "hocon"
+    # "ide-features-trainer"
+    "ideavim"
+    # "indent-rainbow"
+    # "ini"
+    # "key-promoter-x"
+    # "kotlin"
+    # "mario-progress-bar"
+    # "markdtask"
+    # "maven-helper"
+    "mermaid"
+    # "mermaid-chart"
+    # "minecraft-development"
+    # "netbeans-6-5-keymap"
+    # "nix-lsp"
+    # "nixidea"
+    # "oxocarbon"
+    # "php-annotations"
+    # "protocol-buffers"
+    # "python"
+    # "python-community-edition"
+    # "rainbow-brackets"
+    # "rainbow-csv"
+    "randomness"
+    # "rust"
+    # "scala"
+    # "string-manipulation"
+    # "symfony-plugin"
+    # "toml"
+    # "visual-studio-keymap"
+    # "vscode-keymap"
+    "wakatime"
+    # "which-key"
   ];
 
   overrides = {
-    webstorm = {
-      plugins = [
-        # "20959" # Astro
-      ];
-    };
+    webstorm = {};
     goland = {};
     pycharm-professional = {};
     datagrip = {};

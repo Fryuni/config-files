@@ -8,27 +8,14 @@
     # Git stuff
     gh
     lazygit
-    rustCrates.prr
   ];
 
   programs.git = {
     enable = true;
 
-    userName = "Luiz Ferraz";
-    userEmail = "luiz@lferraz.com";
-
     signing = {
       key = "2B568731DB2447EC";
       signByDefault = true;
-    };
-
-    delta = {
-      enable = true;
-      options = {
-        features = "side-by-side line-numbers";
-        navigate = true;
-        dark = true;
-      };
     };
 
     lfs.enable = true;
@@ -40,7 +27,10 @@
       }
     ];
 
-    extraConfig = {
+    settings = {
+      user.name = "Luiz Ferraz";
+      user.email = "luiz@lferraz.com";
+
       url = {
         "ssh://git@github.com/" = {insteadOf = "https://github.com/";};
         "ssh://git@gitlab.com/" = {insteadOf = "https://gitlab.com/";};
@@ -63,6 +53,20 @@
     };
   };
 
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options = {
+      features = "side-by-side line-numbers";
+      navigate = true;
+      dark = true;
+    };
+  };
+
+  programs.zsh.shellAliases = {
+    gcpr = "gh pr list | cut -f1,2 | gum filter --height=10 --limit=1 --select-if-one | cut -f1 | xargs gh pr checkout";
+  };
+
   home.activation."fixGitMaintenance" = lib.hm.dag.entryAfter ["linkGeneration"] ''
     ${lib.escapeShellArgs [
       "${pkgs.sd}/bin/sd"
@@ -70,6 +74,6 @@
       "${pkgs.git}/"
       "${config.home.homeDirectory}/.config/systemd/user/git-maintenance@.service"
     ]} || true
-    systemctl --user daemon-reload
+    ${pkgs.systemd}/bin/systemctl --user daemon-reload || true
   '';
 }

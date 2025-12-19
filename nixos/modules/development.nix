@@ -1,10 +1,4 @@
-{
-  config,
-  pkgs,
-  lib,
-  stdenv,
-  ...
-}: {
+{pkgs, ...}: {
   environment.variables.EDITOR = "nvim";
 
   documentation.dev.enable = true;
@@ -18,10 +12,7 @@
     gcc
     file
     termshark
-    wireshark
-
-    config.boot.kernelPackages.perf
-
+    perf
     docker-compose
   ];
 
@@ -34,6 +25,10 @@
       autoPrune.enable = true;
       autoPrune.dates = "weekly";
       autoPrune.flags = ["--all"];
+
+      daemon.settings = {
+        registry-mirrors = ["https://mirror.gcr.io"];
+      };
     };
   };
 

@@ -14,15 +14,38 @@
 
     libnotify
     slack
+    insomnia
 
+    # GoLang
     go
     golangci-lint
     gosec
+
     ngrok
     just
     master.turso-cli
     zigpkgs.master
+
+    # LSPs
+    gopls # Go LSP
+    marksman # Markdown LSP
+    nil # Nix LSP
+    nixd # Nix LSP - Daemon
+    deadnix
+    selene # Lua LSP - Linter
+    sqls
+    ty # Python LSP
     zigpkgs.master.zls
+    htmx-lsp2
+    just-lsp
+    postgres-language-server
+    astro-language-server
+    bash-language-server
+    java-language-server
+    lua-language-server
+    mdx-language-server
+    typescript-language-server
+    yaml-language-server
 
     kubectl
     krew

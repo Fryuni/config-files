@@ -9,6 +9,15 @@
     }
   '';
 
+  home.packages = with pkgs; [fh];
+
+  programs.nh.enable = true;
+
+  programs.nix-index = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   nix = {
     package = pkgs.nix;
 

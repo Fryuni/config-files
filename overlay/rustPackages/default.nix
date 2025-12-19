@@ -17,7 +17,7 @@ final: prev: let
     extra = extras.${name} or {};
     safeExtras = builtins.removeAttrs extra ["nativeBuildInputs"];
   in
-    final.stable.rustPlatform.buildRustPackage ({
+    rustPlatform.buildRustPackage ({
         pname = name;
         inherit (definition) version;
 
@@ -33,7 +33,7 @@ final: prev: let
           sha256 = definition.crateSha256;
         };
 
-        cargoHash = definition.depsHash;
+        cargoHash = definition.depsHash or null;
         meta = {
           inherit (definition) description keywords;
           homepage = definition.homepage or "https://crates.io/crates/${name}";

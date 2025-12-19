@@ -1,5 +1,5 @@
-homeRoot := ".#homeConfigurations.notebook.activationPackage"
-sysRoot := ".#nixosConfigurations.notebook.config.system.build.toplevel"
+homeRoot := ".#homeConfigurations.lotus@lotus-notebook.activationPackage"
+sysRoot := ".#nixosConfigurations.lotus-notebook.config.system.build.toplevel"
 
 default:
   nix flake metadata
@@ -16,26 +16,11 @@ why-sys dependency *args:
 why-sys-closure dependency *args:
   @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure "{{sysRoot}}" ".#{{dependency}}" {{args}}
 
-build *args:
-  @nix build --no-link --print-out-paths "{{homeRoot}}" {{args}}
+tree-home:
+  nix-tree --derivation "{{homeRoot}}"
 
-os-build:
-  @nix build --no-link --print-out-paths "{{sysRoot}}"
-
-
-diff: build
-  nix run .#nvd -- diff \
-    $(home-manager generations | head -1 | awk '{print $NF}') \
-    $(just build)
-
-os-diff: os-build
-  nix run .#nvd -- diff /run/current-system $(just os-build)
-
-switch:
-  nix run .#switch
-
-os-boot:
-  nix run .#os-boot
+tree-sys:
+  nix-tree --derivation "{{sysRoot}}"
 
 update: update-flake update-overlays
 
@@ -58,5 +43,5 @@ update-pulumi:
   overlay/pulumi/update.sh
 
 update-rustCrates:
-  overlay/rustPackages/update.sh
+  overlay/rustPackages/update.mjs
 

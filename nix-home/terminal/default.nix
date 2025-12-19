@@ -33,18 +33,35 @@
     };
   };
 
+  programs.zoxide = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+  home.sessionVariables = {
+    _ZO_EXCLUDE_DIRS = "/tmp/*";
+  };
+
   programs.zsh = {
     enable = true;
     autosuggestion.enable = true;
     enableCompletion = true;
     autocd = true;
 
-    initExtraFirst = ''
+    initContent = pkgs.lib.mkBefore ''
       setopt cdable_vars
+
+      function tmp() {
+        local RETURN_DIR=$(pwd)
+        local EPHEMERAL_DIR=$(realpath $(mktemp -d))
+        cd "$EPHEMERAL_DIR"
+        bash -c "exec $SHELL"
+        local EXIT_CODE=$?
+        rm -rf "$EPHEMERAL_DIR"
+        zoxide remove "$EPHEMERAL_DIR" &> /dev/null || true
+        exit $EXIT_CODE
+      }
     '';
-    # if [ -z "$ZELLIJ" ] && [ -z "$TERMINAL_EMULATOR" ]; then
-    #   exec zellij
-    # fi
 
     dirHashes = {
       nix-system = "/run/current-system";
@@ -76,11 +93,10 @@
       gselect = "gcloud config configurations activate";
 
       # Run code inside of a container with the full home context
-      drun = "docker run -it --rm -v /run/user/$UID:/run/user/$UID -v /home/lotus:/home/lotus -w $(pwd) -u $UID:$GID -e HOME=$HOME";
+      drun = "docker run -it --rm -v /run/user/$UID:/run/user/$UID -v /home/lotus:/home/lotus -w \"$(pwd)\" -u $UID:$GID -e HOME=$HOME";
 
       ns = "nix shell";
       nixc = "nix develop -c";
-      tmp = "cd $(mktemp -d)";
     };
 
     oh-my-zsh = {

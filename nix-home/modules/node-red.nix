@@ -58,7 +58,7 @@ in {
     };
 
     repo = mkOption {
-      type = types.nullOr types.string;
+      type = types.nullOr types.str;
       default = null;
     };
 
@@ -98,30 +98,33 @@ in {
         WorkingDirectory = cfg.userDir;
         StateDirectory = mkIf (cfg.userDir == defaultUserDir) "node-red";
 
-        ExecStartPre = mkIf (cfg.repo != null) (
-          let
-            repo = escapeShellArg cfg.repo;
-          in
-            pkgs.writers.writeBash "sync-node-red-config-repo" ''
-              if [ "$(git config get remote.origin.url||true)" = ${repo} ]; then
-                echo "Repo configured, syncing..."
-                git add . || true
-                git commit --all --message "service initialization sync" || true
-                git pull --rebase || true
-              else
-                echo "Repo not configured, cloning..."
-                rm -rf * .*
-                git clone ${repo} .
-              fi
-
-              echo "node_modules" > .git/info/exclude
-              echo "*.backup" > .git/info/exclude
-
-              if [ -f package.json ]; then
-                corepack install
-              fi
-            ''
-        );
+        # ExecStartPre = mkIf (cfg.repo != null) (
+        #   let
+        #     repo = escapeShellArg cfg.repo;
+        #   in
+        #     pkgs.writers.writeBash "sync-node-red-config-repo" ''
+        #       set -exuo pipefail
+        #       export PATH=${config.home.homeDirectory}/.nix-profile/bin:$PATH
+        #
+        #       if [ "$(git config get remote.origin.url||true)" = ${repo} ]; then
+        #         echo "Repo configured, syncing..."
+        #         git add . || true
+        #         git commit --all --message "service initialization sync" || true
+        #         git pull --rebase || true
+        #       else
+        #         echo "Repo not configured, cloning..."
+        #         rm -rf * .*
+        #         git clone ${repo} .
+        #       fi
+        #
+        #       echo "node_modules" > .git/info/exclude
+        #       echo "*.backup" > .git/info/exclude
+        #
+        #       if [ -f package.json ]; then
+        #         corepack install
+        #       fi
+        #     ''
+        # );
 
         ExecStart = escapeShellArgs ([
             "${cfg.package}/bin/node-red"
