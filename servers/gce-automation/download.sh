@@ -6,6 +6,7 @@ export BUCKET_NAME="twitch-vods-02057f9"
 
 CHANNELS=(
   fesicuro
+  peresflores
 )
 
 for channel in "${CHANNELS[@]}"; do
