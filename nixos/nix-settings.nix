@@ -13,8 +13,6 @@
   #   plugin-files = ${pkgs.nix-doc}/lib/libnix_doc_plugin.so
   # '';
 
-  nix.optimise.automatic = true;
-
   nix.settings = {
     trusted-users = ["root" "lotus"];
 
@@ -45,8 +43,9 @@
     # ];
   };
 
+  nix.optimise.automatic = false;
   nix.gc = {
-    automatic = true;
+    automatic = false;
     # interval = "weekly";
     options = "--delete-older-than 7d";
   };

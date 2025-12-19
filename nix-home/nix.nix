@@ -9,7 +9,7 @@
     }
   '';
 
-  home.packages = with pkgs; [fh];
+  # home.packages = with pkgs; [fh];
 
   programs.nh.enable = true;
 

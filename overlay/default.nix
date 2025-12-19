@@ -12,7 +12,7 @@ in [
   attrs.agenix.overlays.default
   attrs.nix-alien.overlays.default
   attrs.nur.overlays.default
-  (pickPackages attrs.flakehub.overlays.default ["fh"])
+  # (pickPackages attrs.flakehub.overlays.default ["fh"])
   attrs.polymc.overlay
 
   (import ./utils.nix)
