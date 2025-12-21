@@ -14,8 +14,10 @@
     package = pkgs.master.zed-editor;
     installRemoteServer = true;
 
-    mutableUserSettings = false;
-    mutableUserKeymaps = false;
+    # Settings have to be editable, otherwise Zed won't allow selecting different models
+    # from the UI.
+    mutableUserSettings = true;
+    mutableUserKeymaps = true;
     mutableUserTasks = false;
     mutableUserDebug = false;
 
@@ -53,10 +55,10 @@
     ];
 
     userTasks = [
-      {
-        label = "start lazygit";
-        command = "lazygit -p $ZED_WORKTREE_ROOT";
-      }
+      # {
+      #   label = "start lazygit";
+      #   command = "lazygit -p $ZED_WORKTREE_ROOT";
+      # }
     ];
 
     userSettings = {
@@ -68,7 +70,7 @@
       git_panel = {sort_by_path = false;};
       formatter = "auto";
       icon_theme = "Catppuccin Frappé";
-      language_servers = ["!eslint" "..."];
+      language_servers = ["!eslint" "!vtsls" "!typescript-language-server" "..."];
       format_on_save = "on";
       auto_update = false;
       restore_on_startup = "none";
