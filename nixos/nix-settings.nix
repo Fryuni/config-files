@@ -13,12 +13,12 @@
     package = pkgs.appimage-run;
   };
 
+  nix.extraOptions = ''
+    !include ${config.age.secrets.nix-access-tokens.path}
+  '';
+
   nix.settings = {
     trusted-users = ["root" "lotus"];
-
-    access-tokens = [
-      "github.com=${config.age.secrets.github-key.path}"
-    ];
 
     experimental-features = [
       "nix-command"

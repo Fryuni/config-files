@@ -4,6 +4,12 @@
     habitica-key.file = ../secrets/habitica-key;
     openai-key.file = ../secrets/openai-key;
 
+    nix-access-tokens = {
+      file = ../secrets/nix-access-tokens;
+      # Explicitly set path, the default include an env var reference to $XDG_CONFIG_HOME
+      # instead of the resolved path, which is not allowed in nix configuration.
+      path = "${config.xdg.configHome}/agenix/nix-access-tokens";
+    };
     prr-global = {
       file = ../secrets/prr-global;
       path = "${config.xdg.configHome}/prr/config.toml";

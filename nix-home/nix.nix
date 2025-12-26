@@ -1,6 +1,7 @@
 {
   inputs,
   pkgs,
+  config,
   ...
 }: {
   xdg.configFile."nixpkgs/config.nix".text = ''
@@ -20,6 +21,10 @@
 
   nix = {
     package = pkgs.nix;
+
+    extraOptions = ''
+      !include ${config.age.secrets.nix-access-tokens.path}
+    '';
 
     settings.nix-path = [
       "fryuni=${inputs.self}"
