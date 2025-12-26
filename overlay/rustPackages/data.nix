@@ -101,8 +101,8 @@
     version = "0.1.34";
   };
   cargo-expand = {
-    crateSha256 = "sha256-v1Yk6zY9TWEYwGDJP8rokrQYeoJiPL4Ev2lKnbp/WOY=";
-    depsHash = "sha256-g22WS6aDam45/GUFNZ7dHGlxh/XDjVvyoInGjF33UYQ=";
+    crateSha256 = "sha256-FdhU7aja+/J6yntLsl5w7+Iwendq+xxLOFJjP8NGrOI=";
+    depsHash = "sha256-uzoBSN8YiDljGn84OUDJmIMN7wWKgxPXdvBsLXf+OiM=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -118,7 +118,7 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.118";
+    version = "1.0.119";
   };
   cargo-lock = {
     crateSha256 = "sha256-Gz459c2IWD19RGBg2TyHbI/VNCelha+R0FeNkAaHksU=";
@@ -169,8 +169,8 @@
     version = "11.0.0";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-npSZT8ivdG1e+8mcRKlFHgjjwgLPOOGRqLHsPcu4vu0=";
-    depsHash = "sha256-VHZsUWyUEGMVOJkAuIRGVmej4KdAtAiTjagAvv+k/Os=";
+    crateSha256 = "sha256-Lg8X0t5u4Mq/eWc0yfuLyn4HlE+j6qSsLE+MFBjBpbk=";
+    depsHash = "sha256-OjuCABObMRkFrTbtV4wpSHzV9Yqmwr/VotmsUW9qUDk=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/cargo-public-api/cargo-public-api";
     id = "cargo-public-api";
@@ -195,7 +195,7 @@
         url = "https://github.com/Enselic";
       }
     ];
-    version = "0.50.1";
+    version = "0.50.2";
   };
   cargo-semver-checks = {
     crateSha256 = "sha256-RyA/PS7qsODAVacTvIAL4hvGPeufpvGXX5nh4xKw/co=";
