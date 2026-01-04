@@ -9,12 +9,12 @@
   in [
     # Setup
     {
-      name = "activate/notebook";
+      name = "activate/lotus-notebook";
       category = "setup";
       help = "Install home-manager and apply home configuration";
       command = ''
         export HOME_MANAGER_BACKUP_EXT=old
-        ${self.outputs.homeConfigurations.notebook.activationPackage}/activate
+        ${self.outputs.homeConfigurations.lotus-notebook.activationPackage}/activate
       '';
     }
 
@@ -42,7 +42,7 @@
       command = ''
         ${bins.nvd} diff \
           $(${bins.nix} eval -f ~/.nix-profile/manifest.nix --json | ${bins.jq} -r '.[0]') \
-          ${self.outputs.homeConfigurations.notebook.config.home.path}
+          ${self.outputs.homeConfigurations."lotus@lotus-notebook".config.home.path}
       '';
     }
     {
@@ -50,7 +50,7 @@
       category = "Home";
       help = "Build home-manager configuration without applying it";
       command = ''
-        ${bins.nix} build --no-link --print-out-paths .#homeConfigurations.notebook.activationPackage $@
+        ${bins.nix} build --no-link --print-out-paths .#homeConfigurations."lotus@lotus-notebook".activationPackage $@
       '';
     }
     {
@@ -58,7 +58,7 @@
       category = "Home";
       help = "Switch home-manager to apply home config changes";
       command = ''
-        ${homeManager} switch --flake '.#notebook' -b bck $@
+        ${homeManager} switch --flake '.#lotus-notebook' -b bck $@
       '';
     }
     {
@@ -79,7 +79,7 @@
       category = "NixOS";
       help = "Apply NixOS configuration and configure it as the default profile";
       command = ''
-        sudo nixos-rebuild switch --flake '.#notebook' $@
+        sudo nixos-rebuild switch --flake '.#lotus-notebook' $@
       '';
     }
     {
@@ -87,7 +87,7 @@
       category = "NixOS";
       help = "Apply NixOS configuration but don't set it on any boot entry";
       command = ''
-        sudo nixos-rebuild test --flake '.#notebook' $@
+        sudo nixos-rebuild test --flake '.#lotus-notebook' $@
       '';
     }
     {
@@ -97,7 +97,7 @@
       command = ''
         ${bins.nvd} diff \
           /run/current-system \
-          ${self.outputs.nixosConfigurations.notebook.config.system.build.toplevel}
+          ${self.outputs.nixosConfigurations.lotus-notebook.config.system.build.toplevel}
       '';
     }
     {
@@ -105,7 +105,7 @@
       category = "NixOS";
       help = "Build NixOS configuration without applying";
       command = ''
-        echo "${self.outputs.nixosConfigurations.notebook.config.system.build.toplevel}"
+        echo "${self.outputs.nixosConfigurations.lotus-notebook.config.system.build.toplevel}"
       '';
     }
     {
@@ -113,7 +113,7 @@
       category = "NixOS";
       help = "Apply NixOS configuration as the default boot profile, but don't load it immediately";
       command = ''
-        sudo nixos-rebuild boot --flake '.#notebook' $@
+        sudo nixos-rebuild boot --flake '.#lotus-notebook' $@
       '';
     }
     {
@@ -121,7 +121,7 @@
       category = "NixOS";
       help = "Apply NixOS configuration as the default boot profile, but don't load it immediately";
       command = ''
-        sudo nixos-rebuild boot --flake '.#notebook' --option substitute false $@
+        sudo nixos-rebuild boot --flake '.#lotus-notebook' --option substitute false $@
       '';
     }
     {
