@@ -1,11 +1,11 @@
 # DO NOT EDIT! This file is generated automatically by update.sh
 _: {
-  version = "3.213.0";
+  version = "3.214.1";
   pulumiPkgs = {
     x86_64-linux = [
       {
-        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.213.0-linux-x64.tar.gz";
-        sha256 = "11hy0jz00iyivj5y0jwwvi5wa3r7sx6wxrgrbm7fijbn64cm3zkq";
+        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.214.1-linux-x64.tar.gz";
+        sha256 = "0qbhxaki0pwxsx2w7p46n815r75y7ylp49nn22qb1r25aiqw4b55";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-docker-v4.11.0-linux-amd64.tar.gz";
@@ -36,8 +36,8 @@ _: {
         sha256 = "1jhqqiy6nrkkhg7rnhcjgzm97jy5z0508b2bh8mhcjsqgbc8kxrk";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-random-v4.18.4-linux-amd64.tar.gz";
-        sha256 = "12xw7fc5xsdbjlwbxwp0jdyv89l2af0hh6b2890fh1g83jp80rxs";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-random-v4.18.5-linux-amd64.tar.gz";
+        sha256 = "0dwimh1mvygqjllyglkvkndnqbyfg3p882sfx5d6y6120112w3ig";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-tls-v5.2.3-linux-amd64.tar.gz";
