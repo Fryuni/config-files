@@ -3,7 +3,7 @@
   config,
   ...
 }: let
-  gcloud-sdk = pkgs.stable.google-cloud-sdk.withExtraComponents (
+  gcloud-sdk = (pkgs.stable.google-cloud-sdk.override {python312 = pkgs.stable.python310;}).withExtraComponents (
     with pkgs.stable.google-cloud-sdk.components; [
       docker-credential-gcr
       beta
