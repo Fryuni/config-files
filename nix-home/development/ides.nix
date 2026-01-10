@@ -70,7 +70,7 @@
       git_panel = {sort_by_path = false;};
       formatter = "auto";
       icon_theme = "Catppuccin Frappé";
-      language_servers = ["!eslint" "!vtsls" "!typescript-language-server" "..."];
+      language_servers = ["!eslint" "vtsls" "!tsgo" "!typescript-language-server" "..."];
       format_on_save = "on";
       auto_update = false;
       restore_on_startup = "none";
