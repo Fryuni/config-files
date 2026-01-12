@@ -130,7 +130,7 @@ in {
             "${cfg.package}/bin/node-red"
           ]
           ++ (cli.toGNUCommandLine {} {
-            safe = cfg.safe;
+            inherit (cfg) safe;
             settings = toString cfg.configFile;
             port = toString cfg.port;
             userDir = toString cfg.userDir;

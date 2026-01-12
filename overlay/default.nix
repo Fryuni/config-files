@@ -21,12 +21,12 @@ in [
   (import ./pulumi)
   (import ./rustPackages)
   (final: pkgs: let
-    system = pkgs.stdenv.hostPlatform.system;
+    inherit (pkgs.stdenv.hostPlatform) system;
   in {
-    direnv = final.master.direnv;
+    inherit (final.master) direnv;
     # direnv = direnv.packages.${system}.default;
-    parsecgaming = parsecgaming.packages.${system}.parsecgaming;
+    inherit (parsecgaming.packages.${system}) parsecgaming;
 
-    nix = determinate.inputs.nix.packages.${system}.nix;
+    inherit (determinate.inputs.nix.packages.${system}) nix;
   })
 ]

@@ -1,5 +1,5 @@
 final: pkgs: let
-  jetbrains = pkgs.master.jetbrains;
+  inherit (pkgs.master) jetbrains;
   # jetbrains = pkgs.master.callPackage ./jetbrains {};
 
   globalPlugins = [

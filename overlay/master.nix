@@ -1,6 +1,6 @@
 _: [
   (final: pkgs: {
-    electron = pkgs.stable.electron;
-    electron_36 = pkgs.stable.electron_36;
+    inherit (pkgs.stable) electron;
+    inherit (pkgs.stable) electron_36;
   })
 ]

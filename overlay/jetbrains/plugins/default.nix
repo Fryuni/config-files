@@ -62,7 +62,7 @@
     builtins.listToAttrs
     (map
       (id: {
-        name = pluginsJson.plugins."${id}".name;
+        inherit (pluginsJson.plugins."${id}") name;
         value = byId."${id}";
       })
       ids);
@@ -86,7 +86,7 @@ in rec {
   in
     stdenv.mkDerivation rec {
       pname = meta.mainProgram + "-with-plugins";
-      version = ide.version;
+      inherit (ide) version;
       src = ide;
       dontInstall = true;
       dontFixup = true;
