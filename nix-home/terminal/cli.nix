@@ -89,7 +89,10 @@ in {
     yt-dlp
   ];
 
-  programs.zsh.shellAliases."clear-mods-conversations" = "rm -rf ~/.local/share/mods/conversations";
+  programs.zsh.shellAliases = {
+    clear-mods-conversations = "rm -rf ~/.local/share/mods/conversations";
+    oc = "opencode";
+  };
 
   home.sessionVariables = {
     USE_GKE_GCLOUD_AUTH_PLUGIN = "True";
