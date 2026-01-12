@@ -19,6 +19,7 @@ in {
     nix-prefetch
     nix-visualize
     nix-tree
+    master.nix-search
 
     # Utils
     coreutils
@@ -68,6 +69,7 @@ in {
     google-cloud-sql-proxy
 
     # AI
+    master.opencode
     nur.repos.charmbracelet.crush
     (symlinkJoin {
       name = "mods-authenticated";
