@@ -152,24 +152,6 @@
         ${bins.nix} fmt $@
       '';
     }
-    {
-      name = "gc";
-      category = "Utility";
-      help = "Garbage collection";
-      command = ''
-        sudo nix-collect-garbage $@
-      '';
-    }
-    {
-      name = "gc-all-gen";
-      category = "Utility";
-      help = ''Delete old generations and garbage collection'';
-      command = ''
-        rm -rf ./result
-        ${homeManager} expire-generations now || true
-        sudo nix-collect-garbage -d $@
-      '';
-    }
   ];
   commandToApp = cmd: {
     inherit (cmd) name;
