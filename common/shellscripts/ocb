@@ -3,9 +3,11 @@
 
 set -euo pipefail
 
+# Get the root of the git repository
+cd "$(git rev-parse --show-toplevel)"
+
 # Get existing worktrees (excluding the main worktree)
 worktrees=$(git worktree list --porcelain | grep '^worktree ' | cut -d' ' -f2-)
-worktree_count=$(echo "$worktrees" | grep -c . || true)
 
 # Build options: existing worktrees + NEW option
 options="NEW"
