@@ -84,6 +84,9 @@ in {
       '';
     })
 
+    # AI auxiliary tools
+    mcp-grafana
+
     grafterm
     python312Packages.habitipy
     yt-dlp
