@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ocb - OpenCode Branch: manage git worktrees and start opencode in them
+# twt - tmux worktree: manage git worktrees and start a new tmux session in them
 
 set -euo pipefail
 
@@ -10,13 +10,18 @@ cd "$root_dir"
 
 name=$(basename "$root_dir")
 
-# Get existing worktrees (excluding the main worktree)
-worktrees=$(git worktree list --porcelain | grep '^worktree ' | cut -d' ' -f2-)
+# Get existing branches (local + remote). Remote branches exclude the 'origin/' prefix.
+branches=$(
+  {
+    git for-each-ref --format='%(refname:short)' refs/heads
+    git for-each-ref --format='%(refname:short)' refs/remotes/origin | sed 's|^origin/||'
+  } | sort -u
+)
 
-# Build options: existing worktrees + NEW option
+# Build options: existing branches + NEW option
 options="NEW"
-if [[ -n "$worktrees" ]]; then
-  options=$(printf "%s\n%s" "$worktrees" "$options")
+if [[ -n "$branches" ]]; then
+  options=$(printf "%s\n%s" "$branches" "$options")
 fi
 
 # Use gum to select a worktree or NEW
@@ -30,13 +35,27 @@ if [[ "$selected" == "NEW" ]]; then
     echo "No branch name provided, aborting."
     exit 1
   fi
-
-  # Create a new branch from HEAD without switching to it
   git branch "$branch_name" HEAD
+  selected="$branch_name"
+fi
+
+existing_wt_path="$(git worktree list --porcelain | awk -v br="$selected" '
+  $1=="worktree"{p=$2}
+  $1=="branch"{
+    b=$2
+    sub(/^refs\/heads\//,"",b)
+    if (b==br) { print p; exit }
+  }')"
+
+if [[ -n "$existing_wt_path" ]]; then
+  echo "Worktree for branch '$selected' already exists at: $existing_wt_path"
+  selected="$existing_wt_path"
+else
+  mkdir -p .wt
 
   # Create worktree directory under .wt/<root_name>_<branch_name>
-  worktree_path=".wt/${name}_${branch_name}"
-  git worktree add "$worktree_path" "$branch_name"
+  worktree_path=".wt/${name}_${selected}"
+  git worktree add "$worktree_path" "$selected"
 
   # Copy untracked files (not ignored by git) to the new worktree
   # Exclude well-known package directories
@@ -55,5 +74,8 @@ if [[ "$selected" == "NEW" ]]; then
   selected="$worktree_path"
 fi
 
-# Start opencode in the selected worktree
-exec opencode "$selected"
+full_path=$(realpath "$selected")
+
+echo "Starting tmux session in worktree: $selected"
+
+exec t "$full_path"
