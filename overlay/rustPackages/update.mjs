@@ -3,6 +3,7 @@
 import * as fs from 'node:fs';
 import * as cp from 'node:child_process';
 import * as util from 'node:util';
+import * as path from 'node:path';
 
 const execRaw = util.promisify(cp.execFile);
 const execFull = async (command, ...args) => {
@@ -34,6 +35,7 @@ const MARKER_HASH = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
 await prefillData();
 await fillHashes();
 
+process.chdir(REPO_DIR);
 await execFull('git', 'commit', '-m', "chore(tools): Update custom Rust crates", '--', `${import.meta.dirname}/data.nix`)
 
 async function fillHashes() {
@@ -64,7 +66,7 @@ async function fillHashes() {
 						break;
 				}
 			} catch (error) {
-				console.log(`Error on ${crate}:\n`, { code, stdout, stderr });
+				console.log(`Error on ${crate}:\n`, { code, stdout, stderr, error });
 			}
 		}
 
@@ -118,5 +120,8 @@ async function saveData(data) {
 		{ encoding: 'utf8' },
 	);
 
-	await exec('nix', 'fmt', './data.nix');
+	const cwd = process.cwd();
+	process.chdir(REPO_DIR);
+	await exec('nix', 'fmt', path.join(cwd, 'data.nix'));
+	process.chdir(cwd);
 }

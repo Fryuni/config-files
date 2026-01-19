@@ -1,6 +1,6 @@
 final: pkgs: let
   data = import ./data.nix {};
-  system = pkgs.stdenv.hostPlatform.system;
+  inherit (pkgs.stdenv.hostPlatform) system;
 in {
   pulumi-bin = pkgs.pulumi-bin.overrideAttrs (_: _: {
     inherit (data) version;

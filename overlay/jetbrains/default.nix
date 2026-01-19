@@ -64,12 +64,12 @@
     .overrideAttrs (attrs: {
       nativeBuildInputs =
         (attrs.nativeBuildInputs or [])
-        ++ lib.optionals (stdenv.isLinux) [
+        ++ lib.optionals stdenv.isLinux [
           autoPatchelfHook
         ];
       buildInputs =
         (attrs.buildInputs or [])
-        ++ lib.optionals (stdenv.isLinux) [
+        ++ lib.optionals stdenv.isLinux [
           python3
           stdenv.cc.cc
           libdbusmenu
@@ -84,7 +84,7 @@
       dontAutoPatchelf = true;
       postFixup =
         (attrs.postFixup or "")
-        + lib.optionalString (stdenv.isLinux) ''
+        + lib.optionalString stdenv.isLinux ''
           (
             cd $out/clion
 
@@ -378,12 +378,12 @@
     .overrideAttrs (attrs: {
       nativeBuildInputs =
         (attrs.nativeBuildInputs or [])
-        ++ lib.optionals (stdenv.isLinux) [
+        ++ lib.optionals stdenv.isLinux [
           autoPatchelfHook
         ];
       buildInputs =
         (attrs.buildInputs or [])
-        ++ lib.optionals (stdenv.isLinux) [
+        ++ lib.optionals stdenv.isLinux [
           stdenv.cc.cc
           zlib
           fontconfig # plugins/dotTrace/DotFiles/linux-*/libSkiaSharp.so
@@ -391,7 +391,7 @@
       dontAutoPatchelf = true;
       postFixup =
         (attrs.postFixup or "")
-        + lib.optionalString (stdenv.isLinux) ''
+        + lib.optionalString stdenv.isLinux ''
           (
             cd $out/rider
 
@@ -451,12 +451,12 @@
     .overrideAttrs (attrs: {
       nativeBuildInputs =
         (attrs.nativeBuildInputs or [])
-        ++ lib.optionals (stdenv.isLinux) [
+        ++ lib.optionals stdenv.isLinux [
           autoPatchelfHook
         ];
       buildInputs =
         (attrs.buildInputs or [])
-        ++ lib.optionals (stdenv.isLinux) [
+        ++ lib.optionals stdenv.isLinux [
           python3
           stdenv.cc.cc
           libdbusmenu
@@ -471,7 +471,7 @@
       dontAutoPatchelf = true;
       postFixup =
         (attrs.postFixup or "")
-        + lib.optionalString (stdenv.isLinux) ''
+        + lib.optionalString stdenv.isLinux ''
           (
             cd $out/rust-rover
 
@@ -523,218 +523,218 @@ in {
 
   clion = buildClion rec {
     pname = "clion";
-    version = products.clion.version;
+    inherit (products.clion) version;
     buildNumber = products.clion.build_number;
     description = "C/C++ IDE. New. Intelligent. Cross-platform";
     license = lib.licenses.unfree;
     src = fetchurl {
-      url = products.clion.url;
-      sha256 = products.clion.sha256;
+      inherit (products.clion) url;
+      inherit (products.clion) sha256;
     };
     wmClass = "jetbrains-clion";
-    update-channel = products.clion.update-channel;
+    inherit (products.clion) update-channel;
   };
 
   datagrip = buildDataGrip rec {
     pname = "datagrip";
-    version = products.datagrip.version;
+    inherit (products.datagrip) version;
     buildNumber = products.datagrip.build_number;
     description = "Your Swiss Army Knife for Databases and SQL";
     license = lib.licenses.unfree;
     src = fetchurl {
-      url = products.datagrip.url;
-      sha256 = products.datagrip.sha256;
+      inherit (products.datagrip) url;
+      inherit (products.datagrip) sha256;
     };
     wmClass = "jetbrains-datagrip";
-    update-channel = products.datagrip.update-channel;
+    inherit (products.datagrip) update-channel;
   };
 
   dataspell = buildDataSpell rec {
     pname = "dataspell";
-    version = products.dataspell.version;
+    inherit (products.dataspell) version;
     buildNumber = products.dataspell.build_number;
     description = "The IDE for Professional Data Scientists";
     license = lib.licenses.unfree;
     src = fetchurl {
-      url = products.dataspell.url;
-      sha256 = products.dataspell.sha256;
+      inherit (products.dataspell) url;
+      inherit (products.dataspell) sha256;
     };
     wmClass = "jetbrains-dataspell";
-    update-channel = products.dataspell.update-channel;
+    inherit (products.dataspell) update-channel;
   };
 
   gateway = buildGateway rec {
     pname = "gateway";
     product = "JetBrains Gateway";
-    version = products.gateway.version;
+    inherit (products.gateway) version;
     buildNumber = products.gateway.build_number;
     description = "Your single entry point to all remote development environments";
     license = lib.licenses.unfree;
     src = fetchurl {
-      url = products.gateway.url;
-      sha256 = products.gateway.sha256;
+      inherit (products.gateway) url;
+      inherit (products.gateway) sha256;
     };
     wmClass = "jetbrains-gateway";
-    update-channel = products.gateway.update-channel;
+    inherit (products.gateway) update-channel;
   };
 
   goland = buildGoland rec {
     pname = "goland";
-    version = products.goland.version;
+    inherit (products.goland) version;
     buildNumber = products.goland.build_number;
     description = "Up and Coming Go IDE";
     license = lib.licenses.unfree;
     src = fetchurl {
-      url = products.goland.url;
-      sha256 = products.goland.sha256;
+      inherit (products.goland) url;
+      inherit (products.goland) sha256;
     };
     wmClass = "jetbrains-goland";
-    update-channel = products.goland.update-channel;
+    inherit (products.goland) update-channel;
   };
 
   idea-community = buildIdea rec {
     pname = "idea-community";
     product = "IntelliJ IDEA CE";
-    version = products.idea-community.version;
+    inherit (products.idea-community) version;
     buildNumber = products.idea-community.build_number;
     description = "Integrated Development Environment (IDE) by Jetbrains, community edition";
     license = lib.licenses.asl20;
     src = fetchurl {
-      url = products.idea-community.url;
-      sha256 = products.idea-community.sha256;
+      inherit (products.idea-community) url;
+      inherit (products.idea-community) sha256;
     };
     wmClass = "jetbrains-idea-ce";
-    update-channel = products.idea-community.update-channel;
+    inherit (products.idea-community) update-channel;
   };
 
   idea-ultimate = buildIdea rec {
     pname = "idea-ultimate";
     product = "IntelliJ IDEA";
-    version = products.idea-ultimate.version;
+    inherit (products.idea-ultimate) version;
     buildNumber = products.idea-ultimate.build_number;
     description = "Integrated Development Environment (IDE) by Jetbrains, requires paid license";
     license = lib.licenses.unfree;
     src = fetchurl {
-      url = products.idea-ultimate.url;
-      sha256 = products.idea-ultimate.sha256;
+      inherit (products.idea-ultimate) url;
+      inherit (products.idea-ultimate) sha256;
     };
     wmClass = "jetbrains-idea";
-    update-channel = products.idea-ultimate.update-channel;
+    inherit (products.idea-ultimate) update-channel;
   };
 
   mps = buildMps rec {
     pname = "mps";
     product = "MPS ${products.mps.version}";
-    version = products.mps.version;
+    inherit (products.mps) version;
     buildNumber = products.mps.build_number;
     description = "Create your own domain-specific language";
     license = lib.licenses.asl20;
     src = fetchurl {
-      url = products.mps.url;
-      sha256 = products.mps.sha256;
+      inherit (products.mps) url;
+      inherit (products.mps) sha256;
     };
     wmClass = "jetbrains-mps";
-    update-channel = products.mps.update-channel;
+    inherit (products.mps) update-channel;
   };
 
   phpstorm = buildPhpStorm rec {
     pname = "phpstorm";
-    version = products.phpstorm.version;
+    inherit (products.phpstorm) version;
     buildNumber = products.phpstorm.build_number;
     description = "Professional IDE for Web and PHP developers";
     license = lib.licenses.unfree;
     src = fetchurl {
-      url = products.phpstorm.url;
-      sha256 = products.phpstorm.sha256;
+      inherit (products.phpstorm) url;
+      inherit (products.phpstorm) sha256;
     };
     wmClass = "jetbrains-phpstorm";
-    update-channel = products.phpstorm.update-channel;
+    inherit (products.phpstorm) update-channel;
   };
 
   pycharm-community = buildPycharm rec {
     pname = "pycharm-community";
     product = "PyCharm CE";
-    version = products.pycharm-community.version;
+    inherit (products.pycharm-community) version;
     buildNumber = products.pycharm-community.build_number;
     description = "PyCharm Community Edition";
     license = lib.licenses.asl20;
     src = fetchurl {
-      url = products.pycharm-community.url;
-      sha256 = products.pycharm-community.sha256;
+      inherit (products.pycharm-community) url;
+      inherit (products.pycharm-community) sha256;
     };
     wmClass = "jetbrains-pycharm-ce";
-    update-channel = products.pycharm-community.update-channel;
+    inherit (products.pycharm-community) update-channel;
   };
 
   pycharm-professional = buildPycharm rec {
     pname = "pycharm-professional";
     product = "PyCharm";
-    version = products.pycharm-professional.version;
+    inherit (products.pycharm-professional) version;
     buildNumber = products.pycharm-community.build_number;
     description = "PyCharm Professional Edition";
     license = lib.licenses.unfree;
     src = fetchurl {
-      url = products.pycharm-professional.url;
-      sha256 = products.pycharm-professional.sha256;
+      inherit (products.pycharm-professional) url;
+      inherit (products.pycharm-professional) sha256;
     };
     wmClass = "jetbrains-pycharm";
-    update-channel = products.pycharm-professional.update-channel;
+    inherit (products.pycharm-professional) update-channel;
   };
 
   rider = buildRider rec {
     pname = "rider";
-    version = products.rider.version;
+    inherit (products.rider) version;
     buildNumber = products.rider.build_number;
     description = "A cross-platform .NET IDE based on the IntelliJ platform and ReSharper";
     license = lib.licenses.unfree;
     src = fetchurl {
-      url = products.rider.url;
-      sha256 = products.rider.sha256;
+      inherit (products.rider) url;
+      inherit (products.rider) sha256;
     };
     wmClass = "jetbrains-rider";
-    update-channel = products.rider.update-channel;
+    inherit (products.rider) update-channel;
   };
 
   ruby-mine = buildRubyMine rec {
     pname = "ruby-mine";
-    version = products.ruby-mine.version;
+    inherit (products.ruby-mine) version;
     buildNumber = products.ruby-mine.build_number;
     description = "The Most Intelligent Ruby and Rails IDE";
     license = lib.licenses.unfree;
     src = fetchurl {
-      url = products.ruby-mine.url;
-      sha256 = products.ruby-mine.sha256;
+      inherit (products.ruby-mine) url;
+      inherit (products.ruby-mine) sha256;
     };
     wmClass = "jetbrains-rubymine";
-    update-channel = products.ruby-mine.update-channel;
+    inherit (products.ruby-mine) update-channel;
   };
 
   rust-rover = buildRustRover rec {
     pname = "rust-rover";
-    version = products.rust-rover.version;
+    inherit (products.rust-rover) version;
     buildNumber = products.rust-rover.build_number;
     description = "Rust IDE";
     license = lib.licenses.unfree;
     src = fetchurl {
-      url = products.rust-rover.url;
-      sha256 = products.rust-rover.sha256;
+      inherit (products.rust-rover) url;
+      inherit (products.rust-rover) sha256;
     };
     wmClass = "jetbrains-rustrover";
-    update-channel = products.rust-rover.update-channel;
+    inherit (products.rust-rover) update-channel;
   };
 
   webstorm = buildWebStorm rec {
     pname = "webstorm";
-    version = products.webstorm.version;
+    inherit (products.webstorm) version;
     buildNumber = products.webstorm.build_number;
     description = "Professional IDE for Web and JavaScript development";
     license = lib.licenses.unfree;
     src = fetchurl {
-      url = products.webstorm.url;
-      sha256 = products.webstorm.sha256;
+      inherit (products.webstorm) url;
+      inherit (products.webstorm) sha256;
     };
     wmClass = "jetbrains-webstorm";
-    update-channel = products.webstorm.update-channel;
+    inherit (products.webstorm) update-channel;
   };
 
   plugins = callPackage ./plugins {};

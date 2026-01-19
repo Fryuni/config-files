@@ -14,8 +14,8 @@ final: pkgs: {
         };
     };
 
-  electron = pkgs.stable.electron;
-  electron_36 = pkgs.stable.electron_36;
+  inherit (pkgs.stable) electron;
+  inherit (pkgs.stable) electron_36;
 
   terraform = pkgs.mkTerraform {
     version = "1.5.5";
@@ -78,7 +78,7 @@ final: pkgs: {
     vendorHash = "sha256-f82ibPnauUOuZ5D6Rz3Yyt0jiAXvjN8Or3gud+ri6FA=";
   };
 
-  bun = pkgs.master.bun;
+  inherit (pkgs.master) bun;
 
   ulauncher = pkgs.master.ulauncher.overridePythonAttrs {
     propagatedBuildInputs =

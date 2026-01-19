@@ -3,7 +3,7 @@
   config,
   ...
 }: let
-  gcloud-sdk = pkgs.stable.google-cloud-sdk.withExtraComponents (
+  gcloud-sdk = (pkgs.stable.google-cloud-sdk.override {python312 = pkgs.stable.python310;}).withExtraComponents (
     with pkgs.stable.google-cloud-sdk.components; [
       docker-credential-gcr
       beta
@@ -19,6 +19,7 @@ in {
     nix-prefetch
     nix-visualize
     nix-tree
+    master.nix-search
 
     # Utils
     coreutils
@@ -68,6 +69,7 @@ in {
     google-cloud-sql-proxy
 
     # AI
+    master.opencode
     nur.repos.charmbracelet.crush
     (symlinkJoin {
       name = "mods-authenticated";
@@ -82,12 +84,18 @@ in {
       '';
     })
 
+    # AI auxiliary tools
+    mcp-grafana
+
     grafterm
     python312Packages.habitipy
     yt-dlp
   ];
 
-  programs.zsh.shellAliases."clear-mods-conversations" = "rm -rf ~/.local/share/mods/conversations";
+  programs.zsh.shellAliases = {
+    clear-mods-conversations = "rm -rf ~/.local/share/mods/conversations";
+    oc = "opencode";
+  };
 
   home.sessionVariables = {
     USE_GKE_GCLOUD_AUTH_PLUGIN = "True";

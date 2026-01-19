@@ -102,7 +102,7 @@
                   [
                     (_: _: {
                       unstable = final;
-                      stable = final.stable;
+                      inherit (final) stable;
                     })
                   ]
                   ++ (import ./overlay/master.nix attrs);
@@ -113,7 +113,7 @@
                   [
                     (_: _: {
                       unstable = final;
-                      master = final.master;
+                      inherit (final) master;
                     })
                   ]
                   ++ (import ./overlay/stable.nix attrs);

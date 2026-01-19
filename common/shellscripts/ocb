@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# ocb - OpenCode Branch: manage git worktrees and start opencode in them
+
+set -euo pipefail
+
+root_dir="$(git rev-parse --show-toplevel)"
+
+# Get the root of the git repository
+cd "$root_dir"
+
+name=$(basename "$root_dir")
+
+# Get existing worktrees (excluding the main worktree)
+worktrees=$(git worktree list --porcelain | grep '^worktree ' | cut -d' ' -f2-)
+
+# Build options: existing worktrees + NEW option
+options="NEW"
+if [[ -n "$worktrees" ]]; then
+  options=$(printf "%s\n%s" "$worktrees" "$options")
+fi
+
+# Use gum to select a worktree or NEW
+selected=$(echo "$options" | gum filter --placeholder="Select worktree or NEW...")
+
+if [[ "$selected" == "NEW" ]]; then
+  # Ask for a new branch name
+  branch_name=$(gum input --placeholder="Enter new branch name...")
+
+  if [[ -z "$branch_name" ]]; then
+    echo "No branch name provided, aborting."
+    exit 1
+  fi
+
+  # Create a new branch from HEAD without switching to it
+  git branch "$branch_name" HEAD
+
+  # Create worktree directory under .wt/<root_name>_<branch_name>
+  worktree_path=".wt/${name}_${branch_name}"
+  git worktree add "$worktree_path" "$branch_name"
+
+  # Copy untracked files (not ignored by git) to the new worktree
+  # Exclude well-known package directories
+  echo "Copying untracked files to new worktree..."
+  git ls-files --others --ignored --exclude-standard |
+    grep -v -E '^(node_modules/|vendor/|\.wt/|\.direnv/|unsafe)' |
+    while IFS= read -r file; do
+      if [[ -f "$file" ]]; then
+        target_dir="$worktree_path/$(dirname "$file")"
+        mkdir -p "$target_dir"
+        cp "$file" "$worktree_path/$file"
+      fi
+    done
+
+  echo "Created worktree at $worktree_path"
+  selected="$worktree_path"
+fi
+
+# Start opencode in the selected worktree
+exec opencode "$selected"

@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# twt - tmux worktree: manage git worktrees and start a new tmux session in them
+
+set -euo pipefail
+
+root_dir="$(git rev-parse --show-toplevel)"
+
+# Get the root of the git repository
+cd "$root_dir"
+
+name=$(basename "$root_dir")
+
+# Get existing branches (local + remote). Remote branches exclude the 'origin/' prefix.
+branches=$(
+  {
+    git for-each-ref --format='%(refname:short)' refs/heads
+    git for-each-ref --format='%(refname:short)' refs/remotes/origin | sed 's|^origin/||'
+  } | sort -u
+)
+
+# Build options: existing branches + NEW option
+options="NEW"
+if [[ -n "$branches" ]]; then
+  options=$(printf "%s\n%s" "$branches" "$options")
+fi
+
+# Use gum to select a worktree or NEW
+selected=$(echo "$options" | gum filter --placeholder="Select worktree or NEW...")
+
+if [[ "$selected" == "NEW" ]]; then
+  # Ask for a new branch name
+  branch_name=$(gum input --placeholder="Enter new branch name...")
+
+  if [[ -z "$branch_name" ]]; then
+    echo "No branch name provided, aborting."
+    exit 1
+  fi
+  git branch "$branch_name" HEAD
+  selected="$branch_name"
+fi
+
+existing_wt_path="$(git worktree list --porcelain | awk -v br="$selected" '
+  $1=="worktree"{p=$2}
+  $1=="branch"{
+    b=$2
+    sub(/^refs\/heads\//,"",b)
+    if (b==br) { print p; exit }
+  }')"
+
+if [[ -n "$existing_wt_path" ]]; then
+  echo "Worktree for branch '$selected' already exists at: $existing_wt_path"
+  selected="$existing_wt_path"
+else
+  mkdir -p .wt
+
+  # Create worktree directory under .wt/<root_name>_<branch_name>
+  worktree_path=".wt/${name}_${selected}"
+  git worktree add "$worktree_path" "$selected"
+
+  # Copy untracked files (not ignored by git) to the new worktree
+  # Exclude well-known package directories
+  echo "Copying untracked files to new worktree..."
+  git ls-files --others --ignored --exclude-standard |
+    grep -v -E '^(node_modules/|vendor/|\.wt/|\.direnv/|unsafe)' |
+    while IFS= read -r file; do
+      if [[ -f "$file" ]]; then
+        target_dir="$worktree_path/$(dirname "$file")"
+        mkdir -p "$target_dir"
+        cp "$file" "$worktree_path/$file"
+      fi
+    done
+
+  echo "Created worktree at $worktree_path"
+  selected="$worktree_path"
+fi
+
+full_path=$(realpath "$selected")
+
+echo "Starting tmux session in worktree: $selected"
+
+exec t "$full_path"
