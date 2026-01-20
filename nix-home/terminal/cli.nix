@@ -69,8 +69,17 @@ in {
     google-cloud-sql-proxy
 
     # AI
-    master.opencode
     nur.repos.charmbracelet.crush
+    (master.opencode.overrideAttrs (old: {
+      nativeBuildInputs = old.nativeBuildInputs ++ [makeWrapper];
+      postInstall = ''
+        ${old.postInstall or ""}
+        mv "$out/bin/opencode" "$out/bin/opencode-local-auth"
+        makeWrapper "$out/bin/opencode-local-auth" "$out/bin/opencode" \
+          --set GOOGLE_APPLICATION_CREDENTIALS "${config.age.secrets.google-account.path}" \
+          --set GOOGLE_CLOUD_PROJECT croct-dev
+      '';
+    }))
     (symlinkJoin {
       name = "mods-authenticated";
       nativeBuildInputs = [makeWrapper coreutils];
