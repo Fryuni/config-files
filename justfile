@@ -45,3 +45,8 @@ update-pulumi:
 update-rustCrates:
   overlay/rustPackages/update.mjs
 
+apply-reload:
+  home-manager switch --flake .
+  sudo nixos-rebuild switch --flake .
+  systemctl reboot
+
