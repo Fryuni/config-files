@@ -12,7 +12,7 @@
     flameshot
     discord-canary
     master.obsidian
-    (jrnl.overrideAttrs (_: { doTest = false; }))
+    (jrnl.overrideAttrs (_: {doTest = false;}))
     vlc
     screenkey
 
