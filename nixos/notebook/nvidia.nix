@@ -9,6 +9,23 @@ in {
     nvtopPackages.nvidia
   ];
 
+  # NVIDIA Wayland environment variables
+  environment.sessionVariables = {
+    # Use NVIDIA GBM backend
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+
+    # Disable hardware cursors (fixes cursor issues on NVIDIA)
+    WLR_NO_HARDWARE_CURSORS = "1";
+
+    # Use legacy DRM flip (helps with some rendering issues)
+    __GL_GSYNC_ALLOWED = "1";
+    __GL_VRR_ALLOWED = "1";
+
+    # Electron/Chromium hardware acceleration
+    LIBVA_DRIVER_NAME = "nvidia";
+  };
+
   services.xserver.videoDrivers = ["nvidia"];
   hardware.graphics = {
     enable = true;

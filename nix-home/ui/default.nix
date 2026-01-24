@@ -3,13 +3,14 @@
     # ./xfce.nix
     ./xsession.nix
     ./rofi.nix
+    ./hyprland.nix
+    ./gtk.nix
   ];
 
   home.packages = with pkgs; [
     calibre
     kdePackages.okular
     spotify
-    flameshot
     discord-canary
     master.obsidian
     (jrnl.overrideAttrs (_: {doTest = false;}))

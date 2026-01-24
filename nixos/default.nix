@@ -9,6 +9,7 @@
     ./nix-settings.nix
     ./secrets.nix
     ./modules/networking
+    ./modules/hyprland.nix
     ./users.nix
     ./audio.nix
     ./registries.nix
@@ -35,8 +36,15 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  services.displayManager.sddm.enable = true;
-  services.displayManager.defaultSession = "plasmax11";
+  # Display manager - SDDM with Wayland support
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+  };
+  # Default to Hyprland session (can also select Plasma from SDDM)
+  services.displayManager.defaultSession = "hyprland";
+
+  # Keep Plasma available as an alternative
   services.desktopManager.plasma6.enable = true;
 
   # services.xserver.desktopManager.xfce.enable = true;
@@ -50,7 +58,7 @@
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
-    variant = "alt-intl";
+    variant = "intl";
   };
 
   # Configure console keymap
