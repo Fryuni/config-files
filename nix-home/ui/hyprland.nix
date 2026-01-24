@@ -67,8 +67,8 @@ in {
         "wl-paste --type image --watch cliphist store"
 
         # Wallpaper daemon
-        "swww-daemon"
-        "swww img ${../../common/wallpaper/wallpaper.png}"
+        # "swww-daemon"
+        # "swww img ${../../common/wallpaper/wallpaper.png}"
 
         # Notification daemon
         "swaync"
@@ -103,16 +103,16 @@ in {
 
       # Decoration
       decoration = {
-        rounding = 8;
+        rounding = 4;
         blur = {
-          enabled = true;
+          enabled = false;
           size = 8;
           passes = 2;
           new_optimizations = true;
           xray = false;
         };
         shadow = {
-          enabled = true;
+          enabled = false;
           range = 15;
           render_power = 3;
           color = "rgba(1a1a1aee)";
@@ -121,7 +121,7 @@ in {
 
       # Animations
       animations = {
-        enabled = true;
+        enabled = false;
         bezier = [
           "ease, 0.25, 0.1, 0.25, 1"
           "wind, 0.05, 0.9, 0.1, 1.05"
@@ -187,9 +187,9 @@ in {
 
       # Misc
       misc = {
-        force_default_wallpaper = 0;
-        disable_hyprland_logo = true;
-        disable_splash_rendering = true;
+        force_default_wallpaper = 1;
+        disable_hyprland_logo = false;
+        disable_splash_rendering = false;
         mouse_move_enables_dpms = true;
         key_press_enables_dpms = true;
       };
@@ -341,17 +341,30 @@ in {
       ];
 
       # Window rules
-      windowrulev2 = [
-        "float, class:^(pavucontrol)$"
-        "float, class:^(nm-connection-editor)$"
-        "float, title:^(Picture-in-Picture)$"
-        "float, title:(Bitwarden)"
-        "pin, title:^(Picture-in-Picture)$"
-        "float, class:^(org.gnome.Calculator)$"
-        "float, class:^(org.gnome.Nautilus)$, title:^(Properties)$"
+      windowrulev2 = let
+        # Input: 
+        #   [ ["class:^()$", "float", "pin"] ]
+        # Output:
+        #   ["float, class:^()$" "pin, class:^()$"]
+        buildRules = rules: lib.concatMap (rule: 
+          let
+            conditions = lib.head rule;
+            actions = lib.tail rule;
+          in
+            lib.map (action: lib.concatStringsSep ", " (action :: conditions)) actions
+        ) rules;
+      in
+        buildRules [
+          ["class:^(pavucontrol)$" "float"]
+          ["class:^(nm-connection-editor)$" "float"]
+        ["title:^(Picture-in-Picture)$" "float"]
+        ["title:^(Bitwarden)$" "float"]
+        ["class:^(org.gnome.Calculator)$" "float"]
+        ["class:^(org.gnome.Nautilus)$, title:^(Properties)$" "float"]
+        ["title:^(Picture-in-Picture)$", "pin"]
 
         # Suppress maximize requests from apps
-        "suppressevent maximize, class:.*"
+          # ["class:.*" "suppressevent maximize"]
       ];
     };
 
@@ -387,23 +400,23 @@ in {
 
         modules-left = ["hyprland/workspaces" "hyprland/window"];
         modules-center = ["pulseaudio" "tray" "battery"];
-        modules-right = ["clock"];
+        modules-right = ["network" "clock"];
 
         "hyprland/workspaces" = {
           format = "{icon}";
           format-icons = {
-            "1" = "";
-            "2" = "";
-            "3" = "";
-            "4" = "";
-            "5" = "";
-            "6" = "";
-            "7" = "";
-            "8" = "";
-            "9" = "";
-            "10" = "";
-            urgent = "";
-            default = "";
+            "1" = "1";
+            "2" = "2";
+            "3" = "3";
+            "4" = "4";
+            "5" = "5";
+            "6" = "6";
+            "7" = "7";
+            "8" = "8";
+            "9" = "9";
+            "10" = "0";
+            urgent = "U";
+            default = "D";
           };
           on-click = "activate";
         };
@@ -418,24 +431,24 @@ in {
           tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
         };
 
-        cpu = {
-          format = " {usage}%";
-          tooltip = false;
-        };
+        # cpu = {
+        #   format = " {usage}%";
+        #   tooltip = false;
+        # };
 
-        memory = {
-          format = " {}%";
-        };
+        # memory = {
+        #   format = " {}%";
+        # };
 
-        battery = {
-          states = {
-            warning = 30;
-            critical = 15;
-          };
-          format = "{icon} {capacity}%";
-          format-charging = " {capacity}%";
-          format-icons = ["" "" "" "" ""];
-        };
+        # battery = {
+        #   states = {
+        #     warning = 30;
+        #     critical = 15;
+        #   };
+        #   format = "{icon} {capacity}%";
+        #   format-charging = " {capacity}%";
+        #   format-icons = ["" "" "" "" ""];
+        # };
 
         network = {
           format-wifi = "  {signalStrength}%";
@@ -447,9 +460,9 @@ in {
         pulseaudio = {
           format = "{icon} {volume}%";
           format-muted = " Muted";
-          format-icons = {
-            default = ["" "" ""];
-          };
+          # format-icons = {
+          #   default = ["" "" ""];
+          # };
           on-click = "pavucontrol";
         };
 
