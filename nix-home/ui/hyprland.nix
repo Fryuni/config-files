@@ -31,11 +31,6 @@ in {
     playerctl
     pamixer
 
-    # File manager
-    thunar
-    thunar-volman # Removable media management
-    thunar-archive-plugin # Archive support
-
     # Screenshot (grim required for flameshot wayland adapter)
     grim
 

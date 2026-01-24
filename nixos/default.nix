@@ -48,11 +48,14 @@
   services.desktopManager.plasma6.enable = true;
 
   # services.xserver.desktopManager.xfce.enable = true;
-  # programs.thunar.plugins = with pkgs.xfce; [
-  #   thunar-archive-plugin
-  #   thunar-volman
-  # ];
-  # services.gvfs.enable = true;
+  programs.thunar = {
+    enable = true;
+    plugins = with pkgs; [
+      thunar-archive-plugin
+      thunar-volman
+    ];
+  };
+  services.gvfs.enable = true; # Enable automounting for removable media
   services.tumbler.enable = true;
 
   # Configure keymap in X11

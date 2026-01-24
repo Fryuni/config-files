@@ -1,7 +1,4 @@
-{
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   # Enable fcitx5 for proper input method support on Wayland
   i18n.inputMethod = {
     enable = true;

@@ -1,6 +1,6 @@
 {pkgs, ...}: {
   imports = [
-   ./rofi-power-menu.nix
+    ./rofi-power-menu.nix
   ];
   home.file.".local/share/rofi/themes/styles".source = ../../common/rofi/styles;
   programs.rofi = {
