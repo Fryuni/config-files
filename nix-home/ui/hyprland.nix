@@ -340,32 +340,35 @@ in {
         ", XF86AudioNext, exec, playerctl next"
       ];
 
+      debug = {
+        disable_logs = false;
+      };
+
       # Window rules
       windowrulev2 = let
-        # Input: 
-        #   [ ["class:^()$", "float", "pin"] ]
-        # Output:
-        #   ["float, class:^()$" "pin, class:^()$"]
-        buildRules = rules: lib.concatMap (rule: 
-          let
-            conditions = lib.head rule;
-            actions = lib.tail rule;
+        buildRules = builtins.concatMap (
+          group: let
+            base = builtins.head group;
+            rules = builtins.tail group;
           in
-            lib.map (action: lib.concatStringsSep ", " (action :: conditions)) actions
-        ) rules;
+            map (rule: "${rule}, ${base}") rules
+        );
       in
         buildRules [
+          ["title:.*" "bordercolor rgb(FF00FF)"]
           ["class:^(pavucontrol)$" "float"]
           ["class:^(nm-connection-editor)$" "float"]
-        ["title:^(Picture-in-Picture)$" "float"]
-        ["title:^(Bitwarden)$" "float"]
-        ["class:^(org.gnome.Calculator)$" "float"]
-        ["class:^(org.gnome.Nautilus)$, title:^(Properties)$" "float"]
-        ["title:^(Picture-in-Picture)$", "pin"]
+          ["title:^(Picture-in-Picture)$" "float"]
+          ["title:(Bitwarden)" "float"]
+          ["class:^(org.gnome.Calculator)$" "float"]
+          ["class:^(org.gnome.Nautilus)$, title:^(Properties)$" "float"]
+          ["title:^(Picture-in-Picture)$" "pin"]
 
-        # Suppress maximize requests from apps
+          ["initialTitle:(flameshot)" "monitor 0" "move 0 0" "float" "pin" "noanim" "stayfocused" "size 5760 2160" "bordercolor rgb(FF0000)"]
+
+          # Suppress maximize requests from apps
           # ["class:.*" "suppressevent maximize"]
-      ];
+        ];
     };
 
     # Resize submap (modal resize mode)
