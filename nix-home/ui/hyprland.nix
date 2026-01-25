@@ -36,6 +36,9 @@ in {
 
     # Wallpaper daemon
     swww
+
+    # Display configuration GUI
+    wdisplays
   ];
 
   # Hyprland configuration
