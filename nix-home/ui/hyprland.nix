@@ -45,7 +45,7 @@ in {
     systemd.enable = true;
 
     plugins = with pkgs.hyprlandPlugins; [
-      hyprexpo # Workspace overview
+      # hyprexpo # Workspace overview
       borders-plus-plus # Enhanced borders
     ];
 
@@ -168,13 +168,13 @@ in {
       # Plugin configurations
       plugin = {
         # hyprexpo - Workspace overview
-        hyprexpo = {
-          columns = 3;
-          gap_size = 5;
-          bg_col = "rgba(${colors.background}ff)";
-          workspace_method = "first 1"; # Start from workspace 1
-          enable_gesture = true;
-        };
+        # hyprexpo = {
+        #   columns = 3;
+        #   gap_size = 5;
+        #   bg_col = "rgba(${colors.background}ff)";
+        #   workspace_method = "first 1"; # Start from workspace 1
+        #   enable_gesture = true;
+        # };
 
         # borders-plus-plus - Enhanced borders
         "borders-plus-plus" = {
@@ -297,7 +297,7 @@ in {
         "$mod SHIFT, minus, movetoworkspace, special:magic"
 
         # ===== Workspace Overview (hyprexpo) =====
-        "$mod, grave, hyprexpo:expo, toggle" # ` key
+        # "$mod, grave, hyprexpo:expo, toggle" # ` key
 
         # ===== Scroll Through Workspaces =====
         "$mod, mouse_down, workspace, e+1"
@@ -345,29 +345,101 @@ in {
       };
 
       # Window rules
-      windowrulev2 = let
-        buildRules = builtins.concatMap (
-          group: let
-            base = builtins.head group;
-            rules = builtins.tail group;
-          in
-            map (rule: "${rule}, ${base}") rules
-        );
+      windowrule = let
+        # Build window rules from attribute sets
+        # Format: { "match:type" = "value"; property1 = value1; property2 = value2; }
+        # Output: "match:type value, property1 value1, property2 value2"
+        buildRules = rules:
+          map (
+            rule: let
+              # Separate match criteria from properties
+              matchKeys = lib.filter (k: lib.hasPrefix "match:" k) (builtins.attrNames rule);
+              propKeys = lib.filter (k: !(lib.hasPrefix "match:" k)) (builtins.attrNames rule);
+
+              # Format a value (preserve strings, convert booleans)
+              formatValue = v:
+                if builtins.isBool v
+                then
+                  (
+                    if v
+                    then "1"
+                    else "0"
+                  )
+                else toString v;
+
+              # Build match part (e.g., "match:class my-window")
+              matchParts = map (k: "${k} ${rule.${k}}") matchKeys;
+
+              # Build properties part (e.g., "border_size 10")
+              propParts = map (k: "${k} ${formatValue rule.${k}}") propKeys;
+
+              # Combine all parts with commas
+              allParts = matchParts ++ propParts;
+            in
+              lib.concatStringsSep ", " allParts
+          )
+          rules;
       in
         buildRules [
-          ["title:.*" "bordercolor rgb(FF00FF)"]
-          ["class:^(pavucontrol)$" "float"]
-          ["class:^(nm-connection-editor)$" "float"]
-          ["title:^(Picture-in-Picture)$" "float"]
-          ["title:(Bitwarden)" "float"]
-          ["class:^(org.gnome.Calculator)$" "float"]
-          ["class:^(org.gnome.Nautilus)$, title:^(Properties)$" "float"]
-          ["title:^(Picture-in-Picture)$" "pin"]
+          # Floating windows
+          {
+            "match:class" = "pavucontrol";
+            float = true;
+          }
+          {
+            "match:class" = "nm-connection-editor";
+            float = true;
+          }
+          {
+            "match:title" = "Bitwarden";
+            float = true;
+          }
+          {
+            "match:class" = "org.gnome.Calculator";
+            float = true;
+          }
+          {
+            "match:class" = "org.gnome.Nautilus";
+            "match:title" = "Properties";
+            float = true;
+          }
 
-          ["initialTitle:(flameshot)" "monitor 0" "move 0 0" "float" "pin" "noanim" "stayfocused" "size 5760 2160" "bordercolor rgb(FF0000)"]
+          # Pin windows
+          {
+            "match:title" = "Picture-in-Picture";
+            float = true;
+            pin = true;
+          }
 
-          # Suppress maximize requests from apps
-          # ["class:.*" "suppressevent maximize"]
+          # Flameshot configuration
+          {
+            "match:initial_title" = "flameshot";
+            monitor = "0";
+            move = "0 0";
+            float = true;
+            pin = true;
+            no_anim = true;
+            stay_focused = true;
+            size = "5760 2160";
+          }
+          {
+            "match:initial_title" = "flameshot-pin";
+            float = true;
+            pin = true;
+            no_anim = true;
+            no_blur = true;
+            no_shadow = true;
+            no_follow_mouse = true;
+            decorate = false;
+            size = "1 1";
+            min_size = "1 1";
+          }
+
+          # Suppress maximize requests from apps (uncomment if needed)
+          # {
+          #   "match:class" = ".*";
+          #   suppressevent = "maximize";
+          # }
         ];
     };
 
