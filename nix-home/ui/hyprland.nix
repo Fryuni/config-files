@@ -39,6 +39,9 @@ in {
 
     # Display configuration GUI
     wdisplays
+
+    # Audio configuration GUI
+    pavucontrol
   ];
 
   # Hyprland configuration
@@ -386,7 +389,7 @@ in {
         buildRules [
           # Floating windows
           {
-            "match:class" = "pavucontrol";
+            "match:class" = "org.pulseaudio.pavucontrol";
             float = true;
           }
           {
