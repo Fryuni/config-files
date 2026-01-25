@@ -199,7 +199,7 @@ in {
 
       # Keybindings
       "$mod" = "SUPER";
-      "$terminal" = "ghostty -e t";
+      "$terminal" = "ghostty";
       "$menu" = "rofi -show drun";
       "$browser" = "google-chrome-stable";
 
