@@ -94,7 +94,7 @@ in {
       # Input settings
       input = {
         kb_layout = "us";
-        kb_variant = "intl"; # US International with dead keys
+        kb_variant = "alt-intl"; # US International with dead keys
         kb_options = "";
         kb_model = "";
         kb_rules = "";
