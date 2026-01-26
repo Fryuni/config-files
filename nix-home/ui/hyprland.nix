@@ -209,6 +209,7 @@ in {
       bind = [
         # ===== Core Bindings =====
         "$mod, Return, exec, $terminal"
+        "$mod SHIFT, Return, exec, $terminal -e t"
         "$mod, Q, killactive"
         "$mod, M, exit"
         "$mod, N, exec, thunar"
