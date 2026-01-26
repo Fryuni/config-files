@@ -23,7 +23,8 @@ git_main_branch() {
   return 1
 }
 
-root_dir="$(dirname "$(git rev-parse --git-common-dir)")"
+git_dir="$(git rev-parse --git-common-dir)"
+root_dir="$(dirname "$git_dir")"
 
 # Get the root of the git repository
 cd "$root_dir"
@@ -74,10 +75,10 @@ if [[ -n "$existing_wt_path" ]]; then
   echo "Worktree for branch '$selected' already exists at: $existing_wt_path"
   selected="$existing_wt_path"
 else
-  mkdir -p .wt
+  mkdir -p "$git_dir/wtroot"
 
   # Create worktree directory under .wt/<root_name>_<branch_name>
-  worktree_path=".wt/${selected}"
+  worktree_path="$git_dir/wtroot/${selected}"
   git worktree add "$worktree_path" "$selected"
 
   # Copy untracked files (not ignored by git) to the new worktree
