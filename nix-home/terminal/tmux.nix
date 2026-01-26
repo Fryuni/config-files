@@ -32,6 +32,9 @@ in {
 
       # Enable True Color, required by termguicolors
       set-option -sa terminal-overrides ',XXX:RGB'
+
+      # Update Hyprland/WAYLAND env variables in tmux sessions
+      set-option -g update-environment "HYPRLAND_INSTANCE_SIGNATURE DISPLAY WAYLAND_DISPLAY SWAYSOCK"
     '';
 
     tmuxp.enable = true;

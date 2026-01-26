@@ -686,4 +686,8 @@ in {
       };
     };
   };
+
+  programs.zsh.shellAliases = {
+    hyprctl = "HYPRLAND_INSTANCE_SIGNATURE=$(ls -1t \"$XDG_RUNTIME_DIR/hypr/\" | head -n 1) hyprctl";
+  };
 }
