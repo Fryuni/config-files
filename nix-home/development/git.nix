@@ -5,8 +5,8 @@
   ...
 }: {
   home.packages = with pkgs; [
-    # Git stuff
-    gh
+    gh # GitHub CLI
+    glab # GitLab CLI
     lazygit
   ];
 
@@ -66,6 +66,10 @@
   programs.zsh.shellAliases = {
     gcpr = "gh pr list | cut -f1,2 | gum filter --height=10 --limit=1 --select-if-one | cut -f1 | xargs gh pr checkout";
   };
+
+  programs.zsh.initContent = lib.mkOrder 200 ''
+    source <(${pkgs.glab}/bin/glab completion -s zsh)
+  '';
 
   home.activation."fixGitMaintenance" = lib.hm.dag.entryAfter ["linkGeneration"] ''
     ${lib.escapeShellArgs [
