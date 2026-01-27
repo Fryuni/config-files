@@ -49,6 +49,7 @@
     max-jobs = 4;
   };
 
+  networking.firewall.allowedTCPPorts = [22];
   services.openssh = {
     enable = true;
     startWhenNeeded = true;
