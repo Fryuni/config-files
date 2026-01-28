@@ -20,7 +20,12 @@
     };
     npm-token = {
       file = ../secrets/npm-token;
-      path = "/home/lotus/.npmrc";
+      path = "${config.home.homeDirectory}/.npmrc";
+    };
+    # TODO: Remove when https://github.com/oven-sh/bun/issues/23128 is fixed
+    bun-token = {
+      file = ../secrets/npm-token;
+      path = "${config.xdg.configHome}/.npmrc";
     };
   };
 }
