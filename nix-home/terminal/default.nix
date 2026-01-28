@@ -89,6 +89,9 @@
       nv = "nvim";
       nivm = "nvim";
 
+      et = "exec t";
+      ttmp = "exec t \"$(mktemp -d)\"";
+
       "refresh-gcloud-credentials" = "gcloud auth print-access-token > /dev/null";
       gselect = "gcloud config configurations activate";
 
