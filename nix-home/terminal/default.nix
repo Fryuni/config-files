@@ -92,6 +92,8 @@
 
       et = "exec t";
       ttmp = "exec t \"$(mktemp -d)\"";
+      tx = "t \"$(xplr)\"";
+      etx = "exec t \"$(xplr)\"";
 
       "refresh-gcloud-credentials" = "gcloud auth print-access-token > /dev/null";
       gselect = "gcloud config configurations activate";
