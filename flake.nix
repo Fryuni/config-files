@@ -11,7 +11,11 @@
       url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    flakehub.url = "https://flakehub.com/f/DeterminateSystems/fh/*";
+    flakehub = {
+      url = "https://flakehub.com/f/DeterminateSystems/fh/*";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.fenix.follows = "fenix";
+    };
 
     systems.url = "github:nix-systems/default";
     flake-compat.url = "https://flakehub.com/f/edolstra/flake-compat/1";
@@ -65,6 +69,7 @@
     };
     nix-alien = {
       url = "https://flakehub.com/f/thiagokokada/nix-alien/0.1";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
       inputs.flake-compat.follows = "flake-compat";
     };
   };
