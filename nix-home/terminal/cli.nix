@@ -68,35 +68,6 @@ in {
     gcloud-sdk
     google-cloud-sql-proxy
 
-    # AI
-    nur.repos.charmbracelet.crush
-    (master.opencode.overrideAttrs (old: {
-      nativeBuildInputs = old.nativeBuildInputs ++ [makeWrapper];
-      postInstall = ''
-        ${old.postInstall or ""}
-        mv "$out/bin/opencode" "$out/bin/opencode-local-auth"
-        makeWrapper "$out/bin/opencode-local-auth" "$out/bin/opencode" \
-          --set VERTEX_LOCATION global \
-          --set GOOGLE_APPLICATION_CREDENTIALS "${config.age.secrets.google-account.path}" \
-          --set GOOGLE_CLOUD_PROJECT croct-dev
-      '';
-    }))
-    (symlinkJoin {
-      name = "mods-authenticated";
-      nativeBuildInputs = [makeWrapper coreutils];
-      paths = [nur.repos.charmbracelet.mods];
-      postBuild = ''
-        for file in ${nur.repos.charmbracelet.mods}/bin/*; do
-          rm -rf "$out/bin/$(basename $file)"
-          makeWrapper $file "$out/bin/$(basename $file)" \
-            --run 'export OPENAI_API_KEY="$(cat ${config.age.secrets.openai-key.path})"'
-        done
-      '';
-    })
-
-    # AI auxiliary tools
-    mcp-grafana
-
     grafterm
     python312Packages.habitipy
     yt-dlp

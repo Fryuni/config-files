@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   imports = [
+    ./ai.nix
     ./cli.nix
     ./neovim.nix
     ./alacritty.nix

@@ -35,6 +35,10 @@
       inputs.home-manager.follows = "home-manager";
       inputs.systems.follows = "systems";
     };
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nur = {
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";

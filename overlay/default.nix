@@ -11,6 +11,7 @@ in [
   attrs.agenix.overlays.default
   attrs.nix-alien.overlays.default
   attrs.nur.overlays.default
+  attrs.llm-agents.overlays.default
   (pickPackages attrs.flakehub.overlays.default ["fh"])
   attrs.polymc.overlay
 
