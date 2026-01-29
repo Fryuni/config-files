@@ -76,6 +76,7 @@ in {
         ${old.postInstall or ""}
         mv "$out/bin/opencode" "$out/bin/opencode-local-auth"
         makeWrapper "$out/bin/opencode-local-auth" "$out/bin/opencode" \
+          --set VERTEX_LOCATION global \
           --set GOOGLE_APPLICATION_CREDENTIALS "${config.age.secrets.google-account.path}" \
           --set GOOGLE_CLOUD_PROJECT croct-dev
       '';
