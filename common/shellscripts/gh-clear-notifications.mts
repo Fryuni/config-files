@@ -15,9 +15,9 @@
 import { $ } from "bun";
 
 // Configuration
-const RATE_LIMIT_PER_SECOND = 5;
+const RATE_LIMIT_PER_SECOND = 15;
 
-const criterias: Record<string, Criteria> = {
+const criterias = {
   'i18n in title': (notification) => notification.subject.title.toLowerCase().includes("i18n"),
   'cloudflare in title': (notification) => notification.subject.title.toLowerCase().includes("cloudflare"),
   '[ci] in title': (notification) => notification.subject.title.toLowerCase().includes("[ci]"),
@@ -30,7 +30,6 @@ const criterias: Record<string, Criteria> = {
     return ignoredOrgs.includes(owner);
   },
   'opened by bot': (_, details) => isBot(details?.user),
-  'merged PR': (_, details) => details?.merged === true,
   'draft PR': (_, details) => details?.draft === true,
   'closed issue/PR': (_, details) => details?.state === "closed",
   'closed discussion': async (notification) => {
@@ -40,7 +39,14 @@ const criterias: Record<string, Criteria> = {
     const state = await checkDiscussionState(notification.subject.url);
     return state === "closed";
   }
-};
+} satisfies Record<string, Criteria>;
+
+const unsubscribeCriterias = new Set<keyof typeof criterias>([
+  'ignored org',
+  '[ci] in title',
+  'opened by bot',
+  'i18n in title',
+]);
 
 type Criteria = (notification: Notification, details: SubjectDetails | null) => boolean | Promise<boolean>;
 
@@ -80,7 +86,7 @@ interface NotificationMatch {
   type: string;
   title: string;
   reason: string;
-  matchCriteria: string[];
+  matchCriteria: (keyof typeof criterias)[];
 }
 
 interface FilterResult {
@@ -208,7 +214,7 @@ async function checkDiscussionState(url: string): Promise<string> {
 
 // Filter a single notification
 async function filterNotification(notification: Notification, index: number): Promise<FilterResult> {
-  const matchCriteria: string[] = [];
+  const matchCriteria: (keyof typeof criterias)[] = [];
   const type = notification.subject.type;
   const title = notification.subject.title;
   const details = type === "Issue" || type === "PullRequest"
@@ -217,7 +223,7 @@ async function filterNotification(notification: Notification, index: number): Pr
 
   for (const [criteriaName, criteriaFunc] of Object.entries(criterias)) {
     if (await criteriaFunc(notification, details)) {
-      matchCriteria.push(criteriaName);
+      matchCriteria.push(criteriaName as keyof typeof criterias);
     }
   }
 
@@ -280,33 +286,17 @@ function displayTable(matches: NotificationMatch[]): void {
 
   console.log(`\n📋 Found ${matches.length} matching notifications:\n`);
 
-  // Calculate column widths
-  const repoWidth = Math.max(...matches.map(m => m.repository.length), 10);
-  const typeWidth = Math.max(...matches.map(m => m.type.length), 4);
-  const titleWidth = Math.min(Math.max(...matches.map(m => m.title.length), 20), 60);
-
-  // Header
-  console.log(
-    "┌" + "─".repeat(repoWidth + 2) + "┬" + "─".repeat(typeWidth + 2) + "┬" + "─".repeat(titleWidth + 2) + "┬" + "─".repeat(30) + "┐"
-  );
-  console.log(
-    "│ " + "Repository".padEnd(repoWidth) + " │ " + "Type".padEnd(typeWidth) + " │ " + "Title".padEnd(titleWidth) + " │ " + "Match Criteria".padEnd(28) + " │"
-  );
-  console.log(
-    "├" + "─".repeat(repoWidth + 2) + "┼" + "─".repeat(typeWidth + 2) + "┼" + "─".repeat(titleWidth + 2) + "┼" + "─".repeat(30) + "┤"
+  console.table(
+    matches.map(m => ({
+      'Repository': m.repository,
+      'Type': m.type,
+      'Title': m.title,
+      'Unsubscribing': m.matchCriteria.some(c => unsubscribeCriterias.has(c)) ? 'Yes' : 'No',
+      'Match Criteria': m.matchCriteria.join(", "),
+    })),
+    ['Repository', 'Type', 'Title', 'Unsubscribing', 'Match Criteria'],
   );
 
-  // Rows
-  for (const match of matches) {
-    const criteria = match.matchCriteria.join(", ");
-    console.log(
-      "│ " + match.repository.padEnd(repoWidth) + " │ " + match.type.padEnd(typeWidth) + " │ " + match.title.padEnd(titleWidth) + " │ " + criteria.padEnd(28) + " │"
-    );
-  }
-
-  console.log(
-    "└" + "─".repeat(repoWidth + 2) + "┴" + "─".repeat(typeWidth + 2) + "┴" + "─".repeat(titleWidth + 2) + "┴" + "─".repeat(30) + "┘"
-  );
   console.log();
 }
 
@@ -326,9 +316,15 @@ async function askConfirmation(count: number): Promise<boolean> {
 
 // Mark a single notification as done with rate limiting
 async function markNotificationAsDone(match: NotificationMatch, index: number, total: number): Promise<boolean> {
-  await rateLimiter.acquire();
+  const shouldUnsubscribe = match.matchCriteria.some(c => unsubscribeCriterias.has(c));
 
   try {
+    if (shouldUnsubscribe) {
+      await rateLimiter.acquire();
+      await $`gh api -X DELETE notifications/threads/${match.id}/subscription`.quiet()
+    }
+
+    await rateLimiter.acquire();
     const { exitCode } = await $`gh api -X DELETE notifications/threads/${match.id}`.quiet();
     return exitCode === 0;
   } catch {
