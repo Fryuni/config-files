@@ -63,8 +63,14 @@
   home.file = let
     shellscripts =
       lib.mapAttrs'
-      (name: _: {
-        name = ".local/bin/${name}";
+      (name: _: let
+        matchResult = builtins.match "(.*)\\.[^.]*" name;
+        nameWithoutExt =
+          if matchResult == null
+          then name
+          else builtins.elemAt matchResult 0;
+      in {
+        name = ".local/bin/${nameWithoutExt}";
         value = {
           source = ../../common/shellscripts/${name};
           executable = true;
