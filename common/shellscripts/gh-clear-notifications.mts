@@ -18,7 +18,10 @@ import { $ } from "bun";
 const RATE_LIMIT_PER_SECOND = 15;
 
 const criterias = {
-  'i18n in title': (notification) => notification.subject.title.toLowerCase().includes("i18n"),
+  'i18n in title': (notification) => {
+    const title = notification.subject.title.toLowerCase();
+    return title.includes("i18n") || title.includes("a11y");
+  },
   'cloudflare in title': (notification) => notification.subject.title.toLowerCase().includes("cloudflare"),
   '[ci] in title': (notification) => notification.subject.title.toLowerCase().includes("[ci]"),
   '[wip] in title': (notification) => notification.subject.title.toLowerCase().includes("[wip]"),
