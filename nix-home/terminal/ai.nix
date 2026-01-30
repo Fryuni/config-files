@@ -49,4 +49,32 @@ in {
     # AI auxiliary tools
     mcp-grafana
   ];
+
+  home.file.".config/crush/crush.json".text = builtins.toJSON {
+    mcp = {
+      github = {
+        type = "http";
+        url = "https://api.githubcopilot.com/mcp/";
+        headers = {Authorization = "Bearer $(gh auth token)";};
+      };
+    };
+    lsp = {
+      go = {
+        enabled = true;
+        command = "gopls";
+      };
+      nix = {
+        enabled = true;
+        command = "nil";
+      };
+    };
+    permissions = {allowed_tools = ["view" "ls" "grep"];};
+    options = {
+      skills_paths = ["~/.config/crush/skills" "./agents/skills"];
+      attribution = {
+        trailer_style = "none";
+        generated_with = true;
+      };
+    };
+  };
 }
