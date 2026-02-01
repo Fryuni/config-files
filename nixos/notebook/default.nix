@@ -9,6 +9,7 @@
     ./nvidia.nix
     ../modules/development.nix
     ../modules/gaming.nix
+    ../modules/networking/tailscale.nix
   ];
 
   boot.loader.systemd-boot.enable = true;
@@ -19,18 +20,19 @@
   boot.extraModulePackages = with config.boot.kernelPackages; [zenpower];
 
   networking.hostName = "lotus-notebook";
-  networking.nameservers = lib.mkForce [
-    "45.90.28.0#G5--Note-f7fd51.dns.nextdns.io"
-    "2a07:a8c0::#G5--Note-f7fd51.dns.nextdns.io"
-    "45.90.30.0#G5--Note-f7fd51.dns.nextdns.io"
-    "2a07:a8c1::#G5--Note-f7fd51.dns.nextdns.io"
-  ];
-  services.resolved.domains = lib.mkForce [
-    "45.90.28.0#G5--Note-f7fd51.dns.nextdns.io"
-    "2a07:a8c0::#G5--Note-f7fd51.dns.nextdns.io"
-    "45.90.30.0#G5--Note-f7fd51.dns.nextdns.io"
-    "2a07:a8c1::#G5--Note-f7fd51.dns.nextdns.io"
-  ];
+
+  # networking.nameservers = lib.mkForce [
+  #   "45.90.28.0#G5--Note-f7fd51.dns.nextdns.io"
+  #   "2a07:a8c0::#G5--Note-f7fd51.dns.nextdns.io"
+  #   "45.90.30.0#G5--Note-f7fd51.dns.nextdns.io"
+  #   "2a07:a8c1::#G5--Note-f7fd51.dns.nextdns.io"
+  # ];
+  # services.resolved.domains = lib.mkForce [
+  #   "45.90.28.0#G5--Note-f7fd51.dns.nextdns.io"
+  #   "2a07:a8c0::#G5--Note-f7fd51.dns.nextdns.io"
+  #   "45.90.30.0#G5--Note-f7fd51.dns.nextdns.io"
+  #   "2a07:a8c1::#G5--Note-f7fd51.dns.nextdns.io"
+  # ];
 
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
