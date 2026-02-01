@@ -115,6 +115,7 @@
         "node"
         "npm"
         "yarn"
+        "pnpm"
         "rust"
         "command-not-found"
         "sudo"
