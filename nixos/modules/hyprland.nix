@@ -26,34 +26,15 @@
     };
   };
 
-  # Environment variables for Wayland
+  # Global environment variables (apply to all sessions)
   environment.sessionVariables = {
-    # Wayland
-    XDG_SESSION_TYPE = "wayland";
-    XDG_CURRENT_DESKTOP = "Hyprland";
-    XDG_SESSION_DESKTOP = "Hyprland";
-
-    # Qt Wayland
-    QT_QPA_PLATFORM = "wayland;xcb";
-    QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
-
-    # GTK
-    GDK_BACKEND = "wayland,x11";
+    # GTK theme (works for both X11 and Wayland)
     GTK_THEME = "Adwaita:dark";
 
     # Color scheme preference
     COLOR_SCHEME = "dark";
 
-    # SDL
-    SDL_VIDEODRIVER = "wayland";
-
-    # Clutter
-    CLUTTER_BACKEND = "wayland";
-
-    # Firefox/Mozilla
-    MOZ_ENABLE_WAYLAND = "1";
-
-    # Electron apps
+    # Electron apps - use Wayland when available (safe for X11 too)
     NIXOS_OZONE_WL = "1";
   };
 

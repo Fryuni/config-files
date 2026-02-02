@@ -9,14 +9,11 @@ in {
     nvtopPackages.nvidia
   ];
 
-  # NVIDIA Wayland environment variables
+  # NVIDIA environment variables (work for both X11 and Wayland)
   environment.sessionVariables = {
-    # Use NVIDIA GBM backend
+    # Use NVIDIA GBM backend (needed for Wayland compositors)
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-
-    # Disable hardware cursors (fixes cursor issues on NVIDIA)
-    WLR_NO_HARDWARE_CURSORS = "1";
 
     # Use legacy DRM flip (helps with some rendering issues)
     __GL_GSYNC_ALLOWED = "1";

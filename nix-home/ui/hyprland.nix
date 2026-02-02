@@ -56,6 +56,33 @@ in {
     ];
 
     settings = {
+      # Wayland-specific environment variables (only apply to Hyprland session)
+      env = [
+        # Wayland session identifiers
+        "XDG_SESSION_TYPE,wayland"
+        "XDG_CURRENT_DESKTOP,Hyprland"
+        "XDG_SESSION_DESKTOP,Hyprland"
+
+        # Qt Wayland
+        "QT_QPA_PLATFORM,wayland;xcb"
+        "QT_WAYLAND_DISABLE_WINDOWDECORATION,1"
+
+        # GTK - prefer Wayland, fallback to X11
+        "GDK_BACKEND,wayland,x11"
+
+        # SDL
+        "SDL_VIDEODRIVER,wayland"
+
+        # Clutter
+        "CLUTTER_BACKEND,wayland"
+
+        # Firefox/Mozilla
+        "MOZ_ENABLE_WAYLAND,1"
+
+        # NVIDIA Wayland workarounds
+        "WLR_NO_HARDWARE_CURSORS,1"
+      ];
+
       # Monitor configuration
       # Use `hyprctl monitors` to find your monitor names
       monitor = [
