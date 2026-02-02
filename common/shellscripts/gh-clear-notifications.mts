@@ -18,21 +18,17 @@ import { $ } from "bun";
 const RATE_LIMIT_PER_SECOND = 15;
 
 const criterias = {
-  'i18n in title': (notification) => {
-    const title = notification.subject.title.toLowerCase();
-    return title.includes("i18n") || title.includes("a11y");
-  },
-  'cloudflare in title': (notification) => notification.subject.title.toLowerCase().includes("cloudflare"),
-  '[ci] in title': (notification) => notification.subject.title.toLowerCase().includes("[ci]"),
-  '[wip] in title': (notification) => notification.subject.title.toLowerCase().includes("[wip]"),
-  '[do not merge] in title': (notification) => notification.subject.title.toLowerCase().includes("[do not merge]"),
+  'i18n': (notification) => matchOn(notification.subject.title, ['i18n', 'a11y']),
+  'cloudflare': (notification) => matchOn(notification.subject.title, ['cloudflare']),
+  'CI': (notification) => matchOn(notification.subject.title, ['[ci]', /\bci:/]),
+  'WIP': (notification) => matchOn(notification.subject.title, ["[wip]"]),
+  'do not merge': (notification) => matchOn(notification.subject.title, ["[do not merge]"]),
   'new release': (notification) => notification.subject.type === "Release",
-  'ignored org': (notification) => {
-    const ignoredOrgs = ["withstudiocms", "croct-tech"];
-    const owner = notification.repository.owner.login.toLowerCase();
-    return ignoredOrgs.includes(owner);
-  },
-  'opened by bot': (_, details) => isBot(details?.user),
+  'ignored org': (notification) => matchOn(
+    notification.repository.owner.login,
+    [/^withstudiocms$/, /^croct-tech$/]
+  ),
+  'bot': (_, details) => isBot(details?.user),
   'draft PR': (_, details) => details?.draft === true,
   'closed issue/PR': (_, details) => details?.state === "closed",
   'closed discussion': async (notification) => {
@@ -46,10 +42,23 @@ const criterias = {
 
 const unsubscribeCriterias = new Set<keyof typeof criterias>([
   'ignored org',
-  '[ci] in title',
-  'opened by bot',
-  'i18n in title',
+  'CI',
+  'bot',
+  'i18n',
 ]);
+
+function matchOn(value: string | undefined, patterns: Array<string | RegExp>): boolean {
+  if (!value) return false;
+  const lowerValue = value.toLowerCase();
+  for (const pattern of patterns) {
+    if (typeof pattern === "string" && lowerValue.includes(pattern.toLowerCase())) {
+      return true;
+    } else if (pattern instanceof RegExp && pattern.test(value)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 type Criteria = (notification: Notification, details: SubjectDetails | null) => boolean | Promise<boolean>;
 
