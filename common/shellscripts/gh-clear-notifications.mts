@@ -1,14 +1,14 @@
 #!/usr/bin/env bun
 /**
  * GitHub Notifications Manager
- * 
+ *
  * Filters and marks GitHub notifications as done based on criteria:
  * - Merged pull requests
  * - Closed issues/discussions
  * - New releases
  * - Issues/PRs with "i18n" in title
  * - Issues/PRs opened by bots
- * 
+ *
  * Rate limited to 5 requests per second
  */
 
@@ -18,40 +18,49 @@ import { $ } from "bun";
 const RATE_LIMIT_PER_SECOND = 15;
 
 const criterias = {
-  'i18n': (notification) => matchOn(notification.subject.title, ['i18n', 'a11y']),
-  'cloudflare': (notification) => matchOn(notification.subject.title, ['cloudflare']),
-  'CI': (notification) => matchOn(notification.subject.title, ['[ci]', /\bci:/]),
-  'WIP': (notification) => matchOn(notification.subject.title, ["[wip]"]),
-  'do not merge': (notification) => matchOn(notification.subject.title, ["[do not merge]"]),
-  'new release': (notification) => notification.subject.type === "Release",
-  'ignored org': (notification) => matchOn(
-    notification.repository.owner.login,
-    [/^withstudiocms$/, /^croct-tech$/]
-  ),
-  'bot': (_, details) => isBot(details?.user),
-  'draft PR': (_, details) => details?.draft === true,
-  'closed issue/PR': (_, details) => details?.state === "closed",
-  'closed discussion': async (notification) => {
+  i18n: (notification) => matchOn(notification.subject.title, ["i18n", "a11y"]),
+  cloudflare: (notification) =>
+    matchOn(notification.subject.title, ["cloudflare"]),
+  CI: (notification) => matchOn(notification.subject.title, ["[ci]", /\bci:/]),
+  WIP: (notification) => matchOn(notification.subject.title, ["[wip]"]),
+  "do not merge": (notification) =>
+    matchOn(notification.subject.title, ["[do not merge]"]),
+  "new release": (notification) => notification.subject.type === "Release",
+  "ignored org": (notification) =>
+    matchOn(notification.repository.owner.login, [
+      /^withstudiocms$/,
+      /^croct-tech$/,
+    ]),
+  bot: (_, details) => isBot(details?.user),
+  "draft PR": (_, details) => details?.draft === true,
+  "closed issue/PR": (_, details) => details?.state === "closed",
+  "closed discussion": async (notification) => {
     if (notification.subject.type !== "Discussion") {
       return false;
     }
     const state = await checkDiscussionState(notification.subject.url);
     return state === "closed";
-  }
+  },
 } satisfies Record<string, Criteria>;
 
 const unsubscribeCriterias = new Set<keyof typeof criterias>([
-  'ignored org',
-  'CI',
-  'bot',
-  'i18n',
+  "ignored org",
+  "CI",
+  "bot",
+  "i18n",
 ]);
 
-function matchOn(value: string | undefined, patterns: Array<string | RegExp>): boolean {
+function matchOn(
+  value: string | undefined,
+  patterns: Array<string | RegExp>,
+): boolean {
   if (!value) return false;
   const lowerValue = value.toLowerCase();
   for (const pattern of patterns) {
-    if (typeof pattern === "string" && lowerValue.includes(pattern.toLowerCase())) {
+    if (
+      typeof pattern === "string" &&
+      lowerValue.includes(pattern.toLowerCase())
+    ) {
       return true;
     } else if (pattern instanceof RegExp && pattern.test(value)) {
       return true;
@@ -60,7 +69,10 @@ function matchOn(value: string | undefined, patterns: Array<string | RegExp>): b
   return false;
 }
 
-type Criteria = (notification: Notification, details: SubjectDetails | null) => boolean | Promise<boolean>;
+type Criteria = (
+  notification: Notification,
+  details: SubjectDetails | null,
+) => boolean | Promise<boolean>;
 
 // Types for GitHub API responses
 interface Notification {
@@ -134,7 +146,9 @@ class RateLimiter {
       const timeSinceLastRequest = now - this.lastRequestTime;
 
       if (timeSinceLastRequest < this.minInterval) {
-        await new Promise(r => setTimeout(r, this.minInterval - timeSinceLastRequest));
+        await new Promise((r) =>
+          setTimeout(r, this.minInterval - timeSinceLastRequest),
+        );
       }
 
       const resolve = this.queue.shift();
@@ -152,7 +166,9 @@ class RateLimiter {
 const rateLimiter = new RateLimiter(RATE_LIMIT_PER_SECOND);
 
 // Parse owner/repo/number from subject URL
-function parseSubjectUrl(url: string): { owner: string; repo: string; number: number } | null {
+function parseSubjectUrl(
+  url: string,
+): { owner: string; repo: string; number: number } | null {
   const match = url.match(/repos\/([^/]+)\/([^/]+)\/(?:issues|pulls)\/(\d+)$/);
   if (!match) return null;
   return {
@@ -174,14 +190,18 @@ async function fetchNotifications(): Promise<Notification[]> {
   const { stdout, exitCode } = await $`gh api notifications --paginate`.quiet();
 
   if (exitCode !== 0) {
-    throw new Error("Failed to fetch notifications. Make sure you're authenticated with 'gh auth login'");
+    throw new Error(
+      "Failed to fetch notifications. Make sure you're authenticated with 'gh auth login'",
+    );
   }
 
   return JSON.parse(stdout.toString());
 }
 
 // Fetch subject details (issue or PR) with rate limiting
-async function fetchSubjectDetails(notification: Notification): Promise<SubjectDetails | null> {
+async function fetchSubjectDetails(
+  notification: Notification,
+): Promise<SubjectDetails | null> {
   const parsed = parseSubjectUrl(notification.subject.url);
   if (!parsed) return null;
 
@@ -203,7 +223,9 @@ async function fetchSubjectDetails(notification: Notification): Promise<SubjectD
     const { stdout } = await $`gh api ${endpoint}`.quiet();
     return JSON.parse(stdout.toString());
   } catch (error) {
-    console.error(`⚠️  Failed to fetch details for ${notification.repository.full_name} #${number}`);
+    console.error(
+      `⚠️  Failed to fetch details for ${notification.repository.full_name} #${number}`,
+    );
     return null;
   }
 }
@@ -211,27 +233,32 @@ async function fetchSubjectDetails(notification: Notification): Promise<SubjectD
 // Check discussion state with rate limiting
 async function checkDiscussionState(url: string): Promise<string> {
   const parsed = parseSubjectUrl(url);
-  if (!parsed) return 'unknown';
+  if (!parsed) return "unknown";
 
   await rateLimiter.acquire();
 
   try {
-    const { stdout } = await $`gh api repos/${parsed.owner}/${parsed.repo}/discussions/${parsed.number}`.quiet();
+    const { stdout } =
+      await $`gh api repos/${parsed.owner}/${parsed.repo}/discussions/${parsed.number}`.quiet();
     const discussion = JSON.parse(stdout.toString());
     return discussion.state;
   } catch {
-    return 'unknown';
+    return "unknown";
   }
 }
 
 // Filter a single notification
-async function filterNotification(notification: Notification, index: number): Promise<FilterResult> {
+async function filterNotification(
+  notification: Notification,
+  index: number,
+): Promise<FilterResult> {
   const matchCriteria: (keyof typeof criterias)[] = [];
   const type = notification.subject.type;
   const title = notification.subject.title;
-  const details = type === "Issue" || type === "PullRequest"
-    ? await fetchSubjectDetails(notification)
-    : null;
+  const details =
+    type === "Issue" || type === "PullRequest"
+      ? await fetchSubjectDetails(notification)
+      : null;
 
   for (const [criteriaName, criteriaFunc] of Object.entries(criterias)) {
     if (await criteriaFunc(notification, details)) {
@@ -258,9 +285,13 @@ async function filterNotification(notification: Notification, index: number): Pr
 }
 
 // Filter notifications in parallel with rate limiting
-async function filterNotifications(notifications: Notification[]): Promise<NotificationMatch[]> {
+async function filterNotifications(
+  notifications: Notification[],
+): Promise<NotificationMatch[]> {
   const total = notifications.length;
-  console.log(`\n🔍 Analyzing ${total} notifications in parallel (max ${RATE_LIMIT_PER_SECOND} req/sec)...\n`);
+  console.log(
+    `\n🔍 Analyzing ${total} notifications in parallel (max ${RATE_LIMIT_PER_SECOND} req/sec)...\n`,
+  );
 
   let completed = 0;
 
@@ -284,8 +315,8 @@ async function filterNotifications(notifications: Notification[]): Promise<Notif
 
   // Collect matches
   return results
-    .filter(r => r.match !== null)
-    .map(r => r.match!)
+    .filter((r) => r.match !== null)
+    .map((r) => r.match!)
     .sort((a, b) => a.repository.localeCompare(b.repository));
 }
 
@@ -299,14 +330,16 @@ function displayTable(matches: NotificationMatch[]): void {
   console.log(`\n📋 Found ${matches.length} matching notifications:\n`);
 
   console.table(
-    matches.map(m => ({
-      'Repository': m.repository,
-      'Type': m.type,
-      'Title': m.title,
-      'Unsubscribing': m.matchCriteria.some(c => unsubscribeCriterias.has(c)) ? 'Yes' : 'No',
-      'Match Criteria': m.matchCriteria.join(", "),
+    matches.map((m) => ({
+      Repository: m.repository,
+      Type: m.type,
+      Title: m.title,
+      Unsubscribing: m.matchCriteria.some((c) => unsubscribeCriterias.has(c))
+        ? "Yes"
+        : "No",
+      "Match Criteria": m.matchCriteria.join(", "),
     })),
-    ['Repository', 'Type', 'Title', 'Unsubscribing', 'Match Criteria'],
+    ["Repository", "Type", "Title", "Unsubscribing", "Match Criteria"],
   );
 
   console.log();
@@ -327,17 +360,24 @@ async function askConfirmation(count: number): Promise<boolean> {
 }
 
 // Mark a single notification as done with rate limiting
-async function markNotificationAsDone(match: NotificationMatch, index: number, total: number): Promise<boolean> {
-  const shouldUnsubscribe = match.matchCriteria.some(c => unsubscribeCriterias.has(c));
+async function markNotificationAsDone(
+  match: NotificationMatch,
+  index: number,
+  total: number,
+): Promise<boolean> {
+  const shouldUnsubscribe = match.matchCriteria.some((c) =>
+    unsubscribeCriterias.has(c),
+  );
 
   try {
     if (shouldUnsubscribe) {
       await rateLimiter.acquire();
-      await $`gh api -X DELETE notifications/threads/${match.id}/subscription`.quiet()
+      await $`gh api -X DELETE notifications/threads/${match.id}/subscription`.quiet();
     }
 
     await rateLimiter.acquire();
-    const { exitCode } = await $`gh api -X DELETE notifications/threads/${match.id}`.quiet();
+    const { exitCode } =
+      await $`gh api -X DELETE notifications/threads/${match.id}`.quiet();
     return exitCode === 0;
   } catch {
     return false;
@@ -346,7 +386,9 @@ async function markNotificationAsDone(match: NotificationMatch, index: number, t
 
 // Mark notifications as done in parallel with rate limiting
 async function markAsDone(matches: NotificationMatch[]): Promise<void> {
-  console.log(`\n🗑️  Marking ${matches.length} notifications as done (max ${RATE_LIMIT_PER_SECOND} req/sec)...\n`);
+  console.log(
+    `\n🗑️  Marking ${matches.length} notifications as done (max ${RATE_LIMIT_PER_SECOND} req/sec)...\n`,
+  );
 
   let completed = 0;
   let success = 0;
@@ -365,7 +407,9 @@ async function markAsDone(matches: NotificationMatch[]): Promise<void> {
     }
 
     if (completed % 5 === 0 || completed === matches.length) {
-      process.stdout.write(`\r⏳ Marking: ${completed}/${matches.length} (✅ ${success} | ❌ ${failed})`);
+      process.stdout.write(
+        `\r⏳ Marking: ${completed}/${matches.length} (✅ ${success} | ❌ ${failed})`,
+      );
     }
 
     return result;
@@ -416,9 +460,11 @@ async function main(): Promise<void> {
     } else {
       console.log("\n❌ Operation cancelled.\n");
     }
-
   } catch (error) {
-    console.error("\n❌ Error:", error instanceof Error ? error.message : error);
+    console.error(
+      "\n❌ Error:",
+      error instanceof Error ? error.message : error,
+    );
     process.exit(1);
   }
 
