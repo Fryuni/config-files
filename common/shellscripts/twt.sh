@@ -103,6 +103,8 @@ fi
 
 FULL_PATH=$(realpath "$selected")
 
+zoxide add "$FULL_PATH"
+
 echo "Starting tmux session in worktree: $selected"
 
 # determine if the tmux server is running
