@@ -101,8 +101,8 @@
     version = "0.1.34";
   };
   cargo-expand = {
-    crateSha256 = "sha256-FdhU7aja+/J6yntLsl5w7+Iwendq+xxLOFJjP8NGrOI=";
-    depsHash = "sha256-uzoBSN8YiDljGn84OUDJmIMN7wWKgxPXdvBsLXf+OiM=";
+    crateSha256 = "sha256-7uT/4mu+Oh4Bf1NJaEvCgTO2ECBEqhigSVx+ARoj29A=";
+    depsHash = "sha256-oaizW58jwE5umH72w1txe4YJ0k0HCuRe7fYNwSpmkD8=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -118,11 +118,11 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.119";
+    version = "1.0.120";
   };
   cargo-lock = {
-    crateSha256 = "sha256-Gz459c2IWD19RGBg2TyHbI/VNCelha+R0FeNkAaHksU=";
-    depsHash = "sha256-Kw1LWu/DYfeuf5aMaNslnDyEoaRj0J+yxWs7sKHyWlU=";
+    crateSha256 = "sha256-l8B98ycfC17vUY29BbFoucGeAn8mapchCvjdMCNhKqc=";
+    depsHash = "sha256-l76udCsgloW5tZ8TgNMOT47un2Epun0B3UjaHCWdZjE=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
@@ -166,7 +166,7 @@
         url = "https://github.com/rustsec";
       }
     ];
-    version = "11.0.0";
+    version = "11.0.1";
   };
   cargo-public-api = {
     crateSha256 = "sha256-Lg8X0t5u4Mq/eWc0yfuLyn4HlE+j6qSsLE+MFBjBpbk=";
@@ -198,8 +198,8 @@
     version = "0.50.2";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-RyA/PS7qsODAVacTvIAL4hvGPeufpvGXX5nh4xKw/co=";
-    depsHash = "sha256-meF1qnISB60JXKZyYfnwE2LywGqKEVgZbwzZQEZ1Cmc=";
+    crateSha256 = "sha256-jPgR4K4fH3onCtSaKr4UhoGk4WdonwDppI9GHgp4lSU=";
+    depsHash = "sha256-lP4yXCuJ89NqUBZR6zgGi5B570y+5IaabWyzd9qqa3o=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
@@ -215,7 +215,7 @@
         url = "https://github.com/obi1kenobi";
       }
     ];
-    version = "0.45.0";
+    version = "0.46.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-U/LakNUSPqj6FmYimi5ZNVJCRiS7zM4Vzvu4Gb3w38Q=";
