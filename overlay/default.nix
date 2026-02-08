@@ -21,6 +21,9 @@ in [
   (import ./croct.nix)
   (import ./pulumi)
   (import ./rustPackages)
+  (final: pkgs: {
+    oh-my-opencode = pkgs.callPackage ./oh-my-opencode.nix {};
+  })
   (final: pkgs: let
     inherit (pkgs.stdenv.hostPlatform) system;
   in {
