@@ -78,7 +78,7 @@ else
   # Compute hash of the root dir to create a unique git dir for the worktree
   git_dir_hash=$(echo -n "$root_dir" | sha1sum | awk '{print $1}')
 
-  worktree_path="${base_dir}/${git_dir_hash}/${name}_${branch_name}"
+  worktree_path="${base_dir}/${git_dir_hash}/${name}_${selected}"
 
   mkdir -p "$(dirname "$worktree_path")"
 
