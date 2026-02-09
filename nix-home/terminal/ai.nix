@@ -53,6 +53,7 @@ in {
 
     # AI auxiliary tools
     mcp-grafana
+    rustCrates.skill-manager
   ];
 
   home.file.".config/crush/crush.json".text = builtins.toJSON {
