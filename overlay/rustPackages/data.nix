@@ -275,26 +275,6 @@
     ];
     version = "8.5.3";
   };
-  skill-manager = {
-    crateSha256 = "sha256-IjdJ62f5S1lVWIW4avAiYZZTUpABM5N+EqWqM3sQznE=";
-    depsHash = "sha256-ZTIGZb4KmhIdqR90dHlDuNWrXJRm9rmu+ErGpXZCbko=";
-    description = "Manage AI coding tool skills for Claude, OpenCode, Cursor, and Codex";
-    homepage = null;
-    id = "skill-manager";
-    keywords = ["ai" "claude" "cli" "codex" "cursor"];
-    owners = [
-      {
-        avatar = "https://avatars.githubusercontent.com/u/12162406?v=4";
-        email = null;
-        id = 372386;
-        kind = "user";
-        login = "pyrex41";
-        name = null;
-        url = "https://github.com/pyrex41";
-      }
-    ];
-    version = "0.9.0";
-  };
   toml-merge = {
     crateSha256 = "sha256-ZRfTxA5xjA/V6VtecwdyyGkMC6o+kd2ipRCwJ19Zvfg=";
     depsHash = "sha256-xZmPC+rqQVikIhbRZ0U2gQx9MvBfdSbALIUBJObtpiE=";

@@ -15,7 +15,7 @@ final: prev: let
 
   makePkg = name: definition: let
     extra = extras.${name} or {};
-    safeExtras = builtins.removeAttrs extra ["nativeBuildInputs"];
+    safeExtras = builtins.removeAttrs extra ["nativeBuildInputs" "mainProgram"];
   in
     rustPlatform.buildRustPackage ({
         pname = name;
@@ -38,7 +38,7 @@ final: prev: let
           inherit (definition) description keywords;
           homepage = definition.homepage or "https://crates.io/crates/${name}";
           documentation = "https://docs.rs/${name}/${definition.version}";
-          mainProgram = definition.mainProgram or name;
+          mainProgram = extra.mainProgram or definition.mainProgram or name;
           maintainers = [final.lib.maintainers.fryuni];
         };
       }

@@ -8,10 +8,6 @@ pkgs: {
   cargo-edit = {
     buildInputs = with pkgs; [openssl];
   };
-  skill-manager = {
-    nativeBuildInputs= with pkgs; [openssl];
-    buildInputs = with pkgs; [openssl];
-  };
   prr = {
     buildInputs = with pkgs; [openssl];
   };
