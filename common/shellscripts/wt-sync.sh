@@ -56,7 +56,7 @@ while IFS= read -r file; do
       fi
     fi
   fi
-done < <(git ls-files --others --ignored --exclude-standard | grep -v -E '^(node_modules/|vendor/|build/|coverage/|\.wt/|\.direnv/|unsafe)')
+done < <(git ls-files --others --ignored --exclude-standard | grep -v -E '(^|/)(node_modules|vendor|build|coverage|\.wt|\.direnv|unsafe)(/|$)')
 
 echo
 echo "Done. Copied: $copied, Overwritten: $overwritten, Skipped: $skipped"

@@ -88,7 +88,7 @@ else
   # Exclude well-known package directories
   echo "Copying untracked files to new worktree..."
   git ls-files --others --ignored --exclude-standard |
-    grep -v -E '^(node_modules/|vendor/|\.wt/|\.direnv/|unsafe)' |
+    grep -v -E '(^|/)(node_modules|vendor|\.wt|\.direnv|unsafe)(/|$)' |
     while IFS= read -r file; do
       if [[ -f "$file" ]]; then
         target_dir="$worktree_path/$(dirname "$file")"
