@@ -54,6 +54,7 @@ in {
     # AI auxiliary tools
     mcp-grafana
     llm-agents.skills-installer
+    llm-agents.ccusage-opencode
   ];
 
   home.file.".config/crush/crush.json".text = builtins.toJSON {
