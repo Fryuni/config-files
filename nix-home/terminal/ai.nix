@@ -37,7 +37,7 @@ in {
       VERTEXAI_PROJECT = "croct-dev";
       GOOGLE_APPLICATION_CREDENTIALS = config.age.secrets.google-account.path;
     })
-    (makeAuthWrapper master.opencode {
+    (makeAuthWrapper llm-agents.opencode {
       VERTEX_LOCATION = "global";
       GOOGLE_CLOUD_PROJECT = "croct-dev";
       GOOGLE_APPLICATION_CREDENTIALS = config.age.secrets.google-account.path;
@@ -45,16 +45,10 @@ in {
     (makeAuthWrapper nur.repos.charmbracelet.mods {
       OPENAI_API_KEY = {file = config.age.secrets.openai-key.path;};
     })
-    (makeAuthWrapper oh-my-opencode {
-      VERTEX_LOCATION = "global";
-      GOOGLE_CLOUD_PROJECT = "croct-dev";
-      GOOGLE_APPLICATION_CREDENTIALS = config.age.secrets.google-account.path;
-    })
 
     # AI auxiliary tools
     mcp-grafana
     llm-agents.skills-installer
-    llm-agents.ccusage-opencode
   ];
 
   home.file.".config/crush/crush.json".text = builtins.toJSON {
