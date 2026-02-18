@@ -51,6 +51,11 @@ in {
     llm-agents.skills-installer
   ];
 
+  programs.zsh.shellAliases = {
+    clear-mods-conversations = "rm -rf ~/.local/share/mods/conversations";
+    oc = "opencode";
+  };
+
   home.file.".config/crush/crush.json".text = builtins.toJSON {
     mcp = {
       github = {
