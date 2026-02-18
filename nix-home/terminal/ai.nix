@@ -57,6 +57,7 @@ in {
     clear-mods-conversations = "rm -rf ~/.local/share/mods/conversations";
     oc = "opencode";
     wm = "workmux";
+    wmd = "workmux dashboard";
   };
 
   home.file.".config/crush/crush.json".text = builtins.toJSON {

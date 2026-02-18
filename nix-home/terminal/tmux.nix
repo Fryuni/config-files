@@ -25,6 +25,7 @@ in {
       bind -T copy-mode-vi y send-keys -X copy-pipe  # Only copy, no cancel
 
       bind l run-shell "workmux last-done"
+      bind C-s display-popup -h 30 -w 100 -E "workmux dashboard"
 
       # Lower escape-time, recommended by NeoVIM
       set-option -sg escape-time 10
