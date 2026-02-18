@@ -50,6 +50,7 @@ in {
     mcp-grafana
     llm-agents.skills-installer
     llm-agents.workmux
+    llm-agents.tuicr
   ];
 
   programs.zsh.shellAliases = {

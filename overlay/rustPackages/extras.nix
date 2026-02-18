@@ -11,6 +11,11 @@ pkgs: {
   prr = {
     buildInputs = with pkgs; [openssl];
   };
+  octorus = {
+    mainProgram = "or";
+    nativeBuildInputs = with pkgs; [autoPatchelfHook];
+    buildInputs = with pkgs; [stdenv.cc.cc.lib];
+  };
   zellij = {
     nativeBuildInputs = with pkgs; [
       perl
