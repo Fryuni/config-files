@@ -24,6 +24,8 @@ in {
       # use ordinary `Enter`
       bind -T copy-mode-vi y send-keys -X copy-pipe  # Only copy, no cancel
 
+      bind l run-shell "workmux last-done"
+
       # Lower escape-time, recommended by NeoVIM
       set-option -sg escape-time 10
 
