@@ -98,6 +98,16 @@ else
     done
 
   echo "Created worktree at $worktree_path"
+
+  (
+    cd "$worktree_path"
+    direnv allow
+    if [[ -x .wt/setup ]]; then
+      echo "Running .wt/setup..."
+      .wt/setup
+    fi
+  )
+
   selected="$worktree_path"
 fi
 
