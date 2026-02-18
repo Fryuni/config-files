@@ -49,11 +49,13 @@ in {
     # AI auxiliary tools
     mcp-grafana
     llm-agents.skills-installer
+    llm-agents.workmux
   ];
 
   programs.zsh.shellAliases = {
     clear-mods-conversations = "rm -rf ~/.local/share/mods/conversations";
     oc = "opencode";
+    wm = "workmux";
   };
 
   home.file.".config/crush/crush.json".text = builtins.toJSON {
