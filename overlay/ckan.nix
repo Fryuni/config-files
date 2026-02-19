@@ -16,8 +16,6 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-vysUBMy4+ymyivE2XvrC6xxLv5zn9eKwYaJETdb5StQ=";
   };
 
-  system = "x86_64-linux";
-
   # Required for compilation
   nativeBuildInputs = [
     autoPatchelfHook
@@ -43,11 +41,9 @@ stdenv.mkDerivation rec {
     rm -rf $out/usr/bin
   '';
 
-  # meta =  {
-  #   description = "The Comprehensive Kerbal Archive Network";
-  #   homepage = "https://github.com/KSP-CKAN/CKAN";
-  #   license = licenses.mit;
-  #   maintainers = with stdenv.lib.maintainers; [ ];
-  #   platforms = [ "x86_64-linux" ];
-  # };
+  meta = {
+    description = "The Comprehensive Kerbal Archive Network";
+    homepage = "https://github.com/KSP-CKAN/CKAN";
+    platforms = ["x86_64-linux"];
+  };
 }
