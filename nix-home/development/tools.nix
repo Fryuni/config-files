@@ -96,7 +96,7 @@
 
   services.node-red = {
     enable = true;
-    configFile = ../../common/node-red.js;
+    configFile = "${../../common/node-red.js}";
     repo = "git@gitlab.com:Fryuni/node-red-config.git";
     environment = {
       CREDENTIALS_FILE = config.age.secrets.node-red-key.path;

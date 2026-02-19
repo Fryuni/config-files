@@ -129,11 +129,11 @@ in {
         ExecStart = escapeShellArgs ([
             "${cfg.package}/bin/node-red"
           ]
-          ++ (cli.toGNUCommandLine {} {
+          ++ (cli.toCommandLineGNU {} {
             inherit (cfg) safe;
-            settings = toString cfg.configFile;
+            settings = "${cfg.configFile}";
             port = toString cfg.port;
-            userDir = toString cfg.userDir;
+            userDir = "${cfg.userDir}";
             D = mapAttrsToList (name: value: "${name}=${value}") cfg.define;
           }));
       };
