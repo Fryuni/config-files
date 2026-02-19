@@ -2,6 +2,5 @@ main_branch: main
 merge_strategy: rebase
 
 pre_merge:
-  - '<global>'
   - 'nix run .#build'
   - 'nix run .#os-build'
