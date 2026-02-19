@@ -56,10 +56,10 @@ in {
     gojq
 
     # Charm.sh pretty binaries
-    nur.repos.charmbracelet.gum
-    nur.repos.charmbracelet.charm
-    nur.repos.charmbracelet.glow
-    nur.repos.charmbracelet.skate
+    gum
+    charm
+    glow
+    skate
 
     # Cloud
     terraform

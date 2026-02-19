@@ -42,7 +42,7 @@ in {
       GOOGLE_CLOUD_PROJECT = "croct-dev";
       GOOGLE_APPLICATION_CREDENTIALS = config.age.secrets.google-account.path;
     })
-    (makeAuthWrapper nur.repos.charmbracelet.mods {
+    (makeAuthWrapper mods {
       OPENAI_API_KEY = {file = config.age.secrets.openai-key.path;};
     })
 
