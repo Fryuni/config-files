@@ -27,6 +27,10 @@ in {
       bind l run-shell "workmux last-done"
       bind C-s display-popup -h 30 -w 100 -E "workmux dashboard"
 
+      bind '"' split-window -c "#{pane_current_path}"
+      bind % split-window -h -c "#{pane_current_path}"
+      # bind c new-window -c "#{pane_current_path}"
+
       # Lower escape-time, recommended by NeoVIM
       set-option -sg escape-time 10
 
