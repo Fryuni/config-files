@@ -101,10 +101,10 @@ else
 
   (
     cd "$worktree_path"
-    direnv allow
+    direnv allow || true
     if [[ -x .wt/setup ]]; then
       echo "Running .wt/setup..."
-      .wt/setup
+      .wt/setup || true
     fi
   )
 
