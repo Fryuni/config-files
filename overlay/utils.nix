@@ -78,6 +78,24 @@ final: pkgs: {
     vendorHash = "sha256-f82ibPnauUOuZ5D6Rz3Yyt0jiAXvjN8Or3gud+ri6FA=";
   };
 
+  gh = let
+    ghWithGo126 = pkgs.gh.override {
+      buildGoModule = pkgs.buildGo126Module;
+    };
+  in
+    ghWithGo126.overrideAttrs (old:
+      assert pkgs.lib.assertMsg (pkgs.lib.versionOlder old.version "2.87.1") "gh has been updated upstream, remove this override"; {
+        version = "2.87.1";
+        src = pkgs.fetchFromGitHub {
+          owner = "cli";
+          repo = "cli";
+          rev = "v2.87.1";
+          hash = "sha256-omwlYkMcef33YoOkr9N1+llJqwFW2+Y9JnGe7or2JUc=";
+        };
+        vendorHash = "sha256-jf0PYnv6SnyI5c++o7niLgu5knUiwDq/dOvYV9EhoKg=";
+        doCheck = false;
+      });
+
   inherit (pkgs.master) bun;
 
   ulauncher = pkgs.master.ulauncher.overridePythonAttrs {
