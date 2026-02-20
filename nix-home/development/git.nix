@@ -8,6 +8,7 @@
     gh # GitHub CLI
     glab # GitLab CLI
     lazygit
+    rustCrates.octorus
   ];
 
   programs.git = {
