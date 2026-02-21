@@ -231,7 +231,7 @@ in {
       "$mod" = "SUPER";
       "$terminal" = "ghostty";
       "$menu" = "rofi -show drun";
-      "$browser" = "google-chrome-stable";
+      "$browser" = "firefox-beta";
 
       bind = [
         # ===== Core Bindings =====
@@ -242,6 +242,7 @@ in {
         "$mod, N, exec, thunar"
         "$mod, D, exec, $menu"
         "$mod, B, exec, $browser"
+        "$mod SHIFT, B, exec, google-chrome-stable"
 
         # ===== Window State =====
         "$mod, F, fullscreen, 0" # True fullscreen
