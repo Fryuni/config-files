@@ -36,6 +36,7 @@ await prefillData();
 await fillHashes();
 
 process.chdir(REPO_DIR);
+await execFull('git', 'commit', 'add', `${import.meta.dirname}/data.nix`)
 await execFull('git', 'commit', '-m', "chore(tools): Update custom Rust crates", '--', `${import.meta.dirname}/data.nix`)
 
 async function fillHashes() {
