@@ -10,6 +10,7 @@
     ../modules/development.nix
     ../modules/gaming.nix
     ../modules/networking/tailscale.nix
+    ../secrets.nix
   ];
 
   boot.loader.systemd-boot.enable = true;

@@ -7,7 +7,6 @@
     # Include the results of the hardware scan.
     # /etc/nixos/hardware-configuration.nix
     ./nix-settings.nix
-    ./secrets.nix
     ./modules/networking
     ./modules/hyprland.nix
     ./users.nix

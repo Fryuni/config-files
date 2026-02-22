@@ -13,8 +13,11 @@
     package = pkgs.appimage-run;
   };
 
-  nix.extraOptions = ''
-    !include ${config.age.secrets.nix-access-tokens.path}
+  nix.extraOptions = let
+    secrets = config.age.secrets or {};
+    secretInclude = pkgs.lib.optionalString (secrets ? nix-access-tokens) "!include ${secrets.nix-access-tokens.path}";
+  in ''
+    ${secretInclude}
   '';
 
   nix.settings = {
