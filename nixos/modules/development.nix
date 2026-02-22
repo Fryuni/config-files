@@ -33,8 +33,4 @@
   };
 
   programs.wireshark.enable = true;
-
-  services.dgraph = {
-    enable = false;
-  };
 }

@@ -168,7 +168,7 @@
         system = flake-utils.lib.system.aarch64-linux;
 
         boxes = {
-          lotus-rpi3 = [
+          rpi3 = [
             home-manager.nixosModules.home-manager
             ./nixos/rpi3
           ];
