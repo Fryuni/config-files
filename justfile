@@ -1,6 +1,5 @@
 homeRoot := ".#homeConfigurations.lotus@lotus-notebook.activationPackage"
 sysRoot := ".#nixosConfigurations.lotus-notebook.config.system.build.toplevel"
-rpi3Image := ".#nixosConfigurations.lotus-rpi3.config.system.build.sdImage"
 
 default:
   nix flake metadata
@@ -51,5 +50,13 @@ apply-reload:
   sudo nixos-rebuild switch --flake .
   systemctl reboot
 
-build-rpi3-image:
-  nix build --impure --no-link --print-out-paths "{{rpi3Image}}"
+build-sd-image config:
+  nix build --impure --no-link --print-out-paths ".#nixosConfigurations.{{config}}.config.system.build.sdImage"
+
+flash-sd-image config device:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  image_path=$(nix build --impure --no-link --print-out-paths ".#nixosConfigurations.{{config}}.config.system.build.sdImage")
+  image_file=$(find "$image_path" -name '*.img.zst' | head -1)
+  echo "Flashing $image_file to {{device}}"
+  zstdcat "$image_file" | sudo dd of={{device}} bs=4M status=progress conv=fsync
