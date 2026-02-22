@@ -52,4 +52,4 @@ apply-reload:
   systemctl reboot
 
 build-rpi3-image:
-  nix build --no-link --print-out-paths "{{rpi3Image}}"
+  nix build --impure --no-link --print-out-paths "{{rpi3Image}}"

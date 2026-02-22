@@ -111,7 +111,7 @@
             crossSystem = final.stdenv.hostPlatform.system;
           }
           else {
-            system = final.stdenv.hostPlatform.system;
+            inherit (final.stdenv.hostPlatform) system;
           }
         );
     in {
@@ -166,7 +166,7 @@
       }
       {
         system = flake-utils.lib.system.aarch64-linux;
-        buildSystem = flake-utils.lib.system.x86_64-linux;
+
         boxes = {
           lotus-rpi3 = [
             home-manager.nixosModules.home-manager
@@ -182,7 +182,9 @@
       nixosConfigurations =
         builtins.foldl' (
           acc: entry: let
-            isCross = entry ? buildSystem;
+            isCross =
+              builtins ? currentSystem
+              && entry.system != builtins.currentSystem;
           in
             acc
             // builtins.mapAttrs (_: modules:
@@ -196,7 +198,7 @@
                     ++ nixpkgs.lib.optionals isCross [
                       {
                         nixpkgs.hostPlatform = entry.system;
-                        nixpkgs.buildPlatform = entry.buildSystem;
+                        nixpkgs.buildPlatform = builtins.currentSystem;
                         nixpkgs.config = nixpkgsConfig;
                         nixpkgs.overlays = [channelOverlays];
                       }
