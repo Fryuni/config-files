@@ -9,7 +9,6 @@
     "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
     inputs.nixos-hardware.nixosModules.raspberry-pi-3
     ../modules/networking/tailscale.nix
-    ./secrets.nix
   ];
 
   networking.hostName = "lotus-rpi3";
@@ -42,11 +41,6 @@
     };
   };
 
-  services.cachix-agent = {
-    enable = true;
-    credentialsFile = config.age.secrets.cachix-agent-token.path;
-  };
-
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
@@ -68,13 +62,6 @@
     trusted-users = ["root" "lotus"];
     experimental-features = ["nix-command" "flakes"];
     auto-optimise-store = true;
-
-    substituters = [
-      "https://fryuni.cachix.org"
-    ];
-    trusted-public-keys = [
-      "fryuni.cachix.org-1:YCNe73zqPG2YLIxxJkTXDz3/VFKcCiZAvHDIjEJIoDQ="
-    ];
   };
 
   nix.gc = {

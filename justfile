@@ -61,9 +61,5 @@ flash-sd-image config device:
   echo "Flashing $image_file to {{device}}"
   zstdcat "$image_file" | sudo dd of={{device}} bs=4M status=progress conv=fsync
 
-deploy config:
-  #!/usr/bin/env bash
-  set -euo pipefail
-  deploy_spec=$(nix build --impure --no-link --print-out-paths ".#deploy")
-  cachix push fryuni $(nix build --impure --no-link --print-out-paths ".#nixosConfigurations.{{config}}.config.system.build.toplevel")
-  cachix deploy activate "$deploy_spec/deploy.json"
+deploy config host:
+  nixos-rebuild switch --flake ".#{{config}}" --target-host "{{host}}" --sudo --impure
