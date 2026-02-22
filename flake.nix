@@ -81,7 +81,7 @@
   outputs = {
     self,
     nixpkgs,
-    # nixos-hardware,
+    nixos-hardware,
     home-manager,
     flake-utils,
     agenix,
@@ -132,38 +132,55 @@
           ++ (import ./overlay attrs);
       };
 
-    nixosModules = {
-      lotus-notebook = [
-        agenix.nixosModules.age
-        ./nixos
-        ./nixos/notebook
-      ];
-      gce-automation = [
-        "${nixpkgs}/nixos/modules/virtualisation/google-compute-image.nix"
-        ./servers/gce-automation
-      ];
-    };
+    nixosModules = [
+      {
+        system = flake-utils.lib.system.x86_64-linux;
+        boxes = {
+          lotus-notebook = [
+            agenix.nixosModules.age
+            ./nixos
+            ./nixos/notebook
+          ];
+          gce-automation = [
+            "${nixpkgs}/nixos/modules/virtualisation/google-compute-image.nix"
+            ./servers/gce-automation
+          ];
+        };
+      }
+      {
+        system = flake-utils.lib.system.aarch64-linux;
+        boxes = {
+          lotus-rpi3 = [
+            home-manager.nixosModules.home-manager
+            ./nixos/rpi3
+          ];
+        };
+      }
+    ];
 
     globalConfig = {
       templates = import ./templates attrs;
 
-      nixosConfigurations = builtins.mapAttrs (_: modules: let
-        system = flake-utils.lib.system.x86_64-linux;
-      in
-        nixpkgs.lib.nixosSystem
-        {
-          inherit system;
-          modules =
-            modules
-            ++ [
-              attrs.determinate.nixosModules.default
-            ];
-          pkgs = pkgsFun system;
-          specialArgs = {
-            inputs = attrs;
-          };
-        })
-      nixosModules;
+      nixosConfigurations =
+        builtins.foldl' (
+          acc: entry:
+            acc
+            // builtins.mapAttrs (_: modules:
+              nixpkgs.lib.nixosSystem {
+                inherit (entry) system;
+                modules =
+                  modules
+                  ++ [
+                    attrs.determinate.nixosModules.default
+                  ];
+                pkgs = pkgsFun entry.system;
+                specialArgs = {
+                  inputs = attrs;
+                };
+              })
+            entry.boxes
+        ) {}
+        nixosModules;
 
       homeConfigurations."lotus@lotus-notebook" = home-manager.lib.homeManagerConfiguration {
         pkgs = pkgsFun flake-utils.lib.system.x86_64-linux;

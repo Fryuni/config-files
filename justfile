@@ -1,5 +1,6 @@
 homeRoot := ".#homeConfigurations.lotus@lotus-notebook.activationPackage"
 sysRoot := ".#nixosConfigurations.lotus-notebook.config.system.build.toplevel"
+rpi3Image := ".#nixosConfigurations.lotus-rpi3.config.system.build.sdImage"
 
 default:
   nix flake metadata
@@ -50,3 +51,5 @@ apply-reload:
   sudo nixos-rebuild switch --flake .
   systemctl reboot
 
+build-rpi3-image:
+  nix build --no-link --print-out-paths "{{rpi3Image}}"
