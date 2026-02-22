@@ -76,6 +76,9 @@
       inputs.nixpkgs.follows = "nixpkgs-stable";
       inputs.flake-compat.follows = "flake-compat";
     };
+    cachix-deploy-flake = {
+      url = "github:cachix/cachix-deploy-flake";
+    };
   };
 
   outputs = {
@@ -169,6 +172,7 @@
 
         boxes = {
           lotus-rpi3 = [
+            agenix.nixosModules.age
             home-manager.nixosModules.home-manager
             ./nixos/rpi3
           ];
@@ -232,6 +236,7 @@
 
     perSystemConfig = flake-utils.lib.eachDefaultSystem (system: let
       pkgs = pkgsFun system;
+      cachix-deploy-lib = attrs.cachix-deploy-flake.lib pkgs;
     in {
       legacyPackages = pkgs;
 
@@ -244,6 +249,12 @@
       apps = import ./commands.nix {
         inherit self pkgs;
         homeManagerBin = "${home-manager.packages.${system}.home-manager}/bin/home-manager";
+      };
+
+      packages.deploy = cachix-deploy-lib.spec {
+        agents = {
+          lotus-rpi3 = self.nixosConfigurations.lotus-rpi3.config.system.build.toplevel;
+        };
       };
     });
   in
