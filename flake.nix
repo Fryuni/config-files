@@ -87,48 +87,65 @@
     agenix,
     ...
   } @ attrs: let
-    pkgsFun = system: let
-      config = {
-        allowUnfree = true;
-        permittedInsecurePackages = [
-        ];
-        # https://github.com/NixOS/nixpkgs/pull/258447
-        # https://discourse.nixos.org/t/your-system-configures-nixpkgs-with-an-externally-created-instance/33802
-        pulseaudio = true;
+    nixpkgsConfig = {
+      allowUnfree = true;
+      permittedInsecurePackages = [
+      ];
+      # https://github.com/NixOS/nixpkgs/pull/258447
+      # https://discourse.nixos.org/t/your-system-configures-nixpkgs-with-an-externally-created-instance/33802
+      pulseaudio = true;
 
-        doCheckByDefault = false;
-      };
-    in
+      doCheckByDefault = false;
+    };
+
+    # Overlay providing pkgs.master and pkgs.stable channel access.
+    # Detects cross-compilation from stdenv and adjusts channel imports.
+    channelOverlays = final: _: let
+      isCross = final.stdenv.buildPlatform.system != final.stdenv.hostPlatform.system;
+      channelArgs =
+        {config = nixpkgsConfig;}
+        // (
+          if isCross
+          then {
+            localSystem = final.stdenv.buildPlatform.system;
+            crossSystem = final.stdenv.hostPlatform.system;
+          }
+          else {
+            system = final.stdenv.hostPlatform.system;
+          }
+        );
+    in {
+      master = import attrs.nixpkgs-master (channelArgs
+        // {
+          overlays =
+            [
+              (_: _: {
+                unstable = final;
+                inherit (final) stable;
+              })
+            ]
+            ++ (import ./overlay/master.nix attrs);
+        });
+      stable = import attrs.nixpkgs-stable (channelArgs
+        // {
+          overlays =
+            [
+              (_: _: {
+                unstable = final;
+                inherit (final) master;
+              })
+            ]
+            ++ (import ./overlay/stable.nix attrs);
+        });
+    };
+
+    pkgsFun = system:
       import nixpkgs {
-        inherit system config;
+        inherit system;
+        config = nixpkgsConfig;
 
         overlays =
-          [
-            (final: _: {
-              master = import attrs.nixpkgs-master {
-                inherit system config;
-                overlays =
-                  [
-                    (_: _: {
-                      unstable = final;
-                      inherit (final) stable;
-                    })
-                  ]
-                  ++ (import ./overlay/master.nix attrs);
-              };
-              stable = import attrs.nixpkgs-stable {
-                inherit system config;
-                overlays =
-                  [
-                    (_: _: {
-                      unstable = final;
-                      inherit (final) master;
-                    })
-                  ]
-                  ++ (import ./overlay/stable.nix attrs);
-              };
-            })
-          ]
+          [channelOverlays]
           ++ (import ./overlay attrs);
       };
 
@@ -149,6 +166,7 @@
       }
       {
         system = flake-utils.lib.system.aarch64-linux;
+        buildSystem = flake-utils.lib.system.x86_64-linux;
         boxes = {
           lotus-rpi3 = [
             home-manager.nixosModules.home-manager
@@ -163,21 +181,35 @@
 
       nixosConfigurations =
         builtins.foldl' (
-          acc: entry:
+          acc: entry: let
+            isCross = entry ? buildSystem;
+          in
             acc
             // builtins.mapAttrs (_: modules:
-              nixpkgs.lib.nixosSystem {
-                inherit (entry) system;
-                modules =
-                  modules
-                  ++ [
-                    attrs.determinate.nixosModules.default
-                  ];
-                pkgs = pkgsFun entry.system;
-                specialArgs = {
-                  inputs = attrs;
-                };
-              })
+              nixpkgs.lib.nixosSystem (
+                {
+                  modules =
+                    modules
+                    ++ nixpkgs.lib.optionals (!isCross) [
+                      attrs.determinate.nixosModules.default
+                    ]
+                    ++ nixpkgs.lib.optionals isCross [
+                      {
+                        nixpkgs.hostPlatform = entry.system;
+                        nixpkgs.buildPlatform = entry.buildSystem;
+                        nixpkgs.config = nixpkgsConfig;
+                        nixpkgs.overlays = [channelOverlays];
+                      }
+                    ];
+                  specialArgs = {
+                    inputs = attrs;
+                  };
+                }
+                // nixpkgs.lib.optionalAttrs (!isCross) {
+                  inherit (entry) system;
+                  pkgs = pkgsFun entry.system;
+                }
+              ))
             entry.boxes
         ) {}
         nixosModules;
