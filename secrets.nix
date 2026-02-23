@@ -3,6 +3,7 @@ let
   keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILI4D6ddYz7WosKUA4Xr7R1cwLF/mpCSWrCSW3O9Ct7E luiz@lferraz.com"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBYY0uHuJGkwcZOsZLqUgdNw6FMxYkz5pY0YeUgmr8dw luiz@lferraz.com"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOj2JU5S/JO6zJZhqwl0xbAOb7IlulESVXrvipnFXOXf luiz@lferraz.com"
   ];
   fileSecret = getEnv "FILE";
   secretsDir = readDir ./secrets;
