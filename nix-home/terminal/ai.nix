@@ -32,16 +32,8 @@
     };
 in {
   home.packages = with pkgs; [
-    (makeAuthWrapper llm-agents.crush {
-      VERTEXAI_LOCATION = "global";
-      VERTEXAI_PROJECT = "croct-dev";
-      GOOGLE_APPLICATION_CREDENTIALS = config.age.secrets.google-account.path;
-    })
-    (makeAuthWrapper llm-agents.opencode {
-      VERTEX_LOCATION = "global";
-      GOOGLE_CLOUD_PROJECT = "croct-dev";
-      GOOGLE_APPLICATION_CREDENTIALS = config.age.secrets.google-account.path;
-    })
+    llm-agents.crush
+    llm-agents.opencode
     (makeAuthWrapper mods {
       OPENAI_API_KEY = {file = config.age.secrets.openai-key.path;};
     })
