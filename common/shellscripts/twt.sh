@@ -25,6 +25,7 @@ git_main_branch() {
 
 base_dir="$HOME/.local/share/git_worktrees"
 root_dir="$(dirname "$(git rev-parse --git-common-dir)")"
+root_dir="$(realpath "$root_dir")"
 
 # Get the root of the git repository
 cd "$root_dir"
@@ -102,10 +103,8 @@ else
   (
     cd "$worktree_path"
     direnv allow || true
-    if [[ -x .wt/setup ]]; then
-      echo "Running .wt/setup..."
-      .wt/setup || true
-    fi
+    echo "Running .wt/setup..."
+    "$root_dir/.wt/setup" || true
   )
 
   selected="$worktree_path"
