@@ -37,6 +37,10 @@ in {
     (makeAuthWrapper mods {
       OPENAI_API_KEY = {file = config.age.secrets.openai-key.path;};
     })
+    (google-antigravity.override {
+      inherit (pkgs.master) google-chrome;
+      useSystemChromeProfile = false;
+    })
 
     # AI auxiliary tools
     mcp-grafana

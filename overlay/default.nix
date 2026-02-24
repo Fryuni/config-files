@@ -14,6 +14,7 @@ in [
   attrs.llm-agents.overlays.default
   (pickPackages attrs.flakehub.overlays.default ["fh"])
   attrs.polymc.overlay
+  attrs.antigravity.overlays.default
 
   (import ./utils.nix)
   (import ./patches.nix)
