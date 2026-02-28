@@ -43,6 +43,7 @@ in {
     })
 
     # AI auxiliary tools
+    agentfs
     mcp-grafana
     llm-agents.skills-installer
     llm-agents.workmux

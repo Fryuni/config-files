@@ -21,6 +21,7 @@ in [
   (import ./jetbrains.nix)
   (import ./croct.nix)
   (import ./pulumi)
+  (import ./agentfs.nix)
   (import ./rustPackages)
   (final: pkgs: let
     inherit (pkgs.stdenv.hostPlatform) system;
