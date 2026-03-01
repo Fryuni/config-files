@@ -1,8 +1,8 @@
 # DO NOT EDIT! This file is generated automatically by update.mjs
 {
   bootimage = {
-    crateSha256 = "sha256-4WEpNrrGqmkyKbRRLmTe7Z7GnXyk635sniTfn99wN+g=";
-    depsHash = "sha256-CkFJHW7yrIJi/KMGJgyhnLTMkrxnDwO3X4M1aml9cuM=";
+    crateSha256 = "sha256-GBvgeIKuPS/gbYTKvYZ+F//qwWYG2NZv06dTifDyIoE=";
+    depsHash = "sha256-i7ok1fEhUsrW7MpOQQiC10Ky9h9C0NLBBwfp1um8/Gk=";
     description = "Tool to create a bootable OS image from a kernel binary.";
     homepage = null;
     id = "bootimage";
@@ -18,7 +18,7 @@
         url = "https://github.com/phil-opp";
       }
     ];
-    version = "0.10.3";
+    version = "0.10.4";
   };
   cargo-cache = {
     crateSha256 = "sha256-aJoT3jIVpbs4GKiBHcApXTVY4EB11jyjcligV/IdQik=";
@@ -169,8 +169,8 @@
     version = "11.0.1";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-Lg8X0t5u4Mq/eWc0yfuLyn4HlE+j6qSsLE+MFBjBpbk=";
-    depsHash = "sha256-OjuCABObMRkFrTbtV4wpSHzV9Yqmwr/VotmsUW9qUDk=";
+    crateSha256 = "sha256-fnkoIXv6QYJPYtsLZldOEjOxke6YVDEds3jF5SGZGKE=";
+    depsHash = "sha256-F4s3h+WF/S6sQ9ux28sqNe9+C1I5H9735b+cVuRFjk8=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/cargo-public-api/cargo-public-api";
     id = "cargo-public-api";
@@ -195,7 +195,7 @@
         url = "https://github.com/Enselic";
       }
     ];
-    version = "0.50.2";
+    version = "0.51.0";
   };
   cargo-semver-checks = {
     crateSha256 = "sha256-jPgR4K4fH3onCtSaKr4UhoGk4WdonwDppI9GHgp4lSU=";
@@ -276,8 +276,8 @@
     version = "8.5.3";
   };
   octorus = {
-    crateSha256 = "sha256-pnEDdnKLnU0nA2JhFSwMPrOvn8nVqqgsFEu9iRfgWdw=";
-    depsHash = "sha256-abUbEzQXcaeeFW0xOmJCuitCqH2HdB0ECqcVX15wONc=";
+    crateSha256 = "sha256-9Fz5FiLznNJ35TiocoJGp1AjQHlNW0FxMgpj0kyV8mU=";
+    depsHash = "sha256-ArhZvfyXN8cma93JQ1r2WLbNRsAdjfjSK+FtwPwdxsI=";
     description = "A TUI tool for GitHub PR review, designed for Helix editor users";
     homepage = null;
     id = "octorus";
@@ -293,7 +293,7 @@
         url = "https://github.com/ushironoko";
       }
     ];
-    version = "0.4.2";
+    version = "0.5.4";
   };
   toml-merge = {
     crateSha256 = "sha256-ZRfTxA5xjA/V6VtecwdyyGkMC6o+kd2ipRCwJ19Zvfg=";
