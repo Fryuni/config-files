@@ -8,7 +8,7 @@
   ];
 
   home.packages = with pkgs; [
-    calibre
+    stable.calibre
     kdePackages.okular
     spotify
     discord-canary
