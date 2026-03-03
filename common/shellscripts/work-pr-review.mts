@@ -189,6 +189,21 @@ type CandidatePR = {
   projectOrder: number;
 };
 
+type PullRequestReview = {
+  user: { login: string };
+  state: string;
+  submitted_at: string;
+};
+
+type PullRequestCommit = {
+  sha: string;
+  commit: {
+    committer: {
+      date: string;
+    };
+  };
+};
+
 const LIST_PROJECTS_QUERY = `
 query ListOrgProjects($org: String!, $cursor: String) {
   organization(login: $org) {
@@ -379,6 +394,80 @@ async function ghGraphql<T>(query: string, variables: Record<string, string | un
   }
 }
 
+async function ghRest<T>(path: string): Promise<T | null> {
+  try {
+    return (await $`gh api ${path}`.json()) as T;
+  } catch (error) {
+    if (error instanceof $.ShellError) {
+      const stderr = error.stderr.toString().trim();
+      logWarn(`REST call failed for ${path} (${stderr || `exit ${error.exitCode}`})`);
+      return null;
+    }
+
+    logWarn(`REST call failed for ${path} (${String(error)})`);
+    return null;
+  }
+}
+
+async function fetchReviews(owner: string, repo: string, prNumber: number): Promise<PullRequestReview[]> {
+  const reviews = await ghRest<PullRequestReview[]>(
+    `repos/${owner}/${repo}/pulls/${prNumber}/reviews`,
+  );
+  return reviews ?? [];
+}
+
+async function fetchCommits(owner: string, repo: string, prNumber: number): Promise<PullRequestCommit[]> {
+  const commits = await ghRest<PullRequestCommit[]>(
+    `repos/${owner}/${repo}/pulls/${prNumber}/commits?per_page=100`,
+  );
+  return commits ?? [];
+}
+
+function getLastReviewDate(reviews: PullRequestReview[], login: string): string | null {
+  let latest: string | null = null;
+
+  for (const review of reviews) {
+    if (review.user.login.toLowerCase() !== login.toLowerCase()) {
+      continue;
+    }
+
+    if (latest === null || review.submitted_at > latest) {
+      latest = review.submitted_at;
+    }
+  }
+
+  return latest;
+}
+
+function hasCommitsAfter(commits: PullRequestCommit[], afterDate: string): boolean {
+  return commits.some((c) => c.commit.committer.date > afterDate);
+}
+
+async function hasNewCommitsSinceLastReview(
+  repoNameWithOwner: string,
+  prNumber: number,
+  reviewer: string,
+): Promise<{ hasNew: boolean; reason: string }> {
+  const parts = parseRepoIdentifier(repoNameWithOwner);
+  if (!parts) {
+    return { hasNew: false, reason: "malformed repo identifier" };
+  }
+
+  const reviews = await fetchReviews(parts.owner, parts.repo, prNumber);
+  const lastReviewDate = getLastReviewDate(reviews, reviewer);
+
+  if (lastReviewDate === null) {
+    return { hasNew: false, reason: "never reviewed" };
+  }
+
+  const commits = await fetchCommits(parts.owner, parts.repo, prNumber);
+  if (hasCommitsAfter(commits, lastReviewDate)) {
+    return { hasNew: true, reason: `new commits after last review (${lastReviewDate.slice(0, 10)})` };
+  }
+
+  return { hasNew: false, reason: `already reviewed (${lastReviewDate.slice(0, 10)}), no new commits` };
+}
+
 async function listOpenProjects(org: string): Promise<ProjectNode[]> {
   const projects: ProjectNode[] = [];
   let cursor: string | undefined;
@@ -557,8 +646,16 @@ async function main(): Promise<void> {
         }
 
         if (!isReviewRequestedFrom(item.content, REVIEWER_LOGIN)) {
-          logInfo(`  ${colors.dim}skip ${label}: review not requested from ${REVIEWER_LOGIN}${colors.reset}`);
-          continue;
+          const { hasNew, reason } = await hasNewCommitsSinceLastReview(
+            item.content.repository.nameWithOwner,
+            item.content.number,
+            REVIEWER_LOGIN,
+          );
+          if (!hasNew) {
+            logInfo(`  ${colors.dim}skip ${label}: review not requested, ${reason}${colors.reset}`);
+            continue;
+          }
+          logInfo(`  ${colors.green}↻${colors.reset} ${label}: ${reason}`);
         }
 
         candidatePRs.push({
@@ -589,8 +686,16 @@ async function main(): Promise<void> {
           }
 
           if (!isReviewRequestedFrom(linkedPr, REVIEWER_LOGIN)) {
-            logInfo(`  ${colors.dim}skip ${prLabel} (via ${issueLabel}): review not requested from ${REVIEWER_LOGIN}${colors.reset}`);
-            continue;
+            const { hasNew, reason } = await hasNewCommitsSinceLastReview(
+              linkedPr.repository.nameWithOwner,
+              linkedPr.number,
+              REVIEWER_LOGIN,
+            );
+            if (!hasNew) {
+              logInfo(`  ${colors.dim}skip ${prLabel} (via ${issueLabel}): review not requested, ${reason}${colors.reset}`);
+              continue;
+            }
+            logInfo(`  ${colors.green}↻${colors.reset} ${prLabel} (via ${issueLabel}): ${reason}`);
           }
 
           candidatePRs.push({
