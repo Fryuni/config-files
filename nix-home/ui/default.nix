@@ -30,6 +30,11 @@
     };
   };
 
+  # Place mpv desktop entry directly in ~/.local/share/applications/
+  # so KDE's ksycoca can index it under Hyprland (nix-profile symlinks
+  # with epoch timestamps aren't reliably indexed by kbuildsycoca6)
+  xdg.dataFile."applications/mpv.desktop".text = builtins.readFile "${pkgs.mpv}/share/applications/mpv.desktop";
+
   xdg.configFile."mimeapps.list".force = true;
   xdg.mimeApps = import ./xdg-mime.nix {
     defaultBrowser = "firefox-beta.desktop";
