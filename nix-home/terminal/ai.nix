@@ -4,7 +4,7 @@
   ...
 }: let
   makeAuthWrapper = pkg: envMap:
-    pkgs.symlinkJoin {
+    (pkgs.symlinkJoin {
       name = "${pkg.name}-authenticated";
       nativeBuildInputs = [pkgs.makeWrapper pkgs.coreutils];
       paths = [pkg];
@@ -29,7 +29,13 @@
             ${args}
         done
       '';
-    };
+    }).overrideAttrs (old: {
+      meta = pkg.meta;
+    });
+
+  openwhispr-authenticated = makeAuthWrapper pkgs.openwhispr {
+    OPENAI_API_KEY = {file = config.age.secrets.openai-key.path;};
+  };
 in {
   home.packages = with pkgs; [
     llm-agents.crush
@@ -37,6 +43,8 @@ in {
     (makeAuthWrapper mods {
       OPENAI_API_KEY = {file = config.age.secrets.openai-key.path;};
     })
+
+    openwhispr-authenticated
 
     # AI auxiliary tools
     agentfs
@@ -51,6 +59,18 @@ in {
     wm = "workmux";
     wmd = "workmux dashboard";
   };
+
+  # Autostart OpenWhispr on login (XDG autostart for Plasma/X11 and any XDG-compliant DE)
+  xdg.configFile."autostart/openwhispr.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=OpenWhispr
+    Comment=Voice-to-text dictation
+    Exec=${pkgs.lib.meta.getExe openwhispr-authenticated}
+    Terminal=false
+    StartupNotify=false
+    X-GNOME-Autostart-enabled=true
+  '';
 
   home.file.".config/crush/crush.json".text = builtins.toJSON {
     mcp = {

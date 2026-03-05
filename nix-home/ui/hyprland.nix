@@ -105,6 +105,9 @@ in {
 
         # Notification daemon
         "swaync"
+
+        # Voice-to-text dictation
+        "openwhispr"
       ];
 
       # General settings
