@@ -83,6 +83,8 @@
     xarchiver
     cachix
     agenix
+    bubblewrap
+    socat
   ];
 
   # xdg.portal.enable = true;
