@@ -40,6 +40,9 @@ in {
       # Enable True Color, required by termguicolors
       set-option -sa terminal-overrides ',XXX:RGB'
 
+      # Enable extended keys (CSI u / modified keys)
+      set-option -g extended-keys on
+
       # Update Hyprland/WAYLAND env variables in tmux sessions
       set-option -g update-environment "HYPRLAND_INSTANCE_SIGNATURE DISPLAY WAYLAND_DISPLAY SWAYSOCK"
     '';
