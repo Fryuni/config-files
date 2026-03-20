@@ -52,7 +52,6 @@ in {
 
     plugins = with pkgs.hyprlandPlugins; [
       # hyprexpo # Workspace overview
-      borders-plus-plus # Enhanced borders
     ];
 
     settings = {
@@ -212,13 +211,6 @@ in {
         #   enable_gesture = true;
         # };
 
-        # borders-plus-plus - Enhanced borders
-        "borders-plus-plus" = {
-          add_borders = 1;
-          "col.border_1" = "rgba(${colors.secondary}aa)";
-          border_size_1 = 1;
-          natural_rounding = true;
-        };
       };
 
       # Misc
