@@ -1,19 +1,19 @@
 # DO NOT EDIT! This file is generated automatically by update.sh
 _: {
-  version = "3.225.1";
+  version = "3.227.0";
   pulumiPkgs = {
     x86_64-linux = [
       {
-        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.225.1-linux-x64.tar.gz";
-        sha256 = "0ydbj9ck6s4yqhyarivfzaxy55rrwi73gcylpral8q0lp5jdlz33";
+        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.227.0-linux-x64.tar.gz";
+        sha256 = "10kz7zzh763z1aw36kz1wypl7vjz1c9c0w6h9p6h6wr9824apmxl";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-docker-v4.11.0-linux-amd64.tar.gz";
-        sha256 = "1zjz0mbfjgpnjiwr4rl5bv3bfl8l8sym1azyrnckkc0gzbgdkg2d";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-docker-v4.11.1-linux-amd64.tar.gz";
+        sha256 = "1l4nn0nbrv514rmgs8zz89z30fzd6jfnbqh4751malx89ach2rqy";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gcp-v9.14.0-linux-amd64.tar.gz";
-        sha256 = "0kdb1a88z3mrlwm24m8935ck2fgb1vc2ygp38sq8fmndfzvrikvc";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gcp-v9.16.0-linux-amd64.tar.gz";
+        sha256 = "0jfbhy16z988y9afma5dccvqf7xq0lbmkl2dgnizpyr5klwg60nb";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-github-v6.12.1-linux-amd64.tar.gz";
@@ -28,8 +28,8 @@ _: {
         sha256 = "1zra1ck64gs4nwqf62ksfmpbx24lxw6vsgi47j4v8q051m89fgq3";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-kubernetes-v4.27.0-linux-amd64.tar.gz";
-        sha256 = "1babmf4727g6xsp4z00qqqz6nb01wqa2w90c2g0nnx804gsy5rr0";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-kubernetes-v4.28.0-linux-amd64.tar.gz";
+        sha256 = "0saa0i1id3lgdlw8wi2wbwymd1vnxdzmrqqr876gk9hcs9fj7bar";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-postgresql-v3.16.2-linux-amd64.tar.gz";
