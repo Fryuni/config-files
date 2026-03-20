@@ -9,6 +9,11 @@ CHANNELS=(
   peresflores
 )
 
+AUTH_ARGS=()
+if [[ -n "$TWITCH_AUTH_TOKEN" ]]; then
+  AUTH_ARGS=(--auth-token "$TWITCH_AUTH_TOKEN")
+fi
+
 for channel in "${CHANNELS[@]}"; do
   echo "Downloading data for channel: $channel"
 
@@ -31,7 +36,7 @@ for channel in "${CHANNELS[@]}"; do
   mkdir -p "$channel/vods"
 
   VIDEO_IDS=$(
-    twitch-dl videos "$channel" --all --json |
+    twitch-dl videos "$channel" "${AUTH_ARGS[@]}" --all --json |
       jq ".videos[]|select(.recordedAt > \"${EARLY_CUT_DATE}\")|.id" -r |
       tac
   )
@@ -55,7 +60,7 @@ for channel in "${CHANNELS[@]}"; do
 
   echo "Downloading clips"
 
-  twitch-dl clips "$channel" --all --json --period last_week |
+  twitch-dl clips "$channel" "${AUTH_ARGS[@]}" --all --json --period last_week |
     jq ".[]|select(.createdAt > \"${EARLY_CUT_DATE}\")|.slug" -r |
     tac |
     xargs -P8 -n1 bash ./download-and-store.sh # &>/dev/null
