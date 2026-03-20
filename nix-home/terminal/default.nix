@@ -10,10 +10,7 @@
 
   home.packages = with pkgs; [
     pfetch
-    neofetch
   ];
-
-  xdg.configFile."neofetch/config.conf".source = ../../common/neofetch/config.conf;
 
   programs.starship = {
     enable = true;
