@@ -7,6 +7,7 @@ import * as path from 'node:path';
 
 const execRaw = util.promisify(cp.execFile);
 const execFull = async (command, ...args) => {
+	console.log(`Executing: ${command} ${args.join(' ')}`);
 	try {
 		return {
 			code: 0,
@@ -37,7 +38,9 @@ await fillHashes();
 
 process.chdir(REPO_DIR);
 await execFull('git', 'commit', 'add', `${import.meta.dirname}/data.nix`)
+	.then(({ stdout, stderr }) => console.log(stdout, stderr));
 await execFull('git', 'commit', '-m', "chore(tools): Update custom Rust crates", '--', `${import.meta.dirname}/data.nix`)
+	.then(({ stdout, stderr }) => console.log(stdout, stderr));
 
 async function fillHashes() {
 	const data = await loadData();

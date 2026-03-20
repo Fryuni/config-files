@@ -198,8 +198,8 @@
     version = "0.51.0";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-jPgR4K4fH3onCtSaKr4UhoGk4WdonwDppI9GHgp4lSU=";
-    depsHash = "sha256-lP4yXCuJ89NqUBZR6zgGi5B570y+5IaabWyzd9qqa3o=";
+    crateSha256 = "sha256-OlvpG7hGuGDbhP6WKSxwitmx2HQ+fmDItoQp/+XIS5Q=";
+    depsHash = "sha256-YbtYIHj899eJSrp5n5jODgTkL9L26EnruzECwBrBF00=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
@@ -215,11 +215,11 @@
         url = "https://github.com/obi1kenobi";
       }
     ];
-    version = "0.46.0";
+    version = "0.47.0";
   };
   cargo-sort = {
-    crateSha256 = "sha256-U/LakNUSPqj6FmYimi5ZNVJCRiS7zM4Vzvu4Gb3w38Q=";
-    depsHash = "sha256-FoFzBf24mNDTRBfFyTEr9Q7sJjUhs0X/XWRGEoierQ4=";
+    crateSha256 = "sha256-mSxXrPDexaIMFunmOPt5ysYkVyF8BCuOOumT+44zrGA=";
+    depsHash = "sha256-ygMtfhwoUEIZx+q6KB5yOr8/Fj5FRMIs7dXlYDUKb2U=";
     description = "Check if tables and items in a .toml file are lexically sorted";
     homepage = null;
     id = "cargo-sort";
@@ -244,7 +244,7 @@
         url = "https://github.com/DevinR528";
       }
     ];
-    version = "2.0.2";
+    version = "2.1.3";
   };
   cargo-watch = {
     crateSha256 = "sha256-RKUf3sL3Q0iKl1vHPWNL1jG5OwKk+s28PK9RADEBqBc=";
@@ -276,8 +276,8 @@
     version = "8.5.3";
   };
   octorus = {
-    crateSha256 = "sha256-9Fz5FiLznNJ35TiocoJGp1AjQHlNW0FxMgpj0kyV8mU=";
-    depsHash = "sha256-ArhZvfyXN8cma93JQ1r2WLbNRsAdjfjSK+FtwPwdxsI=";
+    crateSha256 = "sha256-noSCAD+oGbG+9KVRpli/Ez91uow1i4HOsNhHitK1KL4=";
+    depsHash = "sha256-iPuyMOX+izNEIeRfI0YrGGMjeHm4gGkO+E/qERUa31Y=";
     description = "A TUI tool for GitHub PR review, designed for Helix editor users";
     homepage = null;
     id = "octorus";
@@ -293,7 +293,7 @@
         url = "https://github.com/ushironoko";
       }
     ];
-    version = "0.5.4";
+    version = "0.5.8";
   };
   toml-merge = {
     crateSha256 = "sha256-ZRfTxA5xjA/V6VtecwdyyGkMC6o+kd2ipRCwJ19Zvfg=";
