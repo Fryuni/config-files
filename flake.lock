@@ -655,6 +655,22 @@
         "url": "https://flakehub.com/f/NixOS/nixpkgs/0.1"
       }
     },
+    "nixpkgs_3": {
+      "locked": {
+        "lastModified": 1772542754,
+        "narHash": "sha256-WGV2hy+VIeQsYXpsLjdr4GvHv5eECMISX1zKLTedhdg=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "8c809a146a140c5c8806f13399592dbcb1bb5dc4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nur": {
       "inputs": {
         "flake-parts": "flake-parts_3",
@@ -769,6 +785,8 @@
         "parsecgaming": "parsecgaming",
         "polymc": "polymc",
         "systems": "systems_2",
+        "vicinae": "vicinae",
+        "vicinae-extensions": "vicinae-extensions",
         "zig": "zig"
       }
     },
@@ -853,6 +871,53 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "vicinae": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_3",
+        "systems": [
+          "systems"
+        ]
+      },
+      "locked": {
+        "lastModified": 1774863692,
+        "narHash": "sha256-UQjEcW/ko+gik6gI049YMKBfCrsC5bpLHoupx8hvdpU=",
+        "owner": "vicinaehq",
+        "repo": "vicinae",
+        "rev": "a94336eecc8719e3f0cd8c80c416dddff0999479",
+        "type": "github"
+      },
+      "original": {
+        "owner": "vicinaehq",
+        "repo": "vicinae",
+        "type": "github"
+      }
+    },
+    "vicinae-extensions": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "systems": [
+          "systems"
+        ],
+        "vicinae": [
+          "vicinae"
+        ]
+      },
+      "locked": {
+        "lastModified": 1774351406,
+        "narHash": "sha256-/h3M/j/VwMks9g1IABnV9LP6zBIiVtxmTIO5BT0ESks=",
+        "owner": "vicinaehq",
+        "repo": "extensions",
+        "rev": "337b6ddea28bcbb58bc9fcc859d866e5117ba10a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "vicinaehq",
+        "repo": "extensions",
         "type": "github"
       }
     },

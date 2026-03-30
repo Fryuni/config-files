@@ -38,6 +38,7 @@
       "https://fryuni.cachix.org"
       "https://zig-overlay.cachix.org"
       "https://cache.numtide.com"
+      "https://vicinae.cachix.org"
     ];
     trusted-public-keys = [
       "nix-shell.cachix.org-1:kat3KoRVbilxA6TkXEtTN9IfD4JhsQp1TPUHg652Mwc="
@@ -47,6 +48,7 @@
       "fryuni.cachix.org-1:YCNe73zqPG2YLIxxJkTXDz3/VFKcCiZAvHDIjEJIoDQ="
       "zig-overlay.cachix.org-1:MCS36+WBxE8vqfE4j5BnCAx0Gse9EnTLSukAvP8JwtA="
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+      "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
     ];
 
     plugin-files = [];

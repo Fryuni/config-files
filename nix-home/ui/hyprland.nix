@@ -226,6 +226,7 @@ in {
       "$mod" = "SUPER";
       "$terminal" = "ghostty";
       "$menu" = "rofi -show drun";
+      "$launcher" = "vicinae toggle";
       "$browser" = "firefox-beta";
 
       bind = [
@@ -236,6 +237,7 @@ in {
         "$mod, M, exit"
         "$mod, N, exec, thunar"
         "$mod, D, exec, $menu"
+        "$mod, Space, exec, $launcher"
         "$mod, B, exec, $browser"
         "$mod SHIFT, B, exec, google-chrome-stable"
 

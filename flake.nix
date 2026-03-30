@@ -65,6 +65,18 @@
       url = "github:DarthPJB/parsec-gaming-nix";
       inputs.nixpkgs.follows = "nixpkgs-stable";
     };
+    vicinae = {
+      url = "github:vicinaehq/vicinae";
+      inputs.systems.follows = "systems";
+      # Don't follow nixpkgs — use their pinned version for cachix cache hits.
+      # Vicinae is a standalone C++ app with no ABI coupling to the rest of the system.
+    };
+    vicinae-extensions = {
+      url = "github:vicinaehq/extensions";
+      inputs.vicinae.follows = "vicinae";
+      inputs.systems.follows = "systems";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     direnv = {
       url = "github:direnv/direnv";
       inputs.nixpkgs.follows = "nixpkgs-master";

@@ -96,6 +96,7 @@ in {
             "${modifier}+c" = ''exec --no-startup-id "rofi -show calc -modi calc -no-show-match -no-sort > /dev/null"'';
             "${modifier}+x" = ''exec --no-startup-id "rofi -show power-menu -modi power-menu:rofi-power-menu"'';
             "${modifier}+z" = ''exec --no-startup-id "rofi -modi emoji -show emoji"'';
+            "${modifier}+space" = ''exec --no-startup-id "vicinae toggle"'';
             "${modifier}+p" = ''exec --no-startup-id "maim -g ${main-display-g} $HOME/screenshots/$(date --iso-8601='seconds').png"'';
           };
 

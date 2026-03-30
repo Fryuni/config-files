@@ -4,6 +4,8 @@
     ./xsession.nix
     ./rofi.nix
     ./hyprland.nix
+    ./plasma.nix
+    ./vicinae.nix
     ./gtk.nix
   ];
 
