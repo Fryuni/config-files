@@ -35,6 +35,12 @@
   # with epoch timestamps aren't reliably indexed by kbuildsycoca6)
   xdg.dataFile."applications/mpv.desktop".text = builtins.readFile "${pkgs.mpv}/share/applications/mpv.desktop";
 
+  # Thunar "Open Terminal Here" uses exo-open which reads this config
+  xdg.configFile."xfce4/helpers.rc".text = ''
+    TerminalEmulator=custom-TerminalEmulator
+    TerminalEmulatorCustom=${pkgs.ghostty}/bin/ghostty
+  '';
+
   xdg.configFile."mimeapps.list".force = true;
   xdg.mimeApps = import ./xdg-mime.nix {
     defaultBrowser = "firefox-beta.desktop";
