@@ -472,6 +472,7 @@ in {
           #   "match:class" = ".*";
           #   suppressevent = "maximize";
           # }
+
         ];
     };
 
@@ -710,6 +711,23 @@ in {
         disabledGrimWarning = true;
         showStartupLaunchMessage = false;
       };
+    };
+  };
+
+  # ydotoold daemon for virtual keyboard input (used by OpenWhispr for paste).
+  # ydotool communicates via a Unix socket which works across the bwrap sandbox,
+  # unlike wtype's zwp_virtual_keyboard_v1 Wayland protocol.
+  systemd.user.services.ydotoold = {
+    Unit = {
+      Description = "ydotool daemon";
+      Documentation = "man:ydotoold(8)";
+    };
+    Service = {
+      ExecStart = "${pkgs.ydotool}/bin/ydotoold";
+      Restart = "on-failure";
+    };
+    Install = {
+      WantedBy = ["graphical-session.target"];
     };
   };
 
