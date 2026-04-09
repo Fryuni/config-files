@@ -276,8 +276,8 @@
     version = "8.5.3";
   };
   octorus = {
-    crateSha256 = "sha256-noSCAD+oGbG+9KVRpli/Ez91uow1i4HOsNhHitK1KL4=";
-    depsHash = "sha256-iPuyMOX+izNEIeRfI0YrGGMjeHm4gGkO+E/qERUa31Y=";
+    crateSha256 = "sha256-9FmCa/JMOqjPFjgLUzJNEtxBUCM0JQWipD1fgSIF3Lg=";
+    depsHash = "sha256-1Vst2+546/DUm71S61qvoc7a0oHXgGEsxnc6x2Vx3jI=";
     description = "A TUI tool for GitHub PR review, designed for Helix editor users";
     homepage = null;
     id = "octorus";
@@ -293,7 +293,7 @@
         url = "https://github.com/ushironoko";
       }
     ];
-    version = "0.5.8";
+    version = "0.6.1";
   };
   toml-merge = {
     crateSha256 = "sha256-ZRfTxA5xjA/V6VtecwdyyGkMC6o+kd2ipRCwJ19Zvfg=";
@@ -316,8 +316,8 @@
     version = "0.2.0";
   };
   zellij = {
-    crateSha256 = "sha256-7SjlPYa/CkQSNu0SyIjYycJuKaJ6RcGInSPVe3+xNMw=";
-    depsHash = "sha256-xfNX5ccDWqnAn5n4/QyLHtvce1ZfXZg9iNNaR/5tjAs=";
+    crateSha256 = "sha256-n3Md6DJF5Bs7bBFqerCGj1WWO9evOZ9/ODGA+wPP9UA=";
+    depsHash = "sha256-lrLjb8/K4DO93QnIwh3ArJBQuk+lgtD/5OaKhkPThEk=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";
@@ -370,6 +370,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.43.1";
+    version = "0.44.1";
   };
 }
