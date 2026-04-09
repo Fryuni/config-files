@@ -10,8 +10,8 @@
   # ];
 
   programs.zed-editor = {
-    enable = true;
-    package = pkgs.master.zed-editor;
+    enable = false;
+    package = pkgs.zed-editor;
     installRemoteServer = true;
 
     # Settings have to be editable, otherwise Zed won't allow selecting different models
