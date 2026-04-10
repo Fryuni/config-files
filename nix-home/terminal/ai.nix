@@ -32,30 +32,27 @@
     }).overrideAttrs (old: {
       meta = pkg.meta;
     });
-
-  openwhispr-authenticated = makeAuthWrapper pkgs.openwhispr {
-    OPENAI_API_KEY = {file = config.age.secrets.openai-key.path;};
-  };
 in {
   home.packages = with pkgs; [
+    pkgs.openwhispr
     llm-agents.crush
     llm-agents.opencode
     (makeAuthWrapper mods {
       OPENAI_API_KEY = {file = config.age.secrets.openai-key.path;};
     })
 
-    openwhispr-authenticated
-
     # AI auxiliary tools
     agentfs
     llm-agents.skills-installer
     llm-agents.workmux
+    llm-agents.claude-code
     llm-agents.tuicr
   ];
 
   programs.zsh.shellAliases = {
     clear-mods-conversations = "rm -rf ~/.local/share/mods/conversations";
     oc = "opencode";
+    cc = "claude";
     wm = "workmux";
     wmd = "workmux dashboard";
   };
@@ -66,7 +63,7 @@ in {
     Type=Application
     Name=OpenWhispr
     Comment=Voice-to-text dictation
-    Exec=${pkgs.lib.meta.getExe openwhispr-authenticated}
+    Exec=${pkgs.lib.meta.getExe pkgs.openwhispr}
     Terminal=false
     StartupNotify=false
     X-GNOME-Autostart-enabled=true
