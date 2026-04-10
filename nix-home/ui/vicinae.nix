@@ -13,7 +13,7 @@
     disabled = "#707880";
   };
 
-  system = pkgs.stdenv.hostPlatform.system;
+  inherit (pkgs.stdenv.hostPlatform) system;
 
   vicinae = inputs.vicinae.packages.${system}.default;
 
@@ -60,8 +60,8 @@ in {
 
         colors = {
           core = {
-            background = colors.background;
-            foreground = colors.foreground;
+            inherit (colors) background;
+            inherit (colors) foreground;
             secondary_background = "#1e2230";
             border = colors.background-alt;
             accent = colors.primary;

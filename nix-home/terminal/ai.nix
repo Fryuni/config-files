@@ -30,7 +30,7 @@
         done
       '';
     }).overrideAttrs (old: {
-      meta = pkg.meta;
+      inherit (pkg) meta;
     });
 in {
   home.packages = with pkgs; [

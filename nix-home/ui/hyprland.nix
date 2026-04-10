@@ -210,7 +210,6 @@ in {
         #   workspace_method = "first 1"; # Start from workspace 1
         #   enable_gesture = true;
         # };
-
       };
 
       # Misc
@@ -472,7 +471,6 @@ in {
           #   "match:class" = ".*";
           #   suppressevent = "maximize";
           # }
-
         ];
     };
 
