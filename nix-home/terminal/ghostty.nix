@@ -11,6 +11,7 @@
       font-family = "JetBrainsMono Nerd Font";
       mouse-hide-while-typing = true;
       auto-update = "off";
+      bell-features = "system,attention,title,border";
     };
   };
 }
