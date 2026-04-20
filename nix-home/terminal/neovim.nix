@@ -3,39 +3,17 @@
   lib,
   ...
 }: {
-  # TODO: Follow this guide to the end: https://www.youtube.com/watch?v=rUvjkBuKua4
-
   xdg.configFile = {
     "nvim/parser/nix.so".source = "${pkgs.tree-sitter.builtGrammars.tree-sitter-nix}/parser";
   };
 
-  programs.neovim = {
-    enable = true;
-
-    # AstroNvim v6 ships nvim-treesitter on its `main` branch, which shells out
-    # to `tree-sitter build` (and a C compiler) to compile parsers from source.
-    # On NixOS the prebuilt `tree-sitter-linux-x64` that astrocore installs via
-    # Mason can't run, so provide a nix-patched CLI + gcc on Neovim's PATH here.
-    extraPackages = with pkgs; [
-      tree-sitter
-      gcc
-    ];
-
-    # plugins = with pkgs.vimPlugins; [
-    #   nvim-tree-lua
-    #   nvim-treesitter
-    #
-    #   vim-nix
-    # ];
-    #
-    # vimAlias = true;
-    # viAlias = true;
-    #
-    # extraConfig = ''
-    #   set number relativenumber
-    #   set shiftwidth=2
-    # '';
-  };
+  # Neovim config is managed in a separate repo — only provide the package and
+  # runtime dependencies here without generating an init.lua wrapper.
+  home.packages = with pkgs; [
+    neovim
+    tree-sitter
+    gcc
+  ];
 
   home.activation = {
     "clearNvimState" = lib.hm.dag.entryAfter ["linkGeneration"] ''
