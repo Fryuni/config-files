@@ -9,12 +9,12 @@
 
     determinate = {
       url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
     flakehub = {
       url = "https://flakehub.com/f/DeterminateSystems/fh/*";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.fenix.follows = "fenix";
+      # inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.fenix.follows = "fenix";
     };
 
     systems.url = "github:nix-systems/default";
@@ -25,36 +25,36 @@
     };
     gomod2nix = {
       url = "github:nix-community/gomod2nix";
-      inputs.nixpkgs.follows = "nixpkgs-master";
-      inputs.flake-utils.follows = "flake-utils";
+      # inputs.nixpkgs.follows = "nixpkgs-master";
+      # inputs.flake-utils.follows = "flake-utils";
     };
 
     agenix = {
       url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
       inputs.systems.follows = "systems";
     };
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
     nur = {
       url = "github:nix-community/NUR";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
     fenix = {
       url = "https://flakehub.com/f/nix-community/fenix/0.1";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
+      # inputs.nixpkgs.follows = "nixpkgs-stable";
     };
     zig = {
       url = "https://flakehub.com/f/Fryuni/zig-overlay/0.1";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
-      inputs.flake-compat.follows = "flake-compat";
+      # inputs.nixpkgs.follows = "nixpkgs-stable";
+      # inputs.flake-compat.follows = "flake-compat";
     };
     home-manager = {
       url = "https://flakehub.com/f/nix-community/home-manager/0.1";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
     polymc = {
       url = "github:Fryuni/PolyMC/develop";
@@ -75,17 +75,17 @@
       url = "github:vicinaehq/extensions";
       inputs.vicinae.follows = "vicinae";
       inputs.systems.follows = "systems";
-      inputs.nixpkgs.follows = "nixpkgs";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
     direnv = {
       url = "github:direnv/direnv";
-      inputs.nixpkgs.follows = "nixpkgs-master";
+      # inputs.nixpkgs.follows = "nixpkgs-master";
       inputs.gomod2nix.follows = "gomod2nix";
       inputs.systems.follows = "systems";
     };
     nix-alien = {
       url = "https://flakehub.com/f/thiagokokada/nix-alien/0.1";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
+      # inputs.nixpkgs.follows = "nixpkgs-stable";
       inputs.flake-compat.follows = "flake-compat";
     };
   };
