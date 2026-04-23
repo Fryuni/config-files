@@ -22,8 +22,8 @@
   xz,
   vmopts ? null,
 }: let
-  platforms = lib.platforms.linux ++ ["x86_64-darwin" "aarch64-darwin"];
-  ideaPlatforms = ["x86_64-darwin" "i686-darwin" "i686-linux" "x86_64-linux" "aarch64-darwin" "aarch64-linux"];
+  platforms = lib.platforms.linux ++ ["aarch64-darwin"];
+  ideaPlatforms = ["x86_64-linux" "aarch64-darwin" "aarch64-linux"];
 
   inherit (stdenv.hostPlatform) system;
 

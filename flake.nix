@@ -242,7 +242,7 @@
       };
     };
 
-    perSystemConfig = flake-utils.lib.eachDefaultSystem (system: let
+    perSystemConfig = flake-utils.lib.eachSystem ["aarch64-linux" "x86_64-linux" "aarch64-darwin"] (system: let
       pkgs = pkgsFun system;
     in {
       legacyPackages = pkgs;
