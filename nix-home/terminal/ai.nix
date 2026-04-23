@@ -37,12 +37,14 @@ in {
     pkgs.openwhispr
     llm-agents.crush
     llm-agents.opencode
+    (makeAuthWrapper llm-agents.omp {
+      OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
+    })
     (makeAuthWrapper mods {
       OPENAI_API_KEY = {file = config.age.secrets.openai-key.path;};
     })
 
     # AI auxiliary tools
-    agentfs
     llm-agents.skills-installer
     llm-agents.workmux
     llm-agents.claude-code
