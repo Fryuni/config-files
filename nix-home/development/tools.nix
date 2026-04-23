@@ -8,8 +8,8 @@
     (python313.withPackages (py: [
       py.pyopenssl
     ]))
-    stable.nodejs_22
-    stable.corepack_22
+    nodejs_25
+    corepack
     bun
 
     libnotify
