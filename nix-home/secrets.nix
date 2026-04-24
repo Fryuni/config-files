@@ -4,6 +4,8 @@
     habitica-key.file = ../secrets/habitica-key;
     openai-key.file = ../secrets/openai-key;
     openrouter-key.file = ../secrets/openrouter-key;
+    firecrawl-api-key.file = ../secrets/firecrawl-api-key;
+    kimi-api-key.file = ../secrets/kimi-api-key;
 
     nix-access-tokens = {
       file = ../secrets/nix-access-tokens;

@@ -37,6 +37,13 @@ in {
     pkgs.openwhispr
     llm-agents.crush
     llm-agents.opencode
+    llm-agents.claude-code
+    (makeAuthWrapper llm-agents.hermes-agent {
+      OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
+      OPENAI_API_KEY = {file = config.age.secrets.openai-key.path;};
+      FIRECRAWL_API_KEY = {file = config.age.secrets.firecrawl-api-key.path;};
+      KIMI_API_KEY = {file = config.age.secrets.kimi-api-key.path;};
+    })
     (makeAuthWrapper llm-agents.omp {
       OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
     })
@@ -47,7 +54,6 @@ in {
     # AI auxiliary tools
     llm-agents.skills-installer
     llm-agents.workmux
-    llm-agents.claude-code
     llm-agents.tuicr
   ];
 
