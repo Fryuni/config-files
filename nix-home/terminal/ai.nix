@@ -38,6 +38,7 @@ in {
     llm-agents.crush
     llm-agents.opencode
     llm-agents.claude-code
+    llm-agents.agent-browser
     (makeAuthWrapper llm-agents.hermes-agent {
       OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
       OPENAI_API_KEY = {file = config.age.secrets.openai-key.path;};
