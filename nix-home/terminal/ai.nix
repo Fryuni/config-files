@@ -56,6 +56,8 @@ in {
     llm-agents.skills-installer
     llm-agents.workmux
     llm-agents.tuicr
+
+    uv # Needed for omp
   ];
 
   programs.zsh.shellAliases = {
