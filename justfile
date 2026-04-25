@@ -61,8 +61,11 @@ flash-sd-image config device:
   echo "Flashing $image_file to {{device}}"
   zstdcat "$image_file" | sudo dd of={{device}} bs=4M status=progress conv=fsync
 
-deploy config host:
-  nixos-rebuild switch --flake ".#{{config}}" --target-host "{{host}}" --sudo --impure
+deploy config host="":
+  #!/usr/bin/env bash
+  DEPLOY_HOST="{{host}}"
+  : ${DEPLOY_HOST:="{{config}}"}
+  nixos-rebuild switch --flake ".#{{config}}" --target-host "$DEPLOY_HOST" --use-substitutes --sudo
 
 hostkey config host:
   #!/usr/bin/env bash
@@ -93,6 +96,7 @@ hostkey config host:
   trap - EXIT
   git add "$target"
   printf '%s\n' "$target"
+
 rekey *args:
   #!/usr/bin/env bash
   set -euo pipefail

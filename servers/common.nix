@@ -41,6 +41,8 @@
 
   time.timeZone = "UTC";
 
+  security.sudo.wheelNeedsPassword = false;
+
   i18n.defaultLocale = "en_US.UTF-8";
 
   i18n.extraLocaleSettings = {
