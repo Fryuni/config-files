@@ -1,6 +1,6 @@
 {pkgs, ...}: {
   imports = [
-    ../common-gce.nix
+    ../common.nix
   ];
 
   fileSystems."/data" = {
