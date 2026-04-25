@@ -176,6 +176,7 @@
             ./servers/gce-automation
           ];
           loem = [
+            agenix.nixosModules.age
             attrs.disko.nixosModules.disko
             ./servers/loem
           ];

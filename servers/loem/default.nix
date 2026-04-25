@@ -1,9 +1,19 @@
 # Hetzner Loem server configuration
-{inputs, ...}: {
+{
+  config,
+  inputs,
+  ...
+}: {
   imports = [
     ../common.nix
     ./disko.nix
+    ../../nixos/modules/networking/tailscale.nix
   ];
+
+  age.identityPaths = ["/root/.ssh/id_ed25519"];
+  age.secrets.tailscale-authkey.file = ../../secrets/tailscale-auth-key;
+
+  services.tailscale.authKeyFile = config.age.secrets.tailscale-authkey.path;
 
   networking.hostName = "loem";
   hardware.facter.reportPath = ./facter.json;
