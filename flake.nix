@@ -61,10 +61,6 @@
       inputs.nixpkgs.follows = "nixpkgs-stable";
       inputs.flake-compat.follows = "flake-compat";
     };
-    parsecgaming = {
-      url = "github:DarthPJB/parsec-gaming-nix";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
-    };
     vicinae = {
       url = "github:vicinaehq/vicinae";
       inputs.systems.follows = "systems";

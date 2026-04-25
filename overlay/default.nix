@@ -1,8 +1,7 @@
 {
-  nixpkgs,
-  parsecgaming,
-  determinate,
-  ...
+	nixpkgs,
+	determinate,
+	...
 } @ attrs: let
   pickPackages = f: pick: final: pkgs: nixpkgs.lib.filterAttrs (name: _: builtins.elem name pick) (f final pkgs);
 in [
@@ -28,7 +27,6 @@ in [
   in {
     inherit (final.master) direnv;
     # direnv = direnv.packages.${system}.default;
-    inherit (parsecgaming.packages.${system}) parsecgaming;
 
     inherit (determinate.inputs.nix.packages.${system}) nix;
   })
