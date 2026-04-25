@@ -1,7 +1,7 @@
 {
-	nixpkgs,
-	determinate,
-	...
+  nixpkgs,
+  determinate,
+  ...
 } @ attrs: let
   pickPackages = f: pick: final: pkgs: nixpkgs.lib.filterAttrs (name: _: builtins.elem name pick) (f final pkgs);
 in [

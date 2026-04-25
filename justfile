@@ -63,3 +63,39 @@ flash-sd-image config device:
 
 deploy config host:
   nixos-rebuild switch --flake ".#{{config}}" --target-host "{{host}}" --sudo --impure
+
+hostkey config host:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  mkdir -p secrets/host-keys
+  target="secrets/host-keys/{{config}}.pub"
+  tmp="$(mktemp)"
+  scan="$(mktemp)"
+  trap 'rm -f "$tmp" "$scan"' EXIT
+  ssh-keyscan -t ed25519 "{{host}}" > "$scan" || true
+  awk -v host="{{host}}" '
+    $2 == "ssh-ed25519" { keys[$2 " " $3] = 1 }
+    END {
+      for (key in keys) { line = key; count++ }
+      if (count == 0) {
+        print "No ed25519 host key found for " host > "/dev/stderr"
+        exit 1
+      }
+      if (count > 1) {
+        print "Multiple distinct ed25519 host keys found for " host > "/dev/stderr"
+        exit 1
+      }
+      print line
+    }
+  ' "$scan" > "$tmp"
+  mv "$tmp" "$target"
+  trap - EXIT
+  git add "$target"
+  printf '%s\n' "$target"
+rekey *args:
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  system="$(nix eval --raw --impure --expr builtins.currentSystem)"
+  nix run ".#agenix-rekey.${system}.rekey" -- {{args}}

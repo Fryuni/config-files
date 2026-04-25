@@ -60,7 +60,7 @@
     };
   };
 
-  age.secrets.cloudflared-creds.file = ../../secrets/notebook-cloudflare-tunnel;
+  age.secrets.cloudflared-creds.rekeyFile = ../../secrets/notebook-cloudflare-tunnel;
   services.cloudflared = {
     enable = true;
     tunnels = {

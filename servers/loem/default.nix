@@ -10,8 +10,7 @@
     ../../nixos/modules/networking/tailscale.nix
   ];
 
-  age.identityPaths = ["/root/.ssh/id_ed25519"];
-  age.secrets.tailscale-authkey.file = ../../secrets/tailscale-auth-key;
+  age.secrets.tailscale-authkey.rekeyFile = ../../secrets/tailscale-vps-key;
 
   services.tailscale.authKeyFile = config.age.secrets.tailscale-authkey.path;
 

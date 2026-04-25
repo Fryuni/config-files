@@ -36,6 +36,10 @@
       inputs.home-manager.follows = "home-manager";
       inputs.systems.follows = "systems";
     };
+    agenix-rekey = {
+      url = "github:oddlama/agenix-rekey";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       # inputs.nixpkgs.follows = "nixpkgs";
@@ -98,6 +102,7 @@
     home-manager,
     flake-utils,
     agenix,
+    agenix-rekey,
     ...
   } @ attrs: let
     nixpkgsConfig = {
@@ -168,6 +173,8 @@
         boxes = {
           lotus-notebook = [
             agenix.nixosModules.age
+            attrs.agenix-rekey.nixosModules.default
+            ./agenix-rekey.nix
             ./nixos
             ./nixos/notebook
           ];
@@ -177,6 +184,8 @@
           ];
           loem = [
             agenix.nixosModules.age
+            attrs.agenix-rekey.nixosModules.default
+            ./agenix-rekey.nix
             attrs.disko.nixosModules.disko
             ./servers/loem
           ];
@@ -196,6 +205,14 @@
 
     globalConfig = {
       templates = import ./templates attrs;
+
+      "agenix-rekey" = attrs.agenix-rekey.configure {
+        userFlake = self;
+        nixosConfigurations = builtins.filterAttrs (_: x: x.config ? age) self.nixosConfigurations;
+        darwinConfigurations = self.darwinConfigurations or {};
+        homeConfigurations = {};
+        collectHomeManagerConfigurations = false;
+      };
 
       nixosConfigurations =
         builtins.foldl' (
