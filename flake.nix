@@ -18,6 +18,7 @@
     };
 
     systems.url = "github:nix-systems/default";
+    nixos-facter.url = "github:nix-community/nixos-facter";
     flake-compat.url = "https://flakehub.com/f/edolstra/flake-compat/1";
     flake-utils = {
       url = "https://flakehub.com/f/numtide/flake-utils/0.1";
@@ -83,6 +84,10 @@
       url = "https://flakehub.com/f/thiagokokada/nix-alien/0.1";
       # inputs.nixpkgs.follows = "nixpkgs-stable";
       inputs.flake-compat.follows = "flake-compat";
+    };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -169,6 +174,10 @@
           gce-automation = [
             "${nixpkgs}/nixos/modules/virtualisation/google-compute-image.nix"
             ./servers/gce-automation
+          ];
+          loem = [
+            attrs.disko.nixosModules.disko
+            ./servers/loem
           ];
         };
       }
