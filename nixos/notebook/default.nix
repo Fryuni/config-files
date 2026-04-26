@@ -39,9 +39,37 @@
 
   users.users.lotus.hashedPassword = "$6$5dd95KPYAytsdzt1$7auK5wgcz3xGilTjmUw./Acr9tNHQDBJn6n9Ob5bgBiL.vXOQQau.5tFhuF0uGkrI.36c8SK61m/P4kBFKoy60";
 
-  nix.settings = {
-    cores = 4;
-    max-jobs = 4;
+  nix = {
+    distributedBuilds = true;
+    buildMachines = [
+      {
+        hostName = "loem";
+        protocol = "ssh-ng";
+        sshUser = "root";
+        systems = [
+          "x86_64-linux"
+          "aarch64-linux"
+          "armv6l-linux"
+          "armv7l-linux"
+        ];
+        maxJobs = 6;
+        speedFactor = 1;
+      }
+    ];
+    settings = {
+      cores = 4;
+      max-jobs = 4;
+    };
+  };
+
+  environment.systemPackages = with pkgs; [
+    pkgs.nix-doc
+  ];
+
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+    package = pkgs.appimage-run;
   };
 
   networking.firewall.allowedTCPPorts = [22];

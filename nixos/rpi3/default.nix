@@ -54,19 +54,44 @@
     wget
     git
     htop
+    btop
     nh
   ];
 
-  nix.settings = {
-    trusted-users = ["root" "lotus"];
-    experimental-features = ["nix-command" "flakes"];
-    auto-optimise-store = true;
-  };
-
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 7d";
+  nix = {
+    distributedBuilds = true;
+    buildMachines = [
+      {
+        hostName = "loem";
+        protocol = "ssh-ng";
+        sshUser = "root";
+        systems = [
+          "x86_64-linux"
+          "aarch64-linux"
+          "armv6l-linux"
+          "armv7l-linux"
+        ];
+        maxJobs = 6;
+        speedFactor = 1;
+      }
+      {
+        hostName = "note";
+        protocol = "ssh-ng";
+        sshUser = "root";
+        systems = [
+          "x86_64-linux"
+          "aarch64-linux"
+          "armv6l-linux"
+          "armv7l-linux"
+        ];
+        maxJobs = 6;
+        speedFactor = 1;
+      }
+    ];
+    settings = {
+      cores = 4;
+      max-jobs = 0;
+    };
   };
 
   system.stateVersion = "26.05";

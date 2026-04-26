@@ -3,16 +3,6 @@
   pkgs,
   ...
 }: {
-  environment.systemPackages = with pkgs; [
-    pkgs.nix-doc
-  ];
-
-  programs.appimage = {
-    enable = true;
-    binfmt = true;
-    package = pkgs.appimage-run;
-  };
-
   age.secrets.nix-access-tokens.rekeyFile = ../secrets/nix-access-tokens;
   nix.extraOptions = let
     secrets = config.age.secrets or {};
