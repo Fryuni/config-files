@@ -16,6 +16,7 @@
     git
     jq
     dig
+    htop
     btop
     gnumake
     ripgrep

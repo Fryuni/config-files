@@ -1,0 +1,20 @@
+{
+  config,
+  pkgs,
+  lib,
+  modulesPath,
+  inputs,
+  ...
+}: {
+  imports = [
+    "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
+    inputs.nixos-hardware.nixosModules.raspberry-pi-3
+    ../modules/networking/tailscale.nix
+    ../common.nix
+    ../interactive.nix
+  ];
+
+  networking.hostName = "rpi3";
+
+  # time.timeZone = lib.mkForce "America/Sao_Paulo";
+}

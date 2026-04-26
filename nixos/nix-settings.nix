@@ -3,6 +3,10 @@
   pkgs,
   ...
 }: {
+  environment.systemPackages = with pkgs; [
+    nh
+  ];
+
   age.secrets.nix-access-tokens.rekeyFile = ../secrets/nix-access-tokens;
   nix.extraOptions = let
     secrets = config.age.secrets or {};
@@ -46,8 +50,17 @@
   };
 
   nix.gc = {
-    automatic = true;
+    automatic = false;
     dates = "weekly";
     options = "--delete-older-than 7d";
+  };
+
+  programs.nh = {
+    enable = true;
+    clean = {
+      enable = true;
+      dates = "daily";
+      extraArgs = "--keep-since 7d --optimise";
+    };
   };
 }

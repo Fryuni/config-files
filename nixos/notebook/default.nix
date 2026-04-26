@@ -46,6 +46,7 @@
         hostName = "loem";
         protocol = "ssh-ng";
         sshUser = "root";
+        sshKey = "/home/lotus/.ssh/id_ed25519";
         systems = [
           "x86_64-linux"
           "aarch64-linux"
