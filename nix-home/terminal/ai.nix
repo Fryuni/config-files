@@ -34,7 +34,6 @@
     });
 in {
   home.packages = with pkgs; [
-    pkgs.openwhispr
     llm-agents.crush
     llm-agents.opencode
     llm-agents.claude-code
@@ -68,18 +67,6 @@ in {
     wm = "workmux";
     wmd = "workmux dashboard";
   };
-
-  # Autostart OpenWhispr on login (XDG autostart for Plasma/X11 and any XDG-compliant DE)
-  xdg.configFile."autostart/openwhispr.desktop".text = ''
-    [Desktop Entry]
-    Type=Application
-    Name=OpenWhispr
-    Comment=Voice-to-text dictation
-    Exec=${pkgs.lib.meta.getExe pkgs.openwhispr}
-    Terminal=false
-    StartupNotify=false
-    X-GNOME-Autostart-enabled=true
-  '';
 
   home.file.".config/crush/crush.json".text = builtins.toJSON {
     mcp = {

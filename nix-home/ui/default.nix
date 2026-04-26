@@ -7,6 +7,7 @@
     ./plasma.nix
     ./vicinae.nix
     ./gtk.nix
+    ./fonts.nix
   ];
 
   home.packages = with pkgs; [
@@ -18,9 +19,13 @@
     (jrnl.overrideAttrs (_: {doTest = false;}))
     vlc
     screenkey
+    openwhispr
 
     master.zeal
   ];
+
+  home.file.".background-image".source = ../common/wallpaper/wallpaper.png;
+  xdg.enable = true;
 
   programs.mpv = {
     enable = true;
@@ -64,4 +69,16 @@
     enable = true;
     package = pkgs.stable.firefox-beta;
   };
+
+  # Autostart OpenWhispr on login (XDG autostart for Plasma/X11 and any XDG-compliant DE)
+  xdg.configFile."autostart/openwhispr.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=OpenWhispr
+    Comment=Voice-to-text dictation
+    Exec=${pkgs.lib.meta.getExe pkgs.openwhispr}
+    Terminal=false
+    StartupNotify=false
+    X-GNOME-Autostart-enabled=true
+  '';
 }

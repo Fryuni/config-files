@@ -190,7 +190,6 @@
 
         boxes = {
           rpi3 = [
-            home-manager.nixosModules.home-manager
             ./servers/rpi3
           ];
         };

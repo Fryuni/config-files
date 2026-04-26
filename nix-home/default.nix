@@ -1,13 +1,11 @@
 {...}: {
   # Let home-manager manage itself.
   home.stateVersion = "26.05";
-  programs.home-manager.enable = true;
 
   home.username = "lotus";
   home.homeDirectory = "/home/lotus";
 
   imports = [
-    ./ui
     ./modules
     ./secrets.nix
     ./nix.nix
@@ -18,10 +16,6 @@
   # ];
 
   services.syncthing.enable = true;
-
-  home.file.".background-image".source = ../common/wallpaper/wallpaper.png;
-
-  xdg.enable = true;
 
   # Disable manual generation to work around upstream home-manager bug:
   # both html and manpages depend on hmOptionsDocs.optionsJSON, whose
