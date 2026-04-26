@@ -21,6 +21,13 @@
     devices = ["/dev/sda" "/dev/sdb"];
   };
 
+  # Let this x86_64 server execute common ARM Linux builders through QEMU.
+  boot.binfmt.emulatedSystems = [
+    "aarch64-linux"
+    "armv6l-linux"
+    "armv7l-linux"
+  ];
+
   networking.useDHCP = false;
   networking.interfaces."enp0s31f6" = {
     ipv4.addresses = [
