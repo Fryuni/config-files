@@ -67,6 +67,14 @@ deploy config host="":
   : ${DEPLOY_HOST:="{{config}}"}
   nixos-rebuild switch --flake ".#{{config}}" --target-host "$DEPLOY_HOST" --use-substitutes --sudo
 
+remote-switch config host="":
+  #!/usr/bin/env bash
+  DEPLOY_HOST="{{host}}"
+  : ${DEPLOY_HOST:="{{config}}"}
+  nixos-rebuild switch --flake ".#{{config}}" \
+    --target-host "$DEPLOY_HOST" --build-host "$DEPLOY_HOST" \
+    --use-substitutes --sudo --max-jobs=auto --cores=0
+
 hostkey config host:
   #!/usr/bin/env bash
   set -euo pipefail
