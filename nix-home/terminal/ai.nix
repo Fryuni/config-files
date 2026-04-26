@@ -46,7 +46,8 @@ in {
       KIMI_API_KEY = {file = config.age.secrets.kimi-api-key.path;};
     })
     (makeAuthWrapper llm-agents.omp {
-      OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
+      # OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
+      KIMI_API_KEY = {file = config.age.secrets.kimi-api-key.path;};
     })
     (makeAuthWrapper mods {
       OPENAI_API_KEY = {file = config.age.secrets.openai-key.path;};
