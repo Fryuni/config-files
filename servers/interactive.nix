@@ -1,7 +1,12 @@
-{inputs, lib, ...}: {
+{
+  inputs,
+  lib,
+  ...
+}: {
   imports = [
     inputs.home-manager.nixosModules.home-manager
     ../nixos/sshHosts.nix
+    ../nixos/users.nix
   ];
 
   networking.firewall.allowedTCPPorts = [22];

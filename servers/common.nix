@@ -1,10 +1,13 @@
-{pkgs, lib, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   system.stateVersion = "26.05";
 
   imports = [
     ../nixos/nix-settings.nix
     ../nixos/registries.nix
-    ../nixos/users.nix
   ];
 
   environment.systemPackages = with pkgs; [
