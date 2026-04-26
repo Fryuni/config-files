@@ -59,6 +59,7 @@
     settings = {
       cores = 4;
       max-jobs = 4;
+      builders-use-substitutes = true;
     };
   };
 
