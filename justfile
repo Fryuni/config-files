@@ -71,9 +71,7 @@ remote-switch config host="":
   #!/usr/bin/env bash
   DEPLOY_HOST="{{host}}"
   : ${DEPLOY_HOST:="{{config}}"}
-  nixos-rebuild switch --flake ".#{{config}}" \
-    --target-host "$DEPLOY_HOST" --build-host "$DEPLOY_HOST" \
-    --use-substitutes --sudo --max-jobs=auto --cores=0
+  ssh "$DEPLOY_HOST" "sudo nixos-rebuild switch --flake gitlab:Fryuni/ZShtuils#{{config}}"
 
 hostkey config host:
   #!/usr/bin/env bash
