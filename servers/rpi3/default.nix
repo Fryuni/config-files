@@ -9,7 +9,7 @@
   imports = [
     "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
     inputs.nixos-hardware.nixosModules.raspberry-pi-3
-    ../modules/networking/tailscale.nix
+    ../../nixos/modules/networking/tailscale.nix
     ../common.nix
     ../interactive.nix
   ];
