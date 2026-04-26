@@ -55,11 +55,12 @@
         ];
         maxJobs = 6;
         speedFactor = 1;
+        supportedFeatures = ["kvm" "big-parallel"];
       }
     ];
     settings = {
       cores = 4;
-      max-jobs = 4;
+      max-jobs = "auto";
       builders-use-substitutes = true;
     };
   };
