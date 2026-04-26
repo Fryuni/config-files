@@ -33,7 +33,7 @@ let
     secretPaths
     ++ (
       if fileSecret != ""
-      then ["secrets/${fileSecret}"]
+      then [fileSecret]
       else []
     );
 in

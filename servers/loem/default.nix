@@ -1,13 +1,10 @@
 # Hetzner Loem server configuration
-{
-  config,
-  inputs,
-  ...
-}: {
+{config, ...}: {
   imports = [
     ../common.nix
     ./disko.nix
     ../../nixos/modules/networking/tailscale.nix
+    ../../nixos/modules/software-raid.nix
   ];
 
   age.secrets.tailscale-authkey.rekeyFile = ../../secrets/loem/tailscale-enroll-key;
@@ -23,8 +20,6 @@
     efiInstallAsRemovable = true;
     devices = ["/dev/sda" "/dev/sdb"];
   };
-
-  boot.swraid.enable = true;
 
   networking.useDHCP = false;
   networking.interfaces."enp0s31f6" = {
