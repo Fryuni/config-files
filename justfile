@@ -101,5 +101,6 @@ rekey *args:
   #!/usr/bin/env bash
   set -euo pipefail
 
+  agenix -r
   system="$(nix eval --raw --impure --expr builtins.currentSystem)"
   nix run ".#agenix-rekey.${system}.rekey" -- {{args}}

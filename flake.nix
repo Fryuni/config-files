@@ -172,9 +172,6 @@
         system = flake-utils.lib.system.x86_64-linux;
         boxes = {
           lotus-notebook = [
-            agenix.nixosModules.age
-            attrs.agenix-rekey.nixosModules.default
-            ./agenix-rekey.nix
             ./nixos
             ./nixos/notebook
           ];
@@ -183,9 +180,6 @@
             ./servers/gce-automation
           ];
           loem = [
-            agenix.nixosModules.age
-            attrs.agenix-rekey.nixosModules.default
-            ./agenix-rekey.nix
             attrs.disko.nixosModules.disko
             ./servers/loem
           ];
@@ -226,7 +220,12 @@
               nixpkgs.lib.nixosSystem (
                 {
                   modules =
-                    modules
+                    [
+                      agenix.nixosModules.age
+                      attrs.agenix-rekey.nixosModules.default
+                      ./agenix-rekey.nix
+                    ]
+                    ++ modules
                     ++ nixpkgs.lib.optionals (!isCross) [
                       attrs.determinate.nixosModules.default
                     ]

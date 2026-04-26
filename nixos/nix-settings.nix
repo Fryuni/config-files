@@ -13,6 +13,7 @@
     package = pkgs.appimage-run;
   };
 
+  age.secrets.nix-access-tokens.rekeyFile = ../secrets/nix-access-tokens;
   nix.extraOptions = let
     secrets = config.age.secrets or {};
     secretInclude = pkgs.lib.optionalString (secrets ? nix-access-tokens) "!include ${secrets.nix-access-tokens.path}";

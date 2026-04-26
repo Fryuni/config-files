@@ -10,7 +10,7 @@
     ../../nixos/modules/networking/tailscale.nix
   ];
 
-  age.secrets.tailscale-authkey.rekeyFile = ../../secrets/tailscale-vps-key;
+  age.secrets.tailscale-authkey.rekeyFile = ../../secrets/loem/tailscale-enroll-key;
 
   services.tailscale.authKeyFile = config.age.secrets.tailscale-authkey.path;
 

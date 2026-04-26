@@ -2,10 +2,10 @@
   age.secrets = {
     github-key.file = ../secrets/github-key;
     habitica-key.file = ../secrets/habitica-key;
-    openai-key.file = ../secrets/openai-key;
-    openrouter-key.file = ../secrets/openrouter-key;
-    firecrawl-api-key.file = ../secrets/firecrawl-api-key;
-    kimi-api-key.file = ../secrets/kimi-api-key;
+    openai-key.file = ../secrets/ai/openai;
+    openrouter-key.file = ../secrets/ai/openrouter;
+    firecrawl-api-key.file = ../secrets/ai/firecrawl;
+    kimi-api-key.file = ../secrets/ai/kimi;
 
     nix-access-tokens = {
       file = ../secrets/nix-access-tokens;

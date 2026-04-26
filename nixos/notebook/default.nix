@@ -10,7 +10,6 @@
     ../modules/development.nix
     ../modules/gaming.nix
     ../modules/networking/tailscale.nix
-    ../secrets.nix
   ];
 
   boot.loader.systemd-boot.enable = true;
@@ -60,7 +59,7 @@
     };
   };
 
-  # age.secrets.cloudflared-creds.rekeyFile = ../../secrets/notebook-cloudflare-tunnel;
+  # age.secrets.cloudflared-creds.rekeyFile = ../../secrets/notebook/cloudflare-tunnel;
   # services.cloudflared = {
   #   enable = true;
   #   tunnels = {
