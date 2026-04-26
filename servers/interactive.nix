@@ -1,4 +1,4 @@
-{inputs, ...}: {
+{inputs, lib, ...}: {
   imports = [
     inputs.home-manager.nixosModules.home-manager
     ../nixos/sshHosts.nix

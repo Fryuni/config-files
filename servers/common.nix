@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{pkgs, lib, ...}: {
   system.stateVersion = "26.05";
 
   imports = [
@@ -56,5 +56,13 @@
     LC_PAPER = "en_US.UTF-8";
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
+  };
+
+  services.openssh = {
+    enable = lib.mkDefault true;
+    settings = {
+      PasswordAuthentication = false;
+      PermitRootLogin = lib.mkDefault "prohibit-password";
+    };
   };
 }

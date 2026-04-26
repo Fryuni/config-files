@@ -5,6 +5,7 @@
     ./disko.nix
     ../../nixos/modules/networking/tailscale.nix
     ../../nixos/modules/software-raid.nix
+    ../remoteDev.nix
   ];
 
   age.secrets.tailscale-authkey.rekeyFile = ../../secrets/loem/tailscale-enroll-key;
@@ -49,14 +50,6 @@
     interface = "enp0s31f6";
   };
   networking.nameservers = ["8.8.8.8" "1.1.1.1"];
-
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      PermitRootLogin = "prohibit-password";
-    };
-  };
 
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBYY0uHuJGkwcZOsZLqUgdNw6FMxYkz5pY0YeUgmr8dw"
