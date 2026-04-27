@@ -31,7 +31,7 @@
       imports = [
         inputs.agenix.homeManagerModules.age
         ../nix-home
-        ../nix-home/terminal/ai.nix
+        ../nix-home/terminal
       ];
     };
   };

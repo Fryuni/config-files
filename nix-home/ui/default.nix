@@ -8,6 +8,8 @@
     ./vicinae.nix
     ./gtk.nix
     ./fonts.nix
+    ./alacritty.nix
+    ./ghostty.nix
   ];
 
   home.packages = with pkgs; [

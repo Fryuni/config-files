@@ -6,6 +6,7 @@ let
     # Dev key
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBYY0uHuJGkwcZOsZLqUgdNw6FMxYkz5pY0YeUgmr8dw"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN4weIfIxf3RMmhSII89HEGPqToqNKlwdYFW79CaBqCQ"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPZwBNlYpC3tigLKDxyU6+6jik0J63IIqT6DiFk7Dekc"
   ];
   fileSecret = getEnv "FILE";
 
