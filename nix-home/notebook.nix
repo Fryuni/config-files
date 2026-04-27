@@ -23,15 +23,13 @@
   services.gpg-agent.enable = true;
   services.gpg-agent.pinentry.package = pkgs.pinentry-rofi;
 
-  age.secrets.node-red-key = {
-    file = ../../secrets/node-red-key;
-  };
+  age.secrets.node-red-key.file = ../secrets/node-red-key;
 
   nix.package = pkgs.nix;
 
   services.node-red = {
     enable = true;
-    configFile = "${../../common/node-red.js}";
+    configFile = "${../common/node-red.js}";
     repo = "git@gitlab.com:Fryuni/node-red-config.git";
     environment = {
       CREDENTIALS_FILE = config.age.secrets.node-red-key.path;

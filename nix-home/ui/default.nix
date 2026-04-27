@@ -26,7 +26,7 @@
     master.zeal
   ];
 
-  home.file.".background-image".source = ../common/wallpaper/wallpaper.png;
+  home.file.".background-image".source = ../../common/wallpaper/wallpaper.png;
   xdg.enable = true;
 
   programs.mpv = {
