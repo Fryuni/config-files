@@ -55,4 +55,12 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBYY0uHuJGkwcZOsZLqUgdNw6FMxYkz5pY0YeUgmr8dw"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICphbHvsvJiWjPAV8+JlUZfMHZtXIcp9L+cxn6Y9pjBZ"
   ];
+
+  nix = {
+    distributedBuilds = true;
+    settings = {
+      cores = 3;
+      max-jobs = 2;
+    };
+  };
 }

@@ -40,28 +40,9 @@
   users.users.lotus.hashedPassword = "$6$5dd95KPYAytsdzt1$7auK5wgcz3xGilTjmUw./Acr9tNHQDBJn6n9Ob5bgBiL.vXOQQau.5tFhuF0uGkrI.36c8SK61m/P4kBFKoy60";
 
   nix = {
-    distributedBuilds = true;
-    buildMachines = [
-      {
-        hostName = "loem";
-        protocol = "ssh-ng";
-        sshUser = "lotus";
-        sshKey = "/home/lotus/.ssh/id_ed25519";
-        systems = [
-          "x86_64-linux"
-          "aarch64-linux"
-          "armv6l-linux"
-          "armv7l-linux"
-        ];
-        maxJobs = 6;
-        speedFactor = 1;
-        supportedFeatures = ["kvm" "big-parallel"];
-      }
-    ];
     settings = {
       cores = 4;
-      max-jobs = "auto";
-      builders-use-substitutes = true;
+      max-jobs = 2;
     };
   };
 

@@ -5,3 +5,4 @@ hostsecured
 /result
 .direnv
 /.pi/agent-sessions
+.puppeteerrc.cjs

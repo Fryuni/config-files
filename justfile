@@ -67,6 +67,13 @@ deploy config host="":
   : ${DEPLOY_HOST:="{{config}}"}
   nixos-rebuild switch --flake ".#{{config}}" --target-host "$DEPLOY_HOST" --use-substitutes --sudo
 
+deploy-reboot config host="":
+  #!/usr/bin/env bash
+  DEPLOY_HOST="{{host}}"
+  : ${DEPLOY_HOST:="{{config}}"}
+  nixos-rebuild boot --flake ".#{{config}}" --target-host "$DEPLOY_HOST" --use-substitutes --sudo
+  ssh "$DEPLOY_HOST" "sudo systemctl reboot"
+
 remote-switch config host="":
   #!/usr/bin/env bash
   DEPLOY_HOST="{{host}}"

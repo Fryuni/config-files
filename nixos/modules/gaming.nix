@@ -14,7 +14,7 @@
     mesa-demos
     lutris
     dconf
-    bottles
+    stable.bottles
     vulkan-tools
     winetricks
     # nix-gaming.packages.x86_64-linux.wine-tkg

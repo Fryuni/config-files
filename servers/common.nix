@@ -34,7 +34,7 @@
         alpha
         gsutil
         gke-gcloud-auth-plugin
-        terraform-tools
+        # terraform-tools
       ]
     ))
   ];
