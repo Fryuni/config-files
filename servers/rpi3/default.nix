@@ -16,5 +16,7 @@
 
   networking.hostName = "rpi3";
 
+  services.vmagent.enable = true;
+
   # time.timeZone = lib.mkForce "America/Sao_Paulo";
 }

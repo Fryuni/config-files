@@ -3,6 +3,7 @@
   imports = [
     ../common.nix
     ./disko.nix
+    ./metrics
     ../../nixos/modules/networking/tailscale.nix
     ../../nixos/modules/software-raid.nix
     ../remoteDev.nix
@@ -29,6 +30,7 @@
     "armv7l-linux"
   ];
 
+  networking.firewall.enable = false;
   networking.useDHCP = false;
   networking.interfaces."enp0s31f6" = {
     ipv4.addresses = [

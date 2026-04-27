@@ -21,6 +21,8 @@
 
   networking.hostName = "lotus-notebook";
 
+  services.vmagent.enable = true;
+
   # networking.nameservers = lib.mkForce [
   #   "45.90.28.0#G5--Note-f7fd51.dns.nextdns.io"
   #   "2a07:a8c0::#G5--Note-f7fd51.dns.nextdns.io"
