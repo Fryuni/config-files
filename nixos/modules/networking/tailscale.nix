@@ -1,9 +1,26 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }: let
-  package = pkgs.master.tailscale;
+  # NOTE: Tailscale doesn't support configuring TLS-terminated HTTP services declaratively.
+  #   See https://github.com/tailscale/tailscale/issues/18381
+  # Use fork with hack fix arround this issue while waiting for official position from Tailscale.
+  #   See https://github.com/tailscale/tailscale/issues/18381#issuecomment-4332462281
+  package = pkgs.master.tailscale.overrideAttrs (_: {
+    src = pkgs.fetchFromGitHub {
+      owner = "Fryuni";
+      repo = "tailscale";
+      rev = "c0ccbd0458ea68736a93eac5ce5be35ab1204cd4";
+      hash = "sha256-CUsp9t2eSNcGWNi1z30rc03jyL+2MonvZ92DEldyfFg=";
+    };
+
+    vendorHash = "sha256-5uzkG6NQh0znjgE6yV5b01y8bUlTvLqXyAoWbMRQNEY=";
+
+    # Reason why it is meaningless also in the issue comment above.
+    doCkeck = false;
+  });
 in {
   # make the tailscale command usable to users
   environment.systemPackages = [package];

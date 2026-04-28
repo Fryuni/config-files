@@ -47,8 +47,11 @@
   services.tailscale.serve = {
     enable = true;
     services = {
-      grafana.endpoints."tcp:3000" = "http://localhost:3000";
-      victoriametrics.endpoints."tcp:8428" = "http://localhost:8428";
+      grafana.endpoints."tcp:443" = "tls-terminated-http://localhost:3000";
+      victoriametrics.endpoints = {
+        "tcp:80" = "http://localhost:8428";
+        "tcp:443" = "tls-terminated-http://localhost:8428";
+      };
     };
   };
 
