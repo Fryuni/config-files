@@ -59,17 +59,11 @@ in {
     gum
     charm
     glow
-    skate
 
     # Cloud
-    terraform
-    tfk8s
-    pulumi-bin
     gcloud-sdk
     google-cloud-sql-proxy
 
-    grafterm
-    python312Packages.habitipy
     yt-dlp
   ];
 

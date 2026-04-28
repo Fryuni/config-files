@@ -19,6 +19,12 @@
   boot.blacklistedKernelModules = ["ideapad_laptop"];
   boot.extraModulePackages = with config.boot.kernelPackages; [zenpower];
 
+  boot.binfmt.emulatedSystems = [
+    "aarch64-linux"
+    "armv6l-linux"
+    "armv7l-linux"
+  ];
+
   networking.hostName = "lotus-notebook";
 
   services.vmagent.enable = true;

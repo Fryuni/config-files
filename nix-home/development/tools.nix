@@ -51,6 +51,9 @@
     krew
     k9s
     kubernetes-helm
+    terraform
+    tfk8s
+    pulumi-bin
   ];
 
   home.sessionPath = [
