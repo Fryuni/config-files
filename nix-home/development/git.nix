@@ -15,7 +15,7 @@
     enable = true;
 
     signing = {
-      key = "2B568731DB2447EC";
+      key = "~/.ssh/id_ed25519.pub";
       signByDefault = true;
     };
 
@@ -49,6 +49,7 @@
 
       init.defaultBranch = "main";
       tag.gpgSign = true;
+      gpg.format = "ssh";
 
       push.default = "upstream";
     };
