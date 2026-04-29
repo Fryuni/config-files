@@ -3,6 +3,8 @@
   imports = [
     ../common.nix
     ./disko.nix
+    ./soft-serve.nix
+
     ./metrics
     ../../nixos/modules/networking/tailscale.nix
     ../../nixos/modules/software-raid.nix
