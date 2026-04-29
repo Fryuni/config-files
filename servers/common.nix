@@ -39,6 +39,8 @@
     ))
   ];
 
+  environment.variables.EDITOR = "nvim";
+
   programs.neovim = {
     enable = true;
   };
