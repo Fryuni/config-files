@@ -3,4 +3,4 @@ merge_strategy: rebase
 
 pre_merge:
   - 'nix run .#build'
-  - 'nix run .#os-build'
+  - 'nixos-rebuild build --no-link --flake .'
