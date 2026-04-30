@@ -1,5 +1,6 @@
 {
   pkgs,
+  config,
   lib,
   ...
 }: {
@@ -14,6 +15,16 @@
     tree-sitter
     gcc
   ];
+
+  services.git-sync = {
+    enable = true;
+    repositories = {
+      nvim-config = {
+        path = "${config.home.homeDirectory}/.config/nvim";
+        uri = "git@gitlab.com:Fryuni/astronvim-config.git";
+      };
+    };
+  };
 
   home.activation = {
     "clearNvimState" = lib.hm.dag.entryAfter ["linkGeneration"] ''

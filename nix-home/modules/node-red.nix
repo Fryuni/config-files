@@ -85,6 +85,16 @@ in {
   config = mkIf cfg.enable {
     programs.git.enable = true;
 
+    services.git-sync = mkIf (cfg.repo != null) {
+      enable = true;
+      repositories = {
+        node-red-config = {
+          path = cfg.userDir;
+          uri = cfg.repo;
+        };
+      };
+    };
+
     systemd.user.services.node-red = {
       Unit = {
         Description = "Node-RED Service";
@@ -105,18 +115,6 @@ in {
         #     pkgs.writers.writeBash "sync-node-red-config-repo" ''
         #       set -exuo pipefail
         #       export PATH=${config.home.homeDirectory}/.nix-profile/bin:$PATH
-        #
-        #       if [ "$(git config get remote.origin.url||true)" = ${repo} ]; then
-        #         echo "Repo configured, syncing..."
-        #         git add . || true
-        #         git commit --all --message "service initialization sync" || true
-        #         git pull --rebase || true
-        #       else
-        #         echo "Repo not configured, cloning..."
-        #         rm -rf * .*
-        #         git clone ${repo} .
-        #       fi
-        #
         #       echo "node_modules" > .git/info/exclude
         #       echo "*.backup" > .git/info/exclude
         #

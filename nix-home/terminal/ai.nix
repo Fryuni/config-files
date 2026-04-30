@@ -101,7 +101,7 @@ in {
     repositories = {
       oh-my-pi = {
         path = "${config.home.homeDirectory}/.omp/agent";
-        uri = "git@git-ss.rudd-agama.ts.net:configs/oh-my-pi";
+        uri = "git@git-ss.rudd-agama.ts.net:configs/oh-my-pi.git";
       };
     };
   };
