@@ -103,6 +103,10 @@ in {
         path = "${config.home.homeDirectory}/.omp/agent";
         uri = "git@git-ss.rudd-agama.ts.net:configs/oh-my-pi.git";
       };
+      hermes = {
+        path = "${config.home.homeDirectory}/.hermes";
+        uri = "git@git-ss.rudd-agama.ts.net:configs/hermes.git";
+      };
     };
   };
 }
