@@ -22,6 +22,24 @@
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
+    matchBlocks = {
+      "vps1" = {
+        user = "fedora";
+        identitiesOnly = true;
+      };
+      "*" = {
+        forwardAgent = false;
+        addKeysToAgent = "no";
+        compression = false;
+        serverAliveInterval = 0;
+        serverAliveCountMax = 3;
+        hashKnownHosts = false;
+        userKnownHostsFile = "~/.ssh/known_hosts";
+        controlMaster = "auto";
+        controlPath = "~/.ssh/master-%r@%n:%p";
+        controlPersist = "300";
+      };
+    };
   };
 
   services.gpg-agent.enable = true;
