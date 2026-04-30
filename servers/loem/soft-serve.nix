@@ -17,6 +17,8 @@
       stats = {
         listen_addr = "127.0.0.1:23233";
       };
+      allow-keyless = true;
+      anon-access = "admin-access";
       initial_admin_keys = config.users.users.root.openssh.authorizedKeys.keys;
     };
   };
