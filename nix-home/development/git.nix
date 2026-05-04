@@ -7,6 +7,7 @@
   home.packages = with pkgs; [
     gh # GitHub CLI
     glab # GitLab CLI
+    forgejo-cli # Forgejo CLI
     lazygit
     rustCrates.octorus
   ];
