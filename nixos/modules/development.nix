@@ -11,7 +11,7 @@
     gcc-unwrapped.lib
     gcc
     file
-    termshark
+    # termshark
     perf
     docker-compose
   ];
@@ -32,5 +32,5 @@
     };
   };
 
-  programs.wireshark.enable = true;
+  programs.wireshark.enable = false;
 }
