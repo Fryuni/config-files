@@ -1,6 +1,7 @@
 _: {
-  services.gitea = {
+  services.forgejo = {
     enable = true;
+    lfs.enable = true;
     settings = {
       server = {
         DOMAIN = "gitea.rudd-agama.ts.net";

@@ -6,7 +6,7 @@
     ./soft-serve.nix
 
     ./metrics
-    ./gitea.nix
+    ./forgejo.nix
     ../../nixos/modules/networking/tailscale.nix
     ../../nixos/modules/software-raid.nix
     ../remoteDev.nix
