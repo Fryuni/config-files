@@ -16,7 +16,7 @@
     stable.calibre
     kdePackages.okular
     spotify
-    discord-canary
+    stable.discord-canary
     master.obsidian
     (jrnl.overrideAttrs (_: {doTest = false;}))
     vlc
