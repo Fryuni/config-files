@@ -698,9 +698,19 @@ in {
     };
   };
 
+  assertions = [
+    {
+      assertion = lib.versionOlder pkgs.stable.flameshot.version "14";
+      message = "Flameshot is pinned to pkgs.stable.flameshot because v14 removed the grim adapter settings used on Hyprland; revisit the Flameshot config before upgrading.";
+    }
+  ];
+
   # Flameshot screenshot tool with Wayland/grim support
   services.flameshot = {
     enable = true;
+    # v14.0.rc1 removed useGrimAdapter/disabledGrimWarning, then crashes in
+    # resolveAnyConfigErrors when this managed config contains those keys.
+    package = pkgs.stable.flameshot;
     settings = {
       General = {
         # Use grim adapter for Wayland compatibility (required for Hyprland)
