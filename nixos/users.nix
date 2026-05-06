@@ -4,6 +4,7 @@
   users.users.lotus = {
     uid = 1000;
     isNormalUser = true;
+    linger = true;
     description = "Void Lotus";
     extraGroups = [
       "networkmanager"
