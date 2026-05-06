@@ -45,6 +45,11 @@
   services.gpg-agent.enable = true;
   services.gpg-agent.pinentry.package = pkgs.pinentry-rofi;
 
+  hermes = {
+    enabled = true;
+    gateway.enabled = true;
+  };
+
   age.secrets.node-red-key.file = ../secrets/node-red-key;
 
   nix.package = pkgs.nix;

@@ -68,4 +68,6 @@
       max-jobs = 2;
     };
   };
+
+  home-manager.users.lotus.hermes.enabled = true;
 }

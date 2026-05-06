@@ -1,6 +1,7 @@
 final: pkgs: {
   lib =
     pkgs.lib
+    // (import ./lib.nix {inherit pkgs;})
     // {
       maintainers =
         pkgs.lib.maintainers
