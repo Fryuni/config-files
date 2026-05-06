@@ -6,3 +6,4 @@ hostsecured
 .direnv
 /.pi/agent-sessions
 .puppeteerrc.cjs
+*.log
