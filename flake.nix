@@ -41,7 +41,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     llm-agents = {
-      url = "git+https://codeberg.org/Fryuni/llm-agents.nix";
+      url = "github:numtide/llm-agents.nix";
       # inputs.nixpkgs.follows = "nixpkgs";
     };
     nur = {

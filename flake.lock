@@ -475,11 +475,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777898446,
-        "narHash": "sha256-tTEOTTjMHd8Vffn4hehLTPgOXXxJ27xfkf4DoyZgD7s=",
+        "lastModified": 1777988971,
+        "narHash": "sha256-qIoWPDs+0/8JecyYgE3gpKQxW/4bLW/gp45vow9ioCQ=",
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "rev": "5d82aa3d6b5da25dbfec1a995750a70a03b8c659",
+        "rev": "0678d8986be1661af6bb555f3489f2fdfc31f6ff",
         "type": "github"
       },
       "original": {
@@ -725,17 +725,17 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1778098783,
-        "narHash": "sha256-/Xrwvk4RsOeAHLWnTU0iZxuCeMh+JPFNPpWV2Zn2dA0=",
-        "ref": "refs/heads/main",
-        "rev": "66938b66970d88e30cdfc8bf002222abddac0926",
-        "revCount": 8415,
-        "type": "git",
-        "url": "https://codeberg.org/Fryuni/llm-agents.nix"
+        "lastModified": 1778190489,
+        "narHash": "sha256-HuYEZm1ZpcY6D103MAtAtrrh37GsvM4wsTY3WOIVS3g=",
+        "owner": "numtide",
+        "repo": "llm-agents.nix",
+        "rev": "2ad1248637de136444e5337044b884a6368ad52c",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "https://codeberg.org/Fryuni/llm-agents.nix"
+        "owner": "numtide",
+        "repo": "llm-agents.nix",
+        "type": "github"
       }
     },
     "nix": {
@@ -1133,11 +1133,11 @@
     },
     "nixpkgs_9": {
       "locked": {
-        "lastModified": 1777826146,
-        "narHash": "sha256-wQ/iN5Zp5VIa3ebBibijPnLyKhor+xEbDy4d0goa9Zs=",
+        "lastModified": 1778124196,
+        "narHash": "sha256-pYEytCNic/czazbV9r3tbQ6BZzqRBg/41x2dIC5ymOo=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "73c703c22422b8951895a960959dbbaca7296492",
+        "rev": "68a8af93ff4297686cb68880845e61e5e2e41d92",
         "type": "github"
       },
       "original": {
