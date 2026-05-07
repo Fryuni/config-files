@@ -17,6 +17,18 @@ in {
     enabled = lib.mkEnableOption "Hermes agent";
 
     gateway.enabled = lib.mkEnableOption "Hermes messaging gateway";
+
+    dashboard = {
+      enabled = lib.mkEnableOption "Hermes dashboard";
+
+      tailscaleService = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = ''
+          Name of the Tailscale Service exposing the Hermes dashboard.
+        '';
+      };
+    };
   };
 
   config = lib.mkMerge [
@@ -25,6 +37,14 @@ in {
         {
           assertion = !cfg.gateway.enabled || cfg.enabled;
           message = "hermes.gateway.enabled requires hermes.enabled.";
+        }
+        {
+          assertion = !cfg.dashboard.enabled || cfg.enabled;
+          message = "hermes.dashboard.enabled requires hermes.enabled.";
+        }
+        {
+          assertion = cfg.dashboard.tailscaleService == null || cfg.dashboard.enabled;
+          message = "hermes.dashboard.tailscaleService requires hermes.dashboard.enabled.";
         }
       ];
     }
@@ -79,6 +99,44 @@ in {
           WantedBy = ["default.target"];
         };
       };
+
+      systemd.user.services.hermes-dashboard = lib.mkIf cfg.dashboard.enabled {
+        Unit = {
+          Description = "Hermes Dashboard";
+          After = ["network-online.target"];
+          Wants = ["network-online.target"];
+        };
+
+        Service = {
+          ExecStart =
+            "${package}/bin/hermes dashboard --no-open"
+            + lib.optionalString (cfg.dashboard.tailscaleService != null) " --host 0.0.0.0 --port 9120 --insecure";
+          Restart = "always";
+          RestartSec = "10s";
+        };
+
+        Install = {
+          WantedBy = ["default.target"];
+        };
+      };
+
+      # systemd.user.services.hermes-dashboard-tailscale = lib.mkIf (cfg.dashboard.enabled && cfg.dashboard.tailscaleService != null) {
+      #   Unit = {
+      #     Description = "Tailscale Service for Hermes Dashboard";
+      #     After = ["network-online.target" "hermes-dashboard.service"];
+      #     Wants = ["network-online.target" "hermes-dashboard.service"];
+      #   };
+      #
+      #   Service = {
+      #     ExecStart = "${pkgs.tailscale}/bin/tailscale serve --bg=false --service=svc:${cfg.dashboard.tailscaleService} --https=443 9120";
+      #     Restart = "always";
+      #     RestartSec = "10s";
+      #   };
+      #
+      #   Install = {
+      #     WantedBy = ["default.target"];
+      #   };
+      # };
     })
   ];
 }

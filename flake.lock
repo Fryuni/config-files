@@ -725,11 +725,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1778089467,
-        "narHash": "sha256-1EuOZBWWhPV9jZP5n/p8o+1/f8sKX/hjN0JYw3l4/r0=",
+        "lastModified": 1778098783,
+        "narHash": "sha256-/Xrwvk4RsOeAHLWnTU0iZxuCeMh+JPFNPpWV2Zn2dA0=",
         "ref": "refs/heads/main",
-        "rev": "d85a33c4da16703b9ec14235edcf468f4ee2192c",
-        "revCount": 8414,
+        "rev": "66938b66970d88e30cdfc8bf002222abddac0926",
+        "revCount": 8415,
         "type": "git",
         "url": "https://codeberg.org/Fryuni/llm-agents.nix"
       },

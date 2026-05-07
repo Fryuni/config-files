@@ -48,6 +48,10 @@
   hermes = {
     enabled = true;
     gateway.enabled = true;
+    dashboard = {
+      enabled = true;
+      tailscaleService = "hermes";
+    };
   };
 
   age.secrets.node-red-key.file = ../secrets/node-red-key;
