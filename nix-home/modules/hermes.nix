@@ -70,8 +70,12 @@ in {
 
       programs.git.enable = true;
 
-      home.packages = [
-        package
+      home.packages = with pkgs; [
+        # (uv.overrideAttrs (old: {
+        #   buildInputs = old.buildInputs ++ [python311];
+        # }))
+        uv
+        ffmpeg ripgrep
       ];
 
       services.git-sync = {
@@ -82,43 +86,43 @@ in {
         };
       };
 
-      systemd.user.services.hermes-gateway = lib.mkIf cfg.gateway.enabled {
-        Unit = {
-          Description = "Hermes Messaging Gateway";
-          After = ["network-online.target"];
-          Wants = ["network-online.target"];
-        };
+      # systemd.user.services.hermes-gateway = lib.mkIf cfg.gateway.enabled {
+      #   Unit = {
+      #     Description = "Hermes Messaging Gateway";
+      #     After = ["network-online.target"];
+      #     Wants = ["network-online.target"];
+      #   };
+      #
+      #   Service = {
+      #     ExecStart = "${package}/bin/hermes gateway run --accept-hooks";
+      #     Restart = "always";
+      #     RestartSec = "10s";
+      #   };
+      #
+      #   Install = {
+      #     WantedBy = ["default.target"];
+      #   };
+      # };
 
-        Service = {
-          ExecStart = "${package}/bin/hermes gateway run --accept-hooks";
-          Restart = "always";
-          RestartSec = "10s";
-        };
-
-        Install = {
-          WantedBy = ["default.target"];
-        };
-      };
-
-      systemd.user.services.hermes-dashboard = lib.mkIf cfg.dashboard.enabled {
-        Unit = {
-          Description = "Hermes Dashboard";
-          After = ["network-online.target"];
-          Wants = ["network-online.target"];
-        };
-
-        Service = {
-          ExecStart =
-            "${package}/bin/hermes dashboard --no-open"
-            + lib.optionalString (cfg.dashboard.tailscaleService != null) " --host 0.0.0.0 --port 9120 --insecure";
-          Restart = "always";
-          RestartSec = "10s";
-        };
-
-        Install = {
-          WantedBy = ["default.target"];
-        };
-      };
+      # systemd.user.services.hermes-dashboard = lib.mkIf cfg.dashboard.enabled {
+      #   Unit = {
+      #     Description = "Hermes Dashboard";
+      #     After = ["network-online.target"];
+      #     Wants = ["network-online.target"];
+      #   };
+      #
+      #   Service = {
+      #     ExecStart =
+      #       "${package}/bin/hermes dashboard --no-open"
+      #       + lib.optionalString (cfg.dashboard.tailscaleService != null) " --host 0.0.0.0 --port 9120 --insecure";
+      #     Restart = "always";
+      #     RestartSec = "10s";
+      #   };
+      #
+      #   Install = {
+      #     WantedBy = ["default.target"];
+      #   };
+      # };
 
       # systemd.user.services.hermes-dashboard-tailscale = lib.mkIf (cfg.dashboard.enabled && cfg.dashboard.tailscaleService != null) {
       #   Unit = {
