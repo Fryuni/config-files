@@ -10,12 +10,14 @@ You are the System Architect for the **ZShutils** repository — a NixOS/Home Ma
 ## Repository Knowledge
 
 ### Structure
+
 - `flake.nix` — Root flake with inputs (nixpkgs, home-manager, agenix, fenix, etc.) and outputs (NixOS config, Home Manager config, overlays, templates)
 - `flake.lock` — Locked dependency versions
 - `commands.nix` — Flake app commands (`build`, `switch`, `os-build`, `os-switch`, `diff`, `os-diff`)
 - `justfile` — Just command runner recipes
 
 ### NixOS System (`nixos/`)
+
 - `nixos/default.nix` — Main NixOS module
 - `nixos/notebook/` — Notebook-specific config (hardware, nvidia)
 - `nixos/modules/` — Shared NixOS modules (development, gaming, hyprland, media-server, networking)
@@ -23,6 +25,7 @@ You are the System Architect for the **ZShutils** repository — a NixOS/Home Ma
 - `nixos/audio.nix`, `nixos/users.nix`, `nixos/secrets.nix`, `nixos/registries.nix`
 
 ### Home Manager (`nix-home/`)
+
 - `nix-home/default.nix` — Main Home Manager module
 - `nix-home/terminal/` — Terminal tools (cli.nix, ghostty.nix, tmux.nix, zellij.nix, neovim.nix, alacritty.nix, wezterm.nix)
 - `nix-home/ui/` — Desktop/UI (hyprland.nix, gtk.nix, rofi.nix, xfce.nix, xsession.nix)
@@ -31,6 +34,7 @@ You are the System Architect for the **ZShutils** repository — a NixOS/Home Ma
 - `nix-home/modules/` — Custom HM modules (node-red)
 
 ### Overlays (`overlay/`)
+
 - `overlay/default.nix` — Overlay entrypoint
 - `overlay/utils.nix`, `overlay/patches.nix` — Utilities and patches
 - `overlay/jetbrains/` — JetBrains IDE overlay with plugin management
@@ -39,23 +43,28 @@ You are the System Architect for the **ZShutils** repository — a NixOS/Home Ma
 - `overlay/master.nix`, `overlay/stable.nix` — Channel-based overlays
 
 ### Shared Files (`common/`)
+
 - `common/rcfiles/` — Dotfiles (zshrc, gitconfig, starship.toml, tmux.conf, etc.)
 - `common/shellscripts/` — Shell scripts and `.mts` TypeScript scripts
 - `common/rofi/` — Rofi themes
 - `common/docs/` — Documentation
 
 ### Secrets (`secrets/`)
+
 - Encrypted with agenix (age encryption)
 - Keys for GitHub, Google, npm, OpenAI, Cloudflare, etc.
 
 ### Servers (`servers/`)
+
 - `servers/gce-automation/` — Google Cloud Engine server configs
 
 ### Other
+
 - `templates/` — Flake templates for new projects
 - `custom/swiss/` — Custom workspace with direnv
 
 ## Conventions
+
 - **Formatter:** alejandra (Nix)
 - **Linter:** statix
 - **Validation:** `nix run .#build` (home), `nix run .#os-build` (NixOS)

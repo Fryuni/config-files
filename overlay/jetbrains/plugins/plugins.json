@@ -28,19 +28,14 @@
       "name": "ideavim"
     },
     "631": {
-      "compatible": [
-        "idea-ultimate"
-      ],
+      "compatible": ["idea-ultimate"],
       "builds": {
         "241.9959.31": "https://plugins.jetbrains.com/files/631/475319/python-241.9959.31.zip"
       },
       "name": "python"
     },
     "6954": {
-      "compatible": [
-        "idea-community",
-        "idea-ultimate"
-      ],
+      "compatible": ["idea-community", "idea-ultimate"],
       "builds": {
         "241.9959.31": null
       },
@@ -74,10 +69,7 @@
       "name": "ini"
     },
     "7219": {
-      "compatible": [
-        "idea-ultimate",
-        "phpstorm"
-      ],
+      "compatible": ["idea-ultimate", "phpstorm"],
       "builds": {
         "241.8102.119": "https://plugins.jetbrains.com/files/7219/467592/Symfony_Plugin-2022.1.263.zip",
         "241.9959.31": "https://plugins.jetbrains.com/files/7219/467592/Symfony_Plugin-2022.1.263.zip"
@@ -85,10 +77,7 @@
       "name": "symfony-support"
     },
     "7320": {
-      "compatible": [
-        "idea-ultimate",
-        "phpstorm"
-      ],
+      "compatible": ["idea-ultimate", "phpstorm"],
       "builds": {
         "241.8102.119": "https://plugins.jetbrains.com/files/7320/346181/PHP_Annotations-9.4.0.zip",
         "241.9959.31": "https://plugins.jetbrains.com/files/7320/346181/PHP_Annotations-9.4.0.zip"
@@ -96,12 +85,7 @@
       "name": "php-annotations"
     },
     "7322": {
-      "compatible": [
-        "datagrip",
-        "goland",
-        "idea-community",
-        "rust-rover"
-      ],
+      "compatible": ["datagrip", "goland", "idea-community", "rust-rover"],
       "builds": {
         "233.13135.127": "https://plugins.jetbrains.com/files/7322/456914/python-ce-233.13135.103.zip",
         "233.14015.29": "https://plugins.jetbrains.com/files/7322/474341/python-ce-233.14015.106.zip",
@@ -209,10 +193,7 @@
       "name": "nixidea"
     },
     "9568": {
-      "compatible": [
-        "goland",
-        "idea-ultimate"
-      ],
+      "compatible": ["goland", "idea-ultimate"],
       "builds": {
         "241.8102.131": "https://plugins.jetbrains.com/files/9568/469233/go-plugin-241.8102.112.zip",
         "241.9959.31": "https://plugins.jetbrains.com/files/9568/475234/go-plugin-241.9959.31.zip"
@@ -401,11 +382,7 @@
       "name": "astro-goland-nightly"
     },
     "22407": {
-      "compatible": [
-        "clion",
-        "idea-ultimate",
-        "rust-rover"
-      ],
+      "compatible": ["clion", "idea-ultimate", "rust-rover"],
       "builds": {
         "233.13135.127": "https://plugins.jetbrains.com/files/22407/473386/intellij-rust-233.23135.127.zip",
         "241.8102.118": "https://plugins.jetbrains.com/files/22407/473807/intellij-rust-241.23135.127.zip",

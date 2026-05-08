@@ -2,5 +2,5 @@ main_branch: main
 merge_strategy: rebase
 
 pre_merge:
-  - 'nix run .#build'
-  - 'nixos-rebuild build --no-link --flake .'
+  - "nix run .#build"
+  - "nixos-rebuild build --no-link --flake ."

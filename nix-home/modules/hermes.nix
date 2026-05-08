@@ -75,7 +75,8 @@ in {
         #   buildInputs = old.buildInputs ++ [python311];
         # }))
         uv
-        ffmpeg ripgrep
+        ffmpeg
+        ripgrep
       ];
 
       services.git-sync = {

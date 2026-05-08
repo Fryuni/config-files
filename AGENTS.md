@@ -5,6 +5,7 @@ This document provides guidelines for AI coding agents working in this repositor
 ## Project Overview
 
 **NixOS/Home Manager flake configuration** (dotfiles) managing:
+
 - NixOS system configuration for `lotus-notebook`
 - Home Manager user environment
 - Custom package overlays and GCE server configurations
@@ -29,6 +30,7 @@ This document provides guidelines for AI coding agents working in this repositor
 ### Validation (Testing)
 
 No unit tests - validate by building:
+
 ```bash
 nix run .#build              # Build home config without applying
 nix run .#os-build           # Build NixOS config without applying
@@ -37,6 +39,7 @@ nix run .#os-diff            # Show NixOS config changes before applying
 ```
 
 ### Formatting and Linting
+
 ```bash
 nix fmt .                    # Format all nix files with alejandra
 nix fmt <file-path>          # Format specific file
@@ -44,12 +47,14 @@ nix run .#fmt                # Run statix fix + alejandra
 ```
 
 ### Dependency Updates
+
 ```bash
 just update                  # Update flake + overlays + custom packages
 just update-flake            # Update flake.lock only
 ```
 
 ### Utility
+
 ```bash
 nix run .#ls-pkg             # List installed packages
 nix-search --flake nixpkgs <term>  # Search for packages
@@ -59,11 +64,13 @@ just why-home <pkg>          # Why does home depend on package
 ## Code Style Guidelines
 
 ### Naming Conventions
+
 - **Files/directories:** kebab-case (`doom-nvim.nix`, `nix-home/`)
 - **Nix attributes:** camelCase (`homeManagerBin`, `pkgsFun`)
 - **Package names:** kebab-case (`bitwarden-cli`)
 
 ### Module Structure
+
 ```nix
 {
   pkgs,
@@ -87,6 +94,7 @@ just why-home <pkg>          # Why does home depend on package
 ```
 
 ### Let Bindings
+
 ```nix
 {pkgs, ...}: let
   someLocal = pkgs.somePackage;
@@ -96,6 +104,7 @@ in {
 ```
 
 ### Overlay Pattern
+
 ```nix
 final: pkgs: {
   packageName = pkgs.packageName.override { ... };
@@ -104,6 +113,7 @@ final: pkgs: {
 ```
 
 ### Imports
+
 ```nix
 # Module imports: relative paths
 imports = [ ./subdir ./file.nix ];
@@ -113,6 +123,7 @@ imports = [ ./subdir ./file.nix ];
 ```
 
 ### Error Handling
+
 ```nix
 # Throw for unsupported cases
 products = versions.${system} or (throw "Unsupported system: ${system}");
@@ -125,6 +136,7 @@ ${pkgs.someCommand} || true
 ```
 
 ### Secrets (agenix)
+
 ```nix
 age.secrets.secret-name = {
   file = ../secrets/secret-file;
@@ -135,6 +147,7 @@ age.secrets.secret-name = {
 ## Formatting Rules
 
 Run `nix fmt .` before committing. Expectations:
+
 - 2-space indentation
 - Trailing semicolons on all attributes
 - Opening braces on same line as assignment
@@ -143,6 +156,7 @@ Run `nix fmt .` before committing. Expectations:
 ## Commit Style
 
 Use conventional commits with optional scope:
+
 ```
 type(scope): description
 ```
@@ -152,6 +166,7 @@ type(scope): description
 **Scopes** (optional): `cli`, `ide`, `nix`, `os`, `net`, `flake`, `tools`
 
 **Examples:**
+
 - `feat(ide): Install Zed Editor`
 - `fix(cli): Downgrade Python used by GCloud SDK`
 - `chore: Update flake`
@@ -160,6 +175,7 @@ type(scope): description
 ## Key Dependencies
 
 Access different nixpkgs channels:
+
 - `pkgs` / `final` - Current (unstable)
 - `pkgs.stable` / `final.stable` - Stable channel
 - `pkgs.master` / `final.master` - Master branch
