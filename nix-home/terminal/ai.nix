@@ -29,6 +29,8 @@
     oc = "opencode";
     # cc = "claude";
     wm = "workmux";
+    wma = "workmux add -o";
+    wmb = "workmux add -o --background --prompt-editor";
     wmd = "workmux dashboard";
   };
 
