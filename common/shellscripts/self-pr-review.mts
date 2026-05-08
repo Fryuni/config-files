@@ -3,6 +3,18 @@
 // @ts-expect-error Bun runtime module is resolved at execution time.
 import { $, spawn } from "bun";
 
+let lastChain = Promise.resolve();
+
+function wait<T>(cb: () => Promise<T>): Promise<T> {
+  const result = lastChain.then(cb);
+  lastChain = result
+    .catch(() => {
+      /* prevent unhandled rejections from breaking the chain */
+    })
+    .then(() => timers.setTimeout(500)); // small delay between operations to avoid hitting rate limits
+  return result;
+}
+
 const AUTHOR_LOGIN = "Fryuni";
 
 // PRs to ignore (e.g. pending on other people, no permission to update)
@@ -12,9 +24,7 @@ const IGNORED_PRS: string[] = [
   "https://github.com/samber/mo/pull/4",
 ];
 
-const IGNORED_REPOS: string[] = [
-  "Fryuni/astronomicon",
-];
+const IGNORED_REPOS: string[] = ["Fryuni/astronomicon"];
 
 const IGNORED_OWNERS: string[] = ["croct-tech"];
 
@@ -153,7 +163,9 @@ function logSuccess(message: string): void {
   console.log(`${colors.green}✓${colors.reset} ${message}`);
 }
 
-function parseRepoIdentifier(nameWithOwner: string): { owner: string; repo: string } | null {
+function parseRepoIdentifier(
+  nameWithOwner: string,
+): { owner: string; repo: string } | null {
   const [owner, repo] = nameWithOwner.split("/");
   if (!owner || !repo) {
     return null;
@@ -161,7 +173,10 @@ function parseRepoIdentifier(nameWithOwner: string): { owner: string; repo: stri
   return { owner, repo };
 }
 
-async function ghGraphql<T>(query: string, variables: Record<string, string | undefined>): Promise<T | null> {
+async function ghGraphql<T>(
+  query: string,
+  variables: Record<string, string | undefined>,
+): Promise<T | null> {
   const args: string[] = ["graphql", "-f", `query=${query}`];
 
   for (const [key, value] of Object.entries(variables)) {
@@ -171,7 +186,7 @@ async function ghGraphql<T>(query: string, variables: Record<string, string | un
   }
 
   try {
-    return (await $`gh api ${args}`.json()) as T;
+    return (await wait(() => $`gh api ${args}`.json())) as T;
   } catch (error) {
     if (error instanceof $.ShellError) {
       const stderr = error.stderr.toString().trim();
@@ -186,11 +201,13 @@ async function ghGraphql<T>(query: string, variables: Record<string, string | un
 
 async function ghRest<T>(path: string): Promise<T | null> {
   try {
-    return (await $`gh api ${path}`.json()) as T;
+    return (await wait(() => $`gh api ${path}`.json())) as T;
   } catch (error) {
     if (error instanceof $.ShellError) {
       const stderr = error.stderr.toString().trim();
-      logWarn(`REST call failed for ${path} (${stderr || `exit ${error.exitCode}`})`);
+      logWarn(
+        `REST call failed for ${path} (${stderr || `exit ${error.exitCode}`})`,
+      );
       return null;
     }
 
@@ -239,21 +256,32 @@ function hasNonBotReviewRequests(pr: SearchPullRequest): boolean {
   });
 }
 
-async function fetchReviews(owner: string, repo: string, prNumber: number): Promise<PullRequestReview[]> {
+async function fetchReviews(
+  owner: string,
+  repo: string,
+  prNumber: number,
+): Promise<PullRequestReview[]> {
   const reviews = await ghRest<PullRequestReview[]>(
     `repos/${owner}/${repo}/pulls/${prNumber}/reviews`,
   );
   return reviews ?? [];
 }
 
-async function fetchCommits(owner: string, repo: string, prNumber: number): Promise<PullRequestCommit[]> {
+async function fetchCommits(
+  owner: string,
+  repo: string,
+  prNumber: number,
+): Promise<PullRequestCommit[]> {
   const commits = await ghRest<PullRequestCommit[]>(
     `repos/${owner}/${repo}/pulls/${prNumber}/commits?per_page=100`,
   );
   return commits ?? [];
 }
 
-function getLastSelfReviewDate(reviews: PullRequestReview[], login: string): string | null {
+function getLastSelfReviewDate(
+  reviews: PullRequestReview[],
+  login: string,
+): string | null {
   let latest: string | null = null;
 
   for (const review of reviews) {
@@ -269,7 +297,10 @@ function getLastSelfReviewDate(reviews: PullRequestReview[], login: string): str
   return latest;
 }
 
-function hasCommitsAfter(commits: PullRequestCommit[], afterDate: string): boolean {
+function hasCommitsAfter(
+  commits: PullRequestCommit[],
+  afterDate: string,
+): boolean {
   return commits.some((c) => c.commit.committer.date > afterDate);
 }
 
@@ -288,16 +319,24 @@ async function needsSelfReview(
 
   const commits = await fetchCommits(owner, repo, prNumber);
   if (hasCommitsAfter(commits, lastReviewDate)) {
-    return { needed: true, reason: `commits after last self-review (${lastReviewDate.slice(0, 10)})` };
+    return {
+      needed: true,
+      reason: `commits after last self-review (${lastReviewDate.slice(0, 10)})`,
+    };
   }
 
-  return { needed: false, reason: `self-reviewed (${lastReviewDate.slice(0, 10)}), no new commits` };
+  return {
+    needed: false,
+    reason: `self-reviewed (${lastReviewDate.slice(0, 10)}), no new commits`,
+  };
 }
 
 async function main(): Promise<void> {
   const { dryRun } = parseArgs(runtimeArgv());
 
-  console.log(`${colors.bold}${colors.blue}Self PR Review${colors.reset} ${colors.dim}(${AUTHOR_LOGIN})${colors.reset}`);
+  console.log(
+    `${colors.bold}${colors.blue}Self PR Review${colors.reset} ${colors.dim}(${AUTHOR_LOGIN})${colors.reset}`,
+  );
   logInfo(`Mode: ${dryRun ? "dry-run" : "execute"}`);
 
   const searchResults = await searchAuthorPRs(AUTHOR_LOGIN);
@@ -315,9 +354,9 @@ async function main(): Promise<void> {
     const label = `${pr.repository.nameWithOwner}#${pr.number}`;
 
     if (
-      IGNORED_PRS.includes(pr.url)
-      || IGNORED_REPOS.includes(pr.repository.nameWithOwner)
-      || IGNORED_OWNERS.includes(pr.repository.owner.login)
+      IGNORED_PRS.includes(pr.url) ||
+      IGNORED_REPOS.includes(pr.repository.nameWithOwner) ||
+      IGNORED_OWNERS.includes(pr.repository.owner.login)
     ) {
       logInfo(`  ${colors.dim}skip ${label}: in ignore list${colors.reset}`);
       continue;
@@ -325,9 +364,19 @@ async function main(): Promise<void> {
 
     if (hasNonBotReviewRequests(pr)) {
       const reviewerNames = pr.reviewRequests.nodes
-        .filter((n) => n?.requestedReviewer && (n.requestedReviewer.__typename === "User" || n.requestedReviewer.__typename === "Team"))
-        .map((n) => n?.requestedReviewer?.login ?? n?.requestedReviewer?.slug ?? "?");
-      logInfo(`  ${colors.dim}skip ${label}: review requested from ${reviewerNames.join(", ")}${colors.reset}`);
+        .filter(
+          (n) =>
+            n?.requestedReviewer &&
+            (n.requestedReviewer.__typename === "User" ||
+              n.requestedReviewer.__typename === "Team"),
+        )
+        .map(
+          (n) =>
+            n?.requestedReviewer?.login ?? n?.requestedReviewer?.slug ?? "?",
+        );
+      logInfo(
+        `  ${colors.dim}skip ${label}: review requested from ${reviewerNames.join(", ")}${colors.reset}`,
+      );
       continue;
     }
 
@@ -337,7 +386,12 @@ async function main(): Promise<void> {
       continue;
     }
 
-    const review = await needsSelfReview(parts.owner, parts.repo, pr.number, AUTHOR_LOGIN);
+    const review = await needsSelfReview(
+      parts.owner,
+      parts.repo,
+      pr.number,
+      AUTHOR_LOGIN,
+    );
     if (!review.needed) {
       logInfo(`  ${colors.dim}skip ${label}: ${review.reason}${colors.reset}`);
       continue;
@@ -357,7 +411,9 @@ async function main(): Promise<void> {
   }
 
   // Sort by most recently updated first
-  const sorted = candidatePRs.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const sorted = candidatePRs.sort((a, b) =>
+    b.updatedAt.localeCompare(a.updatedAt),
+  );
 
   logInfo(`PRs needing self-review: ${sorted.length}`);
 
@@ -368,7 +424,9 @@ async function main(): Promise<void> {
   }
 
   for (const pr of sorted) {
-    const draftTag = pr.isDraft ? ` ${colors.yellow}(draft)${colors.reset}` : "";
+    const draftTag = pr.isDraft
+      ? ` ${colors.yellow}(draft)${colors.reset}`
+      : "";
     const command = `or --repo ${pr.repository.nameWithOwner} --pr ${pr.number}`;
     console.log(`${pr.url}${draftTag}`);
 
@@ -379,15 +437,26 @@ async function main(): Promise<void> {
 
     const parts = parseRepoIdentifier(pr.repository.nameWithOwner);
     if (!parts) {
-      logWarn(`Unable to open malformed repo identifier: ${pr.repository.nameWithOwner}`);
+      logWarn(
+        `Unable to open malformed repo identifier: ${pr.repository.nameWithOwner}`,
+      );
       continue;
     }
 
-    const proc = spawn(["or", "--repo", `${parts.owner}/${parts.repo}`, "--pr", String(pr.number)], {
-      stdin: "inherit",
-      stdout: "inherit",
-      stderr: "inherit",
-    });
+    const proc = spawn(
+      [
+        "or",
+        "--repo",
+        `${parts.owner}/${parts.repo}`,
+        "--pr",
+        String(pr.number),
+      ],
+      {
+        stdin: "inherit",
+        stdout: "inherit",
+        stderr: "inherit",
+      },
+    );
 
     const exitCode = await proc.exited;
     if (exitCode !== 0) {

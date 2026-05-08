@@ -1,7 +1,20 @@
 #!/usr/bin/env bun
 
 // @ts-expect-error Bun runtime module is resolved at execution time.
+import * as timers from "node:timers/promises";
 import { $, spawn } from "bun";
+
+let lastChain = Promise.resolve();
+
+function wait<T>(cb: () => Promise<T>): Promise<T> {
+  const result = lastChain.then(cb);
+  lastChain = result
+    .catch(() => {
+      /* prevent unhandled rejections from breaking the chain */
+    })
+    .then(() => timers.setTimeout(500)); // small delay between operations to avoid hitting rate limits
+  return result;
+}
 
 const ORG = "croct-tech";
 const REVIEWER_LOGIN = "Fryuni";
@@ -16,7 +29,6 @@ const colors = {
   bold: "\x1b[1m",
   dim: "\x1b[2m",
 };
-
 
 type ApiPageInfo = {
   hasNextPage: boolean;
@@ -74,7 +86,6 @@ type ListOrgProjectsResponse = {
     } | null;
   };
 };
-
 
 type IssueContent = {
   __typename: "Issue";
@@ -170,7 +181,6 @@ function isIssueTimelinePullRequest(
 ): source is IssueTimelinePullRequest {
   return source?.__typename === "PullRequest";
 }
-
 
 type CandidatePR = {
   id: string;
@@ -349,7 +359,6 @@ function logSuccess(message: string): void {
   console.log(`${colors.green}✓${colors.reset} ${message}`);
 }
 
-
 function isReviewRequestedFrom(
   pr: PullRequestContent | IssueTimelinePullRequest,
   login: string,
@@ -363,7 +372,9 @@ function isReviewRequestedFrom(
   });
 }
 
-function parseRepoIdentifier(nameWithOwner: string): { owner: string; repo: string } | null {
+function parseRepoIdentifier(
+  nameWithOwner: string,
+): { owner: string; repo: string } | null {
   const [owner, repo] = nameWithOwner.split("/");
   if (!owner || !repo) {
     return null;
@@ -371,7 +382,10 @@ function parseRepoIdentifier(nameWithOwner: string): { owner: string; repo: stri
   return { owner, repo };
 }
 
-async function ghGraphql<T>(query: string, variables: Record<string, string | undefined>): Promise<T | null> {
+async function ghGraphql<T>(
+  query: string,
+  variables: Record<string, string | undefined>,
+): Promise<T | null> {
   const args: string[] = ["graphql", "-f", `query=${query}`];
 
   for (const [key, value] of Object.entries(variables)) {
@@ -381,7 +395,7 @@ async function ghGraphql<T>(query: string, variables: Record<string, string | un
   }
 
   try {
-    return (await $`gh api ${args}`.json()) as T;
+    return (await wait(() => $`gh api ${args}`.json())) as T;
   } catch (error) {
     if (error instanceof $.ShellError) {
       const stderr = error.stderr.toString().trim();
@@ -396,11 +410,13 @@ async function ghGraphql<T>(query: string, variables: Record<string, string | un
 
 async function ghRest<T>(path: string): Promise<T | null> {
   try {
-    return (await $`gh api ${path}`.json()) as T;
-  } catch (error) {
+    return (await wait(() => $`gh api ${path}`.json())) as T;
+  } catch (error: any) {
     if (error instanceof $.ShellError) {
       const stderr = error.stderr.toString().trim();
-      logWarn(`REST call failed for ${path} (${stderr || `exit ${error.exitCode}`})`);
+      logWarn(
+        `REST call failed for ${path} (${stderr || `exit ${error.exitCode}`})`,
+      );
       return null;
     }
 
@@ -409,21 +425,32 @@ async function ghRest<T>(path: string): Promise<T | null> {
   }
 }
 
-async function fetchReviews(owner: string, repo: string, prNumber: number): Promise<PullRequestReview[]> {
+async function fetchReviews(
+  owner: string,
+  repo: string,
+  prNumber: number,
+): Promise<PullRequestReview[]> {
   const reviews = await ghRest<PullRequestReview[]>(
     `repos/${owner}/${repo}/pulls/${prNumber}/reviews`,
   );
   return reviews ?? [];
 }
 
-async function fetchCommits(owner: string, repo: string, prNumber: number): Promise<PullRequestCommit[]> {
+async function fetchCommits(
+  owner: string,
+  repo: string,
+  prNumber: number,
+): Promise<PullRequestCommit[]> {
   const commits = await ghRest<PullRequestCommit[]>(
     `repos/${owner}/${repo}/pulls/${prNumber}/commits?per_page=100`,
   );
   return commits ?? [];
 }
 
-function getLastReviewDate(reviews: PullRequestReview[], login: string): string | null {
+function getLastReviewDate(
+  reviews: PullRequestReview[],
+  login: string,
+): string | null {
   let latest: string | null = null;
 
   for (const review of reviews) {
@@ -439,7 +466,10 @@ function getLastReviewDate(reviews: PullRequestReview[], login: string): string 
   return latest;
 }
 
-function hasCommitsAfter(commits: PullRequestCommit[], afterDate: string): boolean {
+function hasCommitsAfter(
+  commits: PullRequestCommit[],
+  afterDate: string,
+): boolean {
   return commits.some((c) => c.commit.committer.date > afterDate);
 }
 
@@ -462,10 +492,16 @@ async function hasNewCommitsSinceLastReview(
 
   const commits = await fetchCommits(parts.owner, parts.repo, prNumber);
   if (hasCommitsAfter(commits, lastReviewDate)) {
-    return { hasNew: true, reason: `new commits after last review (${lastReviewDate.slice(0, 10)})` };
+    return {
+      hasNew: true,
+      reason: `new commits after last review (${lastReviewDate.slice(0, 10)})`,
+    };
   }
 
-  return { hasNew: false, reason: `already reviewed (${lastReviewDate.slice(0, 10)}), no new commits` };
+  return {
+    hasNew: false,
+    reason: `already reviewed (${lastReviewDate.slice(0, 10)}), no new commits`,
+  };
 }
 
 async function listOpenProjects(org: string): Promise<ProjectNode[]> {
@@ -473,10 +509,13 @@ async function listOpenProjects(org: string): Promise<ProjectNode[]> {
   let cursor: string | undefined;
 
   while (true) {
-    const response = await ghGraphql<ListOrgProjectsResponse>(LIST_PROJECTS_QUERY, {
-      org,
-      cursor,
-    });
+    const response = await ghGraphql<ListOrgProjectsResponse>(
+      LIST_PROJECTS_QUERY,
+      {
+        org,
+        cursor,
+      },
+    );
 
     const projectConn = response?.data?.organization?.projectsV2;
     if (!projectConn) {
@@ -500,16 +539,22 @@ async function listOpenProjects(org: string): Promise<ProjectNode[]> {
   return projects;
 }
 
-async function listProjectItems(projectId: string, filterQuery?: string): Promise<ProjectItemNode[]> {
+async function listProjectItems(
+  projectId: string,
+  filterQuery?: string,
+): Promise<ProjectItemNode[]> {
   const items: ProjectItemNode[] = [];
   let cursor: string | undefined;
 
   while (true) {
-    const response = await ghGraphql<GetProjectItemsResponse>(GET_PROJECT_ITEMS_QUERY, {
-      projectId,
-      cursor,
-      filterQuery,
-    });
+    const response = await ghGraphql<GetProjectItemsResponse>(
+      GET_PROJECT_ITEMS_QUERY,
+      {
+        projectId,
+        cursor,
+        filterQuery,
+      },
+    );
 
     const itemConn = response?.data?.node?.items;
     if (!itemConn) {
@@ -554,8 +599,13 @@ function buildItemsQuery(project: ProjectNode): string | undefined {
   return parts.join(" ");
 }
 
-async function getIssueLinkedPullRequests(issueId: string, issueLabel: string): Promise<IssueTimelinePullRequest[]> {
-  const response = await ghGraphql<GetIssuePRsResponse>(GET_ISSUE_PRS_QUERY, { issueId });
+async function getIssueLinkedPullRequests(
+  issueId: string,
+  issueLabel: string,
+): Promise<IssueTimelinePullRequest[]> {
+  const response = await ghGraphql<GetIssuePRsResponse>(GET_ISSUE_PRS_QUERY, {
+    issueId,
+  });
   const nodes = response?.data?.node?.timelineItems.nodes ?? [];
 
   const prs: IssueTimelinePullRequest[] = [];
@@ -570,7 +620,9 @@ async function getIssueLinkedPullRequests(issueId: string, issueLabel: string): 
 
     if (node.source.state !== "OPEN") {
       const prLabel = `${node.source.repository.nameWithOwner}#${node.source.number}`;
-      logInfo(`  ${colors.dim}skip ${prLabel} (via ${issueLabel}): state is ${node.source.state}${colors.reset}`);
+      logInfo(
+        `  ${colors.dim}skip ${prLabel} (via ${issueLabel}): state is ${node.source.state}${colors.reset}`,
+      );
       continue;
     }
 
@@ -602,22 +654,26 @@ function getReviewOptionNames(project: ProjectNode): string[] {
   return names;
 }
 
-
 async function main(): Promise<void> {
   const { dryRun } = parseArgs(runtimeArgv());
 
-  console.log(`${colors.bold}${colors.blue}PR Review Triage${colors.reset} ${colors.dim}(${ORG})${colors.reset}`);
+  console.log(
+    `${colors.bold}${colors.blue}PR Review Triage${colors.reset} ${colors.dim}(${ORG})${colors.reset}`,
+  );
   logInfo(`Mode: ${dryRun ? "dry-run" : "execute"}`);
 
   const openProjects = await listOpenProjects(ORG);
-  logInfo(`Open projects (${openProjects.length}): ${openProjects.map((p) => p.title).join(", ")}`);
-
+  logInfo(
+    `Open projects (${openProjects.length}): ${openProjects.map((p) => p.title).join(", ")}`,
+  );
 
   const candidatePRs: CandidatePR[] = [];
   for (const project of openProjects) {
     const query = buildItemsQuery(project);
     if (query === undefined) {
-      logWarn(`Project ${project.title}: no review-like status options found, skipping.`);
+      logWarn(
+        `Project ${project.title}: no review-like status options found, skipping.`,
+      );
       continue;
     }
 
@@ -636,7 +692,9 @@ async function main(): Promise<void> {
       if (item.content.__typename === "PullRequest") {
         const label = `${item.content.repository.nameWithOwner}#${item.content.number}`;
         if (item.content.state !== "OPEN") {
-          logInfo(`  ${colors.dim}skip ${label}: state is ${item.content.state}${colors.reset}`);
+          logInfo(
+            `  ${colors.dim}skip ${label}: state is ${item.content.state}${colors.reset}`,
+          );
           continue;
         }
 
@@ -652,7 +710,9 @@ async function main(): Promise<void> {
             REVIEWER_LOGIN,
           );
           if (!hasNew) {
-            logInfo(`  ${colors.dim}skip ${label}: review not requested, ${reason}${colors.reset}`);
+            logInfo(
+              `  ${colors.dim}skip ${label}: review not requested, ${reason}${colors.reset}`,
+            );
             continue;
           }
           logInfo(`  ${colors.green}↻${colors.reset} ${label}: ${reason}`);
@@ -677,11 +737,16 @@ async function main(): Promise<void> {
 
       if (item.content.__typename === "Issue") {
         const issueLabel = `${item.content.repository.nameWithOwner}#${item.content.number}`;
-        const linkedPrs = await getIssueLinkedPullRequests(item.content.id, issueLabel);
+        const linkedPrs = await getIssueLinkedPullRequests(
+          item.content.id,
+          issueLabel,
+        );
         for (const linkedPr of linkedPrs) {
           const prLabel = `${linkedPr.repository.nameWithOwner}#${linkedPr.number}`;
           if (linkedPr.isDraft) {
-            logInfo(`  ${colors.dim}skip ${prLabel} (via ${issueLabel}): draft PR${colors.reset}`);
+            logInfo(
+              `  ${colors.dim}skip ${prLabel} (via ${issueLabel}): draft PR${colors.reset}`,
+            );
             continue;
           }
 
@@ -692,10 +757,14 @@ async function main(): Promise<void> {
               REVIEWER_LOGIN,
             );
             if (!hasNew) {
-              logInfo(`  ${colors.dim}skip ${prLabel} (via ${issueLabel}): review not requested, ${reason}${colors.reset}`);
+              logInfo(
+                `  ${colors.dim}skip ${prLabel} (via ${issueLabel}): review not requested, ${reason}${colors.reset}`,
+              );
               continue;
             }
-            logInfo(`  ${colors.green}↻${colors.reset} ${prLabel} (via ${issueLabel}): ${reason}`);
+            logInfo(
+              `  ${colors.green}↻${colors.reset} ${prLabel} (via ${issueLabel}): ${reason}`,
+            );
           }
 
           candidatePRs.push({
@@ -716,7 +785,9 @@ async function main(): Promise<void> {
       }
     }
 
-    logInfo(`${project.title}: ${itemIndex} items returned by server-side filter`);
+    logInfo(
+      `${project.title}: ${itemIndex} items returned by server-side filter`,
+    );
   }
 
   const deduped = new Map<string, CandidatePR>();
@@ -730,7 +801,9 @@ async function main(): Promise<void> {
   }
 
   const uniquePRs = [...deduped.values()];
-  logInfo(`Candidate PRs: ${candidatePRs.length}; deduplicated: ${uniquePRs.length}`);
+  logInfo(
+    `Candidate PRs: ${candidatePRs.length}; deduplicated: ${uniquePRs.length}`,
+  );
 
   // Sort: others' PRs first (by project name alphabetically, then column order),
   // then own PRs last (same sort within)
@@ -762,9 +835,13 @@ async function main(): Promise<void> {
     }
     lastWasOwn = isOwn;
 
-    const authorTag = isOwn ? `${colors.dim}(yours)${colors.reset}` : `${colors.dim}by ${pr.author ?? "unknown"}${colors.reset}`;
+    const authorTag = isOwn
+      ? `${colors.dim}(yours)${colors.reset}`
+      : `${colors.dim}by ${pr.author ?? "unknown"}${colors.reset}`;
     const command = `or --repo ${pr.repository.nameWithOwner} --pr ${pr.number}`;
-    console.log(`${colors.cyan}${pr.sourceProject}${colors.reset} ${pr.url} ${authorTag}`);
+    console.log(
+      `${colors.cyan}${pr.sourceProject}${colors.reset} ${pr.url} ${authorTag}`,
+    );
 
     if (dryRun) {
       console.log(`${colors.yellow}[dry-run]${colors.reset} ${command}`);
@@ -773,15 +850,26 @@ async function main(): Promise<void> {
 
     const parts = parseRepoIdentifier(pr.repository.nameWithOwner);
     if (!parts) {
-      logWarn(`Unable to open malformed repo identifier: ${pr.repository.nameWithOwner}`);
+      logWarn(
+        `Unable to open malformed repo identifier: ${pr.repository.nameWithOwner}`,
+      );
       continue;
     }
 
-    const proc = spawn(["or", "--repo", `${parts.owner}/${parts.repo}`, "--pr", String(pr.number)], {
-      stdin: "inherit",
-      stdout: "inherit",
-      stderr: "inherit",
-    });
+    const proc = spawn(
+      [
+        "or",
+        "--repo",
+        `${parts.owner}/${parts.repo}`,
+        "--pr",
+        String(pr.number),
+      ],
+      {
+        stdin: "inherit",
+        stdout: "inherit",
+        stderr: "inherit",
+      },
+    );
 
     const exitCode = await proc.exited;
     if (exitCode !== 0) {

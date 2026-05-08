@@ -3,6 +3,18 @@
 // @ts-expect-error Bun runtime module is resolved at execution time.
 import { $, spawn } from "bun";
 
+let lastChain = Promise.resolve();
+
+function wait<T>(cb: () => Promise<T>): Promise<T> {
+  const result = lastChain.then(cb);
+  lastChain = result
+    .catch(() => {
+      /* prevent unhandled rejections from breaking the chain */
+    })
+    .then(() => timers.setTimeout(500)); // small delay between operations to avoid hitting rate limits
+  return result;
+}
+
 const EXCLUDED_ORG = "croct-tech";
 const REVIEWER_LOGIN = "Fryuni";
 
@@ -116,7 +128,9 @@ function logSuccess(message: string): void {
   console.log(`${colors.green}✓${colors.reset} ${message}`);
 }
 
-function parseRepoIdentifier(nameWithOwner: string): { owner: string; repo: string } | null {
+function parseRepoIdentifier(
+  nameWithOwner: string,
+): { owner: string; repo: string } | null {
   const [owner, repo] = nameWithOwner.split("/");
   if (!owner || !repo) {
     return null;
@@ -124,7 +138,10 @@ function parseRepoIdentifier(nameWithOwner: string): { owner: string; repo: stri
   return { owner, repo };
 }
 
-async function ghGraphql<T>(query: string, variables: Record<string, string | undefined>): Promise<T | null> {
+async function ghGraphql<T>(
+  query: string,
+  variables: Record<string, string | undefined>,
+): Promise<T | null> {
   const args: string[] = ["graphql", "-f", `query=${query}`];
 
   for (const [key, value] of Object.entries(variables)) {
@@ -134,7 +151,7 @@ async function ghGraphql<T>(query: string, variables: Record<string, string | un
   }
 
   try {
-    return (await $`gh api ${args}`.json()) as T;
+    return (await wait(() => $`gh api ${args}`.json())) as T;
   } catch (error) {
     if (error instanceof $.ShellError) {
       const stderr = error.stderr.toString().trim();
@@ -149,11 +166,13 @@ async function ghGraphql<T>(query: string, variables: Record<string, string | un
 
 async function ghRest<T>(path: string): Promise<T | null> {
   try {
-    return (await $`gh api ${path}`.json()) as T;
+    return (await wait(() => $`gh api ${path}`.json())) as T;
   } catch (error) {
     if (error instanceof $.ShellError) {
       const stderr = error.stderr.toString().trim();
-      logWarn(`REST call failed for ${path} (${stderr || `exit ${error.exitCode}`})`);
+      logWarn(
+        `REST call failed for ${path} (${stderr || `exit ${error.exitCode}`})`,
+      );
       return null;
     }
 
@@ -205,7 +224,9 @@ async function searchPullRequests(
     runSearch(reviewedQuery),
   ]);
 
-  logInfo(`Review requested: ${requested.length}, previously reviewed: ${reviewed.length}`);
+  logInfo(
+    `Review requested: ${requested.length}, previously reviewed: ${reviewed.length}`,
+  );
 
   const deduped = new Map<string, SearchPullRequest>();
   for (const pr of [...requested, ...reviewed]) {
@@ -218,21 +239,32 @@ async function searchPullRequests(
   return [...deduped.values()];
 }
 
-async function fetchReviews(owner: string, repo: string, prNumber: number): Promise<PullRequestReview[]> {
+async function fetchReviews(
+  owner: string,
+  repo: string,
+  prNumber: number,
+): Promise<PullRequestReview[]> {
   const reviews = await ghRest<PullRequestReview[]>(
     `repos/${owner}/${repo}/pulls/${prNumber}/reviews`,
   );
   return reviews ?? [];
 }
 
-async function fetchCommits(owner: string, repo: string, prNumber: number): Promise<PullRequestCommit[]> {
+async function fetchCommits(
+  owner: string,
+  repo: string,
+  prNumber: number,
+): Promise<PullRequestCommit[]> {
   const commits = await ghRest<PullRequestCommit[]>(
     `repos/${owner}/${repo}/pulls/${prNumber}/commits?per_page=100`,
   );
   return commits ?? [];
 }
 
-function getLastReviewDate(reviews: PullRequestReview[], login: string): string | null {
+function getLastReviewDate(
+  reviews: PullRequestReview[],
+  login: string,
+): string | null {
   let latest: string | null = null;
 
   for (const review of reviews) {
@@ -248,7 +280,10 @@ function getLastReviewDate(reviews: PullRequestReview[], login: string): string 
   return latest;
 }
 
-function hasCommitsAfter(commits: PullRequestCommit[], afterDate: string): boolean {
+function hasCommitsAfter(
+  commits: PullRequestCommit[],
+  afterDate: string,
+): boolean {
   return commits.some((c) => c.commit.committer.date > afterDate);
 }
 
@@ -268,16 +303,24 @@ async function needsReview(
 
   const commits = await fetchCommits(owner, repo, prNumber);
   if (hasCommitsAfter(commits, lastReviewDate)) {
-    return { needed: true, reason: `commits after last review (${lastReviewDate.slice(0, 10)})` };
+    return {
+      needed: true,
+      reason: `commits after last review (${lastReviewDate.slice(0, 10)})`,
+    };
   }
 
-  return { needed: false, reason: `already reviewed (${lastReviewDate.slice(0, 10)}), no new commits` };
+  return {
+    needed: false,
+    reason: `already reviewed (${lastReviewDate.slice(0, 10)}), no new commits`,
+  };
 }
 
 async function main(): Promise<void> {
   const { dryRun } = parseArgs(runtimeArgv());
 
-  console.log(`${colors.bold}${colors.blue}OSS PR Review${colors.reset} ${colors.dim}(excluding ${EXCLUDED_ORG})${colors.reset}`);
+  console.log(
+    `${colors.bold}${colors.blue}OSS PR Review${colors.reset} ${colors.dim}(excluding ${EXCLUDED_ORG})${colors.reset}`,
+  );
   logInfo(`Mode: ${dryRun ? "dry-run" : "execute"}`);
 
   const searchResults = await searchPullRequests(REVIEWER_LOGIN, EXCLUDED_ORG);
@@ -305,7 +348,13 @@ async function main(): Promise<void> {
       continue;
     }
 
-    const review = await needsReview(parts.owner, parts.repo, pr.number, REVIEWER_LOGIN, label);
+    const review = await needsReview(
+      parts.owner,
+      parts.repo,
+      pr.number,
+      REVIEWER_LOGIN,
+      label,
+    );
     if (!review.needed) {
       logInfo(`  ${colors.dim}skip ${label}: ${review.reason}${colors.reset}`);
       continue;
@@ -325,7 +374,9 @@ async function main(): Promise<void> {
   }
 
   // Sort by most recently updated first
-  const sorted = candidatePRs.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const sorted = candidatePRs.sort((a, b) =>
+    b.updatedAt.localeCompare(a.updatedAt),
+  );
 
   logInfo(`PRs requiring review: ${sorted.length}`);
 
@@ -347,15 +398,26 @@ async function main(): Promise<void> {
 
     const parts = parseRepoIdentifier(pr.repository.nameWithOwner);
     if (!parts) {
-      logWarn(`Unable to open malformed repo identifier: ${pr.repository.nameWithOwner}`);
+      logWarn(
+        `Unable to open malformed repo identifier: ${pr.repository.nameWithOwner}`,
+      );
       continue;
     }
 
-    const proc = spawn(["or", "--repo", `${parts.owner}/${parts.repo}`, "--pr", String(pr.number)], {
-      stdin: "inherit",
-      stdout: "inherit",
-      stderr: "inherit",
-    });
+    const proc = spawn(
+      [
+        "or",
+        "--repo",
+        `${parts.owner}/${parts.repo}`,
+        "--pr",
+        String(pr.number),
+      ],
+      {
+        stdin: "inherit",
+        stdout: "inherit",
+        stderr: "inherit",
+      },
+    );
 
     const exitCode = await proc.exited;
     if (exitCode !== 0) {
