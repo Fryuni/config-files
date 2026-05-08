@@ -6,7 +6,7 @@
   home.packages = with pkgs; [
     llm-agents.crush
     llm-agents.opencode
-    llm-agents.claude-code
+    # llm-agents.claude-code
     llm-agents.agent-browser
     (pkgs.lib.makeAuthWrapper llm-agents.omp {
       # OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
@@ -27,7 +27,7 @@
   programs.zsh.shellAliases = {
     clear-mods-conversations = "rm -rf ~/.local/share/mods/conversations";
     oc = "opencode";
-    cc = "claude";
+    # cc = "claude";
     wm = "workmux";
     wmd = "workmux dashboard";
   };
