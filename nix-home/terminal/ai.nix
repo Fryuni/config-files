@@ -31,7 +31,8 @@
     wm = "workmux";
     wma = "workmux add -o";
     wmb = "workmux add -o --background --prompt-editor";
-    wmd = "workmux dashboard";
+    wmo = "workmux open";
+    wmr = "workmux rm";
   };
 
   home.file.".config/crush/crush.json".text = builtins.toJSON {
