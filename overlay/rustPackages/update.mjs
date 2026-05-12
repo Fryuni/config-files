@@ -1,33 +1,12 @@
-#!/usr/bin/env -S nix shell -iv -k HOME me#nodejs me#nix me#git me#fd me#bash me#cargo me#rustCrates.cargo-crate -c node --
+#!/usr/bin/env -S nix shell -iv -k HOME me#bun me#nix me#git me#openssh me#fd me#bash me#cargo me#rustCrates.cargo-crate -c bun run
 
 import * as fs from "node:fs";
-import * as cp from "node:child_process";
-import * as util from "node:util";
 import * as path from "node:path";
+import { $ } from "bun";
 
-const execRaw = util.promisify(cp.execFile);
-const execFull = async (command, ...args) => {
-  console.log(`Executing: ${command} ${args.join(" ")}`);
-  try {
-    return {
-      code: 0,
-      ...(await execRaw(command, args)),
-    };
-  } catch (error) {
-    if (error.killed === false) {
-      return error;
-    }
-    throw error;
-  }
-};
-const exec = async (command, ...args) => {
-  const { stdout, stderr } = await execRaw(command, args);
-  if (!!stderr.trim()) console.error(stderr);
-  return stdout.trim();
-};
 process.chdir(import.meta.dirname);
 
-const REPO_DIR = await exec("git", "rev-parse", "--show-toplevel");
+const REPO_DIR = (await $`git rev-parse --show-toplevel`.text()).trim();
 
 const TARGET_CRATES =
   process.argv.length > 2
@@ -40,17 +19,9 @@ await prefillData();
 await fillHashes();
 
 process.chdir(REPO_DIR);
-await execFull("git", "commit", "add", `${import.meta.dirname}/data.nix`).then(
-  ({ stdout, stderr }) => console.log(stdout, stderr),
-);
-await execFull(
-  "git",
-  "commit",
-  "-m",
-  "chore(tools): Update custom Rust crates",
-  "--",
-  `${import.meta.dirname}/data.nix`,
-).then(({ stdout, stderr }) => console.log(stdout, stderr));
+
+await $`git commit add "${import.meta.dirname}/data.nix" 1>&2`.nothrow();
+await $`git commit -m "chore(tools): Update custom Rust crates" -- "${import.meta.dirname}/data.nix" 1>&2`.nothrow();
 
 async function fillHashes() {
   const data = await loadData();
@@ -60,12 +31,10 @@ async function fillHashes() {
       console.log(`Filling ${subDerivation} hash for ${crate}...`);
 
       const entry = data[crate];
-      const { stdout, stderr, code } = await execFull(
-        "nix",
-        "build",
-        "--no-link",
-        `${REPO_DIR}#rustCrates.${crate}.${subDerivation}`,
-      );
+      const { stdout, stderr, code } =
+        await $`nix build --no-link "${REPO_DIR}#rustCrates.${crate}.${subDerivation}"`
+          .nothrow()
+          .quiet();
 
       if (!code) continue;
 
@@ -103,7 +72,7 @@ async function prefillData() {
     const {
       owners,
       krate: { crate: crateInfo },
-    } = JSON.parse(await exec("cargo", "crate", "info", "--json", crate));
+    } = await $`cargo crate info --json ${crate}`.json();
 
     data[crate] = {
       crateSha256: MARKER_HASH,
@@ -122,33 +91,18 @@ async function prefillData() {
 }
 
 async function loadData() {
-  try {
-    return JSON.parse(
-      await exec(
-        "nix",
-        "eval",
-        "--json",
-        "--impure",
-        "--expr",
-        `import ./data.nix`,
-      ),
-    );
-  } catch (error) {
-    console.error(error);
-    return {};
-  }
+  return await $`nix eval --json --impure --expr 'import ./data.nix'`
+    .json()
+    .catch(() => ({}));
 }
 
 async function saveData(data) {
   console.log("Saving data object!");
 
-  const content = await exec(
-    "nix",
-    "eval",
-    "--impure",
-    "--expr",
-    `builtins.fromJSON(${JSON.stringify(JSON.stringify(data))})`,
-  );
+  const jsonData = JSON.stringify(JSON.stringify(data));
+
+  const content =
+    await $`nix eval --impure --expr 'builtins.fromJSON(${jsonData})'`.text();
 
   await fs.promises.writeFile(
     "data.nix",
@@ -160,7 +114,8 @@ async function saveData(data) {
   );
 
   const cwd = process.cwd();
+  console.log(REPO_DIR);
   process.chdir(REPO_DIR);
-  await exec("nix", "fmt", path.join(cwd, "data.nix"));
+  await $`nix fmt "${import.meta.dirname}/data.nix"`.nothrow();
   process.chdir(cwd);
 }
