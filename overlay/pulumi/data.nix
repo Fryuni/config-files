@@ -1,19 +1,19 @@
 # DO NOT EDIT! This file is generated automatically by update.sh
 _: {
-  version = "3.234.0";
+  version = "3.237.0";
   pulumiPkgs = {
     x86_64-linux = [
       {
-        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.234.0-linux-x64.tar.gz";
-        sha256 = "10gzaiz1200fpm1jsha92pc03v8zjkjkiwckdybq7cryrdr7wy35";
+        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.237.0-linux-x64.tar.gz";
+        sha256 = "0h78sg60pbjnrwvp6xshg2xkpddwjq9vwb8cgb567v171lafhr3j";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-docker-v5.0.0-linux-amd64.tar.gz";
         sha256 = "177c2jh44fsr3m40g00qg7czlnmjl50z5dw7grf74jw7qdqj5ihl";
       }
       {
-        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gcp-v9.22.0-linux-amd64.tar.gz";
-        sha256 = "0jy0r3zlwfljqlg0sr8pc4y79wnnpa0wz55krdazww0znqzmiwv6";
+        url = "https://api.pulumi.com/releases/plugins/pulumi-resource-gcp-v9.23.0-linux-amd64.tar.gz";
+        sha256 = "0iqg4xn6vc960sl3nkp09ca65r8vzrffk7axbpd80xmivg0nw5pd";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-github-v6.13.1-linux-amd64.tar.gz";
