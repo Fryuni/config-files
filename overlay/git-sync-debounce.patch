@@ -1,0 +1,73 @@
+--- a/contrib/git-sync-on-fswatch
++++ b/contrib/git-sync-on-fswatch
+@@ -3,6 +3,8 @@
+ GIT_SYNC_COMMAND="${GIT_SYNC_COMMAND:-git-sync}"
+ # In seconds
+ GIT_SYNC_INTERVAL="${GIT_SYNC_INTERVAL:-60}"
++# In seconds; wait this long after the last file change before syncing.
++GIT_SYNC_DEBOUNCE_INTERVAL="${GIT_SYNC_DEBOUNCE_INTERVAL:-10}"
+ 
+ # Initialize the directory
+ if [ ! -d  "$GIT_SYNC_DIRECTORY" ]; then
+@@ -44,7 +46,23 @@
+ 		echo "Syncing due to timeout"
+ 		$GIT_SYNC_COMMAND -n -s
+ 	else
+-		echo "Syncing for: $changedFile"
+-		{ git check-ignore "$changedFile" > /dev/null; } || $GIT_SYNC_COMMAND -n -s
++		if ! git check-ignore "$changedFile" > /dev/null; then
++			echo "Debouncing for: $changedFile"
++			while true; do
++				changedFile=$(
++					timeout $GIT_SYNC_DEBOUNCE_INTERVAL \
++					fswatch --exclude '\.git' --one-event --event MovedTo --event Updated --event Renamed --event Removed --event Created "$GIT_SYNC_DIRECTORY" \
++						--format-time "%w%f" 2>/dev/null
++				)
++				if [ -z "$changedFile" ]; then
++					break
++				fi
++
++				git check-ignore "$changedFile" > /dev/null || echo "Debouncing for: $changedFile"
++			done
++
++			echo "Syncing debounced changes"
++			$GIT_SYNC_COMMAND -n -s
++		fi
+ 	fi
+ done
+--- a/contrib/git-sync-on-inotify
++++ b/contrib/git-sync-on-inotify
+@@ -2,6 +2,8 @@
+ GIT_SYNC_DIRECTORY="${GIT_SYNC_DIRECTORY:-$(pwd)}"
+ GIT_SYNC_COMMAND="${GIT_SYNC_COMMAND:-git-sync}"
+ GIT_SYNC_INTERVAL="${GIT_SYNC_INTERVAL:-500}"
++# In seconds; wait this long after the last file change before syncing.
++GIT_SYNC_DEBOUNCE_INTERVAL="${GIT_SYNC_DEBOUNCE_INTERVAL:-10}"
+ 
+ # Initialize the directory
+ if [ ! -d  "$GIT_SYNC_DIRECTORY" ]; then
+@@ -42,7 +44,22 @@
+ 		echo "Syncing due to timeout"
+ 		$GIT_SYNC_COMMAND -n -s
+ 	else
+-		echo "Syncing for: $changedFile"
+-		{ git check-ignore "$changedFile" > /dev/null; } || $GIT_SYNC_COMMAND -n -s
++		if ! git check-ignore "$changedFile" > /dev/null; then
++			echo "Debouncing for: $changedFile"
++			while true; do
++				changedFile=$(
++					inotifywait "$GIT_SYNC_DIRECTORY" -r -e modify,move,create,delete \
++						--format "%w%f" --exclude '\.git' -t "$GIT_SYNC_DEBOUNCE_INTERVAL" 2>/dev/null
++				)
++				if [ -z "$changedFile" ]; then
++					break
++				fi
++
++				git check-ignore "$changedFile" > /dev/null || echo "Debouncing for: $changedFile"
++			done
++
++			echo "Syncing debounced changes"
++			$GIT_SYNC_COMMAND -n -s
++		fi
+ 	fi
+ done

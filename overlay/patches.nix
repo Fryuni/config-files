@@ -17,4 +17,8 @@ final: prev: {
   openldap = prev.openldap.overrideAttrs (_: {
     doCheck = !prev.stdenv.hostPlatform.isi686;
   });
+
+  git-sync = prev.git-sync.overrideAttrs (old: {
+    patches = (old.patches or []) ++ [./git-sync-debounce.patch];
+  });
 }
