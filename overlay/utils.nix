@@ -18,14 +18,17 @@ final: pkgs: {
   inherit (pkgs.stable) electron;
   inherit (pkgs.stable) electron_36;
 
-  terraform = pkgs.mkTerraform {
-    version = "1.5.5";
-    hash = "sha256-SBS3a/CIUdyIUJvc+rANIs+oXCQgfZut8b0517QKq64=";
-    vendorHash = "sha256-lQgWNMBf+ioNxzAV7tnTQSIS840XdI9fg9duuwoK+U4=";
-    passthru = {
-      inherit (pkgs.terraform) plugins;
+  terraformOSS = let
+    package = pkgs.mkTerraform {
+      version = "1.5.5";
+      hash = "sha256-SBS3a/CIUdyIUJvc+rANIs+oXCQgfZut8b0517QKq64=";
+      vendorHash = "sha256-lQgWNMBf+ioNxzAV7tnTQSIS840XdI9fg9duuwoK+U4=";
+      passthru = {
+        inherit (pkgs.terraform) plugins;
+      };
     };
-  };
+  in
+    final.lib.renameWithSuffix package "oss";
 
   # nix-visualize =
   #   import (pkgs.fetchFromGitHub {

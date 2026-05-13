@@ -28,4 +28,28 @@
     }).overrideAttrs (_: {
       inherit (pkg) meta;
     });
+
+  renameWithSuffix = pkg: suffix:
+    (pkgs.symlinkJoin {
+      name = "${pkg.name}-${suffix}";
+      paths = [pkg];
+      postBuild = ''
+        while IFS= read -r -d "" file; do
+          dir="''${file%/*}"
+          base="''${file##*/}"
+
+          if [[ "$base" == *.* ]]; then
+            stem="''${base%.*}"
+            ext=".''${base##*.}"
+          else
+            stem="$base"
+            ext=""
+          fi
+
+          mv -- "$file" "$dir/$stem-${suffix}$ext"
+        done < <(find "$out" \( -type f -o -type l \) -print0)
+      '';
+    }).overrideAttrs (_: {
+      inherit (pkg) meta passthru;
+    });
 }
