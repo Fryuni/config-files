@@ -13,7 +13,8 @@
     bun
 
     libnotify
-    slack
+    (lib.lowPrio slack)
+    (lib.hiPrio slack-cli)
     insomnia
 
     # GoLang
