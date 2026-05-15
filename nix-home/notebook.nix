@@ -14,6 +14,7 @@
     master.bitwarden-cli
     master.bitwarden-menu
     master.qbittorrent
+    google-workspace-cli
   ];
 
   programs.home-manager.enable = true;

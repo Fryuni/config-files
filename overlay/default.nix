@@ -29,5 +29,6 @@ in [
     # direnv = direnv.packages.${system}.default;
 
     inherit (determinate.inputs.nix.packages.${system}) nix;
+    google-workspace-cli = attrs.google-workspace-cli.packages.${system}.default;
   })
 ]

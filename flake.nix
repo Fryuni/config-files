@@ -7,6 +7,10 @@
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     nixos-hardware.url = "https://flakehub.com/f/NixOS/nixos-hardware/0.1";
 
+    google-workspace-cli = {
+      url = "github:googleworkspace/cli";
+    };
+
     determinate = {
       url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
       # inputs.nixpkgs.follows = "nixpkgs";
