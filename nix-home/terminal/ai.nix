@@ -20,6 +20,9 @@
     uv # Needed for omp
   ];
 
+  home.file.".agents".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.omp/agent/universal-link";
+
   programs.zsh.shellAliases = {
     oc = "opencode";
     # cc = "claude";
