@@ -66,6 +66,10 @@
   # Configure console keymap
   console.keyMap = "us";
 
+  # Temporary hardening for CVE-2026-46333 until all systems boot a fixed kernel.
+  # 3 disables ptrace attachment entirely, including same-UID debugging.
+  boot.kernel.sysctl."kernel.yama.ptrace_scope" = 3;
+
   # Enable CUPS to print documents.
   services.printing.enable = false;
 
