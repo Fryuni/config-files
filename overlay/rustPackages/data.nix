@@ -276,8 +276,8 @@
     version = "8.5.3";
   };
   octorus = {
-    crateSha256 = "sha256-qksJ/uDZJVNGpzncQU64RVMlc9BITnnKfdYC7rl9FzA=";
-    depsHash = "sha256-U8cDAO06AYTkvQKcHWBxIMtmV1qqdl4Us86I75CFuWg=";
+    crateSha256 = "sha256-HSoMaZ/9foqmXOhmPssxIilncnTpG20x4Y1oFoiCFlg=";
+    depsHash = "sha256-BSR2QQlC8qyeQR7tPDpsgO3Kmg4p5CwEPehVL8GVt/c=";
     description = "A TUI tool for GitHub PR review, designed for Helix editor users";
     homepage = null;
     id = "octorus";
@@ -293,7 +293,7 @@
         url = "https://github.com/ushironoko";
       }
     ];
-    version = "0.6.3";
+    version = "0.6.4";
   };
   toml-merge = {
     crateSha256 = "sha256-ZRfTxA5xjA/V6VtecwdyyGkMC6o+kd2ipRCwJ19Zvfg=";
@@ -370,6 +370,6 @@
         url = "https://github.com/har7an";
       }
     ];
-    version = "0.44.2";
+    version = "0.44.3";
   };
 }

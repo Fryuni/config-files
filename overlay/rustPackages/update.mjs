@@ -1,7 +1,6 @@
 #!/usr/bin/env -S nix shell -iv -k HOME me#bun me#nix me#git me#openssh me#fd me#bash me#cargo me#rustCrates.cargo-crate -c bun run
 
 import * as fs from "node:fs";
-import * as path from "node:path";
 import { $ } from "bun";
 
 process.chdir(import.meta.dirname);
@@ -20,17 +19,18 @@ await fillHashes();
 
 process.chdir(REPO_DIR);
 
-await $`git commit add "${import.meta.dirname}/data.nix" 1>&2`.nothrow();
+await $`git add "${import.meta.dirname}/data.nix" 1>&2`.nothrow();
 await $`git commit -m "chore(tools): Update custom Rust crates" -- "${import.meta.dirname}/data.nix" 1>&2`.nothrow();
 
 async function fillHashes() {
   const data = await loadData();
 
-  for (const subDerivation of ["src", "cargoDeps"]) {
-    for (const crate of TARGET_CRATES) {
+  for (const crate of TARGET_CRATES) {
+    const entry = data[crate];
+
+    for (const subDerivation of ["src", "cargoDeps"]) {
       console.log(`Filling ${subDerivation} hash for ${crate}...`);
 
-      const entry = data[crate];
       const { stdout, stderr, code } =
         await $`nix build --no-link "${REPO_DIR}#rustCrates.${crate}.${subDerivation}"`
           .nothrow()
@@ -38,29 +38,19 @@ async function fillHashes() {
 
       if (!code) continue;
 
-      // hash mismatch in fixed-output derivation '/nix/store/ix1lajrq193h5v1d2bpiw61qnpikkkrh-cargo-deps-1.5.1.tar.gz.drv':
-      //          specified: sha256-IQZIy+OAzUurfMjvmlQ4NxXY1u6Dt2x+xa0NGeCiqeg=
-      //             got:    sha256-qnSHG4AhBrleYKZ4SJ4AwHdJyiidj8NTeSSphBRo7gg=
+      const found = extractHashMismatch(`${stdout}\n${stderr}`);
 
-      try {
-        const [, _, found] = stderr.match(
-          /hash mismatch in fixed-output derivation .*:\n\s+specified:\s+(\S+)\s*\n\s*got:\s+(\S+)/,
-        );
-
-        switch (subDerivation) {
-          case "src":
-            entry.crateSha256 = found;
-            break;
-          case "cargoDeps":
-            entry.depsHash = found;
-            break;
-        }
-      } catch (error) {
-        console.log(`Error on ${crate}:\n`, { code, stdout, stderr, error });
+      switch (subDerivation) {
+        case "src":
+          entry.crateSha256 = found;
+          break;
+        case "cargoDeps":
+          entry.depsHash = found;
+          break;
       }
-    }
 
-    await saveData(data);
+      await saveData(data);
+    }
   }
 }
 
@@ -74,10 +64,15 @@ async function prefillData() {
       krate: { crate: crateInfo },
     } = await $`cargo crate info --json ${crate}`.json();
 
+    const previous = data[crate] ?? {};
+    const versionChanged = previous.version !== crateInfo.max_version;
+
     data[crate] = {
-      crateSha256: MARKER_HASH,
-      depsHash: MARKER_HASH,
-      ...data[crate],
+      ...previous,
+      crateSha256: versionChanged
+        ? MARKER_HASH
+        : (previous.crateSha256 ?? MARKER_HASH),
+      depsHash: versionChanged ? MARKER_HASH : (previous.depsHash ?? MARKER_HASH),
       id: crateInfo.id,
       description: crateInfo.description,
       version: crateInfo.max_version,
@@ -88,6 +83,21 @@ async function prefillData() {
   }
 
   await saveData(data);
+}
+
+function extractHashMismatch(output) {
+  // hash mismatch in fixed-output derivation '/nix/store/ix1lajrq193h5v1d2bpiw61qnpikkkrh-cargo-deps-1.5.1.tar.gz.drv':
+  //          specified: sha256-IQZIy+OAzUurfMjvmlQ4NxXY1u6Dt2x+xa0NGeCiqeg=
+  //             got:    sha256-qnSHG4AhBrleYKZ4SJ4AwHdJyiidj8NTeSSphBRo7gg=
+  const match = output.match(
+    /hash mismatch in fixed-output derivation .*:\n\s+specified:\s+\S+\s*\n\s*got:\s+(\S+)/,
+  );
+
+  if (!match) {
+    throw new Error(`Could not extract hash mismatch from build output:\n${output}`);
+  }
+
+  return match[1];
 }
 
 async function loadData() {
