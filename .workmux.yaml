@@ -2,5 +2,7 @@ main_branch: main
 merge_strategy: rebase
 
 pre_merge:
-  - "nix run .#build"
-  - "nixos-rebuild build --no-link --flake ."
+  - "nh home build -c 'lotus@lotus-notebook' ."
+  - "nh os build -c lotus-notebook ."
+  - "nh os build -c loem ."
+  - "nh os build -c gce-automation ."
