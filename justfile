@@ -116,3 +116,26 @@ rekey *args:
 
   system="$(nix eval --raw --impure --expr builtins.currentSystem)"
   nix run ".#agenix-rekey.${system}.rekey" -- {{args}}
+
+build-all:
+  #!/usr/bin/env bun
+  import { $ } from 'bun';
+
+  const hostSystem = await $`nix eval --raw .#pkgs.stdenv.hostPlatform.system`.text();
+  const {inventory: flakeInfo} = await $`nix flake show --json`.json();
+  const nixosConfigs = Object.entries(flakeInfo.nixosConfigurations.output.children)
+    .filter(([,config]) => config.forSystems?.includes(hostSystem))
+    .map(([name]) => name);
+  const homeConfigs = Object.entries(flakeInfo.homeConfigurations.output.children)
+    .filter(([,config]) => config.forSystems?.includes(hostSystem))
+    .map(([name]) => name);
+
+  for (const systemConfig of nixosConfigs) {
+    console.log(`Building system configuration ${systemConfig}...`);
+    await $`nh os build --no-build-output --hostname ${systemConfig} .`;
+  }
+
+  for (const homeConfig of homeConfigs) {
+    console.log(`Building home configuration ${homeConfig}...`);
+    await $`nh home build --configuration ${homeConfig} .`;
+  }

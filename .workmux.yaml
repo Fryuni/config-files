@@ -2,7 +2,4 @@ main_branch: main
 merge_strategy: rebase
 
 pre_merge:
-  - "nh home build -c 'lotus@lotus-notebook' ."
-  - "nh os build -c lotus-notebook ."
-  - "nh os build -c loem ."
-  - "nh os build -c gce-automation ."
+  - "just build-all"
