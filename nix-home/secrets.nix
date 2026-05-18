@@ -7,6 +7,10 @@
     firecrawl-api-key.file = ../secrets/ai/firecrawl;
     kimi-api-key.file = ../secrets/ai/kimi;
 
+    forgejo-cli-keys = {
+      file = ../secrets/forgejo-cli-keys;
+      path = "${config.home.homeDirectory}/.local/share/forgejo-cli/keys.json";
+    };
     nix-access-tokens = {
       file = ../secrets/nix-access-tokens;
       # Explicitly set path, the default include an env var reference to $XDG_CONFIG_HOME
