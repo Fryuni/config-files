@@ -132,7 +132,7 @@ build-all:
 
   for (const systemConfig of nixosConfigs) {
     console.log(`Building system configuration ${systemConfig}...`);
-    await $`nh os build --no-build-output --hostname ${systemConfig} .`;
+    await $`nh os build --hostname ${systemConfig} .`;
   }
 
   for (const homeConfig of homeConfigs) {
