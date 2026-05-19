@@ -24,6 +24,10 @@ in {
       # use ordinary `Enter`
       bind -T copy-mode-vi y send-keys -X copy-pipe  # Only copy, no cancel
 
+      # Keep the terminal/window title aligned with the active tmux context.
+      set-option -g set-titles on
+      set-option -g set-titles-string "#{session_name} | #{pane_title}"
+
       bind l run-shell "workmux last-done"
       bind C-s display-popup -h 30 -w 100 -E "workmux dashboard"
 
