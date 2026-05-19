@@ -3,6 +3,10 @@
   pkgs,
   ...
 }: {
+  imports = [
+    ./nix-store-cache.nix
+  ];
+
   environment.systemPackages = with pkgs; [
     nh
   ];

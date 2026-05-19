@@ -70,7 +70,7 @@
     startWhenNeeded = true;
     ports = [22];
     settings = {
-      AllowUsers = ["lotus"];
+      AllowUsers = ["lotus" "nix-ssh"];
       PermitRootLogin = "no";
       PasswordAuthentication = false;
       UseDns = true;
