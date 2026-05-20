@@ -8,7 +8,7 @@
     # llm-agents.claude-code
     llm-agents.agent-browser
     (pkgs.lib.makeAuthWrapper llm-agents.omp {
-      # OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
+      OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
       KIMI_API_KEY = {file = config.age.secrets.kimi-api-key.path;};
     })
 
