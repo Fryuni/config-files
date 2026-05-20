@@ -1,5 +1,12 @@
 main_branch: main
 merge_strategy: rebase
 
+files:
+  copy: []
+  symlink: []
+
+post_create:
+  - direnv allow
+
 pre_merge:
   - "just build-all"
