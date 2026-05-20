@@ -12,6 +12,7 @@
       mouse-hide-while-typing = true;
       auto-update = "off";
       bell-features = "system,attention,title,border";
+      clipboard-read = "allow";
     };
   };
 }
