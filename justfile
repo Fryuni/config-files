@@ -4,6 +4,12 @@ sysRoot := ".#nixosConfigurations.lotus-notebook.config.system.build.toplevel"
 default:
   nix flake metadata
 
+yeet:
+  git add .
+  omp commit
+  workmux merge --keep --no-verify
+  workmux remove --force
+
 why-home dependency *args:
   @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure --derivation "{{homeRoot}}" ".#{{dependency}}" {{args}}
 
