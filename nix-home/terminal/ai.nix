@@ -18,6 +18,7 @@
     llm-agents.tuicr
 
     uv # Needed for omp
+    sqlite # Needed for many agents and tools
   ];
 
   home.file.".agents".source =
