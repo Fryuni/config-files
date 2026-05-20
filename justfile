@@ -10,6 +10,12 @@ yeet:
   workmux merge --keep --no-verify
   workmux remove --force
 
+yeet-verify:
+  git add .
+  omp commit
+  workmux merge --keep
+  workmux remove --force
+
 why-home dependency *args:
   @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure --derivation "{{homeRoot}}" ".#{{dependency}}" {{args}}
 
