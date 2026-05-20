@@ -28,6 +28,9 @@ in {
       keys = builtins.attrValues hostKeys;
     };
 
-    settings.substituters = map cacheUri peerHostNames;
+    settings = {
+      fallback = true;
+      substituters = map cacheUri peerHostNames;
+    };
   };
 }
