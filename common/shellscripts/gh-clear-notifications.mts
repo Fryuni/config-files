@@ -29,7 +29,8 @@ const criterias = {
   "ignored org": (notification) =>
     matchOn(notification.repository.owner.login, [
       /^withstudiocms$/,
-      /^croct-tech$/,
+      /^withastro$/,
+      // /^croct-tech$/,
     ]),
   bot: (_, details) => isBot(details?.user),
   "draft PR": (_, details) => details?.draft === true,
