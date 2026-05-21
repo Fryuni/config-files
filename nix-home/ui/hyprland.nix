@@ -175,7 +175,7 @@ in {
 
       # Dwindle layout - smart autotiling
       dwindle = {
-        pseudotile = true; # Respect window size hints
+        # Hyprland 0.55 removed dwindle:pseudotile; toggle per-window pseudotiling with $mod+e.
         preserve_split = true; # Keep split direction on resize
         smart_split = false; # Disable cursor-based splitting
         smart_resizing = true; # Resize affects neighbors smartly
@@ -286,7 +286,7 @@ in {
         "$mod SHIFT, j, movewindow, d"
 
         # ===== Layout Control (Dwindle) =====
-        "$mod, s, togglesplit" # Toggle split direction
+        "$mod, s, layoutmsg, togglesplit" # Toggle split direction
         "$mod, e, pseudo" # Toggle pseudotile (respect window size)
         "$mod, g, togglegroup" # Group windows (tabs)
         "$mod, w, changegroupactive, f" # Next tab in group
