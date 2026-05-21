@@ -12,6 +12,7 @@ in {
     baseIndex = 1;
     clock24 = true;
     keyMode = "vi";
+    mouse = true;
 
     extraConfig = ''
       # Switch to another session when closing the last window in the current session
