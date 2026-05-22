@@ -200,24 +200,24 @@
       }
     ];
 
-    globalConfig = {
-      templates = import ./templates attrs;
+    agenix-rekey = attrs.agenix-rekey.configure {
+      userFlake = self;
+      nixosConfigurations = builtins.filterAttrs (_: x: x.config ? age) self.nixosConfigurations;
+      darwinConfigurations = self.darwinConfigurations or {};
+      homeConfigurations = {};
+      collectHomeManagerConfigurations = false;
+    };
 
-      "agenix-rekey" = attrs.agenix-rekey.configure {
-        userFlake = self;
-        nixosConfigurations = builtins.filterAttrs (_: x: x.config ? age) self.nixosConfigurations;
-        darwinConfigurations = self.darwinConfigurations or {};
-        homeConfigurations = {};
-        collectHomeManagerConfigurations = false;
-      };
+    globalConfig = {
+      inherit agenix-rekey;
+
+      templates = import ./templates attrs;
 
       nixosConfigurations =
         builtins.foldl' (
           acc: entry: let
             buildSystem =
-              if builtins ? currentSystem
-              then builtins.currentSystem
-              else flake-utils.lib.system.x86_64-linux;
+              builtins.currentSystem or flake-utils.lib.system.x86_64-linux;
             isCross = entry.system != buildSystem;
           in
             acc
@@ -243,7 +243,11 @@
                       }
                     ];
                   specialArgs = {
-                    inputs = attrs;
+                    inputs =
+                      attrs
+                      // {
+                        inherit agenix-rekey;
+                      };
                   };
                 }
                 // nixpkgs.lib.optionalAttrs (!isCross) {
