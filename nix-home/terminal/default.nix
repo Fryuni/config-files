@@ -89,6 +89,7 @@
       ttmp = "exec t \"$(mktemp -d)\"";
       tx = "t \"$(xplr)\"";
       etx = "exec t \"$(xplr)\"";
+      etclone = "exec tclone";
 
       "refresh-gcloud-credentials" = "gcloud auth print-access-token > /dev/null";
       gselect = "gcloud config configurations activate";
@@ -98,6 +99,24 @@
 
       ns = "nix shell";
       nixc = "nix develop -c";
+    };
+
+    siteFunctions = {
+      tclone = ''
+        local origin="$1"
+        local target="$2"
+
+        if [[ -z "$origin" ]]; then
+          echo "Usage: tclone <git-repository> [target-directory]"
+          return 1
+        fi
+        if [[ -z "$target" ]]; then
+          target="$(basename "$origin" .git)"
+        fi
+
+        git clone "$origin" "$target"
+        t "$(realpath "$target")"
+      '';
     };
 
     oh-my-zsh = {
