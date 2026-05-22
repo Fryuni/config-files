@@ -1,8 +1,10 @@
 {
+  lib,
   pkgs,
   config,
   ...
-}: {
+}:
+lib.mkIf (pkgs.stdenv.buildPlatform.system == pkgs.stdenv.hostPlatform.system) {
   home.packages = with pkgs; [
     llm-agents.opencode
     # llm-agents.claude-code

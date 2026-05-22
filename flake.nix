@@ -5,7 +5,7 @@
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1";
     nixpkgs-stable.url = "https://flakehub.com/f/NixOS/nixpkgs/*";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
-    nixos-hardware.url = "https://flakehub.com/f/NixOS/nixos-hardware/0.1";
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
 
     google-workspace-cli = {
       url = "github:googleworkspace/cli";
@@ -214,9 +214,11 @@
       nixosConfigurations =
         builtins.foldl' (
           acc: entry: let
-            isCross =
-              builtins ? currentSystem
-              && entry.system != builtins.currentSystem;
+            buildSystem =
+              if builtins ? currentSystem
+              then builtins.currentSystem
+              else flake-utils.lib.system.x86_64-linux;
+            isCross = entry.system != buildSystem;
           in
             acc
             // builtins.mapAttrs (_: modules:
@@ -235,9 +237,9 @@
                     ++ nixpkgs.lib.optionals isCross [
                       {
                         nixpkgs.hostPlatform = entry.system;
-                        nixpkgs.buildPlatform = builtins.currentSystem;
+                        nixpkgs.buildPlatform = buildSystem;
                         nixpkgs.config = nixpkgsConfig;
-                        nixpkgs.overlays = [channelOverlays];
+                        nixpkgs.overlays = [channelOverlays] ++ (import ./overlay attrs);
                       }
                     ];
                   specialArgs = {

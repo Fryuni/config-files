@@ -2,7 +2,7 @@
   makeAuthWrapper = pkg: envMap:
     (pkgs.symlinkJoin {
       name = "${pkg.name}-authenticated";
-      nativeBuildInputs = [pkgs.makeWrapper pkgs.coreutils];
+      nativeBuildInputs = [pkgs.buildPackages.makeWrapper pkgs.buildPackages.coreutils];
       paths = [pkg];
       postBuild = let
         inherit (builtins) isString isAttrs attrNames concatStringsSep;
