@@ -16,7 +16,10 @@
     })
     publicKeyFiles);
 
-  cacheHostNames = builtins.attrNames hostKeys;
+  cacheHostNames = [
+    "lotus-notebook"
+    "loem"
+  ];
   peerHostNames = builtins.filter (hostName: hostName != config.networking.hostName) cacheHostNames;
   cacheUri = hostName: "ssh://nix-ssh@${hostName}?ssh-key=/etc/ssh/ssh_host_ed25519_key&trusted=true&priority=50";
 in {
