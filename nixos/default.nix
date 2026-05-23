@@ -46,6 +46,17 @@
   # Keep Plasma available as an alternative
   services.desktopManager.plasma6.enable = true;
 
+  # DrKonqi's systemd-coredump integration is currently crashing on GUI login
+  # while replaying coredumps accumulated before the graphical session starts.
+  # Keep systemd-coredump storage available, but stop the Plasma notification
+  # bridge from picking up and launching notifications for those dumps.
+  systemd.services."drkonqi-coredump-processor@".enable = false;
+  systemd.user.services = {
+    "drkonqi-coredump-launcher@".enable = false;
+    drkonqi-coredump-pickup.enable = false;
+  };
+  systemd.user.sockets.drkonqi-coredump-launcher.enable = false;
+
   # services.xserver.desktopManager.xfce.enable = true;
   programs.thunar = {
     enable = true;
