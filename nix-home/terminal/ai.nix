@@ -26,21 +26,12 @@ lib.mkIf (pkgs.stdenv.buildPlatform.system == pkgs.stdenv.hostPlatform.system) {
   home.file.".agents".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.omp/agent/universal-link";
 
-  programs.zsh = {
-    shellAliases = {
-      oc = "opencode";
-      wm = "workmux";
-      wma = "workmux add -o";
-      wmb = "workmux add -o --background --prompt-editor";
-      wmr = "workmux rm";
-    };
-
-    siteFunctions = {
-      wmo = ''
-        local branch="$(git branch --format='%(refname:short)' | gum choose)"
-        workmux add --open-if-exists "$branch" "$@"
-      '';
-    };
+  programs.zsh.shellAliases = {
+    oc = "opencode";
+    wm = "workmux";
+    wma = "workmux add -o";
+    wmb = "workmux add -o --background --prompt-editor";
+    wmr = "workmux rm";
   };
 
   services.git-sync = {
