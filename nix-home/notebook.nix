@@ -23,22 +23,22 @@
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    matchBlocks = {
+    settings = {
       "vps1" = {
-        user = "fedora";
-        identitiesOnly = true;
+        User = "fedora";
+        IdentitiesOnly = true;
       };
       "*" = {
-        forwardAgent = false;
-        addKeysToAgent = "no";
-        compression = false;
-        serverAliveInterval = 0;
-        serverAliveCountMax = 3;
-        hashKnownHosts = false;
-        userKnownHostsFile = "~/.ssh/known_hosts";
-        controlMaster = "auto";
-        controlPath = "~/.ssh/master-%r@%n:%p";
-        controlPersist = "300";
+        ForwardAgent = false;
+        AddKeysToAgent = "no";
+        Compression = false;
+        ServerAliveInterval = 0;
+        ServerAliveCountMax = 3;
+        HashKnownHosts = false;
+        UserKnownHostsFile = "~/.ssh/known_hosts";
+        ControlMaster = "auto";
+        ControlPath = "~/.ssh/master-%r@%n:%p";
+        ControlPersist = "300";
       };
     };
   };
