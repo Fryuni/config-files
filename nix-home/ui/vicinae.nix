@@ -53,7 +53,7 @@ in {
         meta = {
           version = 1;
           name = "Lotus";
-          description = "Custom theme matching lotus-notebook color scheme";
+          description = "Custom theme matching notebook color scheme";
           variant = "dark";
           inherits = "vicinae-dark";
         };

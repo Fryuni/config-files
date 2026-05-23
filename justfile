@@ -1,5 +1,5 @@
-homeRoot := ".#homeConfigurations.lotus@lotus-notebook.activationPackage"
-sysRoot := ".#nixosConfigurations.lotus-notebook.config.system.build.toplevel"
+homeRoot := ".#homeConfigurations.lotus@note.activationPackage"
+sysRoot := ".#nixosConfigurations.note.config.system.build.toplevel"
 
 default:
   nix flake metadata
