@@ -1,7 +1,16 @@
 {pkgs, ...}: let
+  tSmartTmuxSessionManager = pkgs.tmuxPlugins.t-smart-tmux-session-manager.overrideAttrs (_: {
+    version = "unstable-2026-05-22";
+    src = pkgs.fetchgit {
+      url = "https://codeberg.org/Fryuni/t-smart-tmux-session-manager.git";
+      rev = "57d83d65feb692904644f162881977ffc54644d2";
+      hash = "sha256-DrWNLAXgKH6Kf/NPMFz4nsk6GAjXDlPhLU/cSu6q+lo=";
+    };
+  });
+
   tpkg = pkgs.runCommand "t" {} ''
     mkdir -p "$out/bin"
-    ln -s ${pkgs.tmuxPlugins.t-smart-tmux-session-manager}/share/tmux-plugins/*/bin/t "$out/bin/t"
+    ln -s ${tSmartTmuxSessionManager}/share/tmux-plugins/*/bin/t "$out/bin/t"
   '';
 in {
   programs.tmux = {
@@ -57,7 +66,7 @@ in {
 
     plugins = with pkgs.tmuxPlugins; [
       sensible
-      t-smart-tmux-session-manager
+      tSmartTmuxSessionManager
       fuzzback
       tmux-thumbs
       # tmux-which-key
