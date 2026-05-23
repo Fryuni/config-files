@@ -8,7 +8,7 @@
     (python313.withPackages (py: [
       py.pyopenssl
     ]))
-    nodejs_25
+    nodejs_26
     corepack
     bun
 
