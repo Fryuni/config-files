@@ -11,7 +11,6 @@
     inputs.nixos-hardware.nixosModules.raspberry-pi-3
     ../../nixos/modules/networking/tailscale.nix
     ../common.nix
-    ../interactive.nix
   ];
 
   networking.hostName = "rpi3";

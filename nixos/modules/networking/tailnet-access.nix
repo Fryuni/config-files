@@ -6,16 +6,21 @@
 }: let
   cfg = config.services.lferrazTailnetAccess;
 
-  inherit (lib) mkEnableOption mkIf mkMerge mkOption types;
+  inherit (lib) mkEnableOption mkIf mkMerge mkOption mkForce types;
   inherit (cfg) deviceName publicDomain tailnetDomain;
 
   tailnetHost = "${deviceName}.${tailnetDomain}";
 
   caCert = ../../../common/certs/lferraz-tailnet-ca.crt;
+  caBundle = config.security.pki.caBundle;
   certStateDir = "/var/lib/lferraz-tailnet";
   certDir = "${certStateDir}/certs";
   certFile = "${certDir}/${deviceName}.crt";
   certKeyFile = "${certDir}/${deviceName}.key";
+
+  systemTrustEnvironment = {
+    BUN_OPTIONS = lib.mkDefault "--use-system-ca";
+  };
 
   portProxyHandler = upstream: ''
     header {
@@ -236,6 +241,9 @@ in {
 
       security.pki.certificateFiles = [caCert];
 
+      environment.sessionVariables = systemTrustEnvironment;
+      systemd.globalEnvironment = systemTrustEnvironment;
+
       environment.systemPackages = [issueCertificate];
 
       systemd.tmpfiles.rules = [
@@ -247,8 +255,8 @@ in {
         description = "Issue ${deviceName}.${publicDomain} certificate from the lferraz.dev tailnet CA";
         wantedBy = ["multi-user.target"];
         before = ["caddy.service"];
-        after = ["agenix.service"];
-        requires = ["agenix.service"];
+        after = ["run-agenix.d.mount"];
+        requires = ["run-agenix.d.mount"];
         serviceConfig = {
           Type = "oneshot";
           ExecStart = lib.getExe generateHostCertificate;
@@ -315,27 +323,38 @@ in {
 
       services.caddy = {
         enable = true;
-        virtualHosts."https://*.${deviceName}.${publicDomain}, https://${deviceName}.${publicDomain}, https://${tailnetHost}".extraConfig = ''
-          bind ${tailnetHost}
-          tls ${certFile} ${certKeyFile}
+        virtualHosts.tailnet = {
+          hostName = "https://${tailnetHost}";
+          serverAliases = [
+            "https://*.${deviceName}.${publicDomain}"
+            "https://${deviceName}.${publicDomain}"
+          ];
+          listenAddresses = [tailnetHost];
+          useACMEHost = null;
+          extraConfig = ''
+            tls ${certFile} ${certKeyFile}
 
-          ${aliasProxyBlocks}
+            ${aliasProxyBlocks}
 
-          @port header_regexp port Host ${portHostRegexp}
-          handle @port {
-            ${portProxyHandler "127.0.0.1:{re.port.1}"}
-          }
+            @port header_regexp port Host ${portHostRegexp}
+            handle @port {
+              ${portProxyHandler "127.0.0.1:{re.port.1}"}
+            }
 
-          handle {
-            respond "Use https://<port>.${deviceName}.${publicDomain} to proxy a local HTTP service on this device." 404
-          }
-        '';
+            handle {
+              respond "Use https://<port>.${deviceName}.${publicDomain} to proxy a local HTTP service on this device." 404
+            }
+          '';
+        };
       };
 
       systemd.services.caddy = {
         after = ["lferraz-tailnet-certificate.service" "tailscaled.service"];
         requires = ["lferraz-tailnet-certificate.service"];
         wants = ["tailscaled.service"];
+        serviceConfig = {
+          Restart = mkForce "always";
+        };
       };
     })
   ]);
