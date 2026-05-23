@@ -297,6 +297,12 @@
           inherit (nixpkgs) lib;
           honchoModule = ./nixos/modules/honcho.nix;
         };
+        tailnet-access-module = import ./tests/tailnet-access-module.nix {
+          inherit pkgs;
+          inherit (nixpkgs) lib;
+          agenixModule = agenix.nixosModules.age;
+          tailnetAccessModule = ./nixos/modules/networking/tailnet-access.nix;
+        };
       };
 
       apps = import ./commands.nix {

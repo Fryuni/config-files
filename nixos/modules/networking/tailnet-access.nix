@@ -23,13 +23,13 @@
 
   portProxyHandler = upstream: ''
     header {
-      Access-Control-Allow-Origin "{http.request.header.Origin}"
-      Access-Control-Allow-Credentials "true"
-      Access-Control-Allow-Methods "GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS"
-      Access-Control-Allow-Headers "Authorization, Content-Type, Accept, Origin, User-Agent, DNT, Cache-Control, X-Requested-With, If-Modified-Since, Range"
-      Access-Control-Expose-Headers "Content-Length, Content-Range"
-      Access-Control-Max-Age "86400"
-      Vary "Origin"
+      >Access-Control-Allow-Origin "{http.request.header.Origin}"
+      >Access-Control-Allow-Credentials "true"
+      >Access-Control-Allow-Methods "GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS"
+      >Access-Control-Allow-Headers "Authorization, Content-Type, Accept, Origin, User-Agent, DNT, Cache-Control, X-Requested-With, If-Modified-Since, Range"
+      >Access-Control-Expose-Headers "Content-Length, Content-Range"
+      >Access-Control-Max-Age "3600"
+      >Vary "Origin"
     }
 
     @preflight method OPTIONS
@@ -43,13 +43,16 @@
   matcherName = alias: lib.replaceStrings ["-" "."] ["_" "_"] alias;
   aliasHostRegexp = alias: "^${lib.escapeRegex alias}\\.${lib.escapeRegex deviceName}\\.${lib.escapeRegex publicDomain}(?::[0-9]+)?$";
   portHostRegexp = "^([0-9]+)\\.${lib.escapeRegex deviceName}\\.${lib.escapeRegex publicDomain}(?::[0-9]+)?$";
-  aliasProxyBlocks = lib.concatStringsSep "\n" (lib.mapAttrsToList (alias: port: let
+  aliasProxyBlocks = lib.concatStringsSep "\n" (lib.mapAttrsToList (alias: target: let
       matcher = "alias_${matcherName alias}";
-      upstream = "127.0.0.1:${toString port}";
+      handler =
+        if builtins.isInt target
+        then portProxyHandler "127.0.0.1:${toString target}"
+        else target;
     in ''
       @${matcher} header_regexp ${matcher} Host ${aliasHostRegexp alias}
       handle @${matcher} {
-        ${portProxyHandler upstream}
+        ${handler}
       }
     '')
     cfg.proxy.aliases);
@@ -212,15 +215,22 @@ in {
     proxy = {
       enable = mkEnableOption "Caddy port-subdomain reverse proxy" // {default = true;};
       aliases = mkOption {
-        type = types.attrsOf (types.ints.between 1 65535);
+        type = types.attrsOf (types.either (types.ints.between 1 65535) types.lines);
         default = {};
         example = {
           node-red = 1880;
+          static = ''
+            root * /srv/static
+            file_server
+          '';
         };
         description = ''
-          Named service aliases to local ports. For example,
+          Named service aliases to local ports or Caddy handler blocks. For example,
           `node-red = 1880` makes `node-red.${deviceName}.${publicDomain}` proxy
           to `127.0.0.1:1880`.
+
+          A string value is inserted directly into the alias-specific `handle`
+          block, after matching `<alias>.${deviceName}.${publicDomain}`.
         '';
       };
     };

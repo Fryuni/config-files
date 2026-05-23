@@ -8,6 +8,7 @@
 
     ./disko.nix
     ./honcho.nix
+    ./matrix.nix
     ./metrics
     ./networking.nix
     ./soft-serve.nix
