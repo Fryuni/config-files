@@ -22,6 +22,8 @@
     doCkeck = false;
   });
 in {
+  imports = [./tailnet-access.nix];
+
   # make the tailscale command usable to users
   environment.systemPackages = [package];
 
