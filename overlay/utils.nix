@@ -100,7 +100,18 @@ final: pkgs: {
   #       doCheck = false;
   #     });
 
-  inherit (pkgs.master) bun;
+  bun = pkgs.master.bun.overrideAttrs (old: {
+    version = "${old.version}-pr-31024-b5417a42";
+    src =
+      if final.stdenv.hostPlatform.system == "x86_64-linux"
+      then
+        pkgs.fetchurl {
+          name = "bun-linux-x64-pr-31024.zip";
+          url = "https://buildkite.com/organizations/bun/pipelines/bun/builds/55982/jobs/019e3e91-4803-4ed4-9c9d-2d088ddcfd9a/artifacts/019e3ea3-5bfc-4c95-be9e-47623bdf4427";
+          hash = "sha256-/dtxA/+1TKBVViFdTTP3XDTWw+I/pYpjhAB2BBJJvNQ=";
+        }
+      else old.src;
+  });
 
   ulauncher = pkgs.master.ulauncher.overridePythonAttrs {
     propagatedBuildInputs =
