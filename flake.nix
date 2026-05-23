@@ -175,7 +175,7 @@
       {
         system = flake-utils.lib.system.x86_64-linux;
         boxes = {
-          lotus-notebook = [
+          note = [
             ./nixos
             ./nixos/notebook
           ];

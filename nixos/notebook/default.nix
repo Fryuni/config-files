@@ -25,7 +25,7 @@
     "armv7l-linux"
   ];
 
-  networking.hostName = "lotus-notebook";
+  networking.hostName = "note";
 
   services.vmagent.enable = true;
 

@@ -17,7 +17,7 @@
     publicKeyFiles);
 
   cacheHostNames = [
-    "lotus-notebook"
+    "note"
     "loem"
   ];
   peerHostNames = builtins.filter (hostName: hostName != config.networking.hostName) cacheHostNames;
