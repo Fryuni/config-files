@@ -259,7 +259,7 @@
         ) {}
         nixosModules;
 
-      homeConfigurations."lotus@lotus-notebook" = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations."lotus@note" = home-manager.lib.homeManagerConfiguration {
         pkgs = pkgsFun flake-utils.lib.system.x86_64-linux;
         extraSpecialArgs = {
           inputs = attrs;
