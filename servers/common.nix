@@ -10,36 +10,41 @@
     ../nixos/registries.nix
   ];
 
-  environment.systemPackages = with pkgs; [
-    tmux
-    gcc
-    clang
-    curl
-    wget
-    git
-    jq
-    dig
-    htop
-    btop
-    gnumake
-    ripgrep
-    duf
-    dua
-    xarchiver
-    cachix
-    (google-cloud-sdk.withExtraComponents (
-      with google-cloud-sdk.components; [
-        docker-credential-gcr
-        beta
-        alpha
-        gsutil
-        gke-gcloud-auth-plugin
-        # terraform-tools
-      ]
-    ))
-  ];
+  environment.systemPackages = with pkgs;
+    [
+      tmux
+      gcc
+      clang
+      curl
+      wget
+      git
+      jq
+      dig
+      htop
+      btop
+      gnumake
+      ripgrep
+      duf
+      dua
+      xarchiver
+      cachix
+    ]
+    ++ lib.optionals (!stdenv.hostPlatform.isAarch64) [
+      (google-cloud-sdk.withExtraComponents (
+        with google-cloud-sdk.components; [
+          docker-credential-gcr
+          beta
+          alpha
+          gsutil
+          gke-gcloud-auth-plugin
+          # terraform-tools
+        ]
+      ))
+    ];
 
   environment.variables.EDITOR = "nvim";
+
+  boot.zfs.forceImportRoot = false;
 
   programs.neovim = {
     enable = true;
