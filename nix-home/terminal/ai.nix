@@ -21,6 +21,7 @@ lib.mkIf (pkgs.stdenv.buildPlatform.system == pkgs.stdenv.hostPlatform.system) {
 
     uv # Needed for omp
     sqlite # Needed for many agents and tools
+    tirith # Used by Hermes
   ];
 
   home.file.".agents".source =
