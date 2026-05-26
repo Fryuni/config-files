@@ -173,11 +173,11 @@ Press **`Super + \``** (backtick) to enter workspace overview mode:
 
 | Keybinding      | Action                              |
 | --------------- | ----------------------------------- |
-| `Print`         | Screenshot region (interactive GUI) |
-| `Shift + Print` | Screenshot all screens              |
-| `Super + Print` | Screenshot current monitor          |
+| `Print`         | Screenshot region, annotate, then copy via `wl-copy` |
+| `Shift + Print` | Screenshot all screens                               |
+| `Super + Print` | Screenshot current monitor                           |
 
-Flameshot provides an interactive editor where you can annotate, crop, and save/copy screenshots.
+`Print` uses a small wrapper around `flameshot gui --raw | wl-copy` so annotated images are published through the Wayland clipboard reliably on Hyprland.
 
 ---
 

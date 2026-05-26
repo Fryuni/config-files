@@ -13,36 +13,79 @@
     alert = "ff2e63";
     disabled = "707880";
   };
+
+  flameshotPackage = pkgs.stable.flameshot;
+
+  # Flameshot's native clipboard action is unreliable on Wayland/Hyprland: the
+  # editor closes without publishing image data and can leave the daemon stuck.
+  # Use Flameshot only for selection/annotation, then hand the raw PNG to
+  # wl-copy so wl-clipboard owns the Wayland clipboard lifetime.
+  flameshotCopy = pkgs.writeShellApplication {
+    name = "flameshot-copy";
+    runtimeInputs = [
+      flameshotPackage
+      pkgs.coreutils
+      pkgs.libnotify
+      pkgs.wl-clipboard
+    ];
+    text = ''
+      set -euo pipefail
+
+      tmp="$(mktemp --suffix=.png)"
+      cleanup() {
+        rm -f "$tmp"
+      }
+      trap cleanup EXIT
+
+      if ! flameshot gui --raw > "$tmp"; then
+        exit 0
+      fi
+
+      if [ ! -s "$tmp" ]; then
+        exit 0
+      fi
+
+      wl-copy --type image/png < "$tmp"
+      notify-send \
+        --app-name=flameshot \
+        --icon=flameshot \
+        "Screenshot copied" \
+        "Image is available in the Wayland clipboard." \
+        || true
+    '';
+  };
 in {
-  home.packages = with pkgs; [
-    # Clipboard
-    wl-clipboard
-    cliphist
+  home.packages =
+    (with pkgs; [
+      # Clipboard
+      wl-clipboard
+      cliphist
 
-    # Notifications
-    libnotify
+      # Notifications
+      libnotify
 
-    # Screen locker
-    swaylock-effects
-    swayidle
+      # Screen locker
+      swaylock-effects
+      swayidle
 
-    # Brightness/Volume control
-    brightnessctl
-    playerctl
-    pamixer
+      # Brightness/Volume control
+      brightnessctl
+      playerctl
+      pamixer
 
-    # Screenshot (grim required for flameshot wayland adapter)
-    grim
+      # Screenshot (grim required for flameshot wayland adapter)
+      grim
 
-    # Wallpaper daemon
-    swww
+      # Wallpaper daemon
+      swww
 
-    # Display configuration GUI
-    wdisplays
+      # Display configuration GUI
+      wdisplays
 
-    # Audio configuration GUI
-    pavucontrol
-  ];
+      # Audio configuration GUI
+      pavucontrol
+    ])
+    ++ [flameshotCopy];
 
   # Hyprland configuration
   wayland.windowManager.hyprland = {
@@ -254,7 +297,8 @@ in {
         "$mod SHIFT, V, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy"
 
         # ===== Screenshot (Flameshot) =====
-        ", Print, exec, flameshot gui"
+        # Route copy through wl-copy instead of Flameshot's native Wayland clipboard path.
+        ", Print, exec, flameshot-copy"
         "SHIFT, Print, exec, flameshot full"
         "$mod, Print, exec, flameshot screen"
 
@@ -701,7 +745,7 @@ in {
 
   assertions = [
     {
-      assertion = lib.versionOlder pkgs.stable.flameshot.version "14";
+      assertion = lib.versionOlder flameshotPackage.version "14";
       message = "Flameshot is pinned to pkgs.stable.flameshot because v14 removed the grim adapter settings used on Hyprland; revisit the Flameshot config before upgrading.";
     }
   ];
@@ -711,7 +755,7 @@ in {
     enable = true;
     # v14.0.rc1 removed useGrimAdapter/disabledGrimWarning, then crashes in
     # resolveAnyConfigErrors when this managed config contains those keys.
-    package = pkgs.stable.flameshot;
+    package = flameshotPackage;
     settings = {
       General = {
         # Use grim adapter for Wayland compatibility (required for Hyprland)
