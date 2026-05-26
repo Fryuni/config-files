@@ -33,6 +33,7 @@ lib.mkIf (pkgs.stdenv.buildPlatform.system == pkgs.stdenv.hostPlatform.system) {
     wma = "workmux add -o";
     wmb = "workmux add -o --background --prompt-editor";
     wmr = "workmux rm";
+    wmyeet = "omp commit; workmux merge --keep --rebase --no-verify && workmux remove --force";
   };
 
   services.git-sync = {
