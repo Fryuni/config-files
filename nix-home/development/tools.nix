@@ -85,6 +85,11 @@
   in
     shellscripts
     // {
+      ".local/bin/composer" = {
+        source = ../../common/shellscripts/php.sh;
+        executable = true;
+      };
+
       # Hack to fix SSH warnings/errors due to a file permissions check in some tools
       # ".ssh/config" = {
       #   target = ".ssh/config_source";
