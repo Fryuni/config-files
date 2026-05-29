@@ -39,7 +39,8 @@ in {
       set-option -g set-titles-string "#{session_name} | #{pane_title}"
 
       bind l run-shell "workmux last-done"
-      bind C-s display-popup -h 30 -w 100 -E "workmux dashboard"
+      bind S run-shell "workmux sidebar"
+      bind C-s display-popup -h 50% -w 50% -E "workmux dashboard"
 
       bind '"' split-window -c "#{pane_current_path}"
       bind % split-window -h -c "#{pane_current_path}"
