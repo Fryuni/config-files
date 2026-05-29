@@ -36,7 +36,7 @@ in {
 
       # Keep the terminal/window title aligned with the active tmux context.
       set-option -g set-titles on
-      set-option -g set-titles-string "#{session_name} | #{pane_title}"
+      set-option -g set-titles-string "#H - #{session_name} | #{pane_title}"
 
       bind l run-shell "workmux last-done"
       bind S run-shell "workmux sidebar"
