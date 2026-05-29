@@ -65,7 +65,7 @@ in {
       libnotify
 
       # Screen locker
-      swaylock-effects
+      swaylock
       swayidle
 
       # Brightness/Volume control
@@ -708,15 +708,18 @@ in {
     };
   };
 
-  # Swaylock configuration
+  # Swaylock configuration: keep this intentionally simple for stability on
+  # Hyprland. swaylock-effects is prettier, but its screenshot/effect path has
+  # been unreliable on the notebook.
   programs.swaylock = {
     enable = true;
-    package = pkgs.swaylock-effects;
+    package = pkgs.swaylock;
     settings = {
       color = colors.background;
       font = "JetBrainsMono Nerd Font";
       show-failed-attempts = true;
       ignore-empty-password = true;
+      indicator-idle-visible = true;
       indicator-radius = 100;
       indicator-thickness = 10;
       line-color = colors.background;
@@ -732,14 +735,6 @@ in {
       ring-wrong-color = colors.alert;
       inside-wrong-color = colors.background;
       bs-hl-color = colors.alert;
-      grace = 2;
-      grace-no-mouse = true;
-      grace-no-touch = true;
-      clock = true;
-      indicator = true;
-      effect-blur = "7x5";
-      effect-vignette = "0.5:0.5";
-      screenshots = true;
     };
   };
 
