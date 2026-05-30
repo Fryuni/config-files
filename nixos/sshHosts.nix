@@ -11,5 +11,11 @@ _: let
     })
     txtFiles);
 in {
-  programs.ssh.knownHosts = hosts;
+  programs.ssh = {
+    knownHosts = hosts;
+    extraConfig = ''
+      Host *
+        AddressFamily inet
+    '';
+  };
 }
