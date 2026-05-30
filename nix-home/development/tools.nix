@@ -11,6 +11,7 @@
     nodejs_26
     corepack
     bun
+    wakatime-cli
 
     libnotify
     (lib.lowPrio slack)
