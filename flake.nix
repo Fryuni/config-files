@@ -213,6 +213,8 @@
 
       templates = import ./templates attrs;
 
+      nixosModules.honcho = ./nixos/modules/honcho.nix;
+
       nixosConfigurations =
         builtins.foldl' (
           acc: entry: let
@@ -282,6 +284,14 @@
 
       devShells.default = pkgs.mkShell {
         packages = [];
+      };
+
+      checks = nixpkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
+        honcho-module = import ./tests/honcho-module.nix {
+          inherit pkgs;
+          inherit (nixpkgs) lib;
+          honchoModule = ./nixos/modules/honcho.nix;
+        };
       };
 
       apps = import ./commands.nix {

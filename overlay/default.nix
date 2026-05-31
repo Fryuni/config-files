@@ -21,6 +21,7 @@ in [
   (import ./pulumi)
   (import ./agentfs.nix)
   (import ./openwhispr.nix)
+  (import ./honcho.nix)
   (import ./rustPackages)
   (final: pkgs: let
     inherit (pkgs.stdenv.hostPlatform) system;

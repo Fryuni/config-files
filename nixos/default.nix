@@ -8,6 +8,7 @@
     ./nix-settings.nix
     ./modules/networking
     ./modules/hyprland.nix
+    ./modules/honcho.nix
     ./users.nix
     ./audio.nix
     ./registries.nix
