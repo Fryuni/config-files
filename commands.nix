@@ -14,7 +14,7 @@
       help = "Install home-manager and apply home configuration";
       command = ''
         export HOME_MANAGER_BACKUP_EXT=old
-        ${self.outputs.homeConfigurations.note.activationPackage}/activate
+        ${self.outputs.homeConfigurations."lotus@note".activationPackage}/activate
       '';
     }
 
