@@ -2,6 +2,7 @@
 {config, ...}: {
   imports = [
     ../common.nix
+    ./cloudflare-tunnel.nix
     ./disko.nix
     ./soft-serve.nix
 
