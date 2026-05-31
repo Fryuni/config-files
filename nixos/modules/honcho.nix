@@ -23,6 +23,7 @@
     else "false";
 
   sqlLiteral = value: "'${lib.replaceStrings ["'"] ["''"] value}'";
+  alterDatabaseOwnerSql = "SELECT format('ALTER DATABASE %I OWNER TO %I', ${sqlLiteral cfg.database.name}, ${sqlLiteral databaseUser})";
 
   valueToEnv = value:
     if lib.isBool value
@@ -63,6 +64,7 @@
 
   localDatabaseUnits = lib.optionals cfg.database.createLocally [
     "postgresql.service"
+    "postgresql-setup.service"
     "honcho-postgresql-setup.service"
   ];
 in {
@@ -233,8 +235,8 @@ in {
 
     systemd.services.honcho-postgresql-setup = lib.mkIf cfg.database.createLocally {
       description = "Prepare PostgreSQL objects for Honcho";
-      after = ["postgresql.service"];
-      requires = ["postgresql.service"];
+      after = ["postgresql-setup.service"];
+      requires = ["postgresql-setup.service"];
       before = ["honcho-migrate.service"];
       serviceConfig = {
         Type = "oneshot";
@@ -244,9 +246,11 @@ in {
       script = ''
         set -euo pipefail
 
-        alterDatabaseSql="$(${psql} -v ON_ERROR_STOP=1 --dbname postgres --tuples-only --no-align \
-          --command ${lib.escapeShellArg "SELECT format('ALTER DATABASE %I OWNER TO %I', ${sqlLiteral cfg.database.name}, ${sqlLiteral databaseUser})"})"
-        ${psql} -v ON_ERROR_STOP=1 --dbname postgres --command "$alterDatabaseSql"
+        ${lib.optionalString (databaseUser != cfg.database.name) ''
+          alterDatabaseSql="$(${psql} -v ON_ERROR_STOP=1 --dbname postgres --tuples-only --no-align \
+            --command ${lib.escapeShellArg alterDatabaseOwnerSql})"
+          ${psql} -v ON_ERROR_STOP=1 --dbname postgres --command "$alterDatabaseSql"
+        ''}
 
         ${psql} -v ON_ERROR_STOP=1 --dbname ${lib.escapeShellArg cfg.database.name} \
           --command 'CREATE EXTENSION IF NOT EXISTS vector'

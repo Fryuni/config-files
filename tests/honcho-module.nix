@@ -49,6 +49,9 @@
     apiWants = cfg.systemd.services.honcho-api.wants;
     deriverAfter = cfg.systemd.services.honcho-deriver.after;
     migrateAfter = cfg.systemd.services.honcho-migrate.after;
+    postgresqlSetupAfter = cfg.systemd.services.honcho-postgresql-setup.after;
+    postgresqlSetupRequires = cfg.systemd.services.honcho-postgresql-setup.requires;
+    postgresqlSetupScript = cfg.systemd.services.honcho-postgresql-setup.script;
     apiServiceConfig = cfg.systemd.services.honcho-api.serviceConfig;
     migrateServiceConfig = cfg.systemd.services.honcho-migrate.serviceConfig;
   };
@@ -73,6 +76,13 @@ in
     jq -e '.apiAfter | index("honcho-migrate.service")' config.json
     jq -e '.deriverAfter | index("honcho-migrate.service")' config.json
     jq -e '.migrateAfter | index("postgresql.service")' config.json
+    jq -e '.migrateAfter | index("postgresql-setup.service")' config.json
+    jq -e '.postgresqlSetupAfter | index("postgresql-setup.service")' config.json
+    jq -e '.postgresqlSetupRequires | index("postgresql-setup.service")' config.json
+    jq -e '(.postgresqlSetupScript | contains("ALTER DATABASE")) | not' config.json
+    jq -e '.postgresqlSetupScript | test("CREATE EXTENSION IF NOT EXISTS vector")' config.json
+    jq -e '(.postgresqlSetupScript | contains("CREATE USER")) | not' config.json
+    jq -e '(.postgresqlSetupScript | contains("CREATE DATABASE")) | not' config.json
 
     jq -e '.apiServiceConfig.User == "honcho"' config.json
     jq -e '.apiServiceConfig.Group == "honcho"' config.json
