@@ -4,6 +4,7 @@
     ../common.nix
     ./cloudflare-tunnel.nix
     ./disko.nix
+    ./honcho.nix
     ./soft-serve.nix
 
     ./metrics
