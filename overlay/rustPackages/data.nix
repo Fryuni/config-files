@@ -81,8 +81,8 @@
     version = "1.5.1";
   };
   cargo-docs = {
-    crateSha256 = "sha256-M+IkxIr8HG/Us1wWnPR6V+/JI4lMNCDh3pm47YyH9gU=";
-    depsHash = "sha256-AtsUBGPhOzXNyZyvTZ8EE47OpEmaHJlrik1XwPuTGEY=";
+    crateSha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    depsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
     description = "A cargo plugin for serving rust and crate doc locally.";
     homepage = null;
     id = "cargo-docs";
@@ -98,7 +98,7 @@
         url = "https://github.com/btwiuse";
       }
     ];
-    version = "0.1.34";
+    version = "0.1.35";
   };
   cargo-expand = {
     crateSha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
@@ -169,8 +169,8 @@
     version = "11.0.1";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-fnkoIXv6QYJPYtsLZldOEjOxke6YVDEds3jF5SGZGKE=";
-    depsHash = "sha256-F4s3h+WF/S6sQ9ux28sqNe9+C1I5H9735b+cVuRFjk8=";
+    crateSha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    depsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/cargo-public-api/cargo-public-api";
     id = "cargo-public-api";
@@ -195,11 +195,11 @@
         url = "https://github.com/Enselic";
       }
     ];
-    version = "0.51.0";
+    version = "0.52.0";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-OlvpG7hGuGDbhP6WKSxwitmx2HQ+fmDItoQp/+XIS5Q=";
-    depsHash = "sha256-YbtYIHj899eJSrp5n5jODgTkL9L26EnruzECwBrBF00=";
+    crateSha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    depsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
@@ -215,7 +215,7 @@
         url = "https://github.com/obi1kenobi";
       }
     ];
-    version = "0.47.0";
+    version = "0.48.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-41Zht2qKulVaYmKOJRGCzmSVGCBa1nglUXpHrACAEgY=";
