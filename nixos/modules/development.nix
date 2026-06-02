@@ -18,7 +18,7 @@
 
   virtualisation = {
     containerd.enable = true;
-
+    oci-containers.backend = "docker";
     docker = {
       enable = true;
 
