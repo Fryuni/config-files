@@ -12,7 +12,6 @@
   tailnetHost = "${deviceName}.${tailnetDomain}";
 
   caCert = ../../../common/certs/lferraz-tailnet-ca.crt;
-  caBundle = config.security.pki.caBundle;
   certStateDir = "/var/lib/lferraz-tailnet";
   certDir = "${certStateDir}/certs";
   certFile = "${certDir}/${deviceName}.crt";
@@ -203,6 +202,12 @@ in {
       description = "Tailscale MagicDNS tailnet domain.";
     };
 
+    baseHost = mkOption {
+      type = types.str;
+      readOnly = true;
+      description = "Complete base hostname of the device within the network.";
+    };
+
     dns.enable = mkEnableOption "CoreDNS lferraz.dev-to-MagicDNS aliasing" // {default = true;};
     proxy = {
       enable = mkEnableOption "Caddy port-subdomain reverse proxy" // {default = true;};
@@ -318,6 +323,8 @@ in {
           message = "services.lferrazTailnetAccess.proxy.aliases names must be lowercase, non-numeric DNS labels.";
         }
       ];
+
+      services.lferrazTailnetAccess.baseHost = "${deviceName}.${publicDomain}";
 
       networking.firewall.interfaces.${config.services.tailscale.interfaceName}.allowedTCPPorts = [80 443];
 
