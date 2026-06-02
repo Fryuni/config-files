@@ -1,17 +1,17 @@
 # Hetzner Loem server configuration
 {config, ...}: {
   imports = [
+    ../../nixos/modules/networking/tailscale.nix
+    ../../nixos/modules/software-raid.nix
+
     ../common.nix
+    ../remoteDev.nix
+
     ./cloudflare-tunnel.nix
     ./disko.nix
     ./honcho.nix
-    ./soft-serve.nix
-
     ./metrics
-    # ./forgejo.nix
-    ../../nixos/modules/networking/tailscale.nix
-    ../../nixos/modules/software-raid.nix
-    ../remoteDev.nix
+    ./soft-serve.nix
   ];
 
   age.secrets.tailscale-authkey.rekeyFile = ../../secrets/loem/tailscale-enroll-key;
