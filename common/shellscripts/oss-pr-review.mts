@@ -396,22 +396,8 @@ async function main(): Promise<void> {
       continue;
     }
 
-    const parts = parseRepoIdentifier(pr.repository.nameWithOwner);
-    if (!parts) {
-      logWarn(
-        `Unable to open malformed repo identifier: ${pr.repository.nameWithOwner}`,
-      );
-      continue;
-    }
-
     const proc = spawn(
-      [
-        "or",
-        "--repo",
-        `${parts.owner}/${parts.repo}`,
-        "--pr",
-        String(pr.number),
-      ],
+      ["tuicr", "pr", pr.url],
       {
         stdin: "inherit",
         stdout: "inherit",
