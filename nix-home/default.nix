@@ -1,6 +1,7 @@
 {...}: {
   # Let home-manager manage itself.
   home.stateVersion = "26.05";
+  home.enableNixpkgsReleaseCheck = false;
 
   home.username = "lotus";
   home.homeDirectory = "/home/lotus";
