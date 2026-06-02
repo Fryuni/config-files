@@ -1,5 +1,5 @@
 {pkgs, ...}: {
-  import = [./docker.nix];
+  imports = [./docker.nix];
 
   environment.variables.EDITOR = "nvim";
 
