@@ -7,7 +7,6 @@
     ../remoteDev.nix
 
     ./disko.nix
-    ./honcho.nix
     ./matrix.nix
     ./metrics
     ./networking.nix
