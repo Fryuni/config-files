@@ -287,6 +287,11 @@
       };
 
       checks = nixpkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
+        cloudflare-tunnel-module = import ./tests/cloudflare-tunnel-module.nix {
+          inherit pkgs;
+          inherit (nixpkgs) lib;
+          cloudflareTunnelModule = ./nixos/modules/networking/cloudflare-tunnel.nix;
+        };
         honcho-module = import ./tests/honcho-module.nix {
           inherit pkgs;
           inherit (nixpkgs) lib;

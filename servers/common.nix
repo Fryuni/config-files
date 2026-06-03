@@ -6,6 +6,7 @@
   system.stateVersion = "26.05";
 
   imports = [
+    ../nixos/modules/networking/cloudflare-tunnel.nix
     ../nixos/nix-settings.nix
     ../nixos/registries.nix
   ];
