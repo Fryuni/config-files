@@ -1,9 +1,75 @@
-final: pkgs: {
+final: pkgs: let
+  honchoVersion = "3.0.7";
+  honchoSrc = pkgs.fetchFromGitHub {
+    owner = "plastic-labs";
+    repo = "honcho";
+    rev = "v${honchoVersion}";
+    hash = "sha256-g/uZgSqCOzNiGSAQugEkPwz2+Wt6DPBiMNCRjzmA8sc=";
+  };
+in {
+  honcho-ai = pkgs.python313Packages.buildPythonPackage rec {
+    pname = "honcho-ai";
+    version = "2.1.2";
+    pyproject = true;
+
+    src = honchoSrc;
+    sourceRoot = "${src.name}/sdks/python";
+
+    build-system = with pkgs.python313Packages; [
+      setuptools
+      wheel
+    ];
+
+    dependencies = with pkgs.python313Packages; [
+      httpx
+      pydantic
+      typing-extensions
+    ];
+
+    pythonImportsCheck = ["honcho"];
+
+    meta = {
+      description = "Python SDK for Honcho";
+      homepage = "https://github.com/plastic-labs/honcho";
+      license = pkgs.lib.licenses.asl20;
+      maintainers = with pkgs.lib.maintainers; [fryuni];
+    };
+  };
+
+  honcho-cli = pkgs.python313Packages.buildPythonApplication rec {
+    pname = "honcho-cli";
+    version = "0.1.0";
+    pyproject = true;
+
+    src = honchoSrc;
+    sourceRoot = "${src.name}/honcho-cli";
+
+    build-system = with pkgs.python313Packages; [
+      hatchling
+    ];
+
+    dependencies = with pkgs.python313Packages; [
+      final.honcho-ai
+      httpx
+      rich
+      typer
+    ];
+
+    pythonImportsCheck = ["honcho_cli"];
+
+    meta = {
+      description = "Terminal CLI for Honcho";
+      homepage = "https://github.com/plastic-labs/honcho";
+      license = pkgs.lib.licenses.mit;
+      mainProgram = "honcho";
+      maintainers = with pkgs.lib.maintainers; [fryuni];
+    };
+  };
+
   honcho = final.callPackage ({
     lib,
     cacert,
     stdenvNoCC,
-    fetchFromGitHub,
     fetchurl,
     makeWrapper,
     python313Packages,
@@ -77,16 +143,11 @@ final: pkgs: {
         websockets
       ]);
   in
-    stdenvNoCC.mkDerivation rec {
+    stdenvNoCC.mkDerivation {
       pname = "honcho";
-      version = "3.0.7";
+      version = honchoVersion;
 
-      src = fetchFromGitHub {
-        owner = "plastic-labs";
-        repo = "honcho";
-        rev = "v${version}";
-        hash = "sha256-g/uZgSqCOzNiGSAQugEkPwz2+Wt6DPBiMNCRjzmA8sc=";
-      };
+      src = honchoSrc;
 
       nativeBuildInputs = [makeWrapper];
 

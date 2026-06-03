@@ -18,6 +18,7 @@ lib.mkIf (pkgs.stdenv.buildPlatform.system == pkgs.stdenv.hostPlatform.system) {
     llm-agents.skills-installer
     llm-agents.workmux
     llm-agents.tuicr
+    honcho-cli
 
     uv # Needed for omp
     sqlite # Needed for many agents and tools
