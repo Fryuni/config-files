@@ -79,7 +79,6 @@
     };
   };
 
-  services.tailscale.serve.enable = true;
   services.lferrazTailnetAccess.proxy.aliases.hermes = 9120;
 
   # age.secrets.cloudflared-creds.rekeyFile = ../../secrets/notebook/cloudflare-tunnel;
