@@ -79,12 +79,8 @@
     };
   };
 
-  services.tailscale.serve = {
-    enable = true;
-    services.hermes.endpoints = {
-      "tcp:443" = "tls-terminated-http://localhost:9120";
-    };
-  };
+  services.tailscale.serve.enable = true;
+  services.lferrazTailnetAccess.proxy.aliases.hermes = 9120;
 
   # age.secrets.cloudflared-creds.rekeyFile = ../../secrets/notebook/cloudflare-tunnel;
   # services.cloudflared = {
