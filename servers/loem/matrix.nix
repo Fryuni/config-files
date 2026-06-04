@@ -15,14 +15,15 @@ in {
       server_name = "lferraz.com";
       port = [tuwunel-port];
 
+      trusted_servers = [ "matrix.org" "constellatory.net" "tchncs.de"  "mozilla.org"];
+
       allow_registration = false;
 
       ip_source = "cf_connecting_ip";
-      # unix_socket_path = "/run/tuwunel/tuwunel.sock";
-      # unix_socket_perms = 660;
-
       well_known.client = "https://${domain}";
       well_known.server = "${domain}:443";
+
+      allow_public_room_directory_over_federation = true;
     };
   };
 
