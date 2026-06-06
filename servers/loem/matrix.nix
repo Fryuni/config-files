@@ -15,7 +15,7 @@ in {
       server_name = "lferraz.com";
       port = [tuwunel-port];
 
-      trusted_servers = [ "matrix.org" "constellatory.net" "tchncs.de"  "mozilla.org"];
+      trusted_servers = ["matrix.org" "constellatory.net" "tchncs.de" "mozilla.org"];
 
       allow_registration = false;
 
