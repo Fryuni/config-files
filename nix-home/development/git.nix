@@ -37,6 +37,7 @@
         "ssh://git@github.com/" = {insteadOf = "https://github.com/";};
         "ssh://git@gitlab.com/" = {insteadOf = "https://gitlab.com/";};
         "ssh://git@codeberg.org/" = {insteadOf = "https://codeberg.org/";};
+        "ssh://git@git-gay/" = {insteadOf = "https://git-gay/";};
       };
 
       core.excludesfile = "${../../common/rcfiles/gitignore}";
