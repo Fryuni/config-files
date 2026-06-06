@@ -5,7 +5,10 @@
 
   networking.hostName = "loem";
   age.secrets.tailscale-authkey.rekeyFile = ../../secrets/loem/tailscale-enroll-key;
-  services.tailscale.authKeyFile = config.age.secrets.tailscale-authkey.path;
+  services.tailscale = {
+    authKeyFile = config.age.secrets.tailscale-authkey.path;
+    fileInbox.enable = true;
+  };
 
   networking.firewall.enable = false;
   networking.useDHCP = false;
