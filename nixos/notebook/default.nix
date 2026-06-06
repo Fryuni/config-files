@@ -1,7 +1,6 @@
 {
   config,
   pkgs,
-  lib,
   ...
 }: {
   imports = [
@@ -54,7 +53,7 @@
     };
   };
 
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = [
     pkgs.nix-doc
   ];
 
@@ -80,21 +79,7 @@
   };
 
   services.lferrazTailnetAccess.proxy.aliases.hermes = 9120;
-
-  # age.secrets.cloudflared-creds.rekeyFile = ../../secrets/notebook/cloudflare-tunnel;
-  # services.cloudflared = {
-  #   enable = true;
-  #   tunnels = {
-  #     "25541cb9-1866-4fd1-a22b-55b12a89f35d" = {
-  #       warp-routing.enabled = true;
-  #       credentialsFile = "${config.age.secrets.cloudflared-creds.path}";
-  #       default = "http_status:404";
-  #       ingress = {
-  #         "notebook.lferraz.dev" = "ssh://localhost:22";
-  #       };
-  #     };
-  #   };
-  # };
+  services.tailscale.fileInbox.enable = true;
 
   boot.kernel.sysctl = {
     "net.core.rmem_max" = 7500000;

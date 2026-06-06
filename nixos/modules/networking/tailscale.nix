@@ -22,7 +22,10 @@
     doCkeck = false;
   });
 in {
-  imports = [./tailnet-access.nix];
+  imports = [
+    ./tailnet-access.nix
+    ./tailscale-file-inbox.nix
+  ];
 
   # make the tailscale command usable to users
   environment.systemPackages = [package];
@@ -31,6 +34,7 @@ in {
   services.tailscale = {
     inherit package;
     enable = true;
+    fileInbox.enable = lib.mkDefault true;
     useRoutingFeatures = "both";
   };
 

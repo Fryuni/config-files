@@ -303,6 +303,11 @@
           agenixModule = agenix.nixosModules.age;
           tailnetAccessModule = ./nixos/modules/networking/tailnet-access.nix;
         };
+        tailscale-file-inbox-module = import ./tests/tailscale-file-inbox-module.nix {
+          inherit pkgs;
+          inherit (nixpkgs) lib;
+          tailscaleFileInboxModule = ./nixos/modules/networking/tailscale-file-inbox.nix;
+        };
       };
 
       apps = import ./commands.nix {
