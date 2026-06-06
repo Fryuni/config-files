@@ -427,7 +427,7 @@ async function main(): Promise<void> {
     const draftTag = pr.isDraft
       ? ` ${colors.yellow}(draft)${colors.reset}`
       : "";
-    const command = `or --repo ${pr.repository.nameWithOwner} --pr ${pr.number}`;
+    const command = `tuicr pr ${pr.url}`;
     console.log(`${pr.url}${draftTag}`);
 
     if (dryRun) {
@@ -435,22 +435,8 @@ async function main(): Promise<void> {
       continue;
     }
 
-    const parts = parseRepoIdentifier(pr.repository.nameWithOwner);
-    if (!parts) {
-      logWarn(
-        `Unable to open malformed repo identifier: ${pr.repository.nameWithOwner}`,
-      );
-      continue;
-    }
-
     const proc = spawn(
-      [
-        "or",
-        "--repo",
-        `${parts.owner}/${parts.repo}`,
-        "--pr",
-        String(pr.number),
-      ],
+      ["tuicr", "pr", pr.url],
       {
         stdin: "inherit",
         stdout: "inherit",

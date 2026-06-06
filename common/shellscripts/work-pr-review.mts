@@ -838,7 +838,7 @@ async function main(): Promise<void> {
     const authorTag = isOwn
       ? `${colors.dim}(yours)${colors.reset}`
       : `${colors.dim}by ${pr.author ?? "unknown"}${colors.reset}`;
-    const command = `or --repo ${pr.repository.nameWithOwner} --pr ${pr.number}`;
+    const command = `tuicr pr ${pr.url}`;
     console.log(
       `${colors.cyan}${pr.sourceProject}${colors.reset} ${pr.url} ${authorTag}`,
     );

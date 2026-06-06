@@ -388,7 +388,7 @@ async function main(): Promise<void> {
 
   for (const pr of sorted) {
     const authorTag = `${colors.dim}by ${pr.author ?? "unknown"}${colors.reset}`;
-    const command = `or --repo ${pr.repository.nameWithOwner} --pr ${pr.number}`;
+    const command = `tuicr pr ${pr.url}`;
     console.log(`${pr.url} ${authorTag}`);
 
     if (dryRun) {
