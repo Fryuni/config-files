@@ -81,8 +81,8 @@
     version = "1.5.1";
   };
   cargo-docs = {
-    crateSha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-    depsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    crateSha256 = "sha256-R+t6OHqZsW7fX8kbUgsnpC1WzHQlVY2XUiuIds0xt54=";
+    depsHash = "sha256-slF2N2ft8tAPQhyrKmgY79jUj6bG8pj6pT0Gp3Ilm7c=";
     description = "A cargo plugin for serving rust and crate doc locally.";
     homepage = null;
     id = "cargo-docs";
@@ -101,8 +101,8 @@
     version = "0.1.35";
   };
   cargo-expand = {
-    crateSha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-    depsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    crateSha256 = "sha256-TfGz/y1T3G1fhCWxWmksA6qJS51pMV9oloANhwn676o=";
+    depsHash = "sha256-VnauBXYex3zEEOQcfTX2t2+KvDCdMKXLXU+lY1V9B9o=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -169,8 +169,8 @@
     version = "11.0.1";
   };
   cargo-public-api = {
-    crateSha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-    depsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    crateSha256 = "sha256-Z0r3lcuteU3DcXarBInYzkMaJSwfStdGi6ng2uRMXn8=";
+    depsHash = "sha256-k846yNUwytLTDjrEwQU5eMj2jIuAI6B1RtttZluijDY=";
     description = "List and diff the public API of Rust library crates between releases and commits. Detect breaking API changes and semver violations via CI or a CLI.";
     homepage = "https://github.com/cargo-public-api/cargo-public-api";
     id = "cargo-public-api";
@@ -198,8 +198,8 @@
     version = "0.52.0";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-    depsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    crateSha256 = "sha256-OSxuYN0P822XHEyesOFYAHo2M21XQDDhi9pqS5YXnYs=";
+    depsHash = "sha256-VHxgPvlhasM3GnK1uMDA2vi0z3TxHWpCOlkWJhcV/F8=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
@@ -276,8 +276,8 @@
     version = "8.5.3";
   };
   octorus = {
-    crateSha256 = "sha256-HSoMaZ/9foqmXOhmPssxIilncnTpG20x4Y1oFoiCFlg=";
-    depsHash = "sha256-BSR2QQlC8qyeQR7tPDpsgO3Kmg4p5CwEPehVL8GVt/c=";
+    crateSha256 = "sha256-4TpDdtQtCq5fdeWdhPvZM0Py8r0SBiQgbAIkb3aviB4=";
+    depsHash = "sha256-QKIJcSN7oB4a0z49ZAFYKm47c5VHngYupMAkMts5YNc=";
     description = "A TUI tool for GitHub PR review, designed for Helix editor users";
     homepage = null;
     id = "octorus";
@@ -293,7 +293,7 @@
         url = "https://github.com/ushironoko";
       }
     ];
-    version = "0.6.4";
+    version = "0.6.6";
   };
   toml-merge = {
     crateSha256 = "sha256-ZRfTxA5xjA/V6VtecwdyyGkMC6o+kd2ipRCwJ19Zvfg=";
@@ -316,8 +316,8 @@
     version = "0.2.0";
   };
   zellij = {
-    crateSha256 = "sha256-n3Md6DJF5Bs7bBFqerCGj1WWO9evOZ9/ODGA+wPP9UA=";
-    depsHash = "sha256-lrLjb8/K4DO93QnIwh3ArJBQuk+lgtD/5OaKhkPThEk=";
+    crateSha256 = "sha256-mYQKg/fZdh8J3It83y+MxAd/qUIDDmuRWFARIZmscjs=";
+    depsHash = "sha256-m4CWT2GGbA6mDJRD7S9CBHijvU1AfN04Jt4kaFO9yP0=";
     description = "A terminal workspace with batteries included";
     documentation = null;
     homepage = "https://zellij.dev";

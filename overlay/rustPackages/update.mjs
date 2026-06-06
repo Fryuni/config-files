@@ -28,26 +28,28 @@ async function fillHashes() {
   for (const crate of TARGET_CRATES) {
     const entry = data[crate];
 
-    for (const subDerivation of ["src", "cargoDeps"]) {
+    for (const [subDerivation, hashAttr] of [
+      ["src", "crateSha256"],
+      ["cargoDeps", "depsHash"],
+    ]) {
       console.log(`Filling ${subDerivation} hash for ${crate}...`);
 
-      const { stdout, stderr, code } =
+      const { stdout, stderr, exitCode } =
         await $`nix build --no-link "${REPO_DIR}#rustCrates.${crate}.${subDerivation}"`
           .nothrow()
           .quiet();
 
-      if (!code) continue;
+      if (exitCode === 0) {
+        if (entry[hashAttr] === MARKER_HASH) {
+          throw new Error(
+            `${crate}.${subDerivation} built successfully with the marker hash still in data.nix`,
+          );
+        }
 
-      const found = extractHashMismatch(`${stdout}\n${stderr}`);
-
-      switch (subDerivation) {
-        case "src":
-          entry.crateSha256 = found;
-          break;
-        case "cargoDeps":
-          entry.depsHash = found;
-          break;
+        continue;
       }
+
+      entry[hashAttr] = extractHashMismatch(`${stdout}\n${stderr}`);
 
       await saveData(data);
     }
