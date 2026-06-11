@@ -1,6 +1,7 @@
 # Hetzner Loem server configuration
 {pkgs, ...}: {
   imports = [
+    ../../nixos/modules/docker.nix
     ../../nixos/modules/software-raid.nix
 
     ../common.nix
