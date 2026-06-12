@@ -45,7 +45,7 @@
   configJson = builtins.toJSON {
     cloudflaredEnabled = cfg.services.cloudflared.enable;
     credentialSource = cfg.services.cloudflared.tunnels.${tunnelId}.credentialsFile;
-    environment = service.environment;
+    inherit (service) environment;
     execStart = service.serviceConfig.ExecStart;
     loadCredential = service.serviceConfig.LoadCredential;
   };

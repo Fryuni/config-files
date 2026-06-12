@@ -215,7 +215,7 @@ in {
     users.groups.${cfg.group} = {};
     users.users.${cfg.user} = {
       isSystemUser = true;
-      group = cfg.group;
+      inherit (cfg) group;
       home = "/var/lib/honcho";
     };
 
@@ -262,7 +262,7 @@ in {
       after = ["network-online.target"] ++ localDatabaseUnits;
       wants = ["network-online.target"];
       requires = localDatabaseUnits;
-      environment = environment;
+      inherit environment;
       serviceConfig =
         commonServiceConfig
         // {
@@ -277,7 +277,7 @@ in {
       after = ["network-online.target" "honcho-migrate.service"] ++ localDatabaseUnits;
       wants = ["network-online.target" "honcho-migrate.service"];
       requires = ["honcho-migrate.service"] ++ localDatabaseUnits;
-      environment = environment;
+      inherit environment;
       serviceConfig =
         commonServiceConfig
         // {
@@ -293,7 +293,7 @@ in {
       after = ["network-online.target" "honcho-migrate.service"] ++ localDatabaseUnits;
       wants = ["network-online.target" "honcho-migrate.service"];
       requires = ["honcho-migrate.service"] ++ localDatabaseUnits;
-      environment = environment;
+      inherit environment;
       serviceConfig =
         commonServiceConfig
         // {

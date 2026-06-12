@@ -26,7 +26,7 @@ in {
         attrsOf (
           either str (
             submodule (
-              {...}: {
+              _: {
                 options = {
                   inherit originRequest;
 
@@ -79,7 +79,7 @@ in {
       # with TUNNEL_TOKEN_FILE, which cloudflared prefers over credentials-file.
       credentialsFile = config.age.secrets.cloudflare-tunnel-credentials-file.path;
       default = "http_status:404";
-      ingress = cfg.ingress;
+      inherit (cfg) ingress;
     };
 
     systemd.services."cloudflared-tunnel-${cfg.tunnel-id}" = let
