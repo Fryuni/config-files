@@ -1,5 +1,5 @@
 # Hetzner Loem server configuration
-{pkgs, ...}: {
+{...}: {
   imports = [
     ../../nixos/modules/docker.nix
     ../../nixos/modules/software-raid.nix
@@ -28,12 +28,6 @@
     "aarch64-linux"
     "armv6l-linux"
     "armv7l-linux"
-  ];
-
-  virtualisation.containerd.enable = true;
-
-  environment.systemPackages = with pkgs; [
-    nerdctl
   ];
 
   users.users.root.openssh.authorizedKeys.keys = [
