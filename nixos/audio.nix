@@ -13,6 +13,29 @@
     alsa.support32Bit = true;
     pulse.enable = true;
     systemWide = false;
-    wireplumber.enable = true;
+    wireplumber = {
+      enable = true;
+      extraConfig."51-built-in-audio-profile" = {
+        "wireplumber.settings" = {
+          # Do not restore a stale manually selected "Pro Audio" profile.
+          # WirePlumber then chooses the higher-priority Analog Stereo Duplex
+          # profile for the notebook card, exposing the internal microphone as
+          # FL/FR instead of silent AUX0/AUX1 channels in Chromium/OpenWhispr.
+          "device.restore-profile" = false;
+        };
+        "monitor.alsa.rules" = [
+          {
+            matches = [
+              {
+                "device.name" = "alsa_card.pci-0000_00_1f.3";
+              }
+            ];
+            actions.update-props = {
+              "device.profile" = "output:analog-stereo+input:analog-stereo";
+            };
+          }
+        ];
+      };
+    };
   };
 }
