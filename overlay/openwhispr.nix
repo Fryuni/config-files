@@ -1,11 +1,11 @@
 final: pkgs: {
   openwhispr = let
     pname = "openwhispr";
-    version = "1.6.7";
+    version = "1.7.2";
 
     src = pkgs.fetchurl {
       url = "https://github.com/OpenWhispr/openwhispr/releases/download/v${version}/OpenWhispr-${version}-linux-x86_64.AppImage";
-      hash = "sha256-AKBmdDbI5MNVDusN5TbCYUf21ZCTKNwiJHl6OqkTLUY=";
+      hash = "sha256-EPJTZFtd2bQ026KNcI/FOHfoAMu96HKfJxTPceTc5jw=";
     };
 
     extracted = pkgs.appimageTools.extract {
