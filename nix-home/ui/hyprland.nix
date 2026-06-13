@@ -54,6 +54,26 @@
         || true
     '';
   };
+
+  openwhisprHyprlandAutostart = pkgs.writeShellApplication {
+    name = "openwhispr-hyprland-autostart";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.hyprland
+    ];
+    text = ''
+      set -euo pipefail
+
+      for _ in $(seq 1 20); do
+        if hyprctl dispatch exec ${lib.escapeShellArg (lib.getExe pkgs.openwhispr)}; then
+          exit 0
+        fi
+        sleep 0.5
+      done
+
+      exit 1
+    '';
+  };
 in {
   home.packages =
     (with pkgs; [
@@ -149,8 +169,9 @@ in {
         # Notification daemon
         "swaync"
 
-        # Voice-to-text dictation
-        "openwhispr"
+        # OpenWhispr is started by the systemd bridge below. The bridge asks
+        # Hyprland to spawn Electron, preserving the working keychain/session
+        # behavior while still giving us reliable target-based autostart.
       ];
 
       # General settings
@@ -480,6 +501,19 @@ in {
             float = true;
           }
 
+          # OpenWhispr's recording overlay is not an input target. If it takes
+          # focus, ydotool pastes the transcript into the overlay instead of
+          # the window that was focused before dictation started.
+          {
+            "match:class" = "open-whispr";
+            "match:title" = "Voice Recorder";
+            float = true;
+            no_initial_focus = true;
+            no_focus = true;
+            focus_on_activate = false;
+            suppress_event = "activate activatefocus";
+          }
+
           # Pin windows
           {
             "match:title" = "Picture-in-Picture";
@@ -759,6 +793,25 @@ in {
         disabledGrimWarning = true;
         showStartupLaunchMessage = false;
       };
+    };
+  };
+
+  # Start OpenWhispr when Hyprland starts, but let Hyprland spawn the Electron
+  # process. Direct systemd services cannot decrypt OpenWhispr's saved auth
+  # token in this session; Hyprland-spawned OpenWhispr can.
+  systemd.user.services.openwhispr-autostart = {
+    Unit = {
+      Description = "Start OpenWhispr through Hyprland";
+      After = ["hyprland-session.target" "ydotoold.service"];
+      Wants = ["ydotoold.service"];
+      PartOf = ["hyprland-session.target"];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = lib.getExe openwhisprHyprlandAutostart;
+    };
+    Install = {
+      WantedBy = ["hyprland-session.target"];
     };
   };
 
