@@ -61,6 +61,12 @@ in {
 
       # Update Hyprland/WAYLAND env variables in tmux sessions
       set-option -g update-environment "HYPRLAND_INSTANCE_SIGNATURE DISPLAY WAYLAND_DISPLAY SWAYSOCK"
+
+      # tmux-thumbs copies through tmux so SSH clients receive OSC52 clipboard writes.
+      set -g @thumbs-command 'tmux set-buffer -w -- "$THUMB" && tmux display-message "Copied to clipboard"'
+      set -g @thumbs-upcase-command 'tmux set-buffer -w -- "$THUMB" && tmux paste-buffer && tmux display-message "Copied to clipboard"'
+      set -g @thumbs-multi-command 'tmux set-buffer -w -- "$THUMB" && tmux paste-buffer && tmux send-keys " " && tmux display-message "Copied multiple items to clipboard"'
+      set -g @thumbs-osc52 0
     '';
 
     tmuxp.enable = true;
