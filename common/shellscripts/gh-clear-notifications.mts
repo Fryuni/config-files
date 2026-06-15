@@ -30,7 +30,7 @@ const criterias = {
     matchOn(notification.repository.owner.login, [
       /^withstudiocms$/,
       /^withastro$/,
-      // /^croct-tech$/,
+      /^croct-tech$/,
     ]),
   bot: (_, details) => isBot(details?.user),
   "draft PR": (_, details) => details?.draft === true,
