@@ -761,17 +761,18 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1781573957,
-        "narHash": "sha256-d4IidRcANvwBETwlwe1bNXjFVcczq/Q/8EJvsIYh6Z4=",
-        "owner": "numtide",
-        "repo": "llm-agents.nix",
-        "rev": "ce2ae35ca1db428948ed9dac4b935bc4d7923ca6",
-        "type": "github"
+        "lastModified": 1781579154,
+        "narHash": "sha256-TEz/DydjR7WU+XejXb+UVuel7migui9NUBXLrt6jZ9E=",
+        "ref": "main",
+        "rev": "a8c7b96601d6f389c340f4ea468340515e04f55e",
+        "revCount": 11071,
+        "type": "git",
+        "url": "https://codeberg.org/Fryuni/llm-agents.nix"
       },
       "original": {
-        "owner": "numtide",
-        "repo": "llm-agents.nix",
-        "type": "github"
+        "ref": "main",
+        "type": "git",
+        "url": "https://codeberg.org/Fryuni/llm-agents.nix"
       }
     },
     "nix": {
