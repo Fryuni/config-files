@@ -301,7 +301,6 @@
         tailnet-access-module = import ./tests/tailnet-access-module.nix {
           inherit pkgs;
           inherit (nixpkgs) lib;
-          agenixModule = agenix.nixosModules.age;
           tailnetAccessModule = ./nixos/modules/networking/tailnet-access.nix;
         };
         tailscale-file-inbox-module = import ./tests/tailscale-file-inbox-module.nix {

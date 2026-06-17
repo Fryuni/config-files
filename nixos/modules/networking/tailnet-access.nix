@@ -169,7 +169,7 @@
       openssl x509 -req \
         -in "$work_dir/${deviceName}.csr" \
         -CA ${caCert} \
-        -CAkey ${config.age.secrets.lferraz-tailnet-ca-key.path} \
+        -CAkey "$CREDENTIALS_DIRECTORY/lferraz-tailnet-ca-key" \
         -CAcreateserial \
         -CAserial ${certStateDir}/ca.srl \
         -out "$work_dir/${deviceName}.crt" \
@@ -270,11 +270,10 @@ in {
         description = "Issue ${deviceName}.${publicDomain} certificate from the lferraz.dev tailnet CA";
         wantedBy = ["multi-user.target"];
         before = ["caddy.service"];
-        after = ["run-agenix.d.mount"];
-        requires = ["run-agenix.d.mount"];
         serviceConfig = {
           Type = "oneshot";
           ExecStart = lib.getExe generateHostCertificate;
+          LoadCredential = ["lferraz-tailnet-ca-key:${config.age.secrets.lferraz-tailnet-ca-key.path}"];
           RemainAfterExit = true;
         };
       };
@@ -367,7 +366,7 @@ in {
 
       systemd.services.caddy = {
         after = ["lferraz-tailnet-certificate.service" "tailscaled.service"];
-        requires = ["lferraz-tailnet-certificate.service"];
+        requires = mkIf cfg.certificates.enable ["lferraz-tailnet-certificate.service"];
         wants = ["tailscaled.service"];
         serviceConfig = {
           Restart = mkForce "always";

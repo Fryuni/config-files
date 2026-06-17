@@ -1,5 +1,4 @@
 {
-  agenixModule,
   lib,
   pkgs,
   tailnetAccessModule,
@@ -8,8 +7,32 @@
     system = pkgs.stdenv.hostPlatform.system;
     inherit pkgs;
     modules = [
-      agenixModule
       tailnetAccessModule
+      ({lib, ...}: {
+        options.age.secrets = lib.mkOption {
+          default = {};
+          type = lib.types.attrsOf (lib.types.submodule ({name, ...}: {
+            options = {
+              rekeyFile = lib.mkOption {
+                type = lib.types.path;
+              };
+              path = lib.mkOption {
+                type = lib.types.str;
+                default = "/run/agenix/${name}";
+              };
+              owner = lib.mkOption {
+                type = lib.types.str;
+              };
+              group = lib.mkOption {
+                type = lib.types.str;
+              };
+              mode = lib.mkOption {
+                type = lib.types.str;
+              };
+            };
+          }));
+        };
+      })
       {
         system.stateVersion = "26.05";
         networking.hostName = "note";
@@ -33,8 +56,14 @@
 
   cfg = evaluated.config;
 
+  certificateService = cfg.systemd.services.lferraz-tailnet-certificate;
+
   configJson = builtins.toJSON {
     extraConfig = cfg.services.caddy.virtualHosts.tailnet.extraConfig;
+    certificateAfter = certificateService.after;
+    certificateRequires = certificateService.requires;
+    certificateLoadCredential = certificateService.serviceConfig.LoadCredential;
+    caKeyPath = cfg.age.secrets.lferraz-tailnet-ca-key.path;
   };
 in
   pkgs.runCommand "tailnet-access-module-check" {
@@ -51,6 +80,10 @@ in
     jq -e '.extraConfig | contains("handle @alias_static")' config.json
     jq -e '.extraConfig | contains("root * /srv/static")' config.json
     jq -e '.extraConfig | contains("file_server")' config.json
+
+    jq -e '.certificateAfter | index("run-agenix.d.mount") | not' config.json
+    jq -e '.certificateRequires | index("run-agenix.d.mount") | not' config.json
+    jq -e '.certificateLoadCredential == ["lferraz-tailnet-ca-key:" + .caKeyPath]' config.json
 
     touch "$out"
   ''
