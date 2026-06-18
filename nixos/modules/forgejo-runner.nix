@@ -20,7 +20,7 @@
     (lib.stringToCharacters name);
 
   serviceName = instanceName: "forgejo-runner-${escapeName instanceName}";
-  stateDirectory = instanceName: serviceName instanceName;
+  stateDirectory = serviceName;
   credentialName = instanceName: connectionName: "${escapeName instanceName}-${escapeName connectionName}-${builtins.substring 0 12 (builtins.hashString "sha256" "${instanceName}/${connectionName}")}-token";
 
   connectionType = lib.types.submodule (_: {
@@ -80,7 +80,7 @@
       };
 
       settings = lib.mkOption {
-        type = settingsFormat.type;
+        inherit (settingsFormat) type;
         default = {};
         description = "Freeform Forgejo runner YAML settings merged with managed values.";
       };
@@ -165,7 +165,7 @@
       runner =
         (instance.settings.runner or {})
         // lib.optionalAttrs (instance.labels != []) {
-          labels = instance.labels;
+          inherit (instance) labels;
         };
     };
 
