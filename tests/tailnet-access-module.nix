@@ -83,6 +83,7 @@
   cfg = evaluated.config;
 
   certificateService = cfg.systemd.services.lferraz-tailnet-certificate;
+  certificateExecStart = certificateService.serviceConfig.ExecStart;
 
   configJson = builtins.toJSON {
     extraConfig = cfg.services.caddy.virtualHosts.tailnet.extraConfig;
@@ -95,8 +96,8 @@
   };
 in
   pkgs.runCommand "tailnet-access-module-check" {
-    nativeBuildInputs = [pkgs.jq];
-    inherit configJson;
+    nativeBuildInputs = [pkgs.jq pkgs.openssl];
+    inherit configJson certificateExecStart;
   } ''
     printf '%s\n' "$configJson" > config.json
 
@@ -120,6 +121,16 @@ in
     jq -e '.certificateLoadCredential == ["lferraz-tailnet-ca-key:" + .caKeyPath]' config.json
     jq -e '.caKeyPath == "/run/lferraz-tailnet-ca-key"' config.json
     jq -e '.caKeySymlink == false' config.json
+
+    grep -F 'basicConstraints = critical,CA:FALSE' "$certificateExecStart"
+    grep -F 'keyUsage = critical,digitalSignature,keyEncipherment' "$certificateExecStart"
+    grep -F 'extendedKeyUsage = serverAuth' "$certificateExecStart"
+
+    openssl x509 -in ${../common/certs/lferraz-tailnet-ca.crt} -noout -text > ca.txt
+    grep -F 'X509v3 Basic Constraints: critical' ca.txt
+    grep -F 'CA:TRUE, pathlen:0' ca.txt
+    grep -F 'X509v3 Key Usage: critical' ca.txt
+    grep -F 'Certificate Sign, CRL Sign' ca.txt
 
     touch "$out"
   ''

@@ -124,6 +124,9 @@
 
       [req_ext]
       subjectAltName = $san_entries
+      basicConstraints = critical,CA:FALSE
+      keyUsage = critical,digitalSignature,keyEncipherment
+      extendedKeyUsage = serverAuth
       EOF
 
       openssl genrsa -out "$work_dir/cert.key" 2048 >/dev/null 2>&1
@@ -174,6 +177,9 @@
 
       [req_ext]
       subjectAltName = DNS:${tailnetHost},DNS:${deviceName}.${publicDomain},DNS:*.${deviceName}.${publicDomain}
+      basicConstraints = critical,CA:FALSE
+      keyUsage = critical,digitalSignature,keyEncipherment
+      extendedKeyUsage = serverAuth
       EOF
 
       openssl genrsa -out "$work_dir/${deviceName}.key" 2048 >/dev/null 2>&1
