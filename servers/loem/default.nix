@@ -8,6 +8,7 @@
     ../remoteDev.nix
 
     ./disko.nix
+    ./cli-proxy-api.nix
     ./forgejo.nix
     ./matrix.nix
     ./metrics
