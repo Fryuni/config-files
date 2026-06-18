@@ -16,6 +16,7 @@
   certDir = "${certStateDir}/certs";
   certFile = "${certDir}/${deviceName}.crt";
   certKeyFile = "${certDir}/${deviceName}.key";
+  caKeyCredential = "/run/lferraz-tailnet-ca-key";
 
   systemTrustEnvironment = {
     BUN_OPTIONS = lib.mkDefault "--use-system-ca";
@@ -263,6 +264,8 @@ in {
     (mkIf cfg.certificates.enable {
       age.secrets.lferraz-tailnet-ca-key = {
         rekeyFile = ../../../secrets/lferraz-tailnet-ca.key;
+        path = caKeyCredential;
+        symlink = false;
         owner = "root";
         group = "root";
         mode = "0400";

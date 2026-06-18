@@ -24,6 +24,10 @@
           mode = lib.mkOption {
             type = lib.types.str;
           };
+          symlink = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+          };
         };
       }));
     };
@@ -87,6 +91,7 @@
     certificateRequires = certificateService.requires;
     certificateLoadCredential = certificateService.serviceConfig.LoadCredential;
     caKeyPath = cfg.age.secrets.lferraz-tailnet-ca-key.path;
+    caKeySymlink = cfg.age.secrets.lferraz-tailnet-ca-key.symlink;
   };
 in
   pkgs.runCommand "tailnet-access-module-check" {
@@ -113,6 +118,8 @@ in
     jq -e '.certificateAfter | index("run-agenix.d.mount") | not' config.json
     jq -e '.certificateRequires | index("run-agenix.d.mount") | not' config.json
     jq -e '.certificateLoadCredential == ["lferraz-tailnet-ca-key:" + .caKeyPath]' config.json
+    jq -e '.caKeyPath == "/run/lferraz-tailnet-ca-key"' config.json
+    jq -e '.caKeySymlink == false' config.json
 
     touch "$out"
   ''
