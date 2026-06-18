@@ -57,6 +57,20 @@
     '')
     cfg.proxy.aliases);
   aliasNames = builtins.attrNames cfg.proxy.aliases;
+  aliasUrl = alias: "https://${alias}.${deviceName}.${publicDomain}";
+  aliasListItems =
+    lib.concatMapStringsSep "\n" (alias: ''
+      <li><a href="${aliasUrl alias}">${aliasUrl alias}</a></li>
+    '')
+    aliasNames;
+  aliasListHtml = lib.optionalString (aliasNames != []) ''
+    <section>
+      <h2>Aliases</h2>
+      <ul>
+        ${aliasListItems}
+      </ul>
+    </section>
+  '';
   validAliasName = alias: builtins.match "[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?" alias != null && builtins.match "[0-9]+" alias == null;
 
   issueCertificate = pkgs.writeShellApplication {
@@ -358,7 +372,19 @@ in {
             }
 
             handle {
-              respond "Use https://<port>.${deviceName}.${publicDomain} to proxy a local HTTP service on this device." 404
+              header Content-Type "text/html; charset=utf-8"
+              respond `<!doctype html>
+            <html lang="en">
+              <head>
+                <meta charset="utf-8">
+                <title>${deviceName}.${publicDomain}</title>
+              </head>
+              <body>
+                <h1>${deviceName}.${publicDomain}</h1>
+                <p>Use https://&lt;port&gt;.${deviceName}.${publicDomain} to proxy a local HTTP service on this device.</p>
+            ${aliasListHtml}
+              </body>
+            </html>` 200
             }
           '';
         };
