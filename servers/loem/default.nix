@@ -8,6 +8,7 @@
     ../remoteDev.nix
 
     ./disko.nix
+    ./forgejo.nix
     ./matrix.nix
     ./metrics
     ./networking.nix

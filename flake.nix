@@ -298,6 +298,11 @@
           inherit (nixpkgs) lib;
           honchoModule = ./nixos/modules/honcho.nix;
         };
+        forgejo-runner-module = import ./tests/forgejo-runner-module.nix {
+          inherit pkgs;
+          inherit (nixpkgs) lib;
+          forgejoRunnerModule = ./nixos/modules/forgejo-runner.nix;
+        };
         tailnet-access-module = import ./tests/tailnet-access-module.nix {
           inherit pkgs;
           inherit (nixpkgs) lib;
