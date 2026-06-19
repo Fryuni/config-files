@@ -1,5 +1,5 @@
 # Hetzner Loem server configuration
-{...}: {
+{pkgs, ...}: {
   imports = [
     ../../nixos/modules/docker.nix
     ../../nixos/modules/software-raid.nix
@@ -17,6 +17,9 @@
   ];
 
   hardware.facter.reportPath = ./facter.json;
+  environment.systemPackages = with pkgs; [
+    postgresql
+  ];
 
   boot.loader.grub = {
     enable = true;
