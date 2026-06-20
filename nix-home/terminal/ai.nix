@@ -17,6 +17,7 @@ lib.mkIf (pkgs.stdenv.buildPlatform.system == pkgs.stdenv.hostPlatform.system) {
     # AI auxiliary tools
     llm-agents.skills-installer
     llm-agents.workmux
+    llm-agents.herdr
     llm-agents.tuicr
     honcho-cli
 
