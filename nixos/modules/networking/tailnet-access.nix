@@ -22,7 +22,11 @@
     BUN_OPTIONS = lib.mkDefault "--use-system-ca";
   };
 
-  portProxyHandler = upstream: ''
+  portProxyHandlerWithHeaders = {
+    upstream,
+    hostHeader ? upstream,
+    originHeader ? null,
+  }: ''
     header {
       >Access-Control-Allow-Origin "{http.request.header.Origin}"
       >Access-Control-Allow-Credentials "true"
@@ -37,13 +41,22 @@
     respond @preflight "" 204
 
     reverse_proxy ${upstream} {
-      header_up Host ${upstream}
+      header_up Host ${hostHeader}
+      ${lib.optionalString (originHeader != null) "header_up Origin ${originHeader}"}
     }
   '';
+  portProxyHandler = upstream: portProxyHandlerWithHeaders {inherit upstream;};
+  localPortProxyHandler = port:
+    portProxyHandlerWithHeaders {
+      upstream = "127.0.0.1:${port}";
+      hostHeader = "localhost:${port}";
+      originHeader = "http://localhost:${port}";
+    };
 
   matcherName = alias: lib.replaceStrings ["-" "."] ["_" "_"] alias;
   aliasHostRegexp = alias: "^${lib.escapeRegex alias}\\.${lib.escapeRegex deviceName}\\.${lib.escapeRegex publicDomain}(?::[0-9]+)?$";
   portHostRegexp = "^([0-9]+)\\.${lib.escapeRegex deviceName}\\.${lib.escapeRegex publicDomain}(?::[0-9]+)?$";
+  portLocalHostRegexp = "^([0-9]+)-local\\.${lib.escapeRegex deviceName}\\.${lib.escapeRegex publicDomain}(?::[0-9]+)?$";
   aliasProxyBlocks = lib.concatStringsSep "\n" (lib.mapAttrsToList (alias: target: let
       matcher = "alias_${matcherName alias}";
       handler =
@@ -375,6 +388,11 @@ in {
 
             ${aliasProxyBlocks}
 
+            @port_local header_regexp port_local Host ${portLocalHostRegexp}
+            handle @port_local {
+              ${localPortProxyHandler "{re.port_local.1}"}
+            }
+
             @port header_regexp port Host ${portHostRegexp}
             handle @port {
               ${portProxyHandler "127.0.0.1:{re.port.1}"}
@@ -391,6 +409,7 @@ in {
               <body>
                 <h1>${deviceName}.${publicDomain}</h1>
                 <p>Use https://&lt;port&gt;.${deviceName}.${publicDomain} to proxy a local HTTP service on this device.</p>
+                <p>Use https://&lt;port&gt;-local.${deviceName}.${publicDomain} when the service expects Host/Origin localhost:&lt;port&gt;.</p>
             ${aliasListHtml}
               </body>
             </html>` 200
