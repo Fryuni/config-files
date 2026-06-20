@@ -79,6 +79,7 @@
   };
 
   services.lferrazTailnetAccess.proxy.aliases.hermes = 9120;
+  services.lferrazTailnetAccess.proxy.aliases.aview = 3377;
   services.tailscale.fileInbox.enable = true;
 
   boot.kernel.sysctl = {

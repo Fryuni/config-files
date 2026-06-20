@@ -38,12 +38,15 @@ lib.mkIf (pkgs.stdenv.buildPlatform.system == pkgs.stdenv.hostPlatform.system) {
     wmyeet = "omp commit; workmux merge --keep --rebase --no-verify && workmux remove --force";
   };
 
-  services.git-sync = {
-    enable = true;
-    repositories = {
-      oh-my-pi = {
-        path = "${config.home.homeDirectory}/.omp/agent";
-        uri = "git@git-ss.rudd-agama.ts.net:configs/oh-my-pi.git";
+  services = {
+    agentsview.enable = true;
+    git-sync = {
+      enable = true;
+      repositories = {
+        oh-my-pi = {
+          path = "${config.home.homeDirectory}/.omp/agent";
+          uri = "git@git-ss.rudd-agama.ts.net:configs/oh-my-pi.git";
+        };
       };
     };
   };

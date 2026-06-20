@@ -59,6 +59,11 @@
 
   nix.package = pkgs.nix;
 
+  services.agentsview = {
+    enable = true;
+    publicOrigin = "https://aview.note.lferraz.dev";
+  };
+
   services.node-red = {
     enable = true;
     configFile = "${../common/node-red.js}";
