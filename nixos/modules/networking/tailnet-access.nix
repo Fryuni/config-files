@@ -48,7 +48,7 @@
   portProxyHandler = upstream: portProxyHandlerWithHeaders {inherit upstream;};
   localPortProxyHandler = port:
     portProxyHandlerWithHeaders {
-      upstream = "127.0.0.1:${port}";
+      upstream = "localhost:${port}";
       hostHeader = "localhost:${port}";
       originHeader = "http://localhost:${port}";
     };
@@ -395,7 +395,7 @@ in {
 
             @port header_regexp port Host ${portHostRegexp}
             handle @port {
-              ${portProxyHandler "127.0.0.1:{re.port.1}"}
+              ${portProxyHandler "localhost:{re.port.1}"}
             }
 
             handle {
