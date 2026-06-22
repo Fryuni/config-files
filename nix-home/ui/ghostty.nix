@@ -13,6 +13,7 @@
       auto-update = "off";
       bell-features = "system,attention,title,border";
       clipboard-read = "allow";
+      keybind = "ctrl+enter=unbind";
     };
   };
 }
