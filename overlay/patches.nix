@@ -26,23 +26,27 @@ final: prev: {
   #   See https://github.com/tailscale/tailscale/issues/18381
   # Use fork with hack fix arround this issue while waiting for official position from Tailscale.
   #   See https://github.com/tailscale/tailscale/issues/18381#issuecomment-4332462281
-  tailscale = prev.master.tailscale.overrideAttrs (attrs: {
-    src = final.fetchFromGitHub {
-      owner = "Fryuni";
-      repo = "tailscale";
-      rev = "7cb26f06c1e9c002907f3ca70a197f4a9dc7ad3e";
-      hash = "sha256-czOuezS2JSjTZc5u4O5x39JhstbJDMdeCFsqjkNfYYw=";
-    };
+  tailscale =
+    if prev.stdenv.hostPlatform.isAarch64
+    then prev.tailscale
+    else
+      prev.master.tailscale.overrideAttrs (attrs: {
+        src = final.fetchFromGitHub {
+          owner = "Fryuni";
+          repo = "tailscale";
+          rev = "7cb26f06c1e9c002907f3ca70a197f4a9dc7ad3e";
+          hash = "sha256-czOuezS2JSjTZc5u4O5x39JhstbJDMdeCFsqjkNfYYw=";
+        };
 
-    preBuild = ''
-      ${attrs.preBuild}
+        preBuild = ''
+          ${attrs.preBuild}
 
-      go mod edit -go=${attrs.passthru.go.version}
-    '';
+          go mod edit -go=${attrs.passthru.go.version}
+        '';
 
-    vendorHash = "sha256-DUWC+1lbebDwAnhsaGOde3mmD3wHEtMdIyYOMhwxpBU=";
+        vendorHash = "sha256-DUWC+1lbebDwAnhsaGOde3mmD3wHEtMdIyYOMhwxpBU=";
 
-    # Reason why it is meaningless also in the issue comment above.
-    doCkeck = false;
-  });
+        # Reason why it is meaningless also in the issue comment above.
+        doCheck = false;
+      });
 }

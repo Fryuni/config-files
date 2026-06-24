@@ -192,9 +192,14 @@
       }
       {
         system = flake-utils.lib.system.aarch64-linux;
+        cross = false;
 
         boxes = {
           rpi3 = [
+            ./servers/rpi3
+          ];
+          rpi3-sd = [
+            "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
             ./servers/rpi3
           ];
         };
@@ -203,7 +208,7 @@
 
     agenix-rekey = attrs.agenix-rekey.configure {
       userFlake = self;
-      nixosConfigurations = builtins.filterAttrs (_: x: x.config ? age) self.nixosConfigurations;
+      nixosConfigurations = nixpkgs.lib.filterAttrs (_: x: x.config ? age) self.nixosConfigurations;
       darwinConfigurations = self.darwinConfigurations or {};
       homeConfigurations = {};
       collectHomeManagerConfigurations = false;
@@ -221,7 +226,7 @@
           acc: entry: let
             buildSystem =
               builtins.currentSystem or flake-utils.lib.system.x86_64-linux;
-            isCross = entry.system != buildSystem;
+            isCross = entry.system != buildSystem && (entry.cross or true);
           in
             acc
             // builtins.mapAttrs (_: modules:

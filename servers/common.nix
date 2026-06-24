@@ -2,7 +2,9 @@
   pkgs,
   lib,
   ...
-}: {
+}: let
+  inherit (pkgs) stdenv;
+in {
   system.stateVersion = "26.05";
 
   imports = [
@@ -14,8 +16,6 @@
   environment.systemPackages = with pkgs;
     [
       tmux
-      gcc
-      clang
       curl
       wget
       git
@@ -27,10 +27,12 @@
       ripgrep
       duf
       dua
-      xarchiver
-      cachix
     ]
     ++ lib.optionals (!stdenv.hostPlatform.isAarch64) [
+      gcc
+      clang
+      xarchiver
+      cachix
       (google-cloud-sdk.withExtraComponents (
         with google-cloud-sdk.components; [
           docker-credential-gcr
@@ -43,12 +45,15 @@
       ))
     ];
 
-  environment.variables.EDITOR = "nvim";
+  environment.variables.EDITOR =
+    if stdenv.hostPlatform.isAarch64
+    then "nano"
+    else "nvim";
 
   boot.zfs.forceImportRoot = false;
 
   programs.neovim = {
-    enable = true;
+    enable = !stdenv.hostPlatform.isAarch64;
   };
 
   time.timeZone = "UTC";

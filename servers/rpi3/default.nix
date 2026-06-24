@@ -1,26 +1,38 @@
 {
-  config,
+  inputs,
   pkgs,
   lib,
-  modulesPath,
-  inputs,
   ...
 }: {
   imports = [
-    "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
     inputs.nixos-hardware.nixosModules.raspberry-pi-3
     ../../nixos/modules/networking/tailscale.nix
     ../common.nix
   ];
 
+  # Use the generic cached NixOS aarch64 kernel for target-host updates instead
+  # of locally building nixos-hardware's uncached linux-rpi kernel.
+  boot.kernelPackages = lib.mkForce pkgs.linuxPackages;
+
   networking.hostName = "rpi3";
 
-  # Build the Pi image as an x86_64 -> aarch64 cross system on the notebook.
-  # Without an explicit buildPlatform, pure flake evaluation treats this as a
-  # native aarch64 build and runs timing-sensitive target tests under emulation
-  # (coreutils 9.10 env-signal-handler is one such flaky test).
-  nixpkgs.buildPlatform = lib.mkDefault "x86_64-linux";
-  nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
+  # This host is already installed; build a normal bootable NixOS generation
+  # for `nh os boot --target-host rpi3` instead of a full SD-card image.
+  fileSystems = {
+    "/" = {
+      device = "/dev/disk/by-label/NIXOS_SD";
+      fsType = "ext4";
+    };
+
+    "/boot/firmware" = {
+      device = "/dev/disk/by-label/FIRMWARE";
+      fsType = "vfat";
+      options = [
+        "nofail"
+        "noauto"
+      ];
+    };
+  };
 
   services.vmagent.enable = true;
 

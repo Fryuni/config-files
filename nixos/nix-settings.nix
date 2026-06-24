@@ -7,9 +7,10 @@
     ./nix-store-cache.nix
   ];
 
-  environment.systemPackages = with pkgs; [
-    nh
-  ];
+  environment.systemPackages = with pkgs;
+    pkgs.lib.optionals (!pkgs.stdenv.hostPlatform.isAarch64) [
+      nh
+    ];
 
   age.secrets.nix-access-tokens.rekeyFile = ../secrets/nix-access-tokens;
   nix.extraOptions = let
@@ -61,7 +62,7 @@
     options = "--delete-older-than 7d";
   };
 
-  programs.nh = {
+  programs.nh = pkgs.lib.mkIf (!pkgs.stdenv.hostPlatform.isAarch64) {
     enable = true;
     clean = {
       enable = true;

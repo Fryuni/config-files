@@ -65,6 +65,9 @@ apply-reload:
 build-sd-image config:
   nix build --impure --no-link --print-out-paths ".#nixosConfigurations.{{config}}.config.system.build.sdImage"
 
+build-rpi3-sd-image:
+  nix build --impure --no-link --print-out-paths ".#nixosConfigurations.rpi3-sd.config.system.build.sdImage"
+
 flash-sd-image config device:
   #!/usr/bin/env bash
   set -euo pipefail
