@@ -60,8 +60,6 @@
   nix.package = pkgs.nix;
 
   services.agentsview = {
-    enable = true;
-    publicOrigin = "https://aview.note.lferraz.dev";
     postgres = {
       url = "postgres://agentsview@loem.rudd-agama.ts.net/agentsview?sslmode=disable";
       machine = "note";
