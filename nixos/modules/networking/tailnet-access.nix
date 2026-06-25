@@ -71,11 +71,17 @@
     '')
     cfg.proxy.aliases);
   aliasNames = builtins.attrNames cfg.proxy.aliases;
-  aliasUrl = alias: "https://${alias}.${deviceName}.${publicDomain}";
+  aliasUrls = alias: [
+    "http://${alias}.${deviceName}.${publicDomain}"
+    "https://${alias}.${deviceName}.${publicDomain}"
+  ];
   aliasListItems =
-    lib.concatMapStringsSep "\n" (alias: ''
-      <li><a href="${aliasUrl alias}">${aliasUrl alias}</a></li>
-    '')
+    lib.concatMapStringsSep "\n" (
+      alias:
+        lib.concatMapStringsSep "\n" (
+          url: ''<li><a href="${url}">${url}</a></li>''
+        ) (aliasUrls alias)
+    )
     aliasNames;
   aliasListHtml = lib.optionalString (aliasNames != []) ''
     <section>
@@ -378,7 +384,10 @@ in {
         virtualHosts.tailnet = {
           hostName = "https://${tailnetHost}";
           serverAliases = [
+            "http://${tailnetHost}"
+            "http://*.${deviceName}.${publicDomain}"
             "https://*.${deviceName}.${publicDomain}"
+            "http://${deviceName}.${publicDomain}"
             "https://${deviceName}.${publicDomain}"
           ];
           listenAddresses = [tailnetHost];
@@ -408,8 +417,8 @@ in {
               </head>
               <body>
                 <h1>${deviceName}.${publicDomain}</h1>
-                <p>Use https://&lt;port&gt;.${deviceName}.${publicDomain} to proxy a local HTTP service on this device.</p>
-                <p>Use https://&lt;port&gt;-local.${deviceName}.${publicDomain} when the service expects Host/Origin localhost:&lt;port&gt;.</p>
+                <p>Use http://&lt;port&gt;.${deviceName}.${publicDomain} or https://&lt;port&gt;.${deviceName}.${publicDomain} to proxy a local HTTP service on this device.</p>
+                <p>Use http://&lt;port&gt;-local.${deviceName}.${publicDomain} or https://&lt;port&gt;-local.${deviceName}.${publicDomain} when the service expects Host/Origin localhost:&lt;port&gt;.</p>
             ${aliasListHtml}
               </body>
             </html>` 200

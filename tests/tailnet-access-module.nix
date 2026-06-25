@@ -88,6 +88,8 @@
   configJson = builtins.toJSON {
     extraConfig = cfg.services.caddy.virtualHosts.tailnet.extraConfig;
     emptyAliasesExtraConfig = emptyAliasesEvaluated.config.services.caddy.virtualHosts.tailnet.extraConfig;
+    caddyHostName = cfg.services.caddy.virtualHosts.tailnet.hostName;
+    caddyServerAliases = cfg.services.caddy.virtualHosts.tailnet.serverAliases;
     certificateAfter = certificateService.after;
     certificateRequires = certificateService.requires;
     certificateLoadCredential = certificateService.serviceConfig.LoadCredential;
@@ -100,13 +102,20 @@ in
     inherit configJson certificateExecStart;
   } ''
     printf '%s\n' "$configJson" > config.json
+    jq -e '.caddyHostName == "https://note.tailnet.test"' config.json
+    jq -e '.caddyServerAliases | index("http://note.tailnet.test")' config.json
+    jq -e '.caddyServerAliases | index("http://*.note.example.test")' config.json
+    jq -e '.caddyServerAliases | index("https://*.note.example.test")' config.json
+    jq -e '.caddyServerAliases | index("http://note.example.test")' config.json
+    jq -e '.caddyServerAliases | index("https://note.example.test")' config.json
+
 
     jq -e '.extraConfig | contains("@alias_node_red header_regexp alias_node_red Host ^node-red\\.note\\.example\\.test(?::[0-9]+)?$")' config.json
     jq -e '.extraConfig | contains("reverse_proxy 127.0.0.1:1880")' config.json
     jq -e '.extraConfig | contains("header_up Host 127.0.0.1:1880")' config.json
 
     jq -e '.extraConfig | contains("@port_local header_regexp port_local Host ^([0-9]+)-local\\.note\\.example\\.test(?::[0-9]+)?$")' config.json
-    jq -e '.extraConfig | contains("reverse_proxy 127.0.0.1:{re.port_local.1}")' config.json
+    jq -e '.extraConfig | contains("reverse_proxy localhost:{re.port_local.1}")' config.json
     jq -e '.extraConfig | contains("header_up Host localhost:{re.port_local.1}")' config.json
     jq -e '.extraConfig | contains("header_up Origin http://localhost:{re.port_local.1}")' config.json
 
@@ -115,9 +124,11 @@ in
     jq -e '.extraConfig | contains("root * /srv/static")' config.json
     jq -e '.extraConfig | contains("file_server")' config.json
     jq -e '.extraConfig | contains("header Content-Type \"text/html; charset=utf-8\"")' config.json
-    jq -e '.extraConfig | contains("Use https://&lt;port&gt;.note.example.test to proxy a local HTTP service on this device.")' config.json
-    jq -e '.extraConfig | contains("Use https://&lt;port&gt;-local.note.example.test when the service expects Host/Origin localhost:&lt;port&gt;.")' config.json
+    jq -e '.extraConfig | contains("Use http://&lt;port&gt;.note.example.test or https://&lt;port&gt;.note.example.test to proxy a local HTTP service on this device.")' config.json
+    jq -e '.extraConfig | contains("Use http://&lt;port&gt;-local.note.example.test or https://&lt;port&gt;-local.note.example.test when the service expects Host/Origin localhost:&lt;port&gt;.")' config.json
+    jq -e '.extraConfig | contains("<li><a href=\"http://node-red.note.example.test\">http://node-red.note.example.test</a></li>")' config.json
     jq -e '.extraConfig | contains("<li><a href=\"https://node-red.note.example.test\">https://node-red.note.example.test</a></li>")' config.json
+    jq -e '.extraConfig | contains("<li><a href=\"http://static.note.example.test\">http://static.note.example.test</a></li>")' config.json
     jq -e '.extraConfig | contains("<li><a href=\"https://static.note.example.test\">https://static.note.example.test</a></li>")' config.json
     jq -e '.extraConfig | test("</html>` 200\\n[[:space:]]*}")' config.json
     jq -e '.emptyAliasesExtraConfig | contains("<h2>Aliases</h2>") | not' config.json
