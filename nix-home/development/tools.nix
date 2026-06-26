@@ -44,6 +44,7 @@
     astro-language-server
     bash-language-server
     java-language-server
+    jdt-language-server
     lua-language-server
     mdx-language-server
     typescript-language-server
