@@ -381,20 +381,8 @@ in {
 
       services.caddy = {
         enable = true;
-        virtualHosts.tailnet = {
-          hostName = "https://${tailnetHost}";
-          serverAliases = [
-            "http://${tailnetHost}"
-            "http://*.${deviceName}.${publicDomain}"
-            "https://*.${deviceName}.${publicDomain}"
-            "http://${deviceName}.${publicDomain}"
-            "https://${deviceName}.${publicDomain}"
-          ];
-          listenAddresses = [tailnetHost];
-          useACMEHost = null;
+        virtualHosts = let
           extraConfig = ''
-            tls ${certFile} ${certKeyFile}
-
             ${aliasProxyBlocks}
 
             @port_local header_regexp port_local Host ${portLocalHostRegexp}
@@ -424,6 +412,33 @@ in {
             </html>` 200
             }
           '';
+        in {
+          tailnet = {
+            hostName = "https://${tailnetHost}";
+            serverAliases = [
+              # "http://${tailnetHost}"
+              # "http://*.${deviceName}.${publicDomain}"
+              "https://*.${deviceName}.${publicDomain}"
+              # "http://${deviceName}.${publicDomain}"
+              "https://${deviceName}.${publicDomain}"
+            ];
+            listenAddresses = [tailnetHost];
+            useACMEHost = null;
+            extraConfig = ''
+              tls ${certFile} ${certKeyFile}
+              ${extraConfig}
+            '';
+          };
+          tailnet-no-tls = {
+            inherit extraConfig;
+            hostName = "http://${tailnetHost}";
+            serverAliases = [
+              "http://*.${deviceName}.${publicDomain}"
+              "http://${deviceName}.${publicDomain}"
+            ];
+            listenAddresses = [tailnetHost];
+            useACMEHost = null;
+          };
         };
       };
 
