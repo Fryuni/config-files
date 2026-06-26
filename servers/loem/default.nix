@@ -7,9 +7,10 @@
     ../common.nix
     ../remoteDev.nix
 
-    ./disko.nix
     ./agentsview.nix
     ./cli-proxy-api.nix
+    ./disko.nix
+    ./docker-registry.nix
     ./forgejo.nix
     ./matrix.nix
     ./metrics
