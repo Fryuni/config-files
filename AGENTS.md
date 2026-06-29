@@ -187,7 +187,8 @@ Key inputs: `nixpkgs`, `home-manager`, `agenix`, `fenix` (Rust), `zig`, `nur`
 1. **Do not apply changes** - Never run `switch` commands; the user will apply changes separately
 2. **Do not commit secrets** - Files in `secrets/` are encrypted with agenix
 3. **Test builds before applying** - Use `nix run .#build` or `nix run .#os-build`
-4. **Use direnv** - The `.envrc` enables nix-direnv for this repo
-5. **Target system** - Primary target is `x86_64-linux` (note)
-6. **State version** - Current: `26.05` (do not change without migration)
-7. **Stage new files for Nix** - Nix flakes only see files that are staged or committed in git. Always run `git add <file>` after creating new files, otherwise Nix commands will not see them
+4. **Keep README architecture current** - When changing machine definitions, users, module composition, flake outputs, secret management shape, or validation workflows, update `README.md` in the same change so its architecture overview stays accurate
+5. **Use direnv** - The `.envrc` enables nix-direnv for this repo
+6. **Target system** - Primary target is `x86_64-linux` (note)
+7. **State version** - Current: `26.05` (do not change without migration)
+8. **Stage new files for Nix** - Nix flakes only see files that are staged or committed in git. Always run `git add <file>` after creating new files, otherwise Nix commands will not see them
