@@ -5,6 +5,10 @@
   ...
 }:
 lib.mkIf (pkgs.stdenv.buildPlatform.system == pkgs.stdenv.hostPlatform.system) {
+  imports = [
+    ../modules/t3-code.nix
+  ];
+
   home.packages = with pkgs; [
     llm-agents.opencode
     # llm-agents.claude-code
