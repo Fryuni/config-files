@@ -104,6 +104,9 @@ in {
 
       # Audio configuration GUI
       pavucontrol
+
+      # Wi-Fi configuration GUI
+      networkmanagerapplet
     ])
     ++ [flameshotCopy];
 
@@ -300,6 +303,7 @@ in {
         "$mod, Q, killactive"
         "$mod, M, exit"
         "$mod, N, exec, thunar"
+        "$mod SHIFT, N, exec, ${pkgs.networkmanagerapplet}/bin/nm-connection-editor"
         "$mod, D, exec, $menu"
         "$mod, Space, exec, $launcher"
         "$mod, B, exec, $browser"
@@ -719,6 +723,15 @@ in {
         color: #${colors.disabled};
       }
     '';
+  };
+
+  xsession.preferStatusNotifierItems = true;
+
+  services.network-manager-applet.enable = true;
+
+  services.gnome-keyring = {
+    enable = true;
+    components = ["secrets"];
   };
 
   # SwayNotificationCenter
