@@ -24,7 +24,11 @@
     "armv7l-linux"
   ];
 
-  networking.hostName = "note";
+  networking = {
+    hostName = "note";
+    # Avoid unreliable association/autoconnect behavior on the notebook.
+    networkmanager.wifi.powersave = false;
+  };
 
   services.vmagent.enable = true;
 
