@@ -4,9 +4,9 @@
   config,
   ...
 }: {
-  imports = [
-    ../modules/t3-code.nix
-  ];
+  # imports = [
+  #   ../modules/t3-code.nix
+  # ];
 
   config = lib.mkIf (pkgs.stdenv.buildPlatform.system == pkgs.stdenv.hostPlatform.system) {
     home.packages = with pkgs; [
