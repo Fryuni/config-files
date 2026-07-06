@@ -101,8 +101,8 @@
     version = "0.1.35";
   };
   cargo-expand = {
-    crateSha256 = "sha256-TfGz/y1T3G1fhCWxWmksA6qJS51pMV9oloANhwn676o=";
-    depsHash = "sha256-VnauBXYex3zEEOQcfTX2t2+KvDCdMKXLXU+lY1V9B9o=";
+    crateSha256 = "sha256-D8LCZgTmo4ZQK9rfj0KhYsKmcPFdXlDo8FHKDAVHfZQ=";
+    depsHash = "sha256-8gJz3tR8UAOwdkLZvgd07PllOmR72bRhmjnLMdFC/r8=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -118,7 +118,7 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.122";
+    version = "1.0.123";
   };
   cargo-lock = {
     crateSha256 = "sha256-l8B98ycfC17vUY29BbFoucGeAn8mapchCvjdMCNhKqc=";
