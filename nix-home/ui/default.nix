@@ -3,7 +3,6 @@
     # ./xfce.nix
     ./xsession.nix
     ./rofi.nix
-    ./hyprland.nix
     ./plasma.nix
     ./vicinae.nix
     ./gtk.nix
@@ -39,9 +38,9 @@
     };
   };
 
-  # Place mpv desktop entry directly in ~/.local/share/applications/
-  # so KDE's ksycoca can index it under Hyprland (nix-profile symlinks
-  # with epoch timestamps aren't reliably indexed by kbuildsycoca6)
+  # Place mpv's desktop entry directly in ~/.local/share/applications/
+  # so the active desktop's application cache indexes it reliably rather
+  # than relying on profile symlinks with epoch timestamps.
   xdg.dataFile."applications/mpv.desktop".text = builtins.readFile "${pkgs.mpv}/share/applications/mpv.desktop";
 
   # Thunar "Open Terminal Here" uses exo-open which reads this config

@@ -4,8 +4,7 @@
   pkgs,
   ...
 }: let
-  colors = rec {
-    # general
+  colors = {
     background = "#252a34";
     background-alt = "#3b4354";
     foreground = "#F1FAEE";
@@ -13,32 +12,49 @@
     secondary = "#047672";
     alert = "#ff2e63";
     disabled = "#707880";
+  };
 
-    # rofi
-    bg0 = "${colors.background}E6";
-    bg1 = "${colors.background-alt}80";
-    bg2 = "${colors.primary}E6";
-    fg0 = "#DEDEDE";
-    fg1 = "${colors.foreground}";
-    fg2 = "${colors.disabled}80";
+  modifier = "Mod4";
+  terminal = lib.getExe pkgs.ghostty;
+  flameshot = lib.getExe pkgs.flameshot;
+  i3lock = lib.getExe pkgs.i3lock;
+  rofi = lib.getExe config.programs.rofi.package;
+  copyq = lib.getExe pkgs.copyq;
+  brightnessctl = lib.getExe pkgs.brightnessctl;
+  pamixer = lib.getExe pkgs.pamixer;
+  playerctl = lib.getExe pkgs.playerctl;
+  openwhisprI3Autostart = pkgs.writeShellApplication {
+    name = "openwhispr-i3-autostart";
+    runtimeInputs = [pkgs.systemd];
+    text = ''
+      systemctl --user start ydotoold.service
+      exec ${lib.getExe pkgs.openwhispr}
+    '';
   };
 in {
-  # wallpaper
-  # xdg.configFile."wallpaper/wallpaper.png".source = ../../wallpaper/wallpaper.png;
+  home.packages = [
+    pkgs.autotiling
+    pkgs.brightnessctl
+    pkgs.copyq
+    pkgs.dunst
+    pkgs.flameshot
+    pkgs.i3lock
+    pkgs.networkmanagerapplet
+    pkgs.pavucontrol
+    pkgs.pamixer
+    pkgs.playerctl
+  ];
 
   xsession = {
     enable = true;
-
     scriptPath = ".hm-xsession";
 
-    # i3-gaps
     windowManager.i3 = {
-      enable = false;
-
-      package = pkgs.i3-gaps;
+      enable = true;
+      package = pkgs.i3;
 
       config = {
-        modifier = "Mod4"; # is Super
+        inherit modifier terminal;
 
         fonts = {
           names = ["JetBrainsMono Nerd Font"];
@@ -46,30 +62,19 @@ in {
         };
 
         gaps = {
-          inner = 10;
-          # smartGaps = true;
+          inner = 3;
+          outer = 6;
           smartBorders = "on";
         };
 
-        menu = "${config.programs.rofi.package}/bin/rofi -show drun";
-
-        terminal = "alacritty";
-
-        floating.criteria = [{class = "Pavucontrol";}];
+        floating.modifier = modifier;
+        menu = "${rofi} -show drun";
+        bars = [];
 
         startup = [
           {
-            command = "systemctl --user restart polybar";
-            always = true;
-            notification = false;
-          }
-          {
             command = "xset r rate 200 30";
             always = true;
-            notification = false;
-          }
-          {
-            command = "xrandr --output eDP-1-1 --auto --left-of HDMI-0";
             notification = false;
           }
           {
@@ -78,27 +83,147 @@ in {
             notification = false;
           }
           {
-            command = "${pkgs.feh}/bin/feh --bg-scale ${config.xdg.configHome}/wallpaper/wallpaper.jpg";
+            command = "${pkgs.feh}/bin/feh --bg-fill ${config.home.homeDirectory}/.background-image";
             always = true;
+            notification = false;
+          }
+          {
+            command = lib.getExe pkgs.autotiling;
+            always = true;
+            notification = false;
+          }
+          {
+            command = lib.getExe openwhisprI3Autostart;
             notification = false;
           }
         ];
 
-        bars = [];
+        keybindings = {
+          # Core applications and session controls.
+          "${modifier}+Return" = "exec ${terminal}";
+          "${modifier}+Shift+Return" = "exec ${terminal} -e t";
+          "${modifier}+q" = "kill";
+          "${modifier}+m" = "exit";
+          "${modifier}+n" = "exec thunar";
+          "${modifier}+Shift+n" = "exec ${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
+          "${modifier}+d" = "exec ${rofi} -show drun";
+          "${modifier}+space" = "exec vicinae toggle";
+          "${modifier}+b" = "exec ${lib.getExe pkgs.stable.firefox-beta}";
+          "${modifier}+Shift+b" = "exec ${lib.getExe pkgs.master.google-chrome}";
 
-        defaultWorkspace = "workspace number 1";
+          # Window state. i3's global fullscreen is the closest X11 equivalent
+          # to a maximized fullscreen window that remains above the bar.
+          "${modifier}+f" = "fullscreen toggle";
+          "${modifier}+Shift+f" = "fullscreen toggle global";
+          "${modifier}+v" = "floating toggle";
+          "${modifier}+p" = "sticky toggle";
 
-        keybindings = let
-          main-display-g = "1920x1080+1920+0";
-          inherit (config.xsession.windowManager.i3.config) modifier;
-        in
-          lib.mkOptionDefault {
-            "${modifier}+c" = ''exec --no-startup-id "rofi -show calc -modi calc -no-show-match -no-sort > /dev/null"'';
-            "${modifier}+x" = ''exec --no-startup-id "rofi -show power-menu -modi power-menu:rofi-power-menu"'';
-            "${modifier}+z" = ''exec --no-startup-id "rofi -modi emoji -show emoji"'';
-            "${modifier}+space" = ''exec --no-startup-id "vicinae toggle"'';
-            "${modifier}+p" = ''exec --no-startup-id "maim -g ${main-display-g} $HOME/screenshots/$(date --iso-8601='seconds').png"'';
-          };
+          # Rofi and clipboard utilities.
+          "${modifier}+c" = "exec ${rofi} -show calc -modi calc -no-show-match -no-sort";
+          "${modifier}+x" = "exec ${rofi} -show power-menu -modi power-menu:rofi-power-menu";
+          "${modifier}+z" = "exec ${rofi} -modi emoji -show emoji";
+          "${modifier}+Shift+v" = "exec ${copyq} menu";
+
+          # Native X11 Flameshot commands own the X clipboard directly.
+          "Print" = "exec ${flameshot} gui";
+          "Shift+Print" = "exec ${flameshot} full -c";
+          "${modifier}+Print" = "exec ${flameshot} screen -c";
+          "${modifier}+l" = "exec ${i3lock} -c 252a34";
+
+          # Focus navigation: semicolon is right to leave Mod4+l for locking.
+          "${modifier}+Left" = "focus left";
+          "${modifier}+Right" = "focus right";
+          "${modifier}+Up" = "focus up";
+          "${modifier}+Down" = "focus down";
+          "${modifier}+h" = "focus left";
+          "${modifier}+j" = "focus down";
+          "${modifier}+k" = "focus up";
+          "${modifier}+semicolon" = "focus right";
+          "${modifier}+Tab" = "focus next";
+          "${modifier}+Shift+Tab" = "focus prev";
+
+          # Move focused containers with arrows or the HJKL cluster.
+          "${modifier}+Shift+Left" = "move left";
+          "${modifier}+Shift+Right" = "move right";
+          "${modifier}+Shift+Up" = "move up";
+          "${modifier}+Shift+Down" = "move down";
+          "${modifier}+Shift+h" = "move left";
+          "${modifier}+Shift+j" = "move down";
+          "${modifier}+Shift+k" = "move up";
+          "${modifier}+Shift+l" = "move right";
+
+          # Tiling, tabbed groups, and pseudotile's floating equivalent.
+          "${modifier}+s" = "layout toggle split";
+          "${modifier}+e" = "floating toggle";
+          "${modifier}+g" = "layout tabbed";
+          "${modifier}+w" = "focus next";
+          "${modifier}+Shift+w" = "focus prev";
+
+          # Workspaces and moving containers to them.
+          "${modifier}+1" = "workspace number 1";
+          "${modifier}+2" = "workspace number 2";
+          "${modifier}+3" = "workspace number 3";
+          "${modifier}+4" = "workspace number 4";
+          "${modifier}+5" = "workspace number 5";
+          "${modifier}+6" = "workspace number 6";
+          "${modifier}+7" = "workspace number 7";
+          "${modifier}+8" = "workspace number 8";
+          "${modifier}+9" = "workspace number 9";
+          "${modifier}+0" = "workspace number 10";
+          "${modifier}+bracketleft" = "workspace prev";
+          "${modifier}+bracketright" = "workspace next";
+          "${modifier}+a" = "workspace back_and_forth";
+          "${modifier}+Shift+1" = "move container to workspace number 1";
+          "${modifier}+Shift+2" = "move container to workspace number 2";
+          "${modifier}+Shift+3" = "move container to workspace number 3";
+          "${modifier}+Shift+4" = "move container to workspace number 4";
+          "${modifier}+Shift+5" = "move container to workspace number 5";
+          "${modifier}+Shift+6" = "move container to workspace number 6";
+          "${modifier}+Shift+7" = "move container to workspace number 7";
+          "${modifier}+Shift+8" = "move container to workspace number 8";
+          "${modifier}+Shift+9" = "move container to workspace number 9";
+          "${modifier}+Shift+0" = "move container to workspace number 10";
+
+          # Scratchpad and workspace cycling.
+          "${modifier}+minus" = "scratchpad show";
+          "${modifier}+Shift+minus" = "move scratchpad";
+          "${modifier}+button4" = "workspace prev";
+          "${modifier}+button5" = "workspace next";
+
+          # Resize mode and direct resizing retain the directional bindings.
+          "${modifier}+r" = "mode resize";
+          "${modifier}+Control+Left" = "resize shrink width 20 px or 20 ppt";
+          "${modifier}+Control+Right" = "resize grow width 20 px or 20 ppt";
+          "${modifier}+Control+Up" = "resize shrink height 20 px or 20 ppt";
+          "${modifier}+Control+Down" = "resize grow height 20 px or 20 ppt";
+          "${modifier}+Control+h" = "resize shrink width 20 px or 20 ppt";
+          "${modifier}+Control+l" = "resize grow width 20 px or 20 ppt";
+          "${modifier}+Control+k" = "resize shrink height 20 px or 20 ppt";
+          "${modifier}+Control+j" = "resize grow height 20 px or 20 ppt";
+
+          # Hardware media and brightness keys.
+          "XF86AudioRaiseVolume" = "exec ${pamixer} -i 5";
+          "XF86AudioLowerVolume" = "exec ${pamixer} -d 5";
+          "XF86AudioMute" = "exec ${pamixer} -t";
+          "XF86AudioPlay" = "exec ${playerctl} play-pause";
+          "XF86AudioPrev" = "exec ${playerctl} previous";
+          "XF86AudioNext" = "exec ${playerctl} next";
+          "XF86MonBrightnessUp" = "exec ${brightnessctl} set +5%";
+          "XF86MonBrightnessDown" = "exec ${brightnessctl} set 5%-";
+        };
+
+        modes.resize = {
+          Left = "resize shrink width 20 px or 20 ppt";
+          Right = "resize grow width 20 px or 20 ppt";
+          Up = "resize shrink height 20 px or 20 ppt";
+          Down = "resize grow height 20 px or 20 ppt";
+          h = "resize shrink width 20 px or 20 ppt";
+          j = "resize grow height 20 px or 20 ppt";
+          k = "resize shrink height 20 px or 20 ppt";
+          l = "resize grow width 20 px or 20 ppt";
+          Return = "mode default";
+          Escape = "mode default";
+        };
 
         colors = {
           focused = {
@@ -108,7 +233,6 @@ in {
             childBorder = colors.primary;
             indicator = colors.alert;
           };
-
           focusedInactive = {
             text = colors.foreground;
             background = colors.background-alt;
@@ -116,7 +240,6 @@ in {
             childBorder = colors.secondary;
             indicator = colors.alert;
           };
-
           unfocused = {
             text = colors.foreground;
             inherit (colors) background;
@@ -126,123 +249,103 @@ in {
           };
         };
 
-        window.border = 1;
-
-        workspaceOutputAssign = [
-          {
-            output = "eDP-1-1";
-            workspace = "10";
-          }
-        ];
+        window.border = 2;
       };
 
-      extraConfig = ''for_window [all] title_window_icon padding 10px'';
+      extraConfig = ''
+        for_window [class="(?i)^(org\.pulseaudio\.pavucontrol|pavucontrol)$"] floating enable
+        for_window [class="(?i)^nm-connection-editor$"] floating enable
+        for_window [class="(?i)^bitwarden$"] floating enable
+        for_window [class="(?i)^(org\.gnome\.Calculator|gnome-calculator)$"] floating enable
+        for_window [class="(?i)^(org\.gnome\.Nautilus|nautilus)$" title="(?i).*properties.*"] floating enable
+        for_window [title="(?i)^picture-in-picture$"] floating enable, sticky enable
+        for_window [class="(?i)^flameshot$"] floating enable, sticky enable
+        for_window [title="(?i)^flameshot(-pin)?$"] floating enable, sticky enable
+        no_focus [class="open-whispr" title="Voice Recorder"]
+        for_window [class="open-whispr" title="Voice Recorder"] floating enable, border none
+      '';
     };
   };
 
-  # picom
-  services.picom = {
-    enable = false;
+  services.copyq.enable = true;
+
+  services.dunst = {
+    enable = true;
+    settings.global = {
+      frame_color = colors.primary;
+      separator_color = "frame";
+    };
   };
 
-  # polybar
-  services.polybar = {
-    enable = false;
+  services.flameshot = {
+    enable = true;
+    package = pkgs.flameshot;
+    settings.General.showStartupLaunchMessage = false;
+  };
 
+  services.gnome-keyring = {
+    enable = true;
+    components = ["secrets"];
+  };
+
+  services.network-manager-applet.enable = true;
+
+  services.picom = {
+    enable = true;
+    backend = "xrender";
+    settings = {
+      corner-radius = 4;
+      round-borders = 1;
+      rounded-corners-exclude = [
+        "window_type = 'dock'"
+        "window_type = 'desktop'"
+      ];
+    };
+  };
+
+  services.polybar = {
+    enable = true;
     package = pkgs.polybar.override {
-      i3GapsSupport = true;
-      alsaSupport = true;
+      i3Support = true;
       pulseSupport = true;
       iwSupport = true;
     };
-
-    config = let
-      pulseaudio-control = "${pkgs.callPackage ./pulseaudio-control.nix {}}/bin/pulseaudio-control";
-    in {
-      "global/wm" = {
-        margin-bottom = 0;
-        margin-top = 0;
-      };
-
+    config = {
       "bar/main" = {
-        monitor = "HDMI-0";
-
         width = "100%";
         height = 40;
-
-        background = "${colors.background}";
-        foreground = "${colors.foreground}";
-
-        # underline / overline
+        background = colors.background;
+        foreground = colors.foreground;
         line-size = 2;
-        line-color = "${colors.primary}";
-
+        line-color = colors.primary;
         border-size = 0;
-
         padding = 0;
-
         module-margin = 1;
-
         font-0 = "JetBrainsMono Nerd Font:style=Regular:size=14;4";
-
-        modules-left = "oslogo xworkspaces xwindow";
-        modules-right = "filesystem memory cpu pulseaudio-control-output wlan battery date";
-
-        cursor-click = "pointer";
-        cursor-scroll = "ns-resize";
-
+        modules-left = "i3 xwindow";
+        modules-right = "pulseaudio wlan battery date";
+        tray-position = "right";
+        tray-padding = 2;
         enable-ipc = true;
       };
 
-      "bar/side" = {
-        "inherit" = "bar/main";
-
-        monitor = "eDP-1-1";
-      };
-
-      "module/oslogo" = {
-        type = "custom/text";
-        content = " NixOS";
-        content-foreground = "${colors.background}";
-        content-background = "${colors.primary}";
-        content-padding = 2;
-      };
-
-      "module/xworkspaces" = {
-        type = "internal/xworkspaces";
+      "module/i3" = {
+        type = "internal/i3";
         pin-workspaces = true;
+        enable-click = true;
         enable-scroll = false;
-        icon-0 = "10;";
-        icon-1 = "1;";
-        icon-2 = "2;";
-        icon-3 = "3;";
-        icon-4 = "4;";
-        icon-5 = "5;";
-        icon-6 = "6;";
-        icon-7 = "7;";
-        icon-8 = "8;";
-        icon-9 = "9;";
-        icon-default = "";
-
-        format = "<label-state>";
-
-        label-active = "%icon%";
-        label-active-foreground = "${colors.primary}";
-        label-active-background = "${colors.background-alt}";
-        label-active-underline = "${colors.primary}";
-
-        label-occupied = "%icon%";
-
-        label-urgent = "%icon%";
-        label-urgent-foreground = "${colors.alert}";
-
-        label-empty = "%icon%";
-        label-empty-foreground = "${colors.disabled}";
-
-        label-active-padding = 2;
-        label-occupied-padding = 2;
+        label-focused = "%index%";
+        label-focused-foreground = colors.primary;
+        label-focused-background = colors.background-alt;
+        label-focused-underline = colors.primary;
+        label-focused-padding = 2;
+        label-unfocused = "%index%";
+        label-unfocused-padding = 2;
+        label-visible = "%index%";
+        label-visible-padding = 2;
+        label-urgent = "%index%";
+        label-urgent-foreground = colors.alert;
         label-urgent-padding = 2;
-        label-empty-padding = 2;
       };
 
       "module/xwindow" = {
@@ -250,63 +353,52 @@ in {
         label = "%title:0:40:...%";
         format = "<label>";
         format-prefix = "  ";
-        format-prefix-foreground = "${colors.primary}";
+        format-prefix-foreground = colors.primary;
         label-empty = "NixOS";
       };
 
-      "module/filesystem" = {
-        type = "internal/fs";
-        interval = 25;
-        mount-0 = "/";
-        label-mounted = "%{F${colors.primary}}DISK:%{F-} %percentage_used:2%%";
-        label-unmounted = "%mountpoint% not mounted";
-        label-unmounted-foreground = "${colors.disabled}";
-      };
-
-      "module/pulseaudio-control-output" = {
-        type = "custom/script";
-        tail = true;
-
-        # 必要に応じて nickname および sink や source 名(node名)を変更すること
-        # --color-muted は # なしの rrggbb のため # を取り除く
-        exec = ''${pulseaudio-control} --format '$VOL_ICON $VOL_LEVEL $NODE_NICKNAME' --color-muted "${builtins.replaceStrings ["#"] [""] colors.disabled}" --icons-volume " , " --icon-muted " " --node-nicknames-from "device.profile.name" --node-nickname "alsa_output.pci-0000_00_1f.3.analog-stereo:built-in" listen'';
-        click-right = "exec ${pkgs.pavucontrol}/bin/pavucontrol &";
-        click-left = "${pulseaudio-control} togmute";
-        click-middle = "${pulseaudio-control} next-node";
-        scroll-up = "${pulseaudio-control} --volume-max 130 up";
-        scroll-down = "${pulseaudio-control} --volume-max 130 down";
-        label-foreground = "${colors.primary}";
-      };
-
-      "module/memory" = {
-        type = "internal/memory";
-        interval = 2;
-        format-prefix = "RAM: ";
-        format-prefix-foreground = "${colors.primary}";
-        label = "%percentage_used:2%%";
-      };
-
-      "module/cpu" = {
-        type = "internal/cpu";
-        interval = 2;
-        format-prefix = "CPU: ";
-        format-prefix-foreground = "${colors.primary}";
-        label = "%percentage:2%%";
+      "module/pulseaudio" = {
+        type = "internal/pulseaudio";
+        format-volume = "<ramp-volume> <label-volume>";
+        label-volume = "%percentage%%";
+        label-muted = " muted";
+        label-muted-foreground = colors.disabled;
+        ramp-volume-0 = "";
+        ramp-volume-1 = "";
+        ramp-volume-2 = "";
       };
 
       "module/wlan" = {
         type = "internal/network";
+        interface = "wlp61s0";
         interval = 5;
-        interface-type = "wireless";
         format-connected = "<label-connected>";
         format-disconnected = "<label-disconnected>";
-        label-connected = "on";
-        label-disconnected = "off";
+        label-connected = "%essid%";
+        label-disconnected = "Disconnected";
         format-connected-prefix = "直 ";
-        format-connected-prefix-foreground = "${colors.primary}";
+        format-connected-prefix-foreground = colors.primary;
         format-disconnected-prefix = "睊 ";
-        format-disconnected-foreground = "${colors.disabled}";
-        format-disconnected-prefix-foreground = "${colors.disabled}";
+        format-disconnected-foreground = colors.disabled;
+        format-disconnected-prefix-foreground = colors.disabled;
+      };
+
+      "module/battery" = {
+        type = "internal/battery";
+        battery = "BAT0";
+        adapter = "AC";
+        label-charging = "%percentage%%";
+        label-discharging = "%percentage%%";
+        label-full = "%percentage%%";
+        format-charging = "<label-charging>";
+        format-discharging = "<label-discharging>";
+        format-full = "<label-full>";
+        format-charging-prefix = " ";
+        format-discharging-prefix = " ";
+        format-full-prefix = " ";
+        format-charging-prefix-foreground = colors.primary;
+        format-discharging-prefix-foreground = colors.foreground;
+        format-full-prefix-foreground = colors.primary;
       };
 
       "module/date" = {
@@ -316,40 +408,63 @@ in {
         label = "%date%";
         format = "<label>";
         format-prefix = " ";
-        format-foreground = "${colors.background}";
-        format-background = "${colors.primary}";
+        format-foreground = colors.background;
+        format-background = colors.primary;
         format-padding = 2;
       };
 
-      "module/battery" = {
-        type = "internal/battery";
-        # ls -1 /sys/class/power_supply/
-        battery = "BAT1";
-        adapter = "ACAD";
-
-        label-charging = "%percentage:3%%";
-        label-discharging = "%percentage:3%%";
-        label-full = "%percentage:3%%";
-        format-charging = "<label-charging>";
-        format-discharging = "<label-discharging>";
-        format-full = "<label-full>";
-        format-charging-prefix = " ";
-        format-discharging-prefix = " ";
-        format-full-prefix = " ";
-        format-charging-prefix-foreground = "${colors.primary}";
-        format-discharging-prefix-foreground = "${colors.primary}";
-        format-full-prefix-foreground = "${colors.primary}";
-      };
-
-      "settings" = {
+      settings = {
         screenchange-reload = true;
         pseudo-transparency = true;
       };
     };
-
     script = ''
       polybar --reload main &
-      polybar --reload side &
     '';
+  };
+
+  systemd.user.services = {
+    copyq = {
+      Unit.PartOf = lib.mkForce ["hm-graphical-session.target"];
+      Install.WantedBy = lib.mkForce ["hm-graphical-session.target"];
+    };
+
+    dunst = {
+      Unit.PartOf = lib.mkForce ["hm-graphical-session.target"];
+      Install.WantedBy = lib.mkForce ["hm-graphical-session.target"];
+    };
+
+    flameshot = {
+      Unit.PartOf = lib.mkForce ["hm-graphical-session.target"];
+      Install.WantedBy = lib.mkForce ["hm-graphical-session.target"];
+    };
+
+    network-manager-applet = {
+      Unit.PartOf = lib.mkForce ["hm-graphical-session.target"];
+      Install.WantedBy = lib.mkForce ["hm-graphical-session.target"];
+    };
+
+    picom = {
+      Unit.PartOf = lib.mkForce ["hm-graphical-session.target"];
+      Install.WantedBy = lib.mkForce ["hm-graphical-session.target"];
+    };
+
+    polybar = {
+      Unit.PartOf = lib.mkForce ["hm-graphical-session.target"];
+      Install.WantedBy = lib.mkForce ["hm-graphical-session.target"];
+    };
+
+    ydotoold = {
+      Unit = {
+        Description = "ydotool daemon";
+        Documentation = "man:ydotoold(8)";
+        PartOf = ["graphical-session.target"];
+      };
+      Service = {
+        ExecStart = "${pkgs.ydotool}/bin/ydotoold";
+        Restart = "on-failure";
+      };
+      Install.WantedBy = ["graphical-session.target"];
+    };
   };
 }

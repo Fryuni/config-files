@@ -11,32 +11,39 @@ final: pkgs: {
     extracted = pkgs.appimageTools.extract {
       inherit pname version src;
 
-      # Patch the launcher script: on Hyprland, don't force XWayland so that
-      # the Hyprland D-Bus global hotkey path activates. The JS hotkey manager
-      # checks process.argv for "--ozone-platform=x11" and skips D-Bus
-      # registration if it's present.
       postExtract = ''
-        substituteInPlace $out/open-whispr \
-          --replace-fail \
-            'FLAGS+=(--ozone-platform=x11)' \
-            'if [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; then FLAGS+=(--ozone-platform=x11); fi'
 
-        # Remove linux-fast-paste: its uinput method silently fails on native
-        # Wayland (Ctrl+V not routed to the focused client) but reports success,
-        # preventing the app from falling through to the tool-based paste chain.
         rm -f $out/resources/bin/linux-fast-paste $out/resources/resources/bin/linux-fast-paste
 
-        # Patch clipboard.js inside the asar: reorder paste tool priority for
-        # wlroots compositors (Hyprland/Sway). Put ydotool first because wtype
-        # and xdotool both silently fail inside the bwrap sandbox — wtype's
-        # virtual keyboard protocol doesn't cross the sandbox boundary, and
-        # xdotool's XWayland events don't reach native Wayland clients.
-        # ydotool communicates via a Unix socket to ydotoold on the host.
-        # The replacement is the exact same byte length so asar offsets stay valid.
-        ${pkgs.gnused}/bin/sed -i \
-          's/candidates = \[...wtypeEntry, ...xdotoolEntry, ...ydotoolEntry\]/candidates = [...ydotoolEntry, ...xdotoolEntry, ...wtypeEntry]/' \
-          $out/resources/app.asar
+        # Patch clipboard.js inside the asar without extracting or repacking it.
+        # Equal-length replacement keeps asar offsets valid; one occurrence
+        # prevents silently patching an unexpected upstream layout.
+        ${pkgs.python3}/bin/python3 - "$out/resources/app.asar" <<'PY'
+        from pathlib import Path
+        import sys
 
+        app_asar = Path(sys.argv[1])
+        old = b"candidates = [...wtypeEntry, ...xdotoolEntry, ...ydotoolEntry]"
+        new = b"candidates = [...ydotoolEntry, ...xdotoolEntry, ...wtypeEntry]"
+
+        if len(old) != len(new):
+            raise SystemExit("OpenWhispr asar patch must preserve byte length")
+
+        contents = app_asar.read_bytes()
+        initial_new_count = contents.count(new)
+        if contents.count(old) != 1:
+            raise SystemExit("expected exactly one unpatched OpenWhispr candidate list")
+
+        updated = contents.replace(old, new, 1)
+        if len(updated) != len(contents):
+            raise SystemExit("OpenWhispr asar patch changed byte length")
+        if updated.count(old) != 0:
+            raise SystemExit("OpenWhispr asar patch left an unpatched candidate list")
+        if updated.count(new) != initial_new_count + 1:
+            raise SystemExit("OpenWhispr asar patch replaced an unexpected candidate list")
+
+        app_asar.write_bytes(updated)
+        PY
 
       '';
     };
@@ -49,8 +56,6 @@ final: pkgs: {
         with p; [
           ydotool
           xdotool
-          wl-clipboard
-          wtype
           alsa-lib
           pulseaudio
         ];

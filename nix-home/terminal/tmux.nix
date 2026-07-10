@@ -59,8 +59,8 @@ in {
       set-option -g extended-keys on
       set -g extended-keys-format csi-u
 
-      # Update Hyprland/WAYLAND env variables in tmux sessions
-      set-option -g update-environment "HYPRLAND_INSTANCE_SIGNATURE DISPLAY WAYLAND_DISPLAY SWAYSOCK"
+      # Propagate DISPLAY to existing tmux sessions under X11.
+      set-option -g update-environment "DISPLAY"
 
       # tmux-thumbs copies through tmux so SSH clients receive OSC52 clipboard writes.
       set -g @thumbs-command 'tmux set-buffer -w -- "$THUMB" && tmux display-message "Copied to clipboard"'

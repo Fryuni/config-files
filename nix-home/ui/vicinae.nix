@@ -40,8 +40,6 @@
   extensions = builtins.map mkOfficialExtension [
     "aria2-manager"
     "dashboard-icons"
-    "hypr-keybinds"
-    "hyprland-monitors"
     "it-tools"
     "nerdfont-search"
     "nix"
@@ -155,13 +153,6 @@ in {
       size = {
         width = 770;
         height = 480;
-      };
-
-      # Layer shell for Wayland/Hyprland
-      layer_shell = {
-        enabled = true;
-        keyboard_interactivity = "on_demand";
-        layer = "top";
       };
     };
 

@@ -4,8 +4,8 @@
   ...
 }: {
   # Sunshine is a graphical-session user service. Auto-login starts the
-  # Hyprland session after boot so Sunshine is reachable without first
-  # unlocking the local console.
+  # configured desktop session after boot so Sunshine is reachable without
+  # first unlocking the local console.
   services.displayManager.autoLogin = {
     enable = lib.mkDefault true;
     user = lib.mkDefault "lotus";
@@ -47,10 +47,10 @@
     openFirewall = true;
     capSysAdmin = true; # required for DRM/KMS capture
     settings = {
-      # wlr capture uses Hyprland's wlroots screencopy path. On this hybrid
-      # Intel/NVIDIA host, Hyprland 0.55.2 can abort in copyDmabuf/explicit-sync
-      # as soon as Moonlight connects. KMS capture avoids the compositor
-      # screencopy path and Sunshine already has CAP_SYS_ADMIN above.
+      # On this hybrid Intel/NVIDIA host, compositor screencopy can abort
+      # during DMA-BUF/explicit-sync when Moonlight connects. KMS capture
+      # avoids the compositor capture path and Sunshine already has
+      # CAP_SYS_ADMIN above.
       capture = "kms";
     };
   };

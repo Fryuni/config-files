@@ -7,7 +7,7 @@
     # Include the results of the hardware scan.
     ./nix-settings.nix
     ./modules/networking
-    ./modules/hyprland.nix
+    ./modules/i3.nix
     ./modules/honcho.nix
     ./users.nix
     ./audio.nix
@@ -36,13 +36,13 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Display manager - SDDM with Wayland support
+  # Display manager - SDDM on X11
   services.displayManager.sddm = {
     enable = true;
-    wayland.enable = true;
+    wayland.enable = false;
   };
-  # Default to Hyprland session (can also select Plasma from SDDM)
-  services.displayManager.defaultSession = "hyprland";
+  # Default to Home Manager's i3 X11 session (Plasma and plain i3 remain selectable in SDDM).
+  services.displayManager.defaultSession = "home-manager-i3";
 
   # Keep Plasma available as an alternative
   services.desktopManager.plasma6.enable = true;
@@ -72,7 +72,7 @@
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
-    variant = "intl";
+    variant = "alt-intl";
   };
 
   # Configure console keymap
@@ -85,8 +85,14 @@
   # Enable CUPS to print documents.
   services.printing.enable = false;
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
+  services.libinput = {
+    enable = true;
+    touchpad = {
+      naturalScrolling = true;
+      tapping = true;
+      disableWhileTyping = true;
+    };
+  };
 
   environment.systemPackages = with pkgs; [
     curl

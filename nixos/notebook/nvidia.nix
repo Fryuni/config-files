@@ -9,10 +9,8 @@ in {
     nvtopPackages.nvidia
   ];
 
-  # NVIDIA environment variables (work for both X11 and Wayland)
+  # NVIDIA environment variables for X11.
   environment.sessionVariables = {
-    # Use NVIDIA GBM backend (needed for Wayland compositors)
-    GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
 
     # Use legacy DRM flip (helps with some rendering issues)
