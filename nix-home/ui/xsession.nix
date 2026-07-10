@@ -285,7 +285,10 @@ in {
   services.flameshot = {
     enable = true;
     package = pkgs.flameshot;
-    settings.General.showStartupLaunchMessage = false;
+    settings.General = {
+      showStartupLaunchMessage = false;
+      useX11LegacyScreenshot = true;
+    };
   };
 
   services.gnome-keyring = {
