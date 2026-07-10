@@ -34,6 +34,9 @@
   services.autorandr = {
     enable = true;
     defaultTarget = "horizontal";
+    hooks.postswitch.set-wallpaper = ''
+      ${pkgs.feh}/bin/feh --bg-fill /home/lotus/.background-image
+    '';
 
     profiles = {
       docked = {
