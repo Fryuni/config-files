@@ -45,13 +45,11 @@
     enable = true;
     autoStart = true;
     openFirewall = true;
-    capSysAdmin = true; # required for DRM/KMS capture
     settings = {
-      # On this hybrid Intel/NVIDIA host, compositor screencopy can abort
-      # during DMA-BUF/explicit-sync when Moonlight connects. KMS capture
-      # avoids the compositor capture path and Sunshine already has
-      # CAP_SYS_ADMIN above.
-      capture = "kms";
+      # The i3 desktop runs on X11. KMS capture cannot resolve the active X
+      # outputs on this hybrid Intel/NVIDIA host, while X11 capture detects
+      # both displays and allows Sunshine to use NVENC.
+      capture = "x11";
     };
   };
 
