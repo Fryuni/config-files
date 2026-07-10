@@ -78,6 +78,11 @@ in {
             notification = false;
           }
           {
+            command = "${lib.getExe pkgs.autorandr} --change --default horizontal";
+            always = true;
+            notification = false;
+          }
+          {
             command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
             always = true;
             notification = false;
