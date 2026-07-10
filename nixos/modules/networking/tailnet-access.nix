@@ -329,8 +329,6 @@ in {
             bind 127.0.0.1 ${config.services.tailscale.interfaceName}
             errors
             log
-            health
-            ready
 
             template IN A AAAA ${publicDomain} {
               match ^(?:.*\.)?([^.]+)\.${publicDomain}\.$
