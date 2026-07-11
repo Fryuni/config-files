@@ -1,11 +1,11 @@
 final: pkgs: {
   openwhispr = let
     pname = "openwhispr";
-    version = "1.7.2";
+    version = "1.7.4";
 
     src = pkgs.fetchurl {
       url = "https://github.com/OpenWhispr/openwhispr/releases/download/v${version}/OpenWhispr-${version}-linux-x86_64.AppImage";
-      hash = "sha256-EPJTZFtd2bQ026KNcI/FOHfoAMu96HKfJxTPceTc5jw=";
+      hash = "sha256-hp7FVUi5/K+QiQam8YAOrRsemFkC8MnupT+hhroP+6Y=";
     };
 
     extracted = pkgs.appimageTools.extract {
@@ -15,34 +15,45 @@ final: pkgs: {
 
         rm -f $out/resources/bin/linux-fast-paste $out/resources/resources/bin/linux-fast-paste
 
-        # Patch clipboard.js inside the asar without extracting or repacking it.
-        # Equal-length replacement keeps asar offsets valid; one occurrence
-        # prevents silently patching an unexpected upstream layout.
+        # Patch app.asar in place without extracting or repacking it.  Each
+        # equal-length replacement retains archive offsets and fails closed if
+        # the upstream source layout is not exactly the one we reviewed.
         ${pkgs.python3}/bin/python3 - "$out/resources/app.asar" <<'PY'
         from pathlib import Path
         import sys
 
         app_asar = Path(sys.argv[1])
-        old = b"candidates = [...wtypeEntry, ...xdotoolEntry, ...ydotoolEntry]"
-        new = b"candidates = [...ydotoolEntry, ...xdotoolEntry, ...wtypeEntry]"
-
-        if len(old) != len(new):
-            raise SystemExit("OpenWhispr asar patch must preserve byte length")
+        patches = {
+            "clipboard candidate list": (
+                b"candidates = [...wtypeEntry, ...xdotoolEntry, ...ydotoolEntry]",
+                b"candidates = [...ydotoolEntry, ...xdotoolEntry, ...wtypeEntry]",
+            ),
+            "plaintext token fallback": (
+                b'cached = buf.toString("utf8");\n      return cached || null;',
+                b'return buf.every(b=>b>31&&b<127)?buf.toString("utf8"):null;',
+            ),
+        }
 
         contents = app_asar.read_bytes()
-        initial_new_count = contents.count(new)
-        if contents.count(old) != 1:
-            raise SystemExit("expected exactly one unpatched OpenWhispr candidate list")
+        archive_size = len(contents)
 
-        updated = contents.replace(old, new, 1)
-        if len(updated) != len(contents):
-            raise SystemExit("OpenWhispr asar patch changed byte length")
-        if updated.count(old) != 0:
-            raise SystemExit("OpenWhispr asar patch left an unpatched candidate list")
-        if updated.count(new) != initial_new_count + 1:
-            raise SystemExit("OpenWhispr asar patch replaced an unexpected candidate list")
+        for name, (old, new) in patches.items():
+            if len(old) != len(new):
+                raise SystemExit(f"OpenWhispr {name} patch must preserve byte length")
 
-        app_asar.write_bytes(updated)
+            initial_new_count = contents.count(new)
+            if contents.count(old) != 1:
+                raise SystemExit(f"expected exactly one unpatched OpenWhispr {name}")
+
+            contents = contents.replace(old, new, 1)
+            if len(contents) != archive_size:
+                raise SystemExit(f"OpenWhispr {name} patch changed archive size")
+            if contents.count(old) != 0:
+                raise SystemExit(f"OpenWhispr {name} patch left unpatched source")
+            if contents.count(new) != initial_new_count + 1:
+                raise SystemExit(f"OpenWhispr {name} patch introduced an unexpected source count")
+
+        app_asar.write_bytes(contents)
         PY
 
       '';
