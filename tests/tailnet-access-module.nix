@@ -80,6 +80,28 @@
     ];
   };
 
+  dnsEvaluated = lib.nixosSystem {
+    system = pkgs.stdenv.hostPlatform.system;
+    inherit pkgs;
+    modules = [
+      tailnetAccessModule
+      ageStubModule
+      {
+        system.stateVersion = "26.05";
+        networking.hostName = "loem";
+
+        services.lferrazTailnetAccess = {
+          deviceName = "loem";
+          publicDomain = "example.test";
+          tailnetDomain = "tailnet.test";
+          dns.enable = true;
+          proxy.enable = false;
+          certificates.enable = false;
+        };
+      }
+    ];
+  };
+
   cfg = evaluated.config;
 
   certificateService = cfg.systemd.services.lferraz-tailnet-certificate;
@@ -95,6 +117,7 @@
     certificateLoadCredential = certificateService.serviceConfig.LoadCredential;
     caKeyPath = cfg.age.secrets.lferraz-tailnet-ca-key.path;
     caKeySymlink = cfg.age.secrets.lferraz-tailnet-ca-key.symlink;
+    coreDnsConfig = dnsEvaluated.config.services.coredns.config;
   };
 in
   pkgs.runCommand "tailnet-access-module-check" {
@@ -103,10 +126,7 @@ in
   } ''
     printf '%s\n' "$configJson" > config.json
     jq -e '.caddyHostName == "https://note.tailnet.test"' config.json
-    jq -e '.caddyServerAliases | index("http://note.tailnet.test")' config.json
-    jq -e '.caddyServerAliases | index("http://*.note.example.test")' config.json
     jq -e '.caddyServerAliases | index("https://*.note.example.test")' config.json
-    jq -e '.caddyServerAliases | index("http://note.example.test")' config.json
     jq -e '.caddyServerAliases | index("https://note.example.test")' config.json
 
 
@@ -138,6 +158,14 @@ in
     jq -e '.certificateLoadCredential == ["lferraz-tailnet-ca-key:" + .caKeyPath]' config.json
     jq -e '.caKeyPath == "/run/lferraz-tailnet-ca-key"' config.json
     jq -e '.caKeySymlink == false' config.json
+
+    jq -e '.coreDnsConfig | contains("rewrite stop")' config.json
+    jq -e '.coreDnsConfig | contains("name regex ^(?:.*[.])?([^.]+)[.]example[.]test[.]$ {1}.tailnet.test.")' config.json
+    jq -e '.coreDnsConfig | contains("answer auto")' config.json
+    jq -e '.coreDnsConfig | contains("forward . 100.100.100.100")' config.json
+    jq -e '.coreDnsConfig | contains("1.1.1.1") | not' config.json
+    jq -e '.coreDnsConfig | contains("8.8.8.8") | not' config.json
+    jq -e '.coreDnsConfig | contains(" IN CNAME ") | not' config.json
 
     grep -F 'basicConstraints = critical,CA:FALSE' "$certificateExecStart"
     grep -F 'keyUsage = critical,digitalSignature,keyEncipherment' "$certificateExecStart"

@@ -9,6 +9,7 @@
   inherit (lib) mkEnableOption mkIf mkMerge mkOption mkForce types;
   inherit (cfg) deviceName publicDomain tailnetDomain;
 
+  regexPublicDomain = lib.replaceStrings ["."] ["[.]"] publicDomain;
   tailnetHost = "${deviceName}.${tailnetDomain}";
 
   caCert = ../../../common/certs/lferraz-tailnet-ca.crt;
@@ -330,13 +331,12 @@ in {
             errors
             log
 
-            template IN A AAAA ${publicDomain} {
-              match ^(?:.*\.)?([^.]+)\.${publicDomain}\.$
-              answer "{{ .Name }} 60 IN CNAME {{ index .Match 1 }}.${tailnetDomain}."
-              fallthrough
+            rewrite stop {
+              name regex ^(?:.*[.])?([^.]+)[.]${regexPublicDomain}[.]$ {1}.${tailnetDomain}.
+              answer auto
             }
 
-            forward . 100.100.100.100 1.1.1.1 8.8.8.8
+            forward . 100.100.100.100
             cache 30
           }
         '';
