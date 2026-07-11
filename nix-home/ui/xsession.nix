@@ -45,6 +45,9 @@ in {
     pkgs.playerctl
   ];
 
+  # Xorg derives 137 DPI from the combined displays; 96 DPI is 100% scale.
+  xresources.properties."Xft.dpi" = 96;
+
   xsession = {
     enable = true;
     scriptPath = ".hm-xsession";
@@ -67,7 +70,10 @@ in {
           smartBorders = "on";
         };
 
-        floating.modifier = modifier;
+        floating = {
+          modifier = modifier;
+          titlebar = false;
+        };
         menu = "${rofi} -show drun";
         bars = [];
 
@@ -78,7 +84,7 @@ in {
             notification = false;
           }
           {
-            command = "${lib.getExe pkgs.autorandr} --change --default horizontal";
+            command = "${lib.getExe pkgs.autorandr} --change --default horizontal && ${lib.getExe pkgs.xrandr} --dpi 96";
             always = true;
             notification = false;
           }
@@ -254,7 +260,10 @@ in {
           };
         };
 
-        window.border = 2;
+        window = {
+          border = 2;
+          titlebar = false;
+        };
       };
 
       extraConfig = ''
@@ -415,7 +424,7 @@ in {
         date = "%Y-%m-%d %H:%M";
         label = "%date%";
         format = "<label>";
-        format-prefix = " ";
+        format-prefix = "";
         format-foreground = colors.background;
         format-background = colors.primary;
         format-padding = 2;
