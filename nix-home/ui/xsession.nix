@@ -87,7 +87,7 @@ in {
         };
 
         floating = {
-          modifier = modifier;
+          inherit modifier;
           titlebar = false;
         };
         menu = "${rofi} -show drun";
@@ -347,8 +347,8 @@ in {
       "bar/main" = {
         width = "100%";
         height = 40;
-        background = colors.background;
-        foreground = colors.foreground;
+        inherit (colors) background;
+        inherit (colors) foreground;
         line-size = 2;
         line-color = colors.primary;
         border-size = 0;

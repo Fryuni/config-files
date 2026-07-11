@@ -14,6 +14,7 @@
   home.packages = with pkgs; [
     stable.calibre
     kdePackages.okular
+    kdePackages.gwenview
     spotify
     stable.discord-canary
     master.obsidian
@@ -53,6 +54,7 @@
   xdg.mimeApps = import ./xdg-mime.nix {
     defaultBrowser = "firefox-beta.desktop";
     defaultVideo = "mpv.desktop";
+    defaultImage = "org.kde.gwenview.desktop";
   };
 
   programs.chromium = {
