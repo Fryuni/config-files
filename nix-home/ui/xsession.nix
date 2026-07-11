@@ -100,7 +100,7 @@ in {
             notification = false;
           }
           {
-            command = "${lib.getExe pkgs.autorandr} --change --default horizontal && ${lib.getExe pkgs.xrandr} --dpi 96";
+            command = "${lib.getExe pkgs.autorandr} --change --default horizontal && ${lib.getExe pkgs.xrandr} --dpi 96 && ${pkgs.i3}/bin/i3-msg 'workspace number 1; workspace number 2; workspace number 1'";
             always = true;
             notification = false;
           }
@@ -278,6 +278,9 @@ in {
       };
 
       extraConfig = ''
+        workspace 1 output eDP-1-1
+        workspace 2 output HDMI-0
+
         for_window [class="(?i)^(org\.pulseaudio\.pavucontrol|pavucontrol)$"] floating enable
         for_window [class="(?i)^nm-connection-editor$"] floating enable
         for_window [class="(?i)^bitwarden$"] floating enable
@@ -350,7 +353,8 @@ in {
         padding = 0;
         module-margin = 1;
         font-0 = "JetBrainsMono Nerd Font:style=Regular:size=14;4";
-        modules-left = "i3 xwindow";
+        modules-left = "i3";
+        modules-center = "xwindow";
         modules-right = "pulseaudio wlan battery date";
         tray-position = "right";
         tray-padding = 2;
@@ -359,7 +363,7 @@ in {
 
       "module/i3" = {
         type = "internal/i3";
-        pin-workspaces = true;
+        pin-workspaces = false;
         enable-click = true;
         enable-scroll = false;
         label-focused = "%index%";
