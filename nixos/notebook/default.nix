@@ -43,7 +43,7 @@
         exit 1
       fi
 
-      ${pkgs.feh}/bin/feh --no-fehbg --bg-fill "$wallpaper"
+      ${pkgs.xwallpaper}/bin/xwallpaper --zoom "$wallpaper"
     '';
 
     profiles = {

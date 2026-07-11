@@ -12,7 +12,7 @@
       exit 1
     fi
 
-    exec ${pkgs.feh}/bin/feh --no-fehbg --bg-fill "$wallpaper"
+    exec ${pkgs.xwallpaper}/bin/xwallpaper --zoom "$wallpaper"
   '';
 in {
   imports = [
