@@ -35,7 +35,15 @@
     enable = true;
     defaultTarget = "horizontal";
     hooks.postswitch.set-wallpaper = ''
-      ${pkgs.feh}/bin/feh --bg-fill /home/lotus/.background-image
+      set -eu
+
+      wallpaper="$(${pkgs.findutils}/bin/find "${../../common/wallpaper}" -type f | ${pkgs.coreutils}/bin/shuf -n 1)"
+      if [ -z "$wallpaper" ]; then
+        echo "No wallpaper files found in ${../../common/wallpaper}" >&2
+        exit 1
+      fi
+
+      ${pkgs.feh}/bin/feh --no-fehbg --bg-fill "$wallpaper"
     '';
 
     profiles = {

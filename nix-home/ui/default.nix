@@ -1,4 +1,20 @@
-{pkgs, ...}: {
+{
+  lib,
+  pkgs,
+  ...
+}: let
+  setRandomWallpaper = pkgs.writeShellScript "set-random-wallpaper" ''
+    set -eu
+
+    wallpaper="$(${pkgs.findutils}/bin/find "${../../common/wallpaper}" -type f | ${pkgs.coreutils}/bin/shuf -n 1)"
+    if [ -z "$wallpaper" ]; then
+      echo "No wallpaper files found in ${../../common/wallpaper}" >&2
+      exit 1
+    fi
+
+    exec ${pkgs.feh}/bin/feh --no-fehbg --bg-fill "$wallpaper"
+  '';
+in {
   imports = [
     # ./xfce.nix
     ./xsession.nix
@@ -26,7 +42,16 @@
     master.zeal
   ];
 
-  home.file.".background-image".source = ../../common/wallpaper/wallpaper.png;
+  services.random-background = {
+    enable = true;
+    imageDirectory = "${../../common/wallpaper}";
+    interval = "30min";
+    display = "fill";
+    enableXinerama = true;
+  };
+
+  systemd.user.services.random-background.Service.ExecStart = lib.mkForce setRandomWallpaper;
+
   xdg.enable = true;
 
   programs.mpv = {

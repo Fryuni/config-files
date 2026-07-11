@@ -110,11 +110,6 @@ in {
             notification = false;
           }
           {
-            command = "${pkgs.feh}/bin/feh --bg-fill ${config.home.homeDirectory}/.background-image";
-            always = true;
-            notification = false;
-          }
-          {
             command = lib.getExe pkgs.autotiling;
             always = true;
             notification = false;
