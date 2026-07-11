@@ -41,7 +41,7 @@ Where the command is named, it is the exact current i3 command.
 | `Super+F` | `fullscreen toggle` | true fullscreen (`fullscreen, 0`) | Preserved fullscreen intent. |
 | `Super+V` | `floating toggle` | `togglefloating` | Preserved. |
 | `Super+C`, `Super+X`, `Super+Z` | Rofi calculator, power menu, emoji picker | same Rofi modes | Preserved. |
-| Arrow keys and `Super+H/J/K/L` movement | focus/move in the matching left/down/up/right directions | `movefocus`/`movewindow` in those directions | Preserved except for the `Super+L` focus collision below. |
+| Arrow keys and `Super+H/J/K/L` movement | focus/move in the matching left/down/up/right directions; keyboard focus also centers the pointer on the selected window | `movefocus`/`movewindow` in those directions | Preserved except for the `Super+L` focus collision below. |
 | `Super+Shift+Left/Right/Up/Down` and `Super+Shift+H/J/K/L` | move container in direction | move window in direction | Preserved directional intent. |
 | `Super+1`–`Super+0` | workspace 1–10 | workspace 1–10 | Preserved. |
 | `Super+Shift+1`–`Super+Shift+0` | move container to workspace 1–10 | move window to workspace 1–10 | Preserved. |
@@ -81,9 +81,10 @@ sample binding is not configured, not that i3 supplies a fallback binding.
 | `Super+Shift+R` — restart i3 | not bound | `Super+R` is instead the former resize-mode entry chord. |
 | `Super+Shift+E` — exit i3 | not bound | Exit is intentionally `Super+M`, matching the former core binding. |
 
-`Super+F`, workspace number bindings, arrow-key focus/move bindings,
+`Super+F`, workspace number bindings, directional move bindings,
 `Super+semicolon` focus-right, and the scratchpad chords have compatible i3
-meanings and are not overrides of different behavior.
+meanings and are not overrides of different behavior. Directional and cyclic
+keyboard focus additionally center the pointer on the selected window.
 
 ## Hyprland self-conflicts: selected i3 resolutions
 

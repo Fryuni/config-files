@@ -31,6 +31,22 @@
       exec ${lib.getExe pkgs.openwhispr}
     '';
   };
+  i3FocusAndCenter = pkgs.writeShellApplication {
+    name = "i3-focus-and-center";
+    runtimeInputs = [
+      pkgs.i3
+      pkgs.xdotool
+    ];
+    text = ''
+      i3-msg focus "$1" >/dev/null
+
+      window="$(xdotool getwindowfocus)"
+      WIDTH=0
+      HEIGHT=0
+      eval "$(xdotool getwindowgeometry --shell "$window")"
+      xdotool mousemove --sync --window "$window" "$((WIDTH / 2))" "$((HEIGHT / 2))"
+    '';
+  };
 in {
   home.packages = [
     pkgs.autotiling
@@ -141,17 +157,17 @@ in {
           "${modifier}+Print" = "exec ${flameshot} screen -c";
           "${modifier}+l" = "exec ${i3lock} -c 252a34";
 
-          # Focus navigation: semicolon is right to leave Mod4+l for locking.
-          "${modifier}+Left" = "focus left";
-          "${modifier}+Right" = "focus right";
-          "${modifier}+Up" = "focus up";
-          "${modifier}+Down" = "focus down";
-          "${modifier}+h" = "focus left";
-          "${modifier}+j" = "focus down";
-          "${modifier}+k" = "focus up";
-          "${modifier}+semicolon" = "focus right";
-          "${modifier}+Tab" = "focus next";
-          "${modifier}+Shift+Tab" = "focus prev";
+          # Keep keyboard-driven focus and the pointer on the same window.
+          "${modifier}+Left" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} left";
+          "${modifier}+Right" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} right";
+          "${modifier}+Up" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} up";
+          "${modifier}+Down" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} down";
+          "${modifier}+h" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} left";
+          "${modifier}+j" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} down";
+          "${modifier}+k" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} up";
+          "${modifier}+semicolon" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} right";
+          "${modifier}+Tab" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} next";
+          "${modifier}+Shift+Tab" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} prev";
 
           # Move focused containers with arrows or the HJKL cluster.
           "${modifier}+Shift+Left" = "move left";
@@ -167,8 +183,8 @@ in {
           "${modifier}+s" = "layout toggle split";
           "${modifier}+e" = "floating toggle";
           "${modifier}+g" = "layout tabbed";
-          "${modifier}+w" = "focus next";
-          "${modifier}+Shift+w" = "focus prev";
+          "${modifier}+w" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} next";
+          "${modifier}+Shift+w" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} prev";
 
           # Workspaces and moving containers to them.
           "${modifier}+1" = "workspace number 1";
