@@ -30,8 +30,8 @@ final: prev: {
     src = final.fetchFromGitHub {
       owner = "Fryuni";
       repo = "tailscale";
-      rev = "7cb26f06c1e9c002907f3ca70a197f4a9dc7ad3e";
-      hash = "sha256-czOuezS2JSjTZc5u4O5x39JhstbJDMdeCFsqjkNfYYw=";
+      rev = "d3b0435cb1da6f800a62b65ce7788b0aafe669a5";
+      hash = "sha256-XEPI5NuXl9ojVmIo34CQDiGVn62440TCO+E/SjN6p74=";
     };
 
     preBuild = ''
@@ -40,7 +40,7 @@ final: prev: {
       go mod edit -go=${attrs.passthru.go.version}
     '';
 
-    vendorHash = "sha256-DUWC+1lbebDwAnhsaGOde3mmD3wHEtMdIyYOMhwxpBU=";
+    vendorHash = "sha256-y6rBPJtkhTQMsnUoUC/1Up61FEplPpxaU1OkO2FDeio=";
 
     # Reason why it is meaningless also in the issue comment above.
     doCkeck = false;

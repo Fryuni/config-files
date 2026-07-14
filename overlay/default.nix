@@ -10,7 +10,6 @@ in [
   attrs.agenix.overlays.default
   attrs.nix-alien.overlays.default
   attrs.nur.overlays.default
-  attrs.llm-agents.overlays.default
   (pickPackages attrs.flakehub.overlays.default ["fh"])
   attrs.polymc.overlay
 
@@ -31,5 +30,6 @@ in [
 
     inherit (determinate.inputs.nix.packages.${system}) nix;
     google-workspace-cli = attrs.google-workspace-cli.packages.${system}.default;
+    llm-agents = attrs.llm-agents.packages.${system};
   })
 ]
