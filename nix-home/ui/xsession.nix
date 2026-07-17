@@ -327,6 +327,9 @@ in {
     settings = {
       corner-radius = 4;
       round-borders = 1;
+      opacity-rule = [
+        "80:!focused && !fullscreen && !I3_FLOATING_WINDOW@"
+      ];
       rounded-corners-exclude = [
         "window_type = 'dock'"
         "window_type = 'desktop'"
