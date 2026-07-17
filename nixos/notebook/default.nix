@@ -35,15 +35,33 @@
     enable = true;
     defaultTarget = "horizontal";
     hooks.postswitch.set-wallpaper = ''
-      set -eu
+      set -euo pipefail
 
-      wallpaper="$(${pkgs.findutils}/bin/find "${../../common/wallpaper}" -type f | ${pkgs.coreutils}/bin/shuf -n 1)"
-      if [ -z "$wallpaper" ]; then
-        echo "No wallpaper files found in ${../../common/wallpaper}" >&2
+      wallpaper_directory="${../../common/wallpaper}"
+      mapfile -t outputs < <(
+        ${pkgs.xrandr}/bin/xrandr --listactivemonitors |
+          ${pkgs.gawk}/bin/awk '/^Monitors:/ { found_header = 1; next } found_header && NF { print $NF }'
+      )
+      if [ "''${#outputs[@]}" -eq 0 ]; then
+        echo "No active outputs found." >&2
         exit 1
       fi
 
-      ${pkgs.xwallpaper}/bin/xwallpaper --zoom "$wallpaper"
+      mapfile -d "" -t wallpapers < <(
+        ${pkgs.findutils}/bin/find "$wallpaper_directory" -type f -print0 |
+          ${pkgs.coreutils}/bin/shuf -z -n "''${#outputs[@]}"
+      )
+      if [ "''${#wallpapers[@]}" -lt "''${#outputs[@]}" ]; then
+        echo "Not enough wallpaper files in $wallpaper_directory: need ''${#outputs[@]}, found ''${#wallpapers[@]}." >&2
+        exit 1
+      fi
+
+      args=()
+      for index in "''${!outputs[@]}"; do
+        args+=(--output "''${outputs[$index]}" --zoom "''${wallpapers[$index]}")
+      done
+
+      exec ${pkgs.xwallpaper}/bin/xwallpaper "''${args[@]}"
     '';
 
     profiles = {

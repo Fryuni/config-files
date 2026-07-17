@@ -136,6 +136,14 @@
 
     # Utility
     {
+      name = "wallpaper";
+      category = "Utility";
+      help = "Assign new random wallpapers to all active monitors";
+      command = ''
+        ${builtins.head self.outputs.homeConfigurations."lotus@note".config.systemd.user.services.random-background.Service.ExecStart}
+      '';
+    }
+    {
       name = "clear";
       category = "Utility";
       help = "Clear build result";
