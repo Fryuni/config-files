@@ -111,6 +111,9 @@ in {
   programs.chromium = {
     enable = true;
     package = pkgs.master.google-chrome;
+    commandLineArgs = [
+      "--enable-features=Vulkan"
+    ];
   };
 
   programs.firefox = {
