@@ -8,6 +8,11 @@
         output = 15;
         cacheRead = 0.3;
       };
+      "kimi-for-coding" = {
+        input = 1.9;
+        output = 8;
+        cacheRead = 0.38;
+      };
     };
     postgres = {
       enable = true;
