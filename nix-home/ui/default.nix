@@ -62,6 +62,10 @@ in {
     openwhispr
 
     master.zeal
+    (lib.lowPrio slack)
+    (lib.hiPrio slack-cli)
+    insomnia
+    dbeaver-bin
   ];
 
   services.random-background = {

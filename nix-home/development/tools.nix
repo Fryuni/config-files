@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   lib,
   ...
@@ -14,9 +13,6 @@
     wakatime-cli
 
     libnotify
-    (lib.lowPrio slack)
-    (lib.hiPrio slack-cli)
-    insomnia
 
     # GoLang
     go
@@ -25,7 +21,6 @@
 
     ngrok
     just
-    master.turso-cli
     zigpkgs.master
 
     # LSPs
@@ -49,15 +44,6 @@
     mdx-language-server
     typescript-language-server
     yaml-language-server
-
-    kubectl
-    krew
-    k9s
-    kubernetes-helm
-    terraform
-    terraformOSS
-    tfk8s
-    pulumi-bin
   ];
 
   home.sessionPath = [
@@ -97,8 +83,5 @@
       #   target = ".ssh/config_source";
       #   onChange = ''cat .ssh/config_source > .ssh/config && chmod 400 .ssh/config'';
       # };
-
-      ".jvm/jdk11".source = "${pkgs.jdk11}";
-      ".jvm/jdk21".source = "${pkgs.jdk21}";
     };
 }

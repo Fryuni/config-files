@@ -1,9 +1,8 @@
 {
   imports = [
     ./tools.nix
-    ./rust.nix
+    # ./rust.nix
     ./git.nix
-    ./ides.nix
-    ./devops.nix
   ];
 }
+
