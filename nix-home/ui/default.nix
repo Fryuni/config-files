@@ -54,7 +54,7 @@ in {
     kdePackages.okular
     kdePackages.gwenview
     spotify
-    stable.discord-canary
+    stable.discord
     master.obsidian
     (jrnl.overrideAttrs (_: {doTest = false;}))
     vlc
