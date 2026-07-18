@@ -1,4 +1,4 @@
-{
+{config, ...}: {
   home-manager.users.lotus.services.agentsview = {
     enable = true;
     publicOrigin = "https://aview.loem.lferraz.dev";
@@ -32,5 +32,23 @@
       }
     ];
     extensions = ps: [ps.pgvector];
+  };
+
+  systemd.services.agentsview-postgresql-setup = {
+    description = "Enable pgvector for AgentsView";
+    after = ["postgresql-setup.service"];
+    requires = ["postgresql-setup.service"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "postgres";
+      Group = "postgres";
+    };
+    script = ''
+      ${config.services.postgresql.package}/bin/psql \
+        -v ON_ERROR_STOP=1 \
+        --dbname agentsview \
+        --command 'CREATE EXTENSION IF NOT EXISTS vector'
+    '';
   };
 }
