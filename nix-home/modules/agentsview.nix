@@ -6,6 +6,59 @@
 }: let
   inherit (lib) mkIf mkOption mkEnableOption mkPackageOption types;
   cfg = config.services.agentsview;
+  customModelPricing =
+    lib.mapAttrs (_: pricing: {
+      inherit (pricing) input output;
+      cache_creation = pricing.cacheCreation;
+      cache_read = pricing.cacheRead;
+    })
+    cfg.customModelPricing;
+  managedCustomModelPricing = pkgs.writeText "agentsview-custom-model-pricing.json" (
+    builtins.toJSON customModelPricing
+  );
+  customModelPricingActivation = ''
+    config_dir="$HOME/.agentsview"
+    config_file="$config_dir/config.toml"
+    legacy_config_file="$config_dir/config.json"
+
+    umask 077
+    ${pkgs.coreutils}/bin/mkdir -p -m 0700 "$config_dir"
+    exec 9>"$config_file.lock"
+    ${pkgs.util-linux}/bin/flock 9
+
+    config_input="$config_file"
+    input_format=toml
+    migrate_legacy=
+    if [ ! -e "$config_file" ]; then
+      if [ -e "$legacy_config_file" ]; then
+        config_input="$legacy_config_file"
+        input_format=json
+        migrate_legacy=1
+      else
+        ${pkgs.coreutils}/bin/install -m 0600 /dev/null "$config_file"
+      fi
+    fi
+
+    config_next="$(${pkgs.coreutils}/bin/mktemp "$config_dir/config.toml.XXXXXX")"
+    cleanup() {
+      ${pkgs.coreutils}/bin/rm -f "$config_next"
+    }
+    trap cleanup EXIT
+
+    ${pkgs.yq-go}/bin/yq --input-format "$input_format" --output-format toml \
+      '.custom_model_pricing = load("${managedCustomModelPricing}")' \
+      "$config_input" > "$config_next"
+    if [ -e "$config_file" ]; then
+      ${pkgs.coreutils}/bin/chmod --reference="$config_file" "$config_next"
+    else
+      ${pkgs.coreutils}/bin/chmod 0600 "$config_next"
+    fi
+    ${pkgs.coreutils}/bin/mv -f "$config_next" "$config_file"
+    if [ -n "$migrate_legacy" ]; then
+      ${pkgs.coreutils}/bin/mv -f "$legacy_config_file" "$legacy_config_file.bak"
+    fi
+    trap - EXIT
+  '';
   pgUrl =
     if cfg.postgres.url == null
     then ""
@@ -78,6 +131,41 @@ in {
       description = "Public origin URL agentsview advertises for browser access.";
     };
 
+    customModelPricing = mkOption {
+      type = types.nullOr (types.attrsOf (types.submodule {
+        options = {
+          input = mkOption {
+            type = types.number;
+            default = 0;
+            description = "USD per million input tokens for this model.";
+          };
+
+          output = mkOption {
+            type = types.number;
+            default = 0;
+            description = "USD per million output tokens for this model.";
+          };
+
+          cacheCreation = mkOption {
+            type = types.number;
+            default = 0;
+            description = "USD per million cache-creation tokens for this model.";
+          };
+
+          cacheRead = mkOption {
+            type = types.number;
+            default = 0;
+            description = "USD per million cache-read tokens for this model.";
+          };
+        };
+      }));
+      default = null;
+      description = ''
+        Per-model pricing managed in ~/.agentsview/config.toml under
+        custom_model_pricing. A null value leaves that table unmanaged.
+      '';
+    };
+
     postgres = {
       enable = mkEnableOption "PostgreSQL backend for agentsview";
 
@@ -137,12 +225,17 @@ in {
       ];
     }
 
+    (mkIf (cfg.customModelPricing != null) {
+      home.activation.manageAgentsviewCustomModelPricing = lib.hm.dag.entryAfter ["writeBoundary"] customModelPricingActivation;
+    })
+
     (mkIf cfg.enable {
       home.packages = [cfg.package];
 
       systemd.user.services.agentsview = {
         Unit = {
           Description = "agentsview service";
+          X-Restart-Triggers = lib.optional (cfg.customModelPricing != null) managedCustomModelPricing;
         };
 
         Service =

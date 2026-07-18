@@ -2,6 +2,13 @@
   home-manager.users.lotus.services.agentsview = {
     enable = true;
     publicOrigin = "https://aview.loem.lferraz.dev";
+    customModelPricing = {
+      k3 = {
+        input = 3;
+        output = 15;
+        cacheRead = 0.3;
+      };
+    };
     postgres = {
       enable = true;
       url = "postgres://agentsview@localhost/agentsview?sslmode=disable";
