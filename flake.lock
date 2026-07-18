@@ -1315,6 +1315,7 @@
         "nur": "nur",
         "polymc": "polymc",
         "systems": "systems_5",
+        "treehouse": "treehouse",
         "vicinae": "vicinae",
         "vicinae-extensions": "vicinae-extensions",
         "zig": "zig"
@@ -1524,6 +1525,26 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "treehouse": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1784059781,
+        "narHash": "sha256-Ulgkf8o2Z8Gt1uyqHEhwSxNUt1zSZ8Yj/Uf2IAb5oC8=",
+        "owner": "kunchenguid",
+        "repo": "treehouse",
+        "rev": "f31e04e052a3fba1f50afedc65f2c781769aab4a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kunchenguid",
+        "repo": "treehouse",
         "type": "github"
       }
     },

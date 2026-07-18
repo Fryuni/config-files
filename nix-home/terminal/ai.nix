@@ -24,6 +24,7 @@
       llm-agents.herdr
       llm-agents.tuicr
       honcho-cli
+      treehouse
 
       uv # Needed for omp
       sqlite # Needed for many agents and tools

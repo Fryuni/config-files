@@ -49,6 +49,10 @@
       url = "git+https://codeberg.org/Fryuni/llm-agents.nix?ref=main";
       # inputs.nixpkgs.follows = "nixpkgs";
     };
+    treehouse = {
+      url = "github:kunchenguid/treehouse";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nur = {
       url = "github:nix-community/NUR";
       # inputs.nixpkgs.follows = "nixpkgs";

@@ -31,5 +31,6 @@ in [
     inherit (determinate.inputs.nix.packages.${system}) nix;
     google-workspace-cli = attrs.google-workspace-cli.packages.${system}.default;
     llm-agents = attrs.llm-agents.packages.${system};
+    treehouse = attrs.treehouse.packages.${system}.default;
   })
 ]
