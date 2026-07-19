@@ -2,7 +2,11 @@
   config,
   pkgs,
   ...
-}: {
+}: let
+  domain = "git.fryuni.dev";
+  httpPort = 3333;
+  sshPort = 2222;
+in {
   imports = [../../nixos/modules/forgejo-runner.nix];
 
   age.secrets = {
@@ -19,6 +23,33 @@
       mode = "0400";
     };
   };
+
+  services.forgejo = {
+    enable = true;
+    database.type = "postgres";
+    lfs.enable = true;
+    settings = {
+      server = {
+        DOMAIN = domain;
+        ROOT_URL = "https://${domain}/";
+        SSH_DOMAIN = "git.rudd-agama.ts.net";
+        HTTP_ADDR = "127.0.0.1";
+        HTTP_PORT = httpPort;
+        START_SSH_SERVER = true;
+        SSH_LISTEN_HOST = "127.0.0.1";
+        SSH_LISTEN_PORT = sshPort;
+      };
+      repository = {
+        ENABLE_PUSH_CREATE_USER = true;
+        ENABLE_PUSH_CREATE_ORG = true;
+      };
+      security.GLOBAL_TWO_FACTOR_REQUIREMENT = "all";
+      service.DISABLE_REGISTRATION = true;
+      session.COOKIE_SECURE = true;
+    };
+  };
+
+  services.cfTunnel.ingress.${domain} = "http://localhost:${toString httpPort}";
 
   services.forgejo-runner = {
     package = pkgs.forgejo-runner;
@@ -56,8 +87,7 @@
     };
   };
 
-  services.tailscale.serve.services.gitea.endpoints = {
-    "tcp:22" = "tcp://localhost:2222";
-    "tcp:443" = "tls-terminated-http://localhost:3333";
+  services.tailscale.serve.services.git.endpoints = {
+    "tcp:22" = "tcp://localhost:${toString sshPort}";
   };
 }
