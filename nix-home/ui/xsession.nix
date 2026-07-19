@@ -23,6 +23,7 @@
   brightnessctl = lib.getExe pkgs.brightnessctl;
   pamixer = lib.getExe pkgs.pamixer;
   playerctl = lib.getExe pkgs.playerctl;
+  findCursor = "${lib.getExe pkgs.find-cursor} --size 280 --distance 35 --line-width 6 --color ${lib.escapeShellArg colors.primary} --repeat 2 --grow";
   openwhisprI3Autostart = pkgs.writeShellApplication {
     name = "openwhispr-i3-autostart";
     runtimeInputs = [pkgs.systemd];
@@ -151,6 +152,7 @@ in {
           "Shift+Print" = "exec ${flameshot} full -c";
           "${modifier}+Print" = "exec ${flameshot} screen -c";
           "${modifier}+l" = "exec ${i3lock} -c 252a34";
+          "${modifier}+Pause" = "exec --no-startup-id ${findCursor}";
 
           # Keep keyboard-driven focus and the pointer on the same window.
           "${modifier}+Left" = "exec --no-startup-id ${lib.getExe i3FocusAndCenter} left";
