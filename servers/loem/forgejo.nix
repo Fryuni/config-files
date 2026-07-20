@@ -33,6 +33,8 @@ in {
         DOMAIN = domain;
         ROOT_URL = "https://${domain}/";
         SSH_DOMAIN = "git.rudd-agama.ts.net";
+        SSH_USER = "git";
+        BUILTIN_SSH_SERVER_USER = "git";
         HTTP_ADDR = "127.0.0.1";
         HTTP_PORT = httpPort;
         START_SSH_SERVER = true;
