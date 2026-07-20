@@ -13,7 +13,7 @@ flowchart TD
     flake[flake.nix] --> overlays[overlay/ + channel overlays]
     flake --> secrets[agenix + agenix-rekey]
     flake --> nixosConfigs[nixosConfigurations]
-    flake --> homeConfig[homeConfigurations."lotus@note"]
+    flake --> homeConfig["homeConfigurations.&quot;lotus@note&quot;"]
 
     nixosConfigs --> note[note]
     nixosConfigs --> loem[loem]
