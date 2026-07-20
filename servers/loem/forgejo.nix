@@ -10,6 +10,12 @@ in {
   imports = [../../nixos/modules/forgejo-runner.nix];
 
   age.secrets = {
+    self-actions-token = {
+      rekeyFile = ../../secrets/loem/self-forgejo-actions-runner-token;
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    };
     codeberg-actions-token = {
       rekeyFile = ../../secrets/loem/codeberg-forgejo-actions-runner-token;
       owner = "root";
@@ -56,6 +62,19 @@ in {
   services.forgejo-runner = {
     package = pkgs.forgejo-runner;
     instances = {
+      self = {
+        enable = true;
+        settings.container.docker_host = "automount";
+        labels = [
+          "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+          "docker:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+        ];
+        connections.codeberg = {
+          url = "http://localhost:${toString httpPort}/";
+          uuid = "ff7f3392-9270-4c04-bfb1-9daad9f1c198";
+          tokenFile = config.age.secrets.self-actions-token.path;
+        };
+      };
       codeberg = {
         enable = true;
         settings.container.docker_host = "automount";
