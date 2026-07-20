@@ -70,7 +70,7 @@ in {
           "docker:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
         ];
         connections.codeberg = {
-          url = "http://localhost:${toString httpPort}/";
+          url = "https://${domain}/";
           uuid = "ff7f3392-9270-4c04-bfb1-9daad9f1c198";
           tokenFile = config.age.secrets.self-actions-token.path;
         };
