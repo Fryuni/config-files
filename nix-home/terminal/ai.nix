@@ -4,9 +4,7 @@
   config,
   ...
 }: {
-  # imports = [
-  #   ../modules/t3-code.nix
-  # ];
+  imports = [./treehouse];
 
   config = lib.mkIf (pkgs.stdenv.buildPlatform.system == pkgs.stdenv.hostPlatform.system) {
     home.packages = with pkgs; [
@@ -24,7 +22,6 @@
       llm-agents.herdr
       llm-agents.tuicr
       honcho-cli
-      treehouse
 
       uv # Needed for omp
       sqlite # Needed for many agents and tools
