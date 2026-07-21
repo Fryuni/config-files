@@ -9,6 +9,12 @@
         };
     });
   });
+  nixpkgsHtmlManual = pkgs.nixpkgs-manual.overrideAttrs {
+    postInstall = ''
+      rm "$out/share/doc/nixpkgs/nixpkgs-manual.epub"
+      sed -i '/nixpkgs-manual\.epub/d' "$out/nix-support/hydra-build-products"
+    '';
+  };
 in {
   imports = [./docker.nix];
 
@@ -20,6 +26,7 @@ in {
 
   environment.systemPackages = with pkgs; [
     neovim
+    nixpkgsHtmlManual
     inotify-tools
     gcc-unwrapped.lib
     gcc
