@@ -59,6 +59,11 @@ in {
 
   services.cfTunnel.ingress.${domain} = "http://localhost:${toString httpPort}";
 
+  systemd.services.forgejo-runner-self = {
+    requires = ["forgejo.service"];
+    after = ["forgejo.service"];
+  };
+
   services.forgejo-runner = {
     package = pkgs.forgejo-runner;
     instances = {
