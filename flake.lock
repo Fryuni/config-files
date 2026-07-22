@@ -735,11 +735,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1784372519,
-        "narHash": "sha256-W6NUkJqvtGnSco02oT1aOuwdfGaTBMmsVFTVgDljmAY=",
+        "lastModified": 1784681986,
+        "narHash": "sha256-U8QNdiJf8NWzezWzHq463/g52WWxgezcEZo7G9zj0/k=",
         "ref": "main",
-        "rev": "c98d83a844801f95a7bb3d6319f87b99148d127c",
-        "revCount": 13270,
+        "rev": "0b6bb453bc954f48f4873c83307dd9bb2c29b62b",
+        "revCount": 13503,
         "type": "git",
         "url": "https://codeberg.org/Fryuni/llm-agents.nix"
       },
@@ -950,11 +950,11 @@
     },
     "nixpkgs_10": {
       "locked": {
-        "lastModified": 1784282293,
-        "narHash": "sha256-IpX7tmVJi9seHg5M4Wuexy78bQDlbntVk1HcT9kFts4=",
+        "lastModified": 1784555310,
+        "narHash": "sha256-/FCliTPgiuV1owejZFNx3Ch9irdvkOfOFl+HHZ+DrtM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "a47c123a609287a012dfc44d281de2dd4ed13394",
+        "rev": "421eebfd0ec7bccd4abe826ce62d7e6e83129493",
         "type": "github"
       },
       "original": {
@@ -1494,11 +1494,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780220602,
-        "narHash": "sha256-eynAfOmbmxJnkp7YewvCEbShNnnYJ9gLLqkzsYtBPeM=",
+        "lastModified": 1784369104,
+        "narHash": "sha256-47cxbcZODibHv3rELFQ9vZly0vUNkND/atn/U7HLeb0=",
         "owner": "numtide",
         "repo": "treefmt-nix",
-        "rev": "db947814a175b7ca6ded66e21383d938df01c227",
+        "rev": "df3c0640565d04a0261253cdd89fce78ec50168a",
         "type": "github"
       },
       "original": {
