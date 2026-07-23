@@ -445,6 +445,7 @@ in {
         requires = mkIf cfg.certificates.enable ["lferraz-tailnet-certificate.service"];
         wants = ["tailscaled.service"];
         serviceConfig = {
+          ExecStartPre = "${lib.getExe config.services.tailscale.package} wait";
           Restart = mkForce "always";
         };
       };
