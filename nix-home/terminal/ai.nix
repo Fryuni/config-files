@@ -35,6 +35,7 @@
       config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.omp/agent/universal-link";
 
     programs.zsh.shellAliases = {
+      th = "treehouse";
       oc = "opencode";
       wm = "workmux";
       wma = "workmux add -o";
