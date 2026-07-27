@@ -21,6 +21,9 @@ Docker builds run against the host Docker daemon via the mounted Docker socket.
 Only run trusted workflows on this runner because those jobs can control the host
 Docker daemon.
 
+Each runner process has capacity 2, allowing two matching jobs from the same
+Forgejo instance to run concurrently. The three runner processes are independent.
+
 For the instance-wide runner, open the Codeberg/Forgejo runner settings page and
 choose **Create new runner**. Copy both the UUID and token from Forgejo; this is
 not a user access token.

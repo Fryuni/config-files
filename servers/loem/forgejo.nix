@@ -6,6 +6,10 @@
   domain = "git.fryuni.dev";
   httpPort = 3333;
   sshPort = 2222;
+  runnerSettings = {
+    container.docker_host = "automount";
+    runner.capacity = 5;
+  };
 in {
   imports = [../../nixos/modules/forgejo-runner.nix];
 
@@ -70,7 +74,7 @@ in {
     instances = {
       self = {
         enable = true;
-        settings.container.docker_host = "automount";
+        settings = runnerSettings;
         labels = [
           "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
           "docker:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
@@ -83,7 +87,7 @@ in {
       };
       codeberg = {
         enable = true;
-        settings.container.docker_host = "automount";
+        settings = runnerSettings;
         labels = [
           "ubuntu-24.04:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
           "ubuntu-22.04:docker://ghcr.io/catthehacker/ubuntu:act-22.04"
@@ -98,7 +102,7 @@ in {
       };
       gitgay = {
         enable = true;
-        settings.container.docker_host = "automount";
+        settings = runnerSettings;
         labels = [
           "ubuntu-24.04:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
           "ubuntu-22.04:docker://ghcr.io/catthehacker/ubuntu:act-22.04"
