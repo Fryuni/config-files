@@ -47,6 +47,10 @@
   # Keep Plasma available as an alternative
   services.desktopManager.plasma6.enable = true;
 
+  # Plasma enables the Orca screen reader by default, but its executable
+  # conflicts with the Orca AI orchestrator.
+  services.orca.enable = false;
+
   # DrKonqi's systemd-coredump integration is currently crashing on GUI login
   # while replaying coredumps accumulated before the graphical session starts.
   # Keep systemd-coredump storage available, but stop the Plasma notification

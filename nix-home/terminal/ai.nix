@@ -11,6 +11,7 @@
       llm-agents.opencode
       # llm-agents.claude-code
       llm-agents.agent-browser
+      llm-agents.orca
       (pkgs.lib.makeAuthWrapper llm-agents.omp {
         OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
         KIMI_API_KEY = {file = config.age.secrets.kimi-api-key.path;};
