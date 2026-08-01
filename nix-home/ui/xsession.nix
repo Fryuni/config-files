@@ -131,7 +131,7 @@ in {
           "${modifier}+Shift+n" = "exec ${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
           "${modifier}+d" = "exec ${rofi} -show drun";
           "${modifier}+space" = "exec vicinae toggle";
-          "${modifier}+b" = "exec ${lib.getExe pkgs.stable.firefox-beta}";
+          "${modifier}+b" = "exec ${lib.getExe config.programs.chromium.package}";
           "${modifier}+Shift+b" = "exec ${lib.getExe pkgs.master.google-chrome}";
 
           # Window state. i3's global fullscreen is the closest X11 equivalent

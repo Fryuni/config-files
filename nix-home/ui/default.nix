@@ -3,6 +3,9 @@
   pkgs,
   ...
 }: let
+  brave = pkgs.brave.override {
+    vulkanSupport = true;
+  };
   setRandomWallpaper = pkgs.writeShellScript "set-random-wallpaper" ''
     set -euo pipefail
 
@@ -50,6 +53,7 @@ in {
   ];
 
   home.packages = with pkgs; [
+    master.google-chrome
     stable.calibre
     kdePackages.okular
     kdePackages.gwenview
@@ -103,22 +107,17 @@ in {
 
   xdg.configFile."mimeapps.list".force = true;
   xdg.mimeApps = import ./xdg-mime.nix {
-    defaultBrowser = "firefox-beta.desktop";
+    defaultBrowser = "brave-browser.desktop";
     defaultVideo = "mpv.desktop";
     defaultImage = "org.kde.gwenview.desktop";
   };
 
   programs.chromium = {
     enable = true;
-    package = pkgs.master.google-chrome;
+    package = brave;
     commandLineArgs = [
       "--enable-features=Vulkan"
     ];
-  };
-
-  programs.firefox = {
-    enable = true;
-    package = pkgs.stable.firefox-beta;
   };
 
   # Autostart OpenWhispr on login (XDG autostart for Plasma/X11 and any XDG-compliant DE)
