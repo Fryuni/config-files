@@ -8,6 +8,7 @@
 
   home.packages = with pkgs; [
     pfetch
+    openssl
   ];
 
   programs.starship = {
