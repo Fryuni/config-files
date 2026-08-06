@@ -78,6 +78,7 @@ in {
         labels = [
           "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
           "docker:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+          "nix:host"
         ];
         connections.codeberg = {
           url = "https://${domain}/";

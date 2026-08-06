@@ -30,7 +30,6 @@
               runner.capacity = 2;
               server.connections.codeberg.token = "must-not-survive";
             };
-            hostPackages = [pkgs.bash];
             connections.codeberg = {
               url = "https://codeberg.org/";
               uuid = "11111111-2222-3333-4444-555555555555";
@@ -62,6 +61,7 @@
 
   configJson = builtins.toJSON {
     tokenSecret = toString tokenSecret;
+    nixPackage = toString pkgs.nix;
     inherit (service) after wantedBy wants environment;
     execStart = service.serviceConfig.ExecStart;
     loadCredential = service.serviceConfig.LoadCredential or [];
@@ -94,6 +94,7 @@ in
     jq -e '.servicePath | any(contains("git-minimal"))' config.json
     jq -e '.servicePath | any(contains("coreutils"))' config.json
     jq -e '.servicePath | any(contains("bash"))' config.json
+    jq -e '.nixPackage as $nix | .servicePath | index($nix)' config.json
     jq -e '.execStart | contains("/bin/forgejo-runner daemon -c ")' config.json
     jq -e '(.execStart | contains(" register")) | not' config.json
     jq -e --arg tokenFile "$tokenSecretPath" \

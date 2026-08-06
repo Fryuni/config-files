@@ -21,7 +21,18 @@ Docker builds run against the host Docker daemon via the mounted Docker socket.
 Only run trusted workflows on this runner because those jobs can control the host
 Docker daemon.
 
-Each runner process has capacity 2, allowing two matching jobs from the same
+The local Forgejo runner also exposes `nix:host`. Workflows select it with
+`runs-on: nix` and execute directly as the unprivileged `forgejo-runner` user.
+The runner PATH includes the host Nix client, so flake builds use the host Nix
+daemon and its existing `/nix/store` instead of creating a second store in a
+container. The runner is not a Nix trusted user.
+
+Only grant the `nix` target to trusted repositories: host jobs run arbitrary
+commands outside a container, can write their runner state directory, and can
+ask the Nix daemon to build or copy store paths. Cache credentials must still be
+provided by each workflow through Forgejo Actions secrets.
+
+Each runner process has capacity 5, allowing five matching jobs from the same
 Forgejo instance to run concurrently. The three runner processes are independent.
 
 For the instance-wide runner, open the Codeberg/Forgejo runner settings page and

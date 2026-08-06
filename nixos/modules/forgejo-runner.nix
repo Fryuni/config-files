@@ -94,6 +94,7 @@
           gawk
           gitMinimal
           gnused
+          nix
           nodejs
           wget
         ];
@@ -105,6 +106,7 @@
             gawk
             gitMinimal
             gnused
+            nix
             nodejs
             wget
           ]
