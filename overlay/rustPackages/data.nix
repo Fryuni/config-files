@@ -1,8 +1,8 @@
 # DO NOT EDIT! This file is generated automatically by update.mjs
 {
   bootimage = {
-    crateSha256 = "sha256-GBvgeIKuPS/gbYTKvYZ+F//qwWYG2NZv06dTifDyIoE=";
-    depsHash = "sha256-i7ok1fEhUsrW7MpOQQiC10Ky9h9C0NLBBwfp1um8/Gk=";
+    crateSha256 = "sha256-YvTj/1GKird09nBKv9BHqE/uCTIoj/bTabxz/QFFfBM=";
+    depsHash = "sha256-UylacTDWZVkoyAA7fDsX1v+8TMnynIIfE3v+vxDXxyY=";
     description = "Tool to create a bootable OS image from a kernel binary.";
     homepage = null;
     id = "bootimage";
@@ -18,7 +18,7 @@
         url = "https://github.com/phil-opp";
       }
     ];
-    version = "0.10.4";
+    version = "0.10.5";
   };
   cargo-cache = {
     crateSha256 = "sha256-aJoT3jIVpbs4GKiBHcApXTVY4EB11jyjcligV/IdQik=";
@@ -101,8 +101,8 @@
     version = "0.1.35";
   };
   cargo-expand = {
-    crateSha256 = "sha256-D8LCZgTmo4ZQK9rfj0KhYsKmcPFdXlDo8FHKDAVHfZQ=";
-    depsHash = "sha256-8gJz3tR8UAOwdkLZvgd07PllOmR72bRhmjnLMdFC/r8=";
+    crateSha256 = "sha256-PhGYWVytkQeIwyfSk7Yivk640THtGY1s8TDcy85toYw=";
+    depsHash = "sha256-DhDPjpHwplg957IjOVZmahY8IQmuFRR+kRZMNpeOEe4=";
     description = "Wrapper around rustc -Zunpretty=expanded. Shows the result of macro expansion and #[derive] expansion.";
     homepage = null;
     id = "cargo-expand";
@@ -118,11 +118,11 @@
         url = "https://github.com/dtolnay";
       }
     ];
-    version = "1.0.123";
+    version = "1.0.124";
   };
   cargo-lock = {
-    crateSha256 = "sha256-l8B98ycfC17vUY29BbFoucGeAn8mapchCvjdMCNhKqc=";
-    depsHash = "sha256-l76udCsgloW5tZ8TgNMOT47un2Epun0B3UjaHCWdZjE=";
+    crateSha256 = "sha256-FyFCNXOn30K5zbQUpKNZKGIKrwurwl/Zvi+7ELg6DwE=";
+    depsHash = "sha256-Cco9KksibnQMeqyrNnr6ImxFZKo/OyVc2jL7pKMKYTk=";
     description = "Self-contained Cargo.lock parser with optional dependency graph analysis";
     documentation = null;
     homepage = "https://rustsec.org";
@@ -166,7 +166,7 @@
         url = "https://github.com/rustsec";
       }
     ];
-    version = "11.0.1";
+    version = "11.1.0";
   };
   cargo-public-api = {
     crateSha256 = "sha256-Z0r3lcuteU3DcXarBInYzkMaJSwfStdGi6ng2uRMXn8=";
@@ -198,8 +198,8 @@
     version = "0.52.0";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-OSxuYN0P822XHEyesOFYAHo2M21XQDDhi9pqS5YXnYs=";
-    depsHash = "sha256-VHxgPvlhasM3GnK1uMDA2vi0z3TxHWpCOlkWJhcV/F8=";
+    crateSha256 = "sha256-hoh+WQUhq8MfSjOV5xNAtkHpbjILbKXRhf6CghGaMn8=";
+    depsHash = "sha256-rc3F104atiV+KecsNtThfFwe80jyKOFLHKn53Nhm++w=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
@@ -215,7 +215,7 @@
         url = "https://github.com/obi1kenobi";
       }
     ];
-    version = "0.48.0";
+    version = "0.50.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-41Zht2qKulVaYmKOJRGCzmSVGCBa1nglUXpHrACAEgY=";
@@ -276,8 +276,8 @@
     version = "8.5.3";
   };
   octorus = {
-    crateSha256 = "sha256-AEPmsXVc5N4d5rDWRyKorAqF7i8HIUpw7PT7wK7IkWM=";
-    depsHash = "sha256-5sCj8H4Kq+RD0dQC4Xi/NxOPlZSXUkTDknLKqueHEbo=";
+    crateSha256 = "sha256-KuE0GNa03IIQ9FEsnHdcrdNg1bVEdKjsU8ke13MzeIQ=";
+    depsHash = "sha256-/9kvyWZoYr2ww1X4kMFs6LsB9bYLWZurC+iXjQI57TM=";
     description = "A TUI tool for GitHub PR review, designed for Helix editor users";
     homepage = null;
     id = "octorus";
@@ -293,7 +293,7 @@
         url = "https://github.com/ushironoko";
       }
     ];
-    version = "0.6.7";
+    version = "0.7.1";
   };
   toml-merge = {
     crateSha256 = "sha256-ZRfTxA5xjA/V6VtecwdyyGkMC6o+kd2ipRCwJ19Zvfg=";
