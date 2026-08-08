@@ -34,7 +34,6 @@
 
     programs.zsh.shellAliases = {
       th = "treehouse";
-      oc = "opencode";
       wm = "workmux";
       wma = "workmux add -o";
       wmb = "workmux add -o --background --prompt-editor";
