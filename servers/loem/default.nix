@@ -8,6 +8,7 @@
     ../remoteDev.nix
 
     ./agentsview.nix
+    ./cpa-manager-plus.nix
     ./cli-proxy-api.nix
     ./disko.nix
     ./docker-registry.nix
