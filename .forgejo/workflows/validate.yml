@@ -1,0 +1,47 @@
+name: Validate
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+concurrency:
+  group: validate-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "${{ matrix.name }}"
+    runs-on: nix
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: NixOS note toplevel
+            attr: .#nixosConfigurations.note.config.system.build.toplevel
+          - name: NixOS loem toplevel
+            attr: .#nixosConfigurations.loem.config.system.build.toplevel
+          # - name: rpi3 SD image
+          #   attr: .#nixosConfigurations.rpi3.config.system.build.sdImage
+          #   flags: --impure
+          - name: Home Manager lotus@note activation
+            attr: .#homeConfigurations."lotus@note".activationPackage
+          - name: Flake checks (x86_64-linux)
+            attr: checks
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Build target
+        if: matrix.attr != 'checks'
+        run: nix build --no-link --print-out-paths ${{ matrix.flags }} "${{ matrix.attr }}"
+
+      - name: Build all x86_64-linux flake checks
+        if: matrix.attr == 'checks'
+        run: |
+          mapfile -t attrs < <(nix eval --json .#checks.x86_64-linux --apply builtins.attrNames | nix shell nixpkgs#jq --command jq -r '.[] | ".#checks.x86_64-linux." + .')
+          nix build --no-link --print-out-paths "${attrs[@]}"

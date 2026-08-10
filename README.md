@@ -121,6 +121,11 @@ Common local workflows are exposed as flake apps from `commands.nix`:
 - NixOS build and diff helpers for `note`.
 - Flake lock update and repository formatting helpers.
 
+Forgejo Actions automate the same maintenance paths on the self-hosted Nix runner:
+
+- Every pull request builds all NixOS targets, the `lotus@note` Home Manager generation, and the reusable-module checks.
+- A weekly and manually dispatched update workflow runs `just update`, pushes a dedicated branch, and opens a pull request when dependencies changed. It requires an `UPDATE_FORGEJO_TOKEN` Actions secret with repository write access so the resulting pull request triggers validation.
+
 For validation, prefer the narrow output that matches the change:
 
 - Evaluate or build the affected `homeConfigurations` output for Home Manager-only changes.

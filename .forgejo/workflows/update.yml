@@ -1,0 +1,59 @@
+name: Update dependencies
+
+on:
+  schedule:
+    # Weekly, Mondays at 04:00 UTC
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: nix
+    env:
+      BRANCH: automation/update-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Configure automation git identity
+        run: |
+          git config user.name "forgejo-actions[bot]"
+          git config user.email "forgejo-actions[bot]@localhost"
+
+      - name: Create update branch
+        run: git switch -c "$BRANCH"
+
+      - name: Update dependencies
+        run: env -u GH_TOKEN -u GITHUB_TOKEN nix shell nixpkgs#just --command just update
+
+      - name: Push branch and open pull request
+        env:
+          FORGEJO_TOKEN: ${{ secrets.UPDATE_FORGEJO_TOKEN }}
+          API_URL: ${{ github.api_url }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          git fetch origin main
+          if git diff --quiet origin/main HEAD; then
+            echo "No updates produced; skipping branch push and pull request."
+            exit 0
+          fi
+
+          git push origin "$BRANCH"
+
+          nix shell nixpkgs#curl nixpkgs#jq --command bash -euo pipefail <<'EOF'
+          payload="$(jq -n \
+            --arg title "chore: Update dependencies" \
+            --arg head "$BRANCH" \
+            --arg base "main" \
+            '{title: $title, head: $head, base: $base}')"
+
+          curl --fail-with-body --silent --show-error --request POST \
+            --header "Authorization: token $FORGEJO_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data "$payload" \
+            "$API_URL/repos/$REPOSITORY/pulls"
+          EOF

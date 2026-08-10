@@ -44,7 +44,7 @@ update-flake-master:
 update-flake:
   nix flake update
   git add flake.lock
-  git commit -m "chore: Update flake" -- flake.lock
+  git diff --cached --quiet -- flake.lock || git commit -m "chore: Update flake" -- flake.lock
 
 update-overlays: update-pulumi update-rustCrates
 
