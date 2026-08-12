@@ -53,6 +53,9 @@
       url = "github:kunchenguid/treehouse";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    tmux-treehouse = {
+      url = "git+https://git.fryuni.dev/Fryuni/tmux-treehouse";
+    };
     nur = {
       url = "github:nix-community/NUR";
       # inputs.nixpkgs.follows = "nixpkgs";

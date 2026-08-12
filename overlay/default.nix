@@ -12,6 +12,18 @@ in [
   attrs.nur.overlays.default
   (pickPackages attrs.flakehub.overlays.default ["fh"])
   attrs.polymc.overlay
+  (final: pkgs: {
+    tmuxPlugins =
+      pkgs.tmuxPlugins
+      // {
+        treehouse = attrs.tmux-treehouse.packages.${final.stdenv.hostPlatform.system}.default.overrideAttrs (finalAttrs: old: {
+          pname = "tmuxplugin-treehouse";
+          passthru =
+            (old.passthru or {})
+            // {rtp = "${finalAttrs.finalPackage}/share/tmux-plugins/tmux-treehouse";};
+        });
+      };
+  })
 
   (import ./utils.nix)
   (import ./patches.nix)

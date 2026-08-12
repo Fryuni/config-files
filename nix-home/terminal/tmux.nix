@@ -78,6 +78,7 @@ in {
       tmux-thumbs
       # tmux-which-key
       extrakto
+      treehouse
     ];
   };
 
