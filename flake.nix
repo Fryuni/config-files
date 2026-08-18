@@ -7,8 +7,16 @@
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
-    google-workspace-cli = {
-      url = "github:googleworkspace/cli";
+    google-workspace-cli.url = "github:googleworkspace/cli";
+    treehouse = {
+      url = "github:kunchenguid/treehouse";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    tmux-treehouse.url = "git+https://git.fryuni.dev/Fryuni/tmux-treehouse";
+    forgejo-cli = {
+      url = "git+https://git.fryuni.dev/Fryuni/forgejo-cli.git?ref=main";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.utils.follows = "flake-utils";
     };
 
     determinate = {
@@ -48,13 +56,6 @@
       # url = "github:numtide/llm-agents.nix";
       url = "git+https://codeberg.org/Fryuni/llm-agents.nix?ref=main";
       # inputs.nixpkgs.follows = "nixpkgs";
-    };
-    treehouse = {
-      url = "github:kunchenguid/treehouse";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    tmux-treehouse = {
-      url = "git+https://git.fryuni.dev/Fryuni/tmux-treehouse";
     };
     nur = {
       url = "github:nix-community/NUR";

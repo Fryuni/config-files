@@ -578,6 +578,30 @@
         "url": "https://flakehub.com/f/DeterminateSystems/fh/%2A"
       }
     },
+    "forgejo-cli": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "utils": [
+          "flake-utils"
+        ]
+      },
+      "locked": {
+        "lastModified": 1785609581,
+        "narHash": "sha256-ef/xxMIEopR43dfO9hVHoB+5iskkHBwnEsvUzFjkRMQ=",
+        "ref": "main",
+        "rev": "5ba75d9a7305255cb083f8a16f88800fc8e49517",
+        "revCount": 1092,
+        "type": "git",
+        "url": "https://git.fryuni.dev/Fryuni/forgejo-cli.git"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://git.fryuni.dev/Fryuni/forgejo-cli.git"
+      }
+    },
     "git-hooks-nix": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -1330,6 +1354,7 @@
         "flake-compat": "flake-compat_3",
         "flake-utils": "flake-utils",
         "flakehub": "flakehub",
+        "forgejo-cli": "forgejo-cli",
         "gomod2nix": "gomod2nix",
         "google-workspace-cli": "google-workspace-cli",
         "home-manager": "home-manager",
