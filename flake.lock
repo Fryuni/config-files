@@ -588,11 +588,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785609581,
-        "narHash": "sha256-ef/xxMIEopR43dfO9hVHoB+5iskkHBwnEsvUzFjkRMQ=",
+        "lastModified": 1787080527,
+        "narHash": "sha256-+Du1MAjMhYBN6qP9o7ReB3M0GE+ZhpZImFFe5GxwxWg=",
         "ref": "main",
-        "rev": "5ba75d9a7305255cb083f8a16f88800fc8e49517",
-        "revCount": 1092,
+        "rev": "a9b0ead54cb9198a631a9c48344f36dab4513af7",
+        "revCount": 1119,
         "type": "git",
         "url": "https://git.fryuni.dev/Fryuni/forgejo-cli.git"
       },
@@ -759,16 +759,16 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1787069302,
-        "narHash": "sha256-2aMbADuMXdawkZVjDWE03kgeGLvbnXsyFQykqpZatGU=",
-        "ref": "bun-canary",
-        "rev": "e8976d9e017cbe3955db97f52e2a32a0cc459beb",
+        "lastModified": 1787080969,
+        "narHash": "sha256-kfMXqXlyXtSTugLRepOXKdAQxPTGrhrUwd4DrECzjjQ=",
+        "ref": "main",
+        "rev": "6b7b0961b669d19c69baa1bb84eff5c23a74db4b",
         "revCount": 15729,
         "type": "git",
         "url": "https://git.fryuni.dev/Fryuni/llm-agents.nix"
       },
       "original": {
-        "ref": "bun-canary",
+        "ref": "main",
         "type": "git",
         "url": "https://git.fryuni.dev/Fryuni/llm-agents.nix"
       }

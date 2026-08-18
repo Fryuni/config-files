@@ -54,7 +54,7 @@
     };
     llm-agents = {
       # url = "github:numtide/llm-agents.nix";
-      url = "git+https://git.fryuni.dev/Fryuni/llm-agents.nix?ref=bun-canary";
+      url = "git+https://git.fryuni.dev/Fryuni/llm-agents.nix?ref=main";
       # inputs.nixpkgs.follows = "nixpkgs";
     };
     nur = {
