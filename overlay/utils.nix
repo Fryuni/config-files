@@ -25,7 +25,6 @@ final: pkgs: {
       vendorHash = "sha256-lQgWNMBf+ioNxzAV7tnTQSIS840XdI9fg9duuwoK+U4=";
       passthru = {
         inherit (pkgs.terraform) plugins;
-        updateScript = pkgs.nix-update-script {};
       };
     };
   in
@@ -40,7 +39,7 @@ final: pkgs: {
   #   })
   #   {inherit pkgs;};
 
-  grafterm = pkgs.buildGoModule rec {
+  grafterm = pkgs.buildGoModule {
     pname = "grafterm";
     version = "0.2.0";
 
@@ -55,7 +54,7 @@ final: pkgs: {
     passthru.updateScript = pkgs.nix-update-script {};
   };
 
-  pg-schema-diff = pkgs.buildGoModule rec {
+  pg-schema-diff = pkgs.buildGoModule {
     name = "pg-schema-diff";
     doCheck = false;
 
@@ -107,16 +106,4 @@ final: pkgs: {
   #     });
 
   inherit (pkgs.master) bun;
-
-  ulauncher = pkgs.master.ulauncher.overridePythonAttrs {
-    propagatedBuildInputs =
-      pkgs.ulauncher.propagatedBuildInputs
-      ++ (with pkgs.python3Packages; [
-        pint
-        simpleeval
-        parsedatetime
-        pytz
-        babel
-      ]);
-  };
 }

@@ -1,12 +1,15 @@
-final: pkgs: {
-  cpa-manager-plus = let
+{
+stdenvNoCC,
+fetchurl,
+nix-update-script,
+}: let
     pname = "cpa-manager-plus";
     version = "1.11.12";
   in
-    pkgs.stdenvNoCC.mkDerivation {
+    stdenvNoCC.mkDerivation {
       inherit pname version;
 
-      src = pkgs.fetchurl {
+      src = fetchurl {
         url = "https://github.com/seakee/CPA-Manager-Plus/releases/download/v${version}/${pname}_v${version}_linux_amd64.tar.gz";
         hash = "sha256-z2KHzZoDO68XwIb+5emVyiuse68Cl1qyYG1meIbfkTI=";
       };
@@ -20,8 +23,7 @@ final: pkgs: {
         install -Dm755 cpa-manager-plusctl $out/bin/cpa-manager-plusctl
       '';
 
-      passthru.updateScript = pkgs.nix-update-script {};
+      passthru.updateScript = nix-update-script {};
 
       meta.mainProgram = "cpa-manager-plus";
-    };
 }

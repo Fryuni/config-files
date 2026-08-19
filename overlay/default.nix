@@ -12,35 +12,17 @@ in [
   attrs.nur.overlays.default
   (pickPackages attrs.flakehub.overlays.default ["fh"])
   attrs.polymc.overlay
-  (final: pkgs: {
-    tmuxPlugins =
-      pkgs.tmuxPlugins
-      // {
-        treehouse = attrs.tmux-treehouse.packages.${final.stdenv.hostPlatform.system}.default.overrideAttrs (finalAttrs: old: {
-          pname = "tmuxplugin-treehouse";
-          passthru =
-            (old.passthru or {})
-            // {rtp = "${finalAttrs.finalPackage}/share/tmux-plugins/tmux-treehouse";};
-        });
-      };
-  })
+  attrs.tmux-treehouse.overlays.default
 
   (import ./utils.nix)
   (import ./patches.nix)
-  (import ./jetbrains.nix)
+  (import ./jetbrains)
   (import ./croct.nix)
   (import ./pulumi)
-  (import ./agentfs.nix)
-  (import ./openwhispr.nix)
   (import ./honcho.nix)
   (import ./rustPackages)
-  (final: _: {ksp-ckan = final.callPackage ./ckan.nix {};})
-  (import ./lunarvim.nix)
-  (import ./astro-nvim.nix)
-  (import ./doom-nvim.nix)
-  (import ./t-smart-tmux-session-manager.nix)
-  (import ./cpa-manager-plus.nix)
   (import ./vicinae-extensions.nix attrs)
+
   (final: pkgs: let
     inherit (pkgs.stdenv.hostPlatform) system;
   in {
@@ -51,5 +33,8 @@ in [
     llm-agents = attrs.llm-agents.packages.${system};
     treehouse = attrs.treehouse.packages.${system}.default;
     forgejo-cli = attrs.forgejo-cli.packages.${system}.default;
+
+    cpa-manager-plus = final.callPackage ./packages/cpa-manager-plus.nix {};
+    openwhispr = final.callPackage ./packages/openwhispr.nix {};
   })
 ]

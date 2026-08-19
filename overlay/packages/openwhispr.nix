@@ -1,14 +1,13 @@
-final: pkgs: {
-  openwhispr = let
+{fetchurl, python3, appimageTools, nix-update-script, lib}:let
     pname = "openwhispr";
     version = "1.7.4";
 
-    src = pkgs.fetchurl {
+    src = fetchurl {
       url = "https://github.com/OpenWhispr/openwhispr/releases/download/v${version}/OpenWhispr-${version}-linux-x86_64.AppImage";
       hash = "sha256-hp7FVUi5/K+QiQam8YAOrRsemFkC8MnupT+hhroP+6Y=";
     };
 
-    extracted = pkgs.appimageTools.extract {
+    extracted = appimageTools.extract {
       inherit pname version src;
 
       postExtract = ''
@@ -18,7 +17,7 @@ final: pkgs: {
         # Patch app.asar in place without extracting or repacking it.  Each
         # equal-length replacement retains archive offsets and fails closed if
         # the upstream source layout is not exactly the one we reviewed.
-        ${pkgs.python3}/bin/python3 - "$out/resources/app.asar" <<'PY'
+        ${python3}/bin/python3 - "$out/resources/app.asar" <<'PY'
         from pathlib import Path
         import sys
 
@@ -59,7 +58,7 @@ final: pkgs: {
       '';
     };
   in
-    pkgs.appimageTools.wrapAppImage {
+    appimageTools.wrapAppImage {
       inherit pname version;
       src = extracted;
 
@@ -71,14 +70,13 @@ final: pkgs: {
           pulseaudio
         ];
 
-      passthru.updateScript = pkgs.nix-update-script {};
+      passthru.updateScript = nix-update-script {};
 
       meta = {
         description = "Voice-to-text dictation app with local and cloud models";
         homepage = "https://github.com/OpenWhispr/openwhispr";
-        license = pkgs.lib.licenses.mit;
+        license = lib.licenses.mit;
         mainProgram = "openwhispr";
         platforms = ["x86_64-linux"];
       };
-    };
 }

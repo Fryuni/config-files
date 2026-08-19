@@ -46,25 +46,13 @@ update-flake:
   git add flake.lock
   git diff --cached --quiet -- flake.lock || git commit -m "chore: Update flake" -- flake.lock
 
-update-overlays: update-agentfs update-astro-nvim update-ckan update-cpa-manager-plus update-doom-nvim update-grafterm update-honcho update-jetbrains update-lunarvim update-openwhispr update-pg-schema-diff update-pulumi update-rustCrates update-t-smart-tmux-session-manager update-tailscale update-terraformOSS update-wtf
+update-overlays: update-cpa-manager-plus update-grafterm update-honcho update-jetbrains update-openwhispr update-pg-schema-diff update-pulumi update-rustCrates update-t-smart-tmux-session-manager update-tailscale update-terraformOSS update-wtf
 
 update-overlay package:
-  nix run nixpkgs#nix-update -- --flake {{package}}
-
-update-agentfs:
-  just update-overlay agentfs
-
-update-astro-nvim:
-  just update-overlay astro-nvim
-
-update-ckan:
-  just update-overlay ksp-ckan
+  nix run nixpkgs#nix-update -- --flake -u {{package}}
 
 update-cpa-manager-plus:
   just update-overlay cpa-manager-plus
-
-update-doom-nvim:
-  just update-overlay doom-nvim
 
 update-grafterm:
   just update-overlay grafterm
@@ -75,9 +63,6 @@ update-honcho:
 update-jetbrains:
   overlay/jetbrains/update_ides.py
   overlay/jetbrains/plugins/update_plugins.py
-
-update-lunarvim:
-  just update-overlay lunarvim
 
 update-openwhispr:
   just update-overlay openwhispr

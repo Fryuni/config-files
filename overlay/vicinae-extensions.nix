@@ -29,6 +29,5 @@ in {
     "nerdfont-search"
     "nix"
     "port-killer"
-    # "systemd"  # currently fails to build in nixpkgs (node-gyp)
   ];
 }
