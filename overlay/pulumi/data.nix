@@ -1,11 +1,11 @@
 # DO NOT EDIT! This file is generated automatically by update.sh
 _: {
-  version = "3.258.0";
+  version = "3.259.0";
   pulumiPkgs = {
     x86_64-linux = [
       {
-        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.258.0-linux-x64.tar.gz";
-        sha256 = "0yb4ikm5p468qrngcy8wi4arxhwla5maxivb707y9v1z4kh2vkxn";
+        url = "https://get.pulumi.com/releases/sdk/pulumi-v3.259.0-linux-x64.tar.gz";
+        sha256 = "1r8qyyjm94j5fz3k8gz11k3pn3ywk00b1i44813h2gf2r9x3bfll";
       }
       {
         url = "https://api.pulumi.com/releases/plugins/pulumi-resource-docker-v5.1.0-linux-amd64.tar.gz";
