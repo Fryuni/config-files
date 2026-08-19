@@ -6,6 +6,7 @@
   glibc,
   gcc-unwrapped,
   autoPatchelfHook,
+  nix-update-script,
 }:
 stdenv.mkDerivation rec {
   pname = "ksp-ckan";
@@ -40,6 +41,8 @@ stdenv.mkDerivation rec {
     cp -av $out/usr/bin/ckan $out/bin/ksp-ckan
     rm -rf $out/usr/bin
   '';
+
+  passthru.updateScript = nix-update-script {};
 
   meta = {
     description = "The Comprehensive Kerbal Archive Network";

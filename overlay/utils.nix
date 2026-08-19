@@ -25,6 +25,7 @@ final: pkgs: {
       vendorHash = "sha256-lQgWNMBf+ioNxzAV7tnTQSIS840XdI9fg9duuwoK+U4=";
       passthru = {
         inherit (pkgs.terraform) plugins;
+        updateScript = pkgs.nix-update-script {};
       };
     };
   in
@@ -51,6 +52,7 @@ final: pkgs: {
     };
 
     vendorHash = "sha256-veg5B68AQhkSZg8YA/e4FbqJNG0YGwnUQFsAdscz0QI=";
+    passthru.updateScript = pkgs.nix-update-script {};
   };
 
   pg-schema-diff = pkgs.buildGoModule rec {
@@ -65,6 +67,9 @@ final: pkgs: {
     };
 
     vendorHash = "sha256-/pzW7zK7pPo205oio4QcnOXgP7imRQ8VCdt652YCJkg=";
+    passthru.updateScript = pkgs.nix-update-script {
+      extraArgs = ["--version=branch=main"];
+    };
   };
 
   wtf = pkgs.buildGoModule rec {
@@ -80,6 +85,7 @@ final: pkgs: {
     };
 
     vendorHash = "sha256-f82ibPnauUOuZ5D6Rz3Yyt0jiAXvjN8Or3gud+ri6FA=";
+    passthru.updateScript = pkgs.nix-update-script {};
   };
 
   # gh = let

@@ -71,6 +71,8 @@ final: pkgs: {
           pulseaudio
         ];
 
+      passthru.updateScript = pkgs.nix-update-script {};
+
       meta = {
         description = "Voice-to-text dictation app with local and cloud models";
         homepage = "https://github.com/OpenWhispr/openwhispr";

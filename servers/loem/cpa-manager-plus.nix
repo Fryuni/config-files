@@ -4,26 +4,6 @@
   ...
 }: let
   stateDir = "/var/lib/cpa-manager-plus";
-  cpaManagerPlus = pkgs.stdenvNoCC.mkDerivation {
-    pname = "cpa-manager-plus";
-    version = "1.11.12";
-
-    src = pkgs.fetchurl {
-      url = "https://github.com/seakee/CPA-Manager-Plus/releases/download/v1.11.12/cpa-manager-plus_v1.11.12_linux_amd64.tar.gz";
-      hash = "sha256-z2KHzZoDO68XwIb+5emVyiuse68Cl1qyYG1meIbfkTI=";
-    };
-
-    sourceRoot = "cpa-manager-plus_v1.11.12_linux_amd64";
-    dontConfigure = true;
-    dontBuild = true;
-
-    installPhase = ''
-      install -Dm755 cpa-manager-plus $out/bin/cpa-manager-plus
-      install -Dm755 cpa-manager-plusctl $out/bin/cpa-manager-plusctl
-    '';
-
-    meta.mainProgram = "cpa-manager-plus";
-  };
 in {
   users.groups."cpa-manager-plus" = {};
   users.users."cpa-manager-plus" = {
@@ -47,7 +27,7 @@ in {
     };
 
     serviceConfig = {
-      ExecStart = lib.getExe cpaManagerPlus;
+      ExecStart = lib.getExe pkgs.cpa-manager-plus;
       Restart = "on-failure";
       StateDirectory = "cpa-manager-plus";
       StateDirectoryMode = "0750";

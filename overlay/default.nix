@@ -34,6 +34,13 @@ in [
   (import ./openwhispr.nix)
   (import ./honcho.nix)
   (import ./rustPackages)
+  (final: _: {ksp-ckan = final.callPackage ./ckan.nix {};})
+  (import ./lunarvim.nix)
+  (import ./astro-nvim.nix)
+  (import ./doom-nvim.nix)
+  (import ./t-smart-tmux-session-manager.nix)
+  (import ./cpa-manager-plus.nix)
+  (import ./vicinae-extensions.nix attrs)
   (final: pkgs: let
     inherit (pkgs.stdenv.hostPlatform) system;
   in {

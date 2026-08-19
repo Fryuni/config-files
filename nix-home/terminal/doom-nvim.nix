@@ -9,13 +9,6 @@
   programs.doom-nvim = {
     enable = true;
 
-    doom-nvim-src = {
-      owner = "Fryuni";
-      repo = "doom-nvim";
-      rev = "0ecefdf37c3dac4ba0c133bbe3a8102da745fa20";
-      sha256 = "sha256-hqbgDPR3U1eEesM9Sxfcfo3oNFkMVN0UQboMYL8GkX4=";
-    };
-
     nvimPackage = pkgs.neovim;
 
     features = [

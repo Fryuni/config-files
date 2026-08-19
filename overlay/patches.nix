@@ -41,6 +41,13 @@ final: prev: {
     '';
 
     vendorHash = "sha256-y6rBPJtkhTQMsnUoUC/1Up61FEplPpxaU1OkO2FDeio=";
+    passthru =
+      (attrs.passthru or {})
+      // {
+        updateScript = final.nix-update-script {
+          extraArgs = ["--version=branch=main"];
+        };
+      };
 
     # Reason why it is meaningless also in the issue comment above.
     doCkeck = false;

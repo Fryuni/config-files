@@ -5,8 +5,6 @@
   ...
 }:
 with lib; let
-  inherit (pkgs) stdenv;
-
   cfg =
     trivial.throwIf
     (config.programs.doom-nvim.enable && config.programs.neovim.enable)
@@ -85,25 +83,6 @@ in {
         default = [];
       };
 
-      doom-nvim-src = {
-        owner = mkOption {
-          type = types.str;
-          default = "doom-neovim";
-        };
-        repo = mkOption {
-          type = types.str;
-          default = "doom-nvim";
-        };
-        rev = mkOption {
-          type = types.str;
-          default = "v4.1.0";
-        };
-        sha256 = mkOption {
-          type = types.str;
-          default = "sha256-UekDUyyy/9YGL3QJV/z5RSMgNfVOhr1NWQsTWK/39UY=";
-        };
-      };
-
       vimdiffAlias = mkOption {
         type = types.bool;
         default = false;
@@ -169,26 +148,7 @@ in {
   };
 
   config = let
-    doom-src = stdenv.mkDerivation {
-      pname = "doom-nvim";
-      version = cfg.doom-nvim-src.rev;
-
-      src = pkgs.fetchFromGitHub cfg.doom-nvim-src;
-
-      strictDeps = true;
-      enableParallelBuilding = true;
-      preferLocalBuild = true;
-      allowSubstitutes = false;
-
-      installPhase = ''
-        mkdir -p $out
-        cp lazy-lock.json $out/lazy-lock.json
-        cp init.lua $out/init.lua
-        cp -R lua $out/lua
-        cp -R doc $out/docs
-        cp -R colors $out/colors
-      '';
-    };
+    doom-src = pkgs.doom-nvim;
 
     featurePackages = lists.concatMap (feature: featureDependencies.${feature} or []) cfg.features;
 

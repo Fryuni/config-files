@@ -230,6 +230,7 @@ in {
 
       passthru = {
         python = pythonEnv;
+        updateScript = pkgs.nix-update-script {};
       };
 
       meta = {

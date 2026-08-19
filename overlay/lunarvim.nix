@@ -1,6 +1,4 @@
-pkgs: let
-  inherit (pkgs) stdenv;
-
+final: pkgs: let
   lunarvim-src = pkgs.fetchFromGitHub {
     owner = "lunarvim";
     repo = "lunarvim";
@@ -33,24 +31,15 @@ pkgs: let
     exec -a lvim ${pkgs.neovim}/bin/nvim -u "$LUNARVIM_BASE_DIR/init.lua" "$@"
   '';
 
-  lunarvim = stdenv.mkDerivation {
+  lunarvim = lunarvim-shim.overrideAttrs (_: {
     pname = "lunarvim";
-    version = "1.2";
+    version = "release-1.2/neovim-0.8";
     src = lunarvim-src;
-
-    nativeBuildInputs = with pkgs; [makeWrapper];
-    buildInputs = with pkgs; [git neovim];
-
-    dontBuild = true;
-    installPhase = ''
-      mkdir -p $out
-      runHook preInstall
-      echo "Installing lunarvim on $out"
-
-      runHook postInstall
-    '';
-  };
+    passthru.updateScript = pkgs.nix-update-script {
+      extraArgs = ["--version=branch=release-1.2/neovim-0.8"];
+    };
+  });
 in {
   inherit lunarvim-src;
-  lunarvim = lunarvim-shim;
+  lunarvim = lunarvim;
 }

@@ -49,6 +49,7 @@ in {
     LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [xz libgcc]);
 
     doCheck = false;
+    passthru.updateScript = pkgs.nix-update-script {};
 
     meta = {
       description = "The filesystem for AI agents";
