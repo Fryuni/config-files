@@ -84,7 +84,7 @@ The separate Home Manager output `homeConfigurations."lotus@note"` builds the us
 
 Because `servers/remoteDev.nix` imports `servers/interactive.nix`, `loem` gets SSH access for `lotus`, Home Manager integration for that user, and the shared development-oriented Home Manager layer. `loem` also authorizes root SSH keys for root-level administration.
 
-`servers/loem/forgejo.nix` runs a local Forgejo instance backed by the host PostgreSQL service, with repositories and LFS data persisted under `/var/lib/forgejo`. Forgejo listens only on loopback: the existing Cloudflare Tunnel publishes HTTPS at `git.fryuni.dev`, while Tailscale Serve exposes only the built-in SSH service as `git.rudd-agama.ts.net:22` inside the Tailnet. The same module continues to run the independent Forgejo Actions runners registered with Codeberg and git.gay.
+`servers/loem/forgejo.nix` runs a local Forgejo instance backed by the host PostgreSQL service, with repositories and LFS data persisted under `/var/lib/forgejo`. Forgejo listens only on loopback: the existing Cloudflare Tunnel publishes HTTPS at `git.fryuni.dev`, while Tailscale Serve exposes only the built-in SSH service as `git.rudd-agama.ts.net:22` inside the Tailnet. The same module continues to run the independent Forgejo Actions runners registered with the local Forgejo, Codeberg, and git.gay, configured through the first-party nixpkgs `services.forgejo-runner` module.
 
 ### `gce-automation`
 

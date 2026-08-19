@@ -1,31 +1,39 @@
 # Forgejo Actions runner
 
-The loem runner is configured through the repository-local `services.forgejo-runner`
-module. Forgejo Runner v12+ needs both values copied from the Forgejo runner UI:
+The loem runners are configured through the first-party nixpkgs
+`services.forgejo-runner` NixOS module. Forgejo Runner v12+ needs both values
+copied from the Forgejo runner UI:
 
 - the runner UUID, committed in `servers/loem/forgejo.nix`; and
 - the raw runner token, decrypted from the age secret source at
   `secrets/loem/codeberg-forgejo-actions-runner-token`.
 
-The decrypted token file is passed to systemd as a credential and must contain only
-the raw token bytes:
+The decrypted token file is passed to systemd as a credential and must contain
+only the raw token bytes:
 
 ```text
 <raw-runner-token>
 ```
 
-The module writes `token_url = "file:$CREDENTIALS_DIRECTORY/..."` into the generated
-runner YAML.
+Each instance declares `secrets.server.connections.<name>.token_url` pointing at
+its agenix token path. The module loads it as a systemd `LoadCredential` named
+`server__connections__<name>__token_url` and writes
+`token_url: file:$CREDENTIALS_DIRECTORY/server__connections__<name>__token_url`
+into the generated runner YAML. Runner units run as per-unit `DynamicUser`
+services (`forgejo-runner-self`, `forgejo-runner-codeberg`,
+`forgejo-runner-gitgay`) with state under `/var/lib/forgejo-runner/<name>`; the
+old `/var/lib/forgejo-runner-<name>` directories from the previous custom module
+are orphaned after the migration and can be removed manually.
 
 Docker builds run against the host Docker daemon via the mounted Docker socket.
 Only run trusted workflows on this runner because those jobs can control the host
 Docker daemon.
 
 The local Forgejo runner also exposes `nix:host`. Workflows select it with
-`runs-on: nix` and execute directly as the unprivileged `forgejo-runner` user.
-The runner PATH includes the host Nix client, so flake builds use the host Nix
-daemon and its existing `/nix/store` instead of creating a second store in a
-container. The runner is not a Nix trusted user.
+`runs-on: nix` and execute directly as the unprivileged `DynamicUser` of the
+`forgejo-runner-self` unit. The runner PATH includes the host Nix client, so
+flake builds use the host Nix daemon and its existing `/nix/store` instead of
+creating a second store in a container. The runner is not a Nix trusted user.
 
 Only grant the `nix` target to trusted repositories: host jobs run arbitrary
 commands outside a container, can write their runner state directory, and can

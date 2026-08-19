@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }: let
@@ -11,8 +12,6 @@
     runner.capacity = 5;
   };
 in {
-  imports = [../../nixos/modules/forgejo-runner.nix];
-
   age.secrets = {
     self-actions-token = {
       rekeyFile = ../../secrets/loem/self-forgejo-actions-runner-token;
@@ -64,9 +63,18 @@ in {
 
   services.cfTunnel.ingress.${domain} = "http://localhost:${toString httpPort}";
 
-  systemd.services.forgejo-runner-self = {
-    requires = ["forgejo.service"];
-    after = ["forgejo.service"];
+  systemd.services = {
+    forgejo-runner-self = {
+      requires = ["forgejo.service"];
+      after = ["forgejo.service"];
+      wants = ["docker.service"];
+    };
+    forgejo-runner-codeberg = {
+      wants = ["docker.service"];
+    };
+    forgejo-runner-gitgay = {
+      wants = ["docker.service"];
+    };
   };
 
   services.forgejo-runner = {
@@ -74,47 +82,60 @@ in {
     instances = {
       self = {
         enable = true;
-        settings = runnerSettings;
-        labels = [
-          "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
-          "docker:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
-          "nix:host"
+        settings = lib.mkMerge [
+          runnerSettings
+          {
+            runner.labels = [
+              "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+              "docker:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+              "nix:host"
+            ];
+            server.connections.self = {
+              url = "https://${domain}/";
+              uuid = "ff7f3392-9270-4c04-bfb1-9daad9f1c198";
+            };
+          }
         ];
-        connections.codeberg = {
-          url = "https://${domain}/";
-          uuid = "ff7f3392-9270-4c04-bfb1-9daad9f1c198";
-          tokenFile = config.age.secrets.self-actions-token.path;
-        };
+        secrets.server.connections.self.token_url = config.age.secrets.self-actions-token.path;
+        hostPackages = with pkgs; [bash coreutils curl gawk gitMinimal gnused nix nodejs wget];
       };
       codeberg = {
         enable = true;
-        settings = runnerSettings;
-        labels = [
-          "ubuntu-24.04:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
-          "ubuntu-22.04:docker://ghcr.io/catthehacker/ubuntu:act-22.04"
-          "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
-          "docker:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+        settings = lib.mkMerge [
+          runnerSettings
+          {
+            runner.labels = [
+              "ubuntu-24.04:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+              "ubuntu-22.04:docker://ghcr.io/catthehacker/ubuntu:act-22.04"
+              "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+              "docker:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+            ];
+            server.connections.codeberg = {
+              url = "https://codeberg.org/";
+              uuid = "d1716ab7-66c0-4b19-beb3-0ce1d1f84360";
+            };
+          }
         ];
-        connections.codeberg = {
-          url = "https://codeberg.org/";
-          uuid = "d1716ab7-66c0-4b19-beb3-0ce1d1f84360";
-          tokenFile = config.age.secrets.codeberg-actions-token.path;
-        };
+        secrets.server.connections.codeberg.token_url = config.age.secrets.codeberg-actions-token.path;
       };
       gitgay = {
         enable = true;
-        settings = runnerSettings;
-        labels = [
-          "ubuntu-24.04:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
-          "ubuntu-22.04:docker://ghcr.io/catthehacker/ubuntu:act-22.04"
-          "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
-          "docker:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+        settings = lib.mkMerge [
+          runnerSettings
+          {
+            runner.labels = [
+              "ubuntu-24.04:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+              "ubuntu-22.04:docker://ghcr.io/catthehacker/ubuntu:act-22.04"
+              "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+              "docker:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+            ];
+            server.connections.gitgay = {
+              url = "https://git.gay/";
+              uuid = "4d34b7ae-b5fd-4a1f-abaa-bd361704e760";
+            };
+          }
         ];
-        connections.codeberg = {
-          url = "https://git.gay/";
-          uuid = "4d34b7ae-b5fd-4a1f-abaa-bd361704e760";
-          tokenFile = config.age.secrets.gitgay-actions-token.path;
-        };
+        secrets.server.connections.gitgay.token_url = config.age.secrets.gitgay-actions-token.path;
       };
     };
   };
