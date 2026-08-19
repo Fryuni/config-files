@@ -15,7 +15,7 @@ in [
   attrs.tmux-treehouse.overlays.default
 
   (import ./utils.nix)
-  (import ./patches.nix)
+  (import ./patches)
   (import ./jetbrains)
   (import ./croct.nix)
   (import ./pulumi)

@@ -27,6 +27,7 @@ final: prev: {
   # Use fork with hack fix arround this issue while waiting for official position from Tailscale.
   #   See https://github.com/tailscale/tailscale/issues/18381#issuecomment-4332462281
   tailscale = prev.master.tailscale.overrideAttrs (attrs: {
+    version = "1.97.0-pre-unstable-2026-07-14";
     src = final.fetchFromGitHub {
       owner = "Fryuni";
       repo = "tailscale";
@@ -41,28 +42,14 @@ final: prev: {
     '';
 
     vendorHash = "sha256-y6rBPJtkhTQMsnUoUC/1Up61FEplPpxaU1OkO2FDeio=";
-    passthru =
-      (attrs.passthru or {})
-      // {
-        updateScript = final.nix-update-script {
-          extraArgs = ["--version=branch=main"];
-        };
-      };
-
-    # Reason why it is meaningless also in the issue comment above.
-    doCkeck = false;
   });
 
   t-smart-tmux-session-manager = prev.tmuxPlugins.t-smart-tmux-session-manager.overrideAttrs (_: {
-    version = "unstable-2026-05-22";
+    version = "0-unstable-2026-05-22";
     src = prev.fetchgit {
       url = "https://codeberg.org/Fryuni/t-smart-tmux-session-manager.git";
-      rev = "57d83d65feb692904644f162881977ffc54644d2";
-      hash = "sha256-DrWNLAXgKH6Kf/NPMFz4nsk6GAjXDlPhLU/cSu6q+lo=";
-    };
-
-    passthru.updateScript = prev.nix-update-script {
-      extraArgs = ["--version=branch=main"];
+      rev = "ad54e819c99d1a1cc460bd46352bcfb3f02270ed";
+      hash = "sha256-qDPihXpDga8SAp+uuIwUu4au9CwJy/OFJnK50QobTuw=";
     };
   });
 }

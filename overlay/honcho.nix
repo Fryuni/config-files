@@ -1,15 +1,15 @@
 final: pkgs: let
-  honchoVersion = "3.0.7";
+  honchoVersion = "3.0.12";
   honchoSrc = pkgs.fetchFromGitHub {
     owner = "plastic-labs";
     repo = "honcho";
     rev = "v${honchoVersion}";
-    hash = "sha256-g/uZgSqCOzNiGSAQugEkPwz2+Wt6DPBiMNCRjzmA8sc=";
+    hash = "sha256-nsDb1zumWJYHI9O1RLj1BlNbMGmwCERb1LeYmkS7jM8=";
   };
 in {
   honcho-ai = pkgs.python313Packages.buildPythonPackage rec {
     pname = "honcho-ai";
-    version = "2.1.2";
+    version = "2.3.0";
     pyproject = true;
 
     src = honchoSrc;
@@ -38,7 +38,7 @@ in {
 
   honcho-cli = pkgs.python313Packages.buildPythonApplication rec {
     pname = "honcho-cli";
-    version = "0.1.0";
+    version = "0.1.2";
     pyproject = true;
 
     src = honchoSrc;
@@ -228,10 +228,7 @@ in {
         runHook postInstallCheck
       '';
 
-      passthru = {
-        python = pythonEnv;
-        updateScript = pkgs.nix-update-script {};
-      };
+      passthru.python = pythonEnv;
 
       meta = {
         description = "Honcho self-hosted API server and background deriver";

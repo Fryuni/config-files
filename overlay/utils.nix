@@ -18,6 +18,9 @@ final: pkgs: {
   inherit (pkgs.stable) electron;
   inherit (pkgs.stable) electron_36;
 
+  # NOTE: 1.5.7 is the last MPL-licensed Terraform release; later versions are BUSL.
+  # The pin is terminal, so it has no update recipe. `renameWithSuffix` output has
+  # no version/src attributes, which nix-update requires.
   terraformOSS = let
     package = pkgs.mkTerraform {
       version = "1.5.5";
@@ -50,41 +53,37 @@ final: pkgs: {
       sha256 = "sha256-0pM36rAmwx/P1KAlmVaGoSj8eb9JucYycNC2R867dVo=";
     };
 
-    vendorHash = "sha256-veg5B68AQhkSZg8YA/e4FbqJNG0YGwnUQFsAdscz0QI=";
-    passthru.updateScript = pkgs.nix-update-script {};
+    vendorHash = "sha256-P5N738GXGk3S0GhIHYhkuNoyF69OX12ibL3H6c4Ki1E=";
   };
 
   pg-schema-diff = pkgs.buildGoModule {
-    name = "pg-schema-diff";
+    pname = "pg-schema-diff";
+    version = "1.0.9-unstable-2026-08-06";
     doCheck = false;
 
     src = pkgs.fetchFromGitHub {
       owner = "stripe";
       repo = "pg-schema-diff";
-      rev = "7741e0941c20625d8f8efd0b9dabbe18faee8bca";
-      sha256 = "sha256-JVW2ML+2a9tRXRue0aPXRaPq8vNsgLP0NB7J0g1uMFw=";
+      rev = "9ada4710c28718312557c84cca1be4b2557eed54";
+      sha256 = "sha256-ycp4dM7PwuKH71Od4qqcwJ5JOJfSHv/hq4jrRYljfjM=";
     };
 
-    vendorHash = "sha256-/pzW7zK7pPo205oio4QcnOXgP7imRQ8VCdt652YCJkg=";
-    passthru.updateScript = pkgs.nix-update-script {
-      extraArgs = ["--version=branch=main"];
-    };
+    vendorHash = "sha256-9tronDAe3/5bBtiMW04YGSgxww/F7xlq84sjYFTfxnk=";
   };
 
   wtf = pkgs.buildGoModule rec {
     pname = "wtf";
-    version = "0.43.0";
+    version = "0.50.0";
     doCheck = false;
 
     src = pkgs.fetchFromGitHub {
       owner = "wtfutil";
       repo = "wtf";
       rev = "v${version}";
-      sha256 = "sha256-DFrA4bx+wSOxmt1CVA1oNiYVmcWeW6wpfR5F1tnhyDY=";
+      sha256 = "sha256-sq+8r317JMY8Wbl3KlrmHgIicbs6HZ3BLtG4VGBSHM4=";
     };
 
-    vendorHash = "sha256-f82ibPnauUOuZ5D6Rz3Yyt0jiAXvjN8Or3gud+ri6FA=";
-    passthru.updateScript = pkgs.nix-update-script {};
+    vendorHash = "sha256-lOo+ghppMA2FtKkA6xd2irPsk6ATZEydexBPOm48sy4=";
   };
 
   # gh = let
