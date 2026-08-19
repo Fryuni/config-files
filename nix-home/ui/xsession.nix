@@ -24,6 +24,108 @@
   pamixer = lib.getExe pkgs.pamixer;
   playerctl = lib.getExe pkgs.playerctl;
   findCursor = "${lib.getExe pkgs.find-cursor} --size 280 --distance 35 --line-width 6 --color ${lib.escapeShellArg colors.primary} --repeat 2 --grow";
+  seedAutorandrProfiles = pkgs.writeShellApplication {
+    name = "seed-autorandr-profiles";
+    runtimeInputs = [pkgs.coreutils];
+    text = ''
+      config_root="''${XDG_CONFIG_HOME:-$HOME/.config}/autorandr"
+      mkdir -p "$config_root"
+
+      for profile in docked mobile; do
+        source="/etc/xdg/autorandr/$profile"
+        destination="$config_root/$profile"
+        if [[ -d "$source" && ! -e "$destination" && ! -L "$destination" ]]; then
+          temporary="$(mktemp -d --tmpdir="$config_root" ".$profile.XXXXXX")"
+          cp -R "$source/." "$temporary/"
+          chmod -R u+rwX "$temporary"
+          if ! mv -T "$temporary" "$destination" 2>/dev/null; then
+            rm -rf "$temporary"
+          fi
+        fi
+      done
+    '';
+  };
+  configureDisplays = pkgs.writeShellApplication {
+    name = "configure-displays";
+    runtimeInputs = [
+      pkgs.arandr
+      pkgs.autorandr
+      pkgs.zenity
+    ];
+    text = ''
+      ${lib.getExe seedAutorandrProfiles}
+      arandr
+
+      config_root="''${XDG_CONFIG_HOME:-$HOME/.config}/autorandr"
+      while profile="$(zenity --entry \
+        --title="Save display profile" \
+        --text="Enter a new profile name for this display layout:" \
+        --ok-label="Save")"; do
+        if [[ ! "$profile" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+          zenity --error --title="Invalid profile name" \
+            --text="Use letters, numbers, dots, underscores, or hyphens; start with a letter or number."
+          continue
+        fi
+        if [[ -e "$config_root/$profile" || -L "$config_root/$profile" ]]; then
+          zenity --error --title="Profile already exists" \
+            --text="The profile ‘$profile’ already exists. Choose a different name."
+          continue
+        fi
+        if autorandr --save "$profile" --match-edid; then
+          zenity --info --title="Display profile saved" \
+            --text="Saved the current layout as ‘$profile’."
+          exit 0
+        fi
+        zenity --error --title="Could not save profile" \
+          --text="autorandr could not save ‘$profile’."
+      done
+    '';
+  };
+  selectDisplayProfile = pkgs.writeShellApplication {
+    name = "select-display-profile";
+    runtimeInputs = [
+      pkgs.autorandr
+      pkgs.zenity
+    ];
+    text = ''
+      ${lib.getExe seedAutorandrProfiles}
+      mapfile -t profiles < <(autorandr --detected --match-edid)
+      if (( ''${#profiles[@]} == 0 )); then
+        zenity --info --title="No matching display profiles" \
+          --text="No saved profiles match the currently connected displays."
+        exit 0
+      fi
+
+      profile="$(printf '%s\n' "''${profiles[@]}" | zenity --list \
+        --title="Select display profile" \
+        --text="Profiles matching the connected displays:" \
+        --column="Profile" \
+        --hide-header)" || exit 0
+      [[ -n "$profile" ]] || exit 0
+
+      if ! autorandr --load "$profile" --match-edid; then
+        zenity --error --title="Could not load profile" \
+          --text="autorandr could not load ‘$profile’."
+        exit 1
+      fi
+    '';
+  };
+  configureDisplaysDesktop = pkgs.makeDesktopItem {
+    name = "configure-displays";
+    desktopName = "Configure Displays";
+    comment = "Arrange displays and save an autorandr profile";
+    exec = lib.getExe configureDisplays;
+    icon = "preferences-desktop-display";
+    categories = ["Settings" "HardwareSettings"];
+  };
+  selectDisplayProfileDesktop = pkgs.makeDesktopItem {
+    name = "select-display-profile";
+    desktopName = "Select Display Profile";
+    comment = "Load a profile matching the connected displays";
+    exec = lib.getExe selectDisplayProfile;
+    icon = "video-display";
+    categories = ["Settings" "HardwareSettings"];
+  };
   openwhisprI3Autostart = pkgs.writeShellApplication {
     name = "openwhispr-i3-autostart";
     runtimeInputs = [pkgs.systemd];
@@ -60,6 +162,10 @@ in {
     pkgs.pavucontrol
     pkgs.pamixer
     pkgs.playerctl
+    configureDisplays
+    selectDisplayProfile
+    configureDisplaysDesktop
+    selectDisplayProfileDesktop
   ];
 
   # Xorg derives 137 DPI from the combined displays; 96 DPI is 100% scale.
@@ -101,7 +207,7 @@ in {
             notification = false;
           }
           {
-            command = "${lib.getExe pkgs.autorandr} --change --default horizontal && ${lib.getExe pkgs.xrandr} --dpi 96 && ${pkgs.i3}/bin/i3-msg 'workspace number 1; workspace number 2; workspace number 1'";
+            command = "${lib.getExe seedAutorandrProfiles} && ${lib.getExe pkgs.autorandr} --change --default horizontal --match-edid && ${lib.getExe pkgs.xrandr} --dpi 96 && ${pkgs.i3}/bin/i3-msg 'workspace number 1; workspace number 2; workspace number 1'";
             always = true;
             notification = false;
           }

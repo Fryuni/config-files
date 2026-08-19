@@ -34,6 +34,7 @@
   services.autorandr = {
     enable = true;
     defaultTarget = "horizontal";
+    matchEdid = true;
     hooks.postswitch.set-wallpaper = ''
       set -euo pipefail
 
