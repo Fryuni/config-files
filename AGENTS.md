@@ -129,7 +129,7 @@ imports = [ ./subdir ./file.nix ];
 products = versions.${system} or (throw "Unsupported system: ${system}");
 
 # Conditional lists
-++ lib.optionals (stdenv.isLinux) [ package1 ]
+++ lib.optionals (stdenv.hostPlatform.isLinux) [ package1 ]
 
 # Graceful failures in shell commands
 ${pkgs.someCommand} || true

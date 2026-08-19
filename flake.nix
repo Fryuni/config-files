@@ -295,7 +295,7 @@
         packages = [];
       };
 
-      checks = nixpkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
+      checks = nixpkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
         cloudflare-tunnel-module = import ./tests/cloudflare-tunnel-module.nix {
           inherit pkgs;
           inherit (nixpkgs) lib;

@@ -35,12 +35,12 @@
     buildPhase = let
       arch =
         (
-          if stdenv.isLinux
+          if stdenv.hostPlatform.isLinux
           then "linux"
           else "mac"
         )
         + (
-          if stdenv.isAarch64
+          if stdenv.hostPlatform.isAarch64
           then "arm"
           else ""
         );

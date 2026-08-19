@@ -31,7 +31,7 @@
   products = versions.${system} or (throw "Unsupported system: ${system}");
 
   package =
-    if stdenv.isDarwin
+    if stdenv.hostPlatform.isDarwin
     then ./darwin.nix
     else ./linux.nix;
   mkJetBrainsProduct = callPackage package {inherit vmopts;};
@@ -64,12 +64,12 @@
     .overrideAttrs (attrs: {
       nativeBuildInputs =
         (attrs.nativeBuildInputs or [])
-        ++ lib.optionals stdenv.isLinux [
+        ++ lib.optionals stdenv.hostPlatform.isLinux [
           autoPatchelfHook
         ];
       buildInputs =
         (attrs.buildInputs or [])
-        ++ lib.optionals stdenv.isLinux [
+        ++ lib.optionals stdenv.hostPlatform.isLinux [
           python3
           stdenv.cc.cc
           libdbusmenu
@@ -77,14 +77,14 @@
           expat
           libxcrypt-legacy
         ]
-        ++ lib.optionals (stdenv.isLinux && stdenv.isAarch64) [
+        ++ lib.optionals (stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isAarch64) [
           libxml2
           xz
         ];
       dontAutoPatchelf = true;
       postFixup =
         (attrs.postFixup or "")
-        + lib.optionalString stdenv.isLinux ''
+        + lib.optionalString stdenv.hostPlatform.isLinux ''
           (
             cd $out/clion
 
@@ -209,7 +209,7 @@
     .overrideAttrs (attrs: {
       postFixup =
         (attrs.postFixup or "")
-        + lib.optionalString stdenv.isLinux ''
+        + lib.optionalString stdenv.hostPlatform.isLinux ''
           interp="$(cat $NIX_CC/nix-support/dynamic-linker)"
           patchelf --set-interpreter $interp $out/goland/plugins/go-plugin/lib/dlv/linux/dlv
           chmod +x $out/goland/plugins/go-plugin/lib/dlv/linux/dlv
@@ -262,7 +262,7 @@
     inherit pname version src wmClass jdk buildNumber product;
     productShort = "MPS";
     meta = with lib; {
-      broken = stdenv.isLinux && stdenv.isAarch64;
+      broken = stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isAarch64;
       homepage = "https://www.jetbrains.com/mps/";
       inherit license description platforms;
       longDescription = ''
@@ -308,14 +308,14 @@
     wmClass,
     buildNumber,
     product,
-    cythonSpeedup ? stdenv.isLinux,
+    cythonSpeedup ? stdenv.hostPlatform.isLinux,
     ...
   }:
     (mkJetBrainsProduct {
       inherit pname version src wmClass jdk buildNumber product;
       productShort = "PyCharm";
       meta = with lib; {
-        broken = stdenv.isLinux && stdenv.isAarch64;
+        broken = stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isAarch64;
         homepage = "https://www.jetbrains.com/pycharm/";
         inherit description license platforms;
         longDescription = ''
@@ -378,12 +378,12 @@
     .overrideAttrs (attrs: {
       nativeBuildInputs =
         (attrs.nativeBuildInputs or [])
-        ++ lib.optionals stdenv.isLinux [
+        ++ lib.optionals stdenv.hostPlatform.isLinux [
           autoPatchelfHook
         ];
       buildInputs =
         (attrs.buildInputs or [])
-        ++ lib.optionals stdenv.isLinux [
+        ++ lib.optionals stdenv.hostPlatform.isLinux [
           stdenv.cc.cc
           zlib
           fontconfig # plugins/dotTrace/DotFiles/linux-*/libSkiaSharp.so
@@ -391,7 +391,7 @@
       dontAutoPatchelf = true;
       postFixup =
         (attrs.postFixup or "")
-        + lib.optionalString stdenv.isLinux ''
+        + lib.optionalString stdenv.hostPlatform.isLinux ''
           (
             cd $out/rider
 
@@ -451,19 +451,19 @@
     .overrideAttrs (attrs: {
       nativeBuildInputs =
         (attrs.nativeBuildInputs or [])
-        ++ lib.optionals stdenv.isLinux [
+        ++ lib.optionals stdenv.hostPlatform.isLinux [
           autoPatchelfHook
         ];
       buildInputs =
         (attrs.buildInputs or [])
-        ++ lib.optionals stdenv.isLinux [
+        ++ lib.optionals stdenv.hostPlatform.isLinux [
           python3
           stdenv.cc.cc
           libdbusmenu
           openssl.out
           libxcrypt-legacy
         ]
-        ++ lib.optionals (stdenv.isLinux && stdenv.isAarch64) [
+        ++ lib.optionals (stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isAarch64) [
           expat
           libxml2
           xz
@@ -471,7 +471,7 @@
       dontAutoPatchelf = true;
       postFixup =
         (attrs.postFixup or "")
-        + lib.optionalString stdenv.isLinux ''
+        + lib.optionalString stdenv.hostPlatform.isLinux ''
           (
             cd $out/rust-rover
 
