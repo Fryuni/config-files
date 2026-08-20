@@ -22,7 +22,6 @@
       llm-agents.workmux
       llm-agents.herdr
       llm-agents.tuicr
-      honcho-cli
 
       uv # Needed for omp
       sqlite # Needed for many agents and tools
