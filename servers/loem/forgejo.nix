@@ -58,6 +58,7 @@ in {
       security.GLOBAL_TWO_FACTOR_REQUIREMENT = "all";
       service.DISABLE_REGISTRATION = true;
       session.COOKIE_SECURE = true;
+      actions.DEFAULT_ACTIONS_URL = "self";
     };
   };
 
