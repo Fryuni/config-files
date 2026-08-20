@@ -21,6 +21,13 @@
   ];
 
   hardware.facter.reportPath = ./facter.json;
+
+  # Ignore overlong pathnames when fscking fetched objects (large monorepos).
+  programs.git = {
+    enable = true;
+    config.fetch.fsck.largePathname = "ignore";
+  };
+
   environment.systemPackages = with pkgs; [
     postgresql
   ];
