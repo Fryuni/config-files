@@ -41,7 +41,6 @@
   '';
 in {
   imports = [
-    # ./xfce.nix
     ./xsession.nix
     ./rofi.nix
     ./plasma.nix
