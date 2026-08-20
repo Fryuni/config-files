@@ -59,18 +59,6 @@
 
   nix.package = pkgs.nix;
 
-  services.agentsview = {
-    postgres = {
-      url = "postgres://agentsview@loem.rudd-agama.ts.net/agentsview?sslmode=disable";
-      machine = "note";
-      allowInsecure = true;
-      push = {
-        enable = true;
-        interval = "30m";
-      };
-    };
-  };
-
   services.node-red = {
     enable = true;
     configFile = "${../common/node-red.js}";

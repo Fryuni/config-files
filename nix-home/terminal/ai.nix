@@ -41,7 +41,6 @@
     };
 
     services = {
-      agentsview.enable = true;
       git-sync = {
         enable = true;
         repositories = {
