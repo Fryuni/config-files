@@ -46,7 +46,7 @@ update-flake:
   git add flake.lock
   git diff --cached --quiet -- flake.lock || git commit -m "chore: Update flake" -- flake.lock
 
-update-overlays: update-cpa-manager-plus update-grafterm update-honcho update-openwhispr update-pg-schema-diff update-pulumi update-rustCrates update-t-smart-tmux-session-manager update-tailscale update-wtf
+update-overlays: update-cpa-manager-plus update-honcho update-openwhispr update-pulumi update-rustCrates update-t-smart-tmux-session-manager update-tailscale
 
 # Overlay packages are only exposed through legacyPackages (the full nixpkgs
 # set), which nix-update's flake mode does not search by default, so attribute
@@ -55,21 +55,11 @@ update-overlays: update-cpa-manager-plus update-grafterm update-honcho update-op
 update-cpa-manager-plus:
   nix run nixpkgs#nix-update -- --flake legacyPackages.x86_64-linux.cpa-manager-plus
 
-update-grafterm:
-  nix run nixpkgs#nix-update -- --flake legacyPackages.x86_64-linux.grafterm
-
 update-honcho:
   nix run nixpkgs#nix-update -- --flake legacyPackages.x86_64-linux.honcho
 
-update-jetbrains:
-  overlay/jetbrains/update_ides.py
-  overlay/jetbrains/plugins/update_plugins.py
-
 update-openwhispr:
   nix run nixpkgs#nix-update -- --flake legacyPackages.x86_64-linux.openwhispr --url https://github.com/OpenWhispr/openwhispr --version-regex '^v?(1\.[0-9]+\.[0-9]+)$' --custom-dep appImage
-
-update-pg-schema-diff:
-  nix run nixpkgs#nix-update -- --flake legacyPackages.x86_64-linux.pg-schema-diff --version=branch=main
 
 update-pulumi:
   overlay/pulumi/update.sh
@@ -82,9 +72,6 @@ update-t-smart-tmux-session-manager:
 
 update-tailscale:
   nix run nixpkgs#nix-update -- --flake legacyPackages.x86_64-linux.tailscale --version=branch=main
-
-update-wtf:
-  nix run nixpkgs#nix-update -- --flake legacyPackages.x86_64-linux.wtf
 
 apply-reload:
   home-manager switch --flake .

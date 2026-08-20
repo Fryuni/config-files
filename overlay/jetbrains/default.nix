@@ -1,6 +1,5 @@
 final: pkgs: let
   inherit (pkgs.master) jetbrains;
-  # jetbrains = pkgs.master.callPackage ./custom.nix {};
 
   globalPlugins = [
     # "acejump"
