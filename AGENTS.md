@@ -192,3 +192,17 @@ Key inputs: `nixpkgs`, `home-manager`, `agenix`, `fenix` (Rust), `zig`, `nur`
 6. **Target system** - Primary target is `x86_64-linux` (note)
 7. **State version** - Current: `26.05` (do not change without migration)
 8. **Stage new files for Nix** - Nix flakes only see files that are staged or committed in git. Always run `git add <file>` after creating new files, otherwise Nix commands will not see them
+
+## Agent skills
+
+### Issue tracker
+
+Issues live on the self-hosted Forgejo instance (`git.fryuni.dev/Fryuni/nix-files`), operated via the `fj` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five-role vocabulary, label strings as-is: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
