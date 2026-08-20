@@ -46,7 +46,7 @@ update-flake:
   git add flake.lock
   git diff --cached --quiet -- flake.lock || git commit -m "chore: Update flake" -- flake.lock
 
-update-overlays: update-cpa-manager-plus update-honcho update-openwhispr update-pulumi update-rustCrates update-t-smart-tmux-session-manager update-tailscale
+update-overlays: update-cpa-manager-plus update-openwhispr update-pulumi update-rustCrates update-t-smart-tmux-session-manager update-tailscale
 
 # Overlay packages are only exposed through legacyPackages (the full nixpkgs
 # set), which nix-update's flake mode does not search by default, so attribute
@@ -54,9 +54,6 @@ update-overlays: update-cpa-manager-plus update-honcho update-openwhispr update-
 # `just` calls corrupt quoted flag arguments.
 update-cpa-manager-plus:
   nix run nixpkgs#nix-update -- --flake legacyPackages.x86_64-linux.cpa-manager-plus
-
-update-honcho:
-  nix run nixpkgs#nix-update -- --flake legacyPackages.x86_64-linux.honcho
 
 update-openwhispr:
   nix run nixpkgs#nix-update -- --flake legacyPackages.x86_64-linux.openwhispr --url https://github.com/OpenWhispr/openwhispr --version-regex '^v?(1\.[0-9]+\.[0-9]+)$' --custom-dep appImage

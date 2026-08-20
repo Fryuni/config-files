@@ -222,8 +222,6 @@
 
       templates = import ./templates attrs;
 
-      nixosModules.honcho = ./nixos/modules/honcho.nix;
-
       nixosConfigurations =
         builtins.foldl' (
           acc: entry: let
@@ -300,11 +298,6 @@
           inherit pkgs;
           inherit (nixpkgs) lib;
           cloudflareTunnelModule = ./nixos/modules/networking/cloudflare-tunnel.nix;
-        };
-        honcho-module = import ./tests/honcho-module.nix {
-          inherit pkgs;
-          inherit (nixpkgs) lib;
-          honchoModule = ./nixos/modules/honcho.nix;
         };
         tailnet-access-module = import ./tests/tailnet-access-module.nix {
           inherit pkgs;

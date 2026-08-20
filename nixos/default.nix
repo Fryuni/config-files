@@ -8,7 +8,6 @@
     ./nix-settings.nix
     ./modules/networking
     ./modules/i3.nix
-    ./modules/honcho.nix
     ./users.nix
     ./audio.nix
     ./registries.nix

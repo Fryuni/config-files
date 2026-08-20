@@ -18,7 +18,6 @@ in [
   (import ./patches)
   (import ./jetbrains)
   (import ./pulumi)
-  (import ./honcho.nix)
   (import ./rustPackages)
   (import ./vicinae-extensions.nix attrs)
 
