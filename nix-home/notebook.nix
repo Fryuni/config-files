@@ -46,14 +46,7 @@
   services.gpg-agent.enable = true;
   services.gpg-agent.pinentry.package = pkgs.pinentry-rofi;
 
-  hermes = {
-    enabled = true;
-    gateway.enabled = true;
-    dashboard = {
-      enabled = true;
-      tailscaleService = "hermes";
-    };
-  };
+  hermes.enabled = true;
 
   age.secrets.node-red-key.file = ../secrets/node-red-key;
 
