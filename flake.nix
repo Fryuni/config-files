@@ -18,6 +18,24 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.utils.follows = "flake-utils";
     };
+    nur. url = "github:nix-community/NUR";
+    polymc = {
+      url = "github:Fryuni/PolyMC/develop";
+      inputs.nixpkgs.follows = "nixpkgs-stable";
+      inputs.flake-compat.follows = "flake-compat";
+    };
+    vicinae = {
+      url = "github:vicinaehq/vicinae";
+      inputs.systems.follows = "systems";
+      # Don't follow nixpkgs — use their pinned version for cachix cache hits.
+      # Vicinae is a standalone C++ app with no ABI coupling to the rest of the system.
+    };
+    vicinae-extensions = {
+      url = "github:vicinaehq/extensions";
+      inputs.vicinae.follows = "vicinae";
+      inputs.systems.follows = "systems";
+      # inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     determinate = {
       url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
@@ -57,10 +75,6 @@
       url = "git+https://git.fryuni.dev/Fryuni/llm-agents.nix?ref=main";
       # inputs.nixpkgs.follows = "nixpkgs";
     };
-    nur = {
-      url = "github:nix-community/NUR";
-      # inputs.nixpkgs.follows = "nixpkgs";
-    };
     fenix = {
       url = "https://flakehub.com/f/nix-community/fenix/0.1";
       # inputs.nixpkgs.follows = "nixpkgs-stable";
@@ -72,23 +86,6 @@
     };
     home-manager = {
       url = "https://flakehub.com/f/nix-community/home-manager/0.1";
-      # inputs.nixpkgs.follows = "nixpkgs";
-    };
-    polymc = {
-      url = "github:Fryuni/PolyMC/develop";
-      inputs.nixpkgs.follows = "nixpkgs-stable";
-      inputs.flake-compat.follows = "flake-compat";
-    };
-    vicinae = {
-      url = "github:vicinaehq/vicinae";
-      inputs.systems.follows = "systems";
-      # Don't follow nixpkgs — use their pinned version for cachix cache hits.
-      # Vicinae is a standalone C++ app with no ABI coupling to the rest of the system.
-    };
-    vicinae-extensions = {
-      url = "github:vicinaehq/extensions";
-      inputs.vicinae.follows = "vicinae";
-      inputs.systems.follows = "systems";
       # inputs.nixpkgs.follows = "nixpkgs";
     };
     direnv = {
@@ -111,11 +108,9 @@
   outputs = {
     self,
     nixpkgs,
-    nixos-hardware,
     home-manager,
     flake-utils,
     agenix,
-    agenix-rekey,
     ...
   } @ attrs: let
     nixpkgsConfig = {
