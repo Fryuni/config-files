@@ -15,6 +15,7 @@ in [
   attrs.tmux-treehouse.overlays.default
 
   (import ./utils.nix)
+  (import ./packages)
   (import ./patches)
   (import ./jetbrains)
   (import ./pulumi)
@@ -31,8 +32,5 @@ in [
     llm-agents = attrs.llm-agents.packages.${system};
     treehouse = attrs.treehouse.packages.${system}.default;
     forgejo-cli = attrs.forgejo-cli.packages.${system}.default;
-
-    cpa-manager-plus = final.callPackage ./packages/cpa-manager-plus.nix {};
-    openwhispr = final.callPackage ./packages/openwhispr.nix {};
   })
 ]

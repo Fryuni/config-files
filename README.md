@@ -43,7 +43,7 @@ Important composition rules:
 ## Repository layout
 
 - `flake.nix` — declares inputs, overlays, flake outputs, machine composition, Home Manager composition, checks, formatter, dev shell, and flake apps.
-- `overlay/` — repository overlays and channel-specific overlay extensions used by `pkgsFun`.
+- `overlay/` — repository overlays and channel-specific overlay extensions used by `pkgsFun`. `overlay/registry.nix` is the package registry: the authoritative seam for custom package exposure and update dispatch. Ordinary packages live one-per-file under `overlay/packages/` and are exposed by the registry-driven overlay; specialized families (`overlay/pulumi/`, `overlay/rustPackages/`) own their own exposure and updater scripts.
 - `nixos/` — shared workstation/system modules, reusable NixOS modules, SSH host data, Nix settings, registries, and user declarations.
 - `nixos/notebook/` — `note`-specific hardware, boot, GPU, networking, and notebook policy.
 - `servers/common.nix` — shared server baseline for locale, SSH defaults, Nix settings, registries, and operational tooling categories.
@@ -120,6 +120,15 @@ Common local workflows are exposed as flake apps from `commands.nix`:
 - Home Manager build and diff helpers for `lotus@note`.
 - NixOS build and diff helpers for `note`.
 - Flake lock update and repository formatting helpers.
+
+### Package updates
+
+All custom overlay package updates derive from `overlay/registry.nix`; there is no hand-maintained package list anywhere else:
+
+- `just update-overlays` dispatches every registry entry that declares an update strategy, in deterministic name order, aborting on the first failure.
+- `just update-package <name>` (or `overlay/update.sh <name>`) dispatches a single entry for targeted maintenance or diagnosis.
+- Registry entries pick one of three strategies: ordinary `nix-update` against `legacyPackages` (full argument flexibility), a specialized family updater (`overlay/pulumi/update.sh`, `overlay/rustPackages/update.mjs`), or no automatic updater for intentionally pinned packages (for example the terminal `terraformOSS` pin).
+- Adding an ordinary package means dropping `<name>.nix` into `overlay/packages/` and adding one registry entry; exposure and update dispatch follow automatically.
 
 Forgejo Actions automate the same maintenance paths on the self-hosted Nix runner:
 
