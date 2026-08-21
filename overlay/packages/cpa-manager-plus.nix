@@ -3,14 +3,14 @@
   fetchurl,
 }: let
   pname = "cpa-manager-plus";
-  version = "1.12.1";
+  version = "1.12.2";
 in
   stdenvNoCC.mkDerivation {
     inherit pname version;
 
     src = fetchurl {
       url = "https://github.com/seakee/CPA-Manager-Plus/releases/download/v${version}/${pname}_v${version}_linux_amd64.tar.gz";
-      hash = "sha256-xss6iWamAYFowaAo/Mre0EJeX9j+dCxFXE+jeIbJGNw=";
+      hash = "sha256-yQDVLahEjmTitJfI6lY5uFcb+bCH4fajEc1AXZKWeFY=";
     };
 
     sourceRoot = "${pname}_v${version}_linux_amd64";
