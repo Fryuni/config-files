@@ -8,6 +8,9 @@
   services.tailscale = {
     authKeyFile = config.age.secrets.tailscale-authkey.path;
     fileInbox.enable = true;
+    # Advertise as an exit node. Applied on every boot by tailscaled-set
+    # (the host is already enrolled, so extraUpFlags would never run).
+    extraSetFlags = ["--advertise-exit-node"];
   };
 
   networking.firewall.enable = false;
