@@ -10,11 +10,11 @@
   ];
 
   # make the tailscale command usable to users
-  environment.systemPackages = [pkgs.tailscale];
+  environment.systemPackages = [pkgs.master.tailscale];
 
   # enable the tailscale service
   services.tailscale = {
-    package = pkgs.tailscale;
+    package = pkgs.master.tailscale;
     enable = true;
     fileInbox.enable = lib.mkDefault true;
     useRoutingFeatures = "both";

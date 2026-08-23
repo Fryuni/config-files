@@ -25,6 +25,6 @@
 
   services.tailscale.serve.services.git-ss.endpoints = {
     "tcp:22" = "tcp://localhost:23231";
-    "tcp:443" = "tls-terminated-http://localhost:23232";
+    # "tcp:443" = "tls-terminated-http://localhost:23232";
   };
 }
