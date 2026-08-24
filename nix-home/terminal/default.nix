@@ -36,7 +36,7 @@
   };
 
   home.sessionVariables = {
-    _ZO_EXCLUDE_DIRS = "/tmp/*";
+    _ZO_EXCLUDE_DIRS = "/tmp/*:$HOME/.treehouse/*";
   };
 
   programs.zsh = {
