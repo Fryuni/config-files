@@ -31,6 +31,13 @@
   };
 
   services.vmagent.enable = true;
+  # The Microdia webcam can report valid V4L2 control values while its
+  # internal image processor remains misconfigured after power-on. Rewrite
+  # the known-good controls whenever its capture node is initialized.
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="video4linux", ATTR{index}=="0", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="671f", RUN+="${pkgs.v4l-utils}/bin/v4l2-ctl -d $env{DEVNAME} --set-ctrl=gamma=100,saturation=50,backlight_compensation=3"
+  '';
+
   services.autorandr = {
     enable = true;
     defaultTarget = "horizontal";
