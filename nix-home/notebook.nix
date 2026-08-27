@@ -15,6 +15,27 @@
     master.bitwarden-menu
     master.qbittorrent
     google-workspace-cli
+
+    (makeDesktopItem {
+      name = "set-camera-normal";
+      desktopName = "Camera Normal mode";
+      comment = "Set the camera to normal operating mode";
+      exec = writeShellScript "camera-normal" ''
+        ${v4l-utils}/bin/v4l2-ctl -d /dev/video0 --set-ctrl=gamma=100,saturation=60,backlight_compensation=6
+      '';
+      icon = "preferences-camera";
+      categories = ["Settings" "HardwareSettings"];
+    })
+    (makeDesktopItem {
+      name = "set-camera-noir";
+      desktopName = "Camera Noir mode";
+      comment = "Set the camera to a black and white low-tone noir mode";
+      exec = writeShellScript "camera-noir" ''
+        ${v4l-utils}/bin/v4l2-ctl -d /dev/video0 --set-ctrl=gamma=70,saturation=0,backlight_compensation=1
+      '';
+      icon = "preferences-camera";
+      categories = ["Settings" "HardwareSettings"];
+    })
   ];
 
   programs.home-manager.enable = true;
