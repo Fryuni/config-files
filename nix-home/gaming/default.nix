@@ -1,7 +1,10 @@
 {pkgs, ...}: {
-  home.packages = with pkgs; [
-    # prismlauncher
+  home.packages = [
+    # pkgs.prismlauncher
   ];
 
-  programs.obs-studio = {enable = true;};
+  programs.obs-studio = {
+    enable = true;
+    package = pkgs.obs-studio.override {cudaSupport = true;};
+  };
 }
