@@ -49,6 +49,7 @@ in {
     ./fonts.nix
     ./alacritty.nix
     ./ghostty.nix
+    ./discord.nix
   ];
 
   home.packages = with pkgs; [
@@ -57,7 +58,6 @@ in {
     kdePackages.okular
     kdePackages.gwenview
     spotify
-    stable.discord
     master.obsidian
     (jrnl.overrideAttrs (_: {doTest = false;}))
     vlc
