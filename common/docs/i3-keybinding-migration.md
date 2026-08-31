@@ -44,7 +44,8 @@ Where the command is named, it is the exact current i3 command.
 | Arrow keys and `Super+H/J/K/L` movement | focus/move in the matching left/down/up/right directions; keyboard focus also centers the pointer on the selected window | `movefocus`/`movewindow` in those directions | Preserved except for the `Super+L` focus collision below. |
 | `Super+Shift+Left/Right/Up/Down` and `Super+Shift+H/J/K/L` | move container in direction | move window in direction | Preserved directional intent. |
 | `Super+1`–`Super+0` | workspace 1–10 | workspace 1–10 | Preserved. |
-| `Super+Shift+1`–`Super+Shift+0` | move container to workspace 1–10 | move window to workspace 1–10 | Preserved. |
+| `Super+Shift+1`–`Super+Shift+0` | move container to workspace 1–10, then follow it | move window to workspace 1–10 | Preserved move intent and extended it to focus the destination workspace. |
+| `Super+Ctrl+Shift+1`–`Super+Ctrl+Shift+0` | move container to workspace 1–10 without following it | not bound | Retains i3's previous move-and-stay behavior on an alternate modifier. |
 | `Super+[` / `Super+]` | previous / next workspace | `e-1` / `e+1` workspace | Preserved direction. |
 | `Super+A` | `workspace back_and_forth` | previous workspace | Preserved last-workspace intent. |
 | `Super+R`, then arrows or `H/J/K/L` | resize mode; `Return`/`Escape` exits | resize submap; `Return`/`Escape` resets | Preserved modal controls; repeat behavior differs. |
@@ -174,8 +175,9 @@ After selecting the default i3 session in SDDM and logging in:
    into an X11 application. Open CopyQ with `Super+Shift+V` and restore an item.
 5. Create multiple windows and test directional focus/move, split/tabbed
    layouts, floating, sticky, scratchpad, workspaces, wheel workspace cycling,
-   resize mode, and media/brightness keys. Check the documented
-   approximations—notably `Super+E`, `Super+G`, and `Super+Shift+F`.
+   both move-and-follow and move-without-follow workspace bindings, resize mode,
+   and media/brightness keys. Check the documented approximations—notably
+   `Super+E`, `Super+G`, and `Super+Shift+F`.
 6. Start a dictation with OpenWhispr. Confirm its Voice Recorder overlay remains
    unfocused/floating/borderless and that its completed text pastes into the
    previously focused X11 target.
