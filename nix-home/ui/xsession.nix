@@ -24,6 +24,47 @@
   pamixer = lib.getExe pkgs.pamixer;
   playerctl = lib.getExe pkgs.playerctl;
   findCursor = "${lib.getExe pkgs.find-cursor} --size 280 --distance 35 --line-width 6 --color ${lib.escapeShellArg colors.primary} --repeat 2 --grow";
+  workspaceOutputsConfig = "${config.xdg.cacheHome}/i3/workspace-outputs.conf";
+  generateWorkspaceOutputs = pkgs.writeShellApplication {
+    name = "generate-i3-workspace-outputs";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.gawk
+      pkgs.xrandr
+    ];
+    text = ''
+      output_file=${lib.escapeShellArg workspaceOutputsConfig}
+      mkdir -p "$(dirname "$output_file")"
+
+      mapfile -t outputs < <(
+        xrandr --listactivemonitors |
+          awk '
+            /^Monitors:/ { next }
+            NF && match($3, /([+-][0-9]+)([+-][0-9]+)$/, position) {
+              printf "%d\t%d\t%s\n", position[1], position[2], $NF
+            }
+          ' |
+          sort -n -k1,1 -k2,2 -k3,3 |
+          cut -f3
+      )
+
+      temporary="$(mktemp "$output_file.XXXXXX")"
+      trap 'rm -f "$temporary"' EXIT
+
+      if (( ''${#outputs[@]} > 0 )); then
+        for workspace in {1..10}; do
+          output_index=$(((workspace - 1) % ''${#outputs[@]}))
+          printf 'workspace %d output %s\n' "$workspace" "''${outputs[$output_index]}" >>"$temporary"
+        done
+      fi
+
+      if [[ ! -e "$output_file" ]] || ! cmp -s "$temporary" "$output_file"; then
+        mv "$temporary" "$output_file"
+      fi
+
+      printf '%s\n' "$output_file"
+    '';
+  };
   seedAutorandrProfiles = pkgs.writeShellApplication {
     name = "seed-autorandr-profiles";
     runtimeInputs = [pkgs.coreutils];
@@ -207,7 +248,7 @@ in {
             notification = false;
           }
           {
-            command = "${lib.getExe seedAutorandrProfiles} && ${lib.getExe pkgs.autorandr} --change --default horizontal --match-edid && ${lib.getExe pkgs.xrandr} --dpi 96 && ${pkgs.i3}/bin/i3-msg 'workspace number 1; workspace number 2; workspace number 1'";
+            command = "${lib.getExe seedAutorandrProfiles} && ${lib.getExe pkgs.autorandr} --change --default horizontal --match-edid && ${lib.getExe pkgs.xrandr} --dpi 96 && ${pkgs.i3}/bin/i3-msg reload && ${pkgs.i3}/bin/i3-msg 'workspace number 1; workspace number 2; workspace number 1'";
             always = true;
             notification = false;
           }
@@ -386,8 +427,7 @@ in {
       };
 
       extraConfig = ''
-        workspace 1 output eDP-1-1
-        workspace 2 output HDMI-0
+        include `${lib.getExe generateWorkspaceOutputs}`
 
         for_window [class="(?i)^(org\.pulseaudio\.pavucontrol|pavucontrol)$"] floating enable
         for_window [class="(?i)^nm-connection-editor$"] floating enable
@@ -401,6 +441,13 @@ in {
         for_window [class="open-whispr" title="Voice Recorder"] floating enable, border none
       '';
     };
+  };
+
+  xdg.configFile."autorandr/postswitch.d/50-reload-i3-workspaces" = {
+    source = pkgs.writeShellScript "reload-i3-workspaces" ''
+      ${pkgs.i3}/bin/i3-msg reload >/dev/null 2>&1 || true
+    '';
+    executable = true;
   };
 
   services.copyq.enable = true;
