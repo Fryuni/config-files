@@ -35,7 +35,9 @@
       echo ${pkgs.tree-sitter} >> "$HASH_TMP"
 
       if ! diff -q "$HASH_TMP" ~/.local/state/nvim/nix_deps &>/dev/null ; then
-        rm -rf ~/.local/share/nvim ~/.local/state/nvim ~/.cache/nvim
+        rm -rf ~/.local/share/nvim || true
+        rm -rf ~/.local/state/nvim || true
+        rm -rf ~/.cache/nvim || true
       fi
 
       mkdir -p ~/.local/state/nvim
