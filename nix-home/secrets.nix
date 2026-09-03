@@ -25,6 +25,10 @@
       file = ../secrets/prr-global;
       path = "${config.xdg.configHome}/prr/config.toml";
     };
+    maven-credentials = {
+      file = ../secrets/maven-credentials;
+      path = "${config.home.homeDirectory}/.m2/settings.xml";
+    };
     npm-token = {
       file = ../secrets/npm-token;
       path = "${config.home.homeDirectory}/.npmrc";
