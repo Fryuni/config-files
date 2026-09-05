@@ -5,7 +5,7 @@
   home.file.".local/share/rofi/themes/styles".source = ../../common/rofi/styles;
   programs.rofi = {
     enable = true;
-    pass.enable = true;
+    # pass.enable = true;
 
     terminal = "${pkgs.ghostty}/bin/ghostty";
     theme = ../../common/rofi/sp.theme.rasi;
