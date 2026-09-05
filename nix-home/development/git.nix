@@ -78,12 +78,14 @@
   '';
 
   home.activation."fixGitMaintenance" = lib.hm.dag.entryAfter ["linkGeneration"] ''
-    ${lib.escapeShellArgs [
+    if [[ -f ${lib.escapeShellArg "${config.xdg.configHome}/systemd/user/git-maintenance@.service"} ]]; then
+      run ${lib.escapeShellArgs [
       "${pkgs.sd}/bin/sd"
-      "/nix/store/\\w+-git-[\\d.]+/"
-      "${pkgs.git}/"
-      "${config.home.homeDirectory}/.config/systemd/user/git-maintenance@.service"
-    ]} || true
-    ${pkgs.systemd}/bin/systemctl --user daemon-reload || true
+      "/nix/store/[^/]+-git-[^/]+/bin/git\\b"
+      "${config.home.profileDirectory}/bin/git"
+      "${config.xdg.configHome}/systemd/user/git-maintenance@.service"
+    ]}
+      run ${pkgs.systemd}/bin/systemctl --user daemon-reload || true
+    fi
   '';
 }
