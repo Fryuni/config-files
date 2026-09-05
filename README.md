@@ -102,6 +102,14 @@ Because `servers/remoteDev.nix` imports `servers/interactive.nix`, `loem` gets S
 
 Home Manager configuration is centered on `lotus`: `nix-home/default.nix` sets `/home/lotus` as the home directory and provides the shared user baseline, while notebook and server layers add category-specific modules where appropriate.
 
+### Herdr
+
+The shared terminal AI module imports `nix-home/terminal/herdr/` on notebook and interactive-server Home Manager configurations. It owns Herdr's `config.toml` and `plugins.json`; session files, logs, and plugin state remain writable and unmanaged. Change settings and the installed plugin set in the flake rather than through Herdr's settings or plugin-management commands.
+
+`nix-home/terminal/herdr/plugins/` defines store-backed plugin packages. The current Treehouse integration comes from the locked `herdr-treehouse` flake input; its upstream flake provides only development shells, so the local package definition installs its manifest and scripts with store paths for Python, Git, Gum, and Treehouse. Add repository-local custom plugins in this directory; Git-backed plugins should use pinned flake inputs (`flake = false` for repositories without a flake).
+
+For the first activation on a machine with a manual setup, back up `~/.config/herdr/config.toml` and `~/.config/herdr/plugins.json` before replacing them with Home Manager's links, or use Home Manager's backup option. Existing files are not force-overwritten. The adopted configuration currently enables only `local.herdr-treehouse`; historical plugin state is not an installation source. Reload or restart Herdr after applying the generation.
+
 ## Secrets
 
 Secrets are managed with age through agenix and agenix-rekey:

@@ -13,6 +13,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     tmux-treehouse.url = "git+https://git.fryuni.dev/Fryuni/tmux-treehouse";
+    herdr-treehouse = {
+      url = "git+https://git.fryuni.dev/Fryuni/herdr-treehouse?ref=main";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.treehouse.follows = "treehouse";
+    };
     forgejo-cli = {
       url = "git+https://git.fryuni.dev/Fryuni/forgejo-cli.git?ref=main";
       inputs.nixpkgs.follows = "nixpkgs";

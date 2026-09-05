@@ -684,6 +684,30 @@
         "type": "github"
       }
     },
+    "herdr-treehouse": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "treehouse": [
+          "treehouse"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786716943,
+        "narHash": "sha256-sV790ozkUgH/2FR0GOidw+TJc2vQFtiONHvHB7Ij63U=",
+        "ref": "main",
+        "rev": "cd2a874ae3a90707b6807eeeb7a8decd3d0c94d1",
+        "revCount": 4,
+        "type": "git",
+        "url": "https://git.fryuni.dev/Fryuni/herdr-treehouse"
+      },
+      "original": {
+        "ref": "main",
+        "type": "git",
+        "url": "https://git.fryuni.dev/Fryuni/herdr-treehouse"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": "nixpkgs_9"
@@ -1363,6 +1387,7 @@
         "forgejo-cli": "forgejo-cli",
         "gomod2nix": "gomod2nix",
         "google-workspace-cli": "google-workspace-cli",
+        "herdr-treehouse": "herdr-treehouse",
         "home-manager": "home-manager",
         "llm-agents": "llm-agents",
         "nix-alien": "nix-alien",

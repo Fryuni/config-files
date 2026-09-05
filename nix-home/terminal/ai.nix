@@ -4,7 +4,10 @@
   config,
   ...
 }: {
-  imports = [./treehouse];
+  imports = [
+    ./herdr
+    ./treehouse
+  ];
 
   config = lib.mkIf (pkgs.stdenv.buildPlatform.system == pkgs.stdenv.hostPlatform.system) {
     home.packages = with pkgs; [
@@ -19,7 +22,6 @@
       # AI auxiliary tools
       llm-agents.skills-installer
       llm-agents.workmux
-      llm-agents.herdr
       llm-agents.tuicr
 
       uv # Needed for omp
