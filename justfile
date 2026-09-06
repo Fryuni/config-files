@@ -22,6 +22,9 @@ why-home dependency *args:
 why-home-closure dependency *args:
   @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure "{{homeRoot}}" ".#{{dependency}}" {{args}}
 
+why-home-raw *args:
+  @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure --derivation "{{homeRoot}}" {{args}}
+
 why-sys dependency *args:
   @env NIXPKGS_ALLOW_INSECURE=1 nix why-depends --impure --derivation "{{sysRoot}}" ".#{{dependency}}" {{args}}
 
