@@ -30,6 +30,10 @@
     networkmanager.wifi.powersave = false;
   };
 
+  # IGMPv2 membership reports restore incoming mDNS on the home Wi-Fi;
+  # without them, Cast discovery queries leave but multicast replies never arrive.
+  boot.kernel.sysctl."net.ipv4.conf.wlp61s0.force_igmp_version" = 2;
+
   services.vmagent.enable = true;
   # The Microdia webcam can report valid V4L2 control values while its
   # internal image processor remains misconfigured after power-on. Rewrite
