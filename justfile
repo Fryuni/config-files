@@ -54,6 +54,9 @@ update-flake:
 # per-package recipes here.
 update-overlays:
   overlay/update.sh
+  git add overlay
+  git diff --cached --quiet -- overlay || git commit -m "chore: Update overlays" -- overlay
+
 
 # Update a single package or family from overlay/registry.nix
 # (e.g. `just update-package pulumi`).

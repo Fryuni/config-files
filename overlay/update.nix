@@ -22,7 +22,7 @@
   # because overlay packages are only exposed through legacyPackages, which
   # nix-update's flake mode does not search by default.
   nixUpdate = name: args:
-    "nix run nixpkgs#nix-update -- --flake legacyPackages.x86_64-linux.${name}"
+    "nix run nixpkgs#nix-update -- --commit --flake legacyPackages.x86_64-linux.${name}"
     + (
       if args == []
       then ""
