@@ -28,9 +28,11 @@
 
       app_asar = Path(sys.argv[1])
       patches = {
+          # Since 1.9.2, wtype runs separately and other Wayland compositors
+          # already prefer ydotool. Keep our preference for X11/wlroots too.
           "clipboard candidate list": (
-              b"candidates = [...wtypeEntry, ...xdotoolEntry, ...ydotoolEntry]",
-              b"candidates = [...ydotoolEntry, ...xdotoolEntry, ...wtypeEntry]",
+              b"? [...xdotoolEntry, ...ydotoolEntry]",
+              b"? [...ydotoolEntry, ...xdotoolEntry]",
           ),
           "plaintext token fallback": (
               b'cached = buf.toString("utf8");\n      return cached || null;',
