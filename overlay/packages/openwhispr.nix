@@ -5,11 +5,11 @@
   lib,
 }: let
   pname = "openwhispr";
-  version = "1.8.3";
+  version = "1.9.2";
 
   src = fetchurl {
     url = "https://github.com/OpenWhispr/openwhispr/releases/download/v${version}/OpenWhispr-${version}-linux-x86_64.AppImage";
-    hash = "sha256-/pBkjSIWNJYr7ittyVTVeBWQzZ00X0EkiefjJNQXZ84=";
+    hash = "sha256-U6qI/R95qpATZHPMrlQijqE5efy5v83l9GSCx/Ri0W4=";
   };
 
   extracted = appimageTools.extract {
