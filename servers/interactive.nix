@@ -15,7 +15,7 @@
     enable = true;
     ports = [22];
     settings = {
-      AllowUsers = ["lotus" "nix-ssh"];
+      AllowUsers = ["lotus"];
       PermitRootLogin = "no";
       PasswordAuthentication = false;
     };

@@ -6,8 +6,12 @@
     nixpkgs-stable.url = "https://flakehub.com/f/NixOS/nixpkgs/*";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
+    cargo2nix.url = "github:AstroForge-Incorporated/cargo2nix";
 
-    google-workspace-cli.url = "github:googleworkspace/cli";
+    google-workspace-cli = {
+      url = "github:googleworkspace/cli";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     treehouse = {
       url = "github:kunchenguid/treehouse";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -4,7 +4,7 @@
   ...
 }: {
   imports = [
-    ./nix-store-cache.nix
+    ./modules/nix-store-cache.nix
   ];
 
   environment.systemPackages = with pkgs; [
@@ -12,6 +12,19 @@
   ];
 
   age.secrets.nix-access-tokens.rekeyFile = ../secrets/nix-access-tokens;
+
+  age.secrets.nix-store-cache-netrc = {
+    rekeyFile = ../secrets/nix-store-cache-netrc;
+    mode = "0600";
+    owner = "root";
+    group = "root";
+  };
+  services.nixStoreCache = {
+    enable = true;
+    endpoint = "https://nix-cache.fryuni.dev";
+    netrcFile = config.age.secrets.nix-store-cache-netrc.path;
+  };
+
   nix.extraOptions = let
     secrets = config.age.secrets or {};
     secretInclude = pkgs.lib.optionalString (secrets ? nix-access-tokens) "!include ${secrets.nix-access-tokens.path}";
@@ -42,6 +55,7 @@
       "https://vicinae.cachix.org"
     ];
     trusted-public-keys = [
+      "cubby-17bc3f6008:JMUmCk66H+G5s8997FRIkFSBY3tHRrqdV443N7E++cA="
       "nix-shell.cachix.org-1:kat3KoRVbilxA6TkXEtTN9IfD4JhsQp1TPUHg652Mwc="
       "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="

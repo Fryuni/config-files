@@ -36,6 +36,7 @@ Important composition rules:
 
 - `flake.nix` imports nixpkgs through `pkgsFun`, applying repository overlays from `overlay/`.
 - `channelOverlays` expose alternate package channels as `pkgs.master` and `pkgs.stable` while preserving the active package set as `unstable` inside those channel imports.
+- `google-workspace-cli` follows the root `nixpkgs` input so its `gws` package uses the same upstream Cargo fetcher fixes as the main package set.
 - Every NixOS system gets the agenix and agenix-rekey modules before its machine modules.
 - Native x86_64 builds use the normal `system` and shared `pkgs`; cross builds set host/build platforms and reuse the same overlay policy.
 - The workstation path and server path are separate: `nixos/` is the shared workstation/system baseline, while `servers/common.nix` is the shared server baseline.
@@ -98,7 +99,7 @@ Because `servers/remoteDev.nix` imports `servers/interactive.nix`, `loem` gets S
 
 `nixos/users.nix` declares the normal user `lotus` with UID 1000, zsh as the login shell, immutable user management, SSH authorized keys, and workstation/server administration and device-access groups. The shared workstation baseline imports this user module, and `servers/interactive.nix` reuses it on interactive servers.
 
-`note` sets the password hash for `lotus` and disables root SSH login. Interactive servers restrict SSH to `lotus` and `nix-ssh` and disable password authentication. `loem` additionally authorizes SSH keys for the `root` account, while the common server baseline otherwise defaults root SSH to key-only access.
+`note` sets the password hash for `lotus` and disables root SSH login. Interactive servers restrict SSH to `lotus` and disable password authentication. `loem` additionally authorizes SSH keys for the `root` account, while the common server baseline otherwise defaults root SSH to key-only access.
 
 Home Manager configuration is centered on `lotus`: `nix-home/default.nix` sets `/home/lotus` as the home directory and provides the shared user baseline, while notebook and server layers add category-specific modules where appropriate.
 
@@ -120,6 +121,28 @@ Secrets are managed with age through agenix and agenix-rekey:
 - Home Manager modules may also consume agenix secrets where imported, such as the `lotus@note` configuration.
 
 The `secrets/` tree contains encrypted material and host-key data. Do not treat file names there as an application inventory; the active consumers are the NixOS and Home Manager modules that reference individual secrets.
+
+### Shared remote Nix cache
+
+`nixos/nix-settings.nix` enables `nixos/modules/nix-store-cache.nix` on all four NixOS machines, through the workstation baseline or `servers/common.nix`. It replaces the SSH peer cache; host SSH keys remain in use for normal SSH and agenix. The remote server is [Cubby](https://git.fryuni.dev/Fryuni/cloudflare-nix-cache).
+
+The shared `services.nixStoreCache` settings expose `endpoint` and `netrcFile`. Nix connects directly to `https://nix-cache.fryuni.dev` for substitution and uploads; there is no local proxy. Agenix decrypts `secrets/nix-store-cache-netrc` to a root-owned, mode `0600` runtime file, and `nix.settings.netrc-file` points to that file. Credentials never enter the Nix store. HTTPS is required except for localhost testing. Netrc credentials are hostname-scoped, not path-scoped, so use a dedicated cache hostname.
+
+Determinate Nix overrides `netrc-file` after including NixOS settings. On those machines, the daemon's startup hook combines the agenix credential and any existing `/nix/var/determinate/netrc` into `/run/nix-store-cache/netrc` (mode `0600`, directory `0700`). The daemon receives that path through `NIX_CONFIG`, and the upload hook passes it explicitly. This intentionally avoids `authentication.additionalNetrcSources`, whose merged file is world-readable. The private copy is refreshed on daemon restart, including after changes to Determinate credentials. Upstream Nix machines use the agenix file directly.
+
+The encrypted netrc contains `machine nix-cache.fryuni.dev`, `login ""`, and `password "<Cubby WRITE_TOKEN>"`. The empty login preserves Cubby's Basic authentication convention. Normal users can request substitution through the daemon without reading the credential. Direct user `nix copy` commands need their own credentials; remote uploads are not delegated to the daemon. The configured Cubby public key verifies cache signatures; global signature verification remains enabled and the substituter is not marked `trusted=true`. Treat remote write access and the cache signing key as authority to supply executable store paths to every machine.
+
+The system post-build hook automatically uploads each locally built output and its reference closure with `nix copy`. Root hooks read the local store directly to avoid a recursive daemon call and read the same netrc file for authentication. Uploads are synchronous and add build latency; a failed upload emits a warning without failing the build or stopping subsequent builds. There is no persistent upload queue or outage backfill. Substituted paths do not run the hook. Other configured substituters remain available during a cache outage.
+
+Credential maintenance and deployment:
+
+1. Keep the endpoint in `nixos/nix-settings.nix` and the encrypted netrc's `machine` hostname consistent.
+2. Use `agenix -e secrets/nix-store-cache-netrc` with an authorized master identity to edit the complete netrc file, not just the token. Quote and escape the password according to curl's netrc syntax.
+3. Run `just rekey` and stage the updated encrypted source and host-specific rekeyed files.
+4. For `gce-automation`, first assign a stable hostname and register its SSH host public key with the existing host-key/rekey workflow. That image currently has no host identity and uses agenix-rekey's dummy recipient; its secrets cannot decrypt until provisioned.
+5. Build the affected NixOS configuration before applying it. Deploy the updated secret after rotation and restart `nix-daemon.service` to ensure all transfers use the new credentials.
+
+The netrc migration was checked with remote cache metadata access and a local HTTP cache requiring Basic authentication for Nix uploads and downloads into an isolated store. A separate isolated configuration-precedence smoke test reproduced HTTP 401 with Determinate's override and verified an authenticated response using the generated private netrc and daemon environment. The local unsigned fixture alone used `--no-check-sigs`; production signature settings are unchanged. These checks did not activate a configuration.
 
 ## Workflows and validation
 
