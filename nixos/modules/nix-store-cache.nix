@@ -24,19 +24,58 @@
     ${pkgs.coreutils}/bin/mv ${runtimeDirectory}/netrc.tmp ${runtimeDirectory}/netrc
   '';
 
-  uploadHook = pkgs.writeShellScript "upload-nix-store-paths-to-cubby" ''
-    if [ "$(${pkgs.coreutils}/bin/id -u)" -eq 0 ]; then
-      export NIX_REMOTE=local
-    fi
+  queueDirectory = "/nix/var/nix/gcroots/nix-store-cache";
+  uploadHook = pkgs.writeShellScript "enqueue-nix-store-paths" ''
+    set -eu
+    umask 077
+    ${pkgs.coreutils}/bin/mkdir -p ${queueDirectory}
+    for path in $OUT_PATHS; do
+      # Direct GC roots retain closures until upload succeeds or the entry expires.
+      # Repeated builds coalesce into the same queue entry.
+      ${pkgs.coreutils}/bin/ln -sT "$path" "${queueDirectory}/''${path##*/}" 2>/dev/null \
+        || test -L "${queueDirectory}/''${path##*/}"
+    done
+  '';
 
-    if ! ${config.nix.package}/bin/nix copy \
-      --option netrc-file ${lib.escapeShellArg daemonNetrc} \
+  uploadPath = pkgs.writeShellScript "upload-nix-store-cache-path" ''
+    set -eu
+    # The expiration service may remove an entry after the queue scan.
+    path="$(${pkgs.coreutils}/bin/readlink "$1")" || exit 0
+    if ${config.nix.package}/bin/nix copy \
+      --option netrc-file ${lib.escapeShellArg cfg.netrcFile} \
+      --option http-connections 1 \
+      --option max-substitution-jobs 1 \
       --to ${lib.escapeShellArg cfg.endpoint} \
-      --no-recursive \
-      $OUT_PATHS; then
-      echo "warning: failed to upload build outputs to the remote Nix store cache" >&2
+      "$path"; then
+      ${pkgs.coreutils}/bin/rm -f "$1"
+    else
+      echo "warning: upload failed for $path; retaining GC root for retry" >&2
     fi
+    # Failed uploads must not prevent xargs from draining the remaining queue.
     exit 0
+  '';
+
+  uploadQueue = pkgs.writeShellScript "drain-nix-store-cache-queue" ''
+    set -eu
+    export NIX_REMOTE=local
+    # Serialize service/manual invocations, not enqueue operations.
+    exec 9>${queueDirectory}/.lock
+    ${pkgs.util-linux}/bin/flock -n 9
+    while true; do
+      ${pkgs.findutils}/bin/find ${queueDirectory} -maxdepth 1 -type l -print0 \
+        | ${pkgs.findutils}/bin/xargs -0 -r -n 1 -P ${toString cfg.uploadConcurrency} ${uploadPath}
+      ${pkgs.coreutils}/bin/sleep 5
+    done
+  '';
+
+  expireQueue = pkgs.writeShellScript "expire-nix-store-cache-queue" ''
+    set -eu
+    if [ -d ${queueDirectory} ]; then
+      # Inspect symlink mtime, not target timestamps or access times from retries.
+      ${pkgs.findutils}/bin/find ${queueDirectory} -ignore_readdir_race -maxdepth 1 \
+        -type l ! -newermt '${toString cfg.maxQueueAgeSeconds} seconds ago' \
+        -delete -printf 'Expired cache queue entry: %f\n'
+    fi
   '';
 in {
   options.services.nixStoreCache = {
@@ -52,6 +91,18 @@ in {
       type = types.str;
       example = "/run/agenix/nix-store-cache-netrc";
       description = "Absolute runtime path to a root-readable netrc file containing the cache hostname, an empty login, and the Cubby token as password.";
+    };
+
+    uploadConcurrency = mkOption {
+      type = types.ints.positive;
+      default = 1;
+      description = "Maximum concurrent cache upload processes, each with one HTTP connection. Failed uploads remain queued and are retried after each drain pass and a five-second pause.";
+    };
+
+    maxQueueAgeSeconds = mkOption {
+      type = types.ints.positive;
+      default = 7 * 24 * 60 * 60;
+      description = "Maximum queue entry age in seconds. An independent hourly cleanup removes expired GC roots, even if uploads are stalled. Expired outputs are no longer guaranteed to reach the cache; store paths are left for normal garbage collection.";
     };
   };
 
@@ -72,6 +123,41 @@ in {
       substituters = lib.mkBefore [cfg.endpoint];
       netrc-file = cfg.netrcFile;
       post-build-hook = uploadHook;
+    };
+
+    systemd.tmpfiles.rules = ["d ${queueDirectory} 0700 root root -"];
+
+    systemd.services.nix-store-cache-expire = {
+      description = "Expire old Nix store cache queue entries";
+      unitConfig.RequiresMountsFor = [queueDirectory];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = expireQueue;
+      };
+    };
+
+    systemd.timers.nix-store-cache-expire = {
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnCalendar = "hourly";
+        Persistent = true;
+      };
+    };
+
+    systemd.services.nix-store-cache-upload = {
+      description = "Asynchronous Nix store cache uploads";
+      wantedBy = ["multi-user.target"];
+      wants = ["network-online.target"];
+      after = ["network-online.target" "agenix.service"];
+      unitConfig.RequiresMountsFor = [queueDirectory cfg.netrcFile];
+      serviceConfig = {
+        Type = "simple";
+        ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${queueDirectory}";
+        ExecStart = uploadQueue;
+        Restart = "always";
+        RestartSec = "5s";
+        UMask = "0077";
+      };
     };
 
     systemd.services.nix-daemon = {
