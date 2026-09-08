@@ -26,6 +26,13 @@ in {
       USAGE_DATA_DIR = stateDir;
     };
 
+    # Run offline maintenance as the service user, after the previous process stops.
+    preStart = ''
+      if [[ -e ${stateDir}/usage.sqlite ]]; then
+        ${lib.getExe pkgs.cpa-manager-plus} cleanup-derived --db-path ${stateDir}/usage.sqlite
+      fi
+    '';
+
     serviceConfig = {
       ExecStart = lib.getExe pkgs.cpa-manager-plus;
       Restart = "on-failure";
