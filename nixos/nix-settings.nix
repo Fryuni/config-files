@@ -13,8 +13,8 @@
 
   age.secrets.nix-access-tokens.rekeyFile = ../secrets/nix-access-tokens;
 
-  age.secrets.nix-store-cache-netrc = {
-    rekeyFile = ../secrets/nix-store-cache-netrc;
+  age.secrets.nix-store-cache-token = {
+    rekeyFile = ../secrets/nix-store-cache-token;
     mode = "0600";
     owner = "root";
     group = "root";
@@ -22,7 +22,7 @@
   services.nixStoreCache = {
     enable = true;
     endpoint = "https://nix-cache.fryuni.dev";
-    netrcFile = config.age.secrets.nix-store-cache-netrc.path;
+    tokenFile = config.age.secrets.nix-store-cache-token.path;
   };
 
   nix.extraOptions = let

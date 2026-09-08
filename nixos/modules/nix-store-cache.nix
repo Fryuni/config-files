@@ -9,18 +9,28 @@
   cfg = config.services.nixStoreCache;
   determinateEnabled = config.determinate.enable or false;
   runtimeDirectory = "/run/nix-store-cache";
-  daemonNetrc =
-    if determinateEnabled
-    then "${runtimeDirectory}/netrc"
-    else cfg.netrcFile;
+  daemonNetrc = "${runtimeDirectory}/netrc";
   prepareNetrc = pkgs.writeShellScript "prepare-nix-store-cache-netrc" ''
     set -eu
     umask 077
-    ${pkgs.coreutils}/bin/cat ${lib.escapeShellArg cfg.netrcFile} > ${runtimeDirectory}/netrc.tmp
-    printf '\n' >> ${runtimeDirectory}/netrc.tmp
-    if [ -f /nix/var/determinate/netrc ]; then
-      ${pkgs.coreutils}/bin/cat /nix/var/determinate/netrc >> ${runtimeDirectory}/netrc.tmp
-    fi
+    ${pkgs.python3}/bin/python3 -c '
+    import sys
+    from pathlib import Path
+    from urllib.parse import urlsplit
+
+    token = Path(sys.argv[1]).read_text().rstrip("\n")
+    if not token or any(c in token for c in "\r\n\0"):
+        sys.exit("Cache token must be a nonempty single line")
+    password = token.replace("\\", "\\\\").replace("\"", "\\\"")
+    print("machine " + urlsplit(sys.argv[2]).hostname)
+    print("login \"\"")
+    print("password \"" + password + "\"")
+    ' ${lib.escapeShellArg cfg.tokenFile} ${lib.escapeShellArg cfg.endpoint} > ${runtimeDirectory}/netrc.tmp
+    ${lib.optionalString determinateEnabled ''
+      if [ -f /nix/var/determinate/netrc ]; then
+        ${pkgs.coreutils}/bin/cat /nix/var/determinate/netrc >> ${runtimeDirectory}/netrc.tmp
+      fi
+    ''}
     ${pkgs.coreutils}/bin/mv ${runtimeDirectory}/netrc.tmp ${runtimeDirectory}/netrc
   '';
 
@@ -41,11 +51,7 @@
     set -eu
     # The expiration service may remove an entry after the queue scan.
     path="$(${pkgs.coreutils}/bin/readlink "$1")" || exit 0
-    if ${config.nix.package}/bin/nix copy \
-      --option netrc-file ${lib.escapeShellArg cfg.netrcFile} \
-      --option http-connections 1 \
-      --option max-substitution-jobs 1 \
-      --to ${lib.escapeShellArg cfg.endpoint} \
+    if ${pkgs.cachix}/bin/cachix --host ${lib.escapeShellArg cfg.endpoint} push main \
       "$path"; then
       ${pkgs.coreutils}/bin/rm -f "$1"
     else
@@ -58,6 +64,9 @@
   uploadQueue = pkgs.writeShellScript "drain-nix-store-cache-queue" ''
     set -eu
     export NIX_REMOTE=local
+    # Read the write token at runtime; never embed credentials in the Nix store.
+    CACHIX_AUTH_TOKEN="$(${pkgs.coreutils}/bin/cat ${lib.escapeShellArg cfg.tokenFile})"
+    export CACHIX_AUTH_TOKEN
     # Serialize service/manual invocations, not enqueue operations.
     exec 9>${queueDirectory}/.lock
     ${pkgs.util-linux}/bin/flock -n 9
@@ -87,16 +96,16 @@ in {
       description = "Cubby HTTPS cache base URL. User information, queries, fragments, and whitespace are not allowed. HTTP is allowed only on localhost for testing.";
     };
 
-    netrcFile = mkOption {
+    tokenFile = mkOption {
       type = types.str;
-      example = "/run/agenix/nix-store-cache-netrc";
-      description = "Absolute runtime path to a root-readable netrc file containing the cache hostname, an empty login, and the Cubby token as password.";
+      example = "/run/agenix/nix-store-cache-token";
+      description = "Absolute runtime path to a root-readable file containing only the Cubby write token, optionally followed by a newline. Used for Cachix uploads and runtime netrc generation.";
     };
 
     uploadConcurrency = mkOption {
       type = types.ints.positive;
       default = 1;
-      description = "Maximum concurrent cache upload processes, each with one HTTP connection. Failed uploads remain queued and are retried after each drain pass and a five-second pause.";
+      description = "Maximum concurrent Cachix upload processes. Each process may use multiple HTTP connections for multipart uploads. Failed uploads remain queued and are retried after each drain pass and a five-second pause.";
     };
 
     maxQueueAgeSeconds = mkOption {
@@ -109,8 +118,8 @@ in {
   config = mkIf cfg.enable {
     assertions = [
       {
-        assertion = lib.hasPrefix "/" cfg.netrcFile;
-        message = "services.nixStoreCache.netrcFile must be an absolute path";
+        assertion = lib.hasPrefix "/" cfg.tokenFile;
+        message = "services.nixStoreCache.tokenFile must be an absolute path";
       }
       {
         assertion = builtins.match "(https://[^/@:?#[:space:][:cntrl:]]+|http://(localhost|127\\.0\\.0\\.1))(:[0-9]+)?(/[^?#[:space:][:cntrl:]]*)?" cfg.endpoint != null;
@@ -121,7 +130,7 @@ in {
     nix.settings = {
       fallback = true;
       substituters = lib.mkBefore [cfg.endpoint];
-      netrc-file = cfg.netrcFile;
+      netrc-file = daemonNetrc;
       post-build-hook = uploadHook;
     };
 
@@ -149,7 +158,7 @@ in {
       wantedBy = ["multi-user.target"];
       wants = ["network-online.target"];
       after = ["network-online.target" "agenix.service"];
-      unitConfig.RequiresMountsFor = [queueDirectory cfg.netrcFile];
+      unitConfig.RequiresMountsFor = [queueDirectory cfg.tokenFile];
       serviceConfig = {
         Type = "simple";
         ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${queueDirectory}";
@@ -161,11 +170,12 @@ in {
     };
 
     systemd.services.nix-daemon = {
-      unitConfig.RequiresMountsFor = [cfg.netrcFile];
+      after = ["agenix.service"];
+      unitConfig.RequiresMountsFor = [cfg.tokenFile];
       # Determinate writes netrc-file after nix.custom.conf. Environment settings
       # take precedence without publishing the cache token in its shared netrc.
       environment.NIX_CONFIG = lib.mkIf determinateEnabled "netrc-file = ${daemonNetrc}";
-      serviceConfig = lib.mkIf determinateEnabled {
+      serviceConfig = {
         RuntimeDirectory = "nix-store-cache";
         RuntimeDirectoryMode = "0700";
         ExecStartPre = [prepareNetrc];
