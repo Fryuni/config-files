@@ -22,7 +22,7 @@ final: pkgs: {
   # The pin is terminal, so it has no update recipe. `renameWithSuffix` output has
   # no version/src attributes, which nix-update requires.
   terraformOSS = let
-    package = pkgs.mkTerraform {
+    package = pkgs.stable.mkTerraform {
       version = "1.5.5";
       hash = "sha256-SBS3a/CIUdyIUJvc+rANIs+oXCQgfZut8b0517QKq64=";
       vendorHash = "sha256-lQgWNMBf+ioNxzAV7tnTQSIS840XdI9fg9duuwoK+U4=";
