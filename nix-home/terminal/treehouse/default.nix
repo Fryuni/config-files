@@ -11,19 +11,19 @@
     ];
 
     xdg.configFile = {
-      "treehouse/config.toml".source = (pkgs.formats.toml {}).generate "treehouse-config.toml" {
+      "treehouse/config.toml.off".source = (pkgs.formats.toml {}).generate "treehouse-config.toml" {
         hooks = {
           post_create = ["${config.xdg.configHome}/treehouse/hooks/post-create.ts"];
           pre_destroy = ["${config.xdg.configHome}/treehouse/hooks/pre-destroy.ts"];
         };
       };
 
-      "treehouse/hooks/post-create.ts" = {
+      "treehouse/hooks-off/post-create.ts" = {
         source = ./post-create.ts;
         executable = true;
       };
 
-      "treehouse/hooks/pre-destroy.ts" = {
+      "treehouse/hooks-off/pre-destroy.ts" = {
         source = ./pre-destroy.ts;
         executable = true;
       };
