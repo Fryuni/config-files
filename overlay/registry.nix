@@ -39,6 +39,14 @@
     };
   };
 
+  forgejo = {
+    package = ./packages/forgejo.nix;
+    update = {
+      kind = "command";
+      command = "overlay/packages/update-forgejo.sh";
+    };
+  };
+
   openwhispr = {
     package = ./packages/openwhispr.nix;
     update = {

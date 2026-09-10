@@ -87,6 +87,8 @@ Because `servers/remoteDev.nix` imports `servers/interactive.nix`, `loem` gets S
 
 `servers/loem/forgejo.nix` runs a local Forgejo instance backed by the host PostgreSQL service, with repositories and LFS data persisted under `/var/lib/forgejo`. Forgejo listens only on loopback: the existing Cloudflare Tunnel publishes HTTPS at `git.fryuni.dev`, while Tailscale Serve exposes only the built-in SSH service as `git.rudd-agama.ts.net:22` inside the Tailnet. The same module continues to run the independent Forgejo Actions runners registered with the local Forgejo, Codeberg, and git.gay, configured through the first-party nixpkgs `services.forgejo-runner` module.
 
+The `pkgs.forgejo` overlay builds both the server and frontend from [Fryuni's fork](https://git.fryuni.dev/Fryuni/forgejo), pinned to a commit on its `forgejo` branch. Service configuration and persistent data paths are unchanged.
+
 ### `gce-automation`
 
 `gce-automation` is an x86_64-linux Google Compute image. Its flake entry combines the upstream Google Compute image NixOS module with `servers/gce-automation/`. That host imports `servers/common.nix` and adds a persistent `/data` filesystem plus host-local automation assets.
@@ -162,6 +164,7 @@ All custom overlay package updates derive from `overlay/registry.nix`; there is 
 - `just update-package <name>` (or `overlay/update.sh <name>`) dispatches a single entry for targeted maintenance or diagnosis.
 - Registry entries pick one of three strategies: ordinary `nix-update` against `legacyPackages` (full argument flexibility), a specialized family updater (`overlay/pulumi/update.sh`, `overlay/rustPackages/update.mjs`), or no automatic updater for intentionally pinned packages (for example the terminal `terraformOSS` pin).
 - Adding an ordinary package means dropping `<name>.nix` into `overlay/packages/` and adding one registry entry; exposure and update dispatch follow automatically.
+- `just update-package forgejo` fetches the latest commit on the fork's `forgejo` branch, then refreshes the source, Go vendor, and npm dependency hashes. It does not select release tags. Run `overlay/packages/update-forgejo.sh --no-commit` to update the pin without committing.
 
 Forgejo Actions automate the same maintenance paths on the self-hosted Nix runner:
 
