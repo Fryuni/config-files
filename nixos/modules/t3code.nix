@@ -8,7 +8,10 @@ in {
     after = ["network-online.target"];
 
     # Reuse lotus's provider credentials and development tools without a login session.
-    environment.HOME = "/home/lotus";
+    environment = {
+      HOME = "/home/lotus";
+      T3CODE_TELEMETRY_ENABLED = "false";
+    };
     path = [
       "/etc/profiles/per-user/lotus"
       "/home/lotus/.nix-profile"
