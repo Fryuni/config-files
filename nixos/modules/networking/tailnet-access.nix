@@ -32,7 +32,7 @@
       >Access-Control-Allow-Origin "{http.request.header.Origin}"
       >Access-Control-Allow-Credentials "true"
       >Access-Control-Allow-Methods "GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS"
-      >Access-Control-Allow-Headers "Authorization, Content-Type, Accept, Origin, User-Agent, DNT, Cache-Control, X-Requested-With, If-Modified-Since, Range"
+      >Access-Control-Allow-Headers "Authorization, Content-Type, Accept, Origin, User-Agent, DNT, Cache-Control, X-Requested-With, If-Modified-Since, Range, b3, traceparent"
       >Access-Control-Expose-Headers "Content-Length, Content-Range"
       >Access-Control-Max-Age "3600"
       >Vary "Origin"
