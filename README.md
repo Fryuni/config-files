@@ -105,6 +105,12 @@ The `pkgs.forgejo` overlay builds both the server and frontend from [Fryuni's fo
 
 Home Manager configuration is centered on `lotus`: `nix-home/default.nix` sets `/home/lotus` as the home directory and provides the shared user baseline, while notebook and server layers add category-specific modules where appropriate.
 
+### T3 Code
+
+`note` and `loem` import `nixos/modules/t3code.nix`. It runs `llm-agents.t3code`'s `t3 serve` as `lotus` in a boot-enabled system service, restarting on exit without requiring a login session. The service uses `/home/lotus` for its working directory and home, retaining T3's default per-user state and provider credentials; its PATH includes the user's Nix profiles and system tools.
+
+The backend binds only to `127.0.0.1:3773`. The existing tailnet DNS, certificates, and Caddy proxy expose the `t3` alias at `https://t3.note.lferraz.dev` and `https://t3.loem.lferraz.dev`; no public backend port or separate Tailscale Serve configuration is added. T3's own pairing/authentication remains enabled. Inspect startup and pairing details with `journalctl -u t3code.service` on the respective host.
+
 ### Herdr
 
 The shared terminal AI module imports `nix-home/terminal/herdr/` on notebook and interactive-server Home Manager configurations. It owns Herdr's `config.toml` and `plugins.json`; session files, logs, and plugin state remain writable and unmanaged. Change settings and the installed plugin set in the flake rather than through Herdr's settings or plugin-management commands.

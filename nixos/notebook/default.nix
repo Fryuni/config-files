@@ -9,6 +9,7 @@
     ../modules/development.nix
     ../modules/gaming.nix
     ../modules/networking/tailscale.nix
+    ../modules/t3code.nix
   ];
 
   boot.loader.systemd-boot.enable = true;

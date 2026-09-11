@@ -3,6 +3,7 @@
   imports = [
     ../../nixos/modules/docker.nix
     ../../nixos/modules/software-raid.nix
+    ../../nixos/modules/t3code.nix
 
     ../common.nix
     ../remoteDev.nix
