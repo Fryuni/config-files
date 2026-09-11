@@ -13,7 +13,10 @@
     home.packages = with pkgs; [
       llm-agents.opencode
       llm-agents.agent-browser
-      llm-agents.orca
+      llm-agents.t3code
+      llm-agents.crush
+      llm-agents.openfang
+      llm-agents.code
       (pkgs.lib.makeAuthWrapper llm-agents.omp {
         OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
         KIMI_API_KEY = {file = config.age.secrets.kimi-api-key.path;};
@@ -23,6 +26,7 @@
       llm-agents.skills-installer
       llm-agents.workmux
       llm-agents.tuicr
+      llm-agents.plannotator
       llm-agents.but
 
       uv # Needed for omp
