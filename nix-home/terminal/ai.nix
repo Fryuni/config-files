@@ -23,6 +23,7 @@
       llm-agents.skills-installer
       llm-agents.workmux
       llm-agents.tuicr
+      llm-agents.but
 
       uv # Needed for omp
       sqlite # Needed for many agents and tools
