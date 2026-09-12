@@ -59,5 +59,7 @@
     };
   };
 
+  services.nixStoreCache.uploadConcurrency = 4;
+
   home-manager.users.lotus.hermes.enabled = true;
 }
