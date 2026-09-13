@@ -1,21 +1,29 @@
 name: Update dependencies
 
+# Issue a JWT for the repository Authorized Application.
+enable-openid-connect: true
+
 on:
   schedule:
     # Weekly, Mondays at 04:00 UTC
     - cron: "0 4 * * 1"
   workflow_dispatch:
 
+concurrency:
+  group: update-dependencies
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: nix
     env:
-      BRANCH: automation/update-${{ github.run_id }}-${{ github.run_attempt }}
+      BRANCH: automation/update-dependencies
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           ref: main
+          persist-credentials: false
 
       - name: Configure automation git identity
         run: |
@@ -23,37 +31,96 @@ jobs:
           git config user.email "forgejo-actions[bot]@localhost"
 
       - name: Create update branch
-        run: git switch -c "$BRANCH"
+        id: branch
+        run: |
+          git switch -c "$BRANCH"
+          echo "base=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Update dependencies
-        run: env -u GH_TOKEN -u GITHUB_TOKEN nix shell nixpkgs#just --command just update
-
-      - name: Push branch and open pull request
         env:
-          FORGEJO_TOKEN: ${{ secrets.UPDATE_FORGEJO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: env -u GH_TOKEN nix shell nixpkgs#just --command just update
+
+      - name: Publish dependency update pull request
+        env:
+          UPDATE_BASE: ${{ steps.branch.outputs.base }}
+          TOKEN_AUDIENCE: ${{ vars.TOKEN_AUDIENCE }}
           API_URL: ${{ github.api_url }}
           REPOSITORY: ${{ github.repository }}
         run: |
-          set -euo pipefail
+          nix shell nixpkgs#curl nixpkgs#jq --command bash -euo pipefail <<'EOF'
+          : "${TOKEN_AUDIENCE:?Set the Authorized Application audience in vars.TOKEN_AUDIENCE}"
+          : "${ACTIONS_ID_TOKEN_REQUEST_URL:?OIDC must be enabled}"
+          : "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:?OIDC must be enabled}"
 
+          # Mint only after the dependency updaters have finished.
+          token="$(curl --fail-with-body --silent --show-error --get \
+            --header "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            --data-urlencode "audience=$TOKEN_AUDIENCE" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -er '.value | strings | select(length > 0)')"
+          echo "::add-mask::$token"
+
+          api() {
+            curl --fail-with-body --silent --show-error \
+              --header "Authorization: Bearer $token" \
+              --header "Content-Type: application/json" "$@"
+          }
+
+          # Include branches created by the previous per-run naming scheme.
+          # Paginate so an older update PR cannot be missed.
+          pulls='[]'
+          page=1
+          while true; do
+            batch="$(api "$API_URL/repos/$REPOSITORY/pulls?state=open&limit=50&page=$page")"
+            if [ "$(jq 'length' <<< "$batch")" -eq 0 ]; then
+              break
+            fi
+            matches="$(jq --arg repo "$REPOSITORY" '
+              [.[] | select(.base.ref == "main"
+                and .head.repo.full_name == $repo
+                and (.head.ref | startswith("automation/update-")))]
+            ' <<< "$batch")"
+            pulls="$(jq -cn --argjson old "$pulls" --argjson new "$matches" '$old + $new')"
+            page=$((page + 1))
+          done
+          pulls="$(jq 'sort_by(.number)' <<< "$pulls")"
+          existing="$(jq -r '.[0].number // empty' <<< "$pulls")"
+          if [ -n "$existing" ]; then
+            BRANCH="$(jq -r '.[0].head.ref' <<< "$pulls")"
+          fi
+
+          # No checkout credential is persisted; use the JWT for Git as well.
+          export GIT_CONFIG_COUNT=1
+          export GIT_CONFIG_KEY_0=http.extraHeader
+          export GIT_CONFIG_VALUE_0="Authorization: Bearer $token"
+          export GIT_TERMINAL_PROMPT=0
           git fetch origin main
-          if git diff --quiet origin/main HEAD; then
+          if git diff --quiet "$UPDATE_BASE" HEAD || git diff --quiet origin/main HEAD; then
+            # An earlier run may have opened a PR whose updates are now on main.
+            while read -r number; do
+              api --request PATCH --data '{"state":"closed"}' \
+                "$API_URL/repos/$REPOSITORY/pulls/$number"
+            done < <(jq -r '.[].number' <<< "$pulls")
             echo "No updates produced; skipping branch push and pull request."
             exit 0
           fi
 
-          git push origin "$BRANCH"
+          git push --force origin "HEAD:refs/heads/$BRANCH"
 
-          nix shell nixpkgs#curl nixpkgs#jq --command bash -euo pipefail <<'EOF'
-          payload="$(jq -n \
-            --arg title "chore: Update dependencies" \
-            --arg head "$BRANCH" \
-            --arg base "main" \
-            '{title: $title, head: $head, base: $base}')"
+          if [ -z "$existing" ]; then
+            payload="$(jq -n \
+              --arg title "chore: Update dependencies" \
+              --arg head "$BRANCH" \
+              --arg base "main" \
+              '{title: $title, head: $head, base: $base}')"
+            api --request POST --data "$payload" "$API_URL/repos/$REPOSITORY/pulls"
+          else
+            echo "Refreshed dependency update PR #$existing."
+          fi
 
-          curl --fail-with-body --silent --show-error --request POST \
-            --header "Authorization: token $FORGEJO_TOKEN" \
-            --header "Content-Type: application/json" \
-            --data "$payload" \
-            "$API_URL/repos/$REPOSITORY/pulls"
+          # Consolidate any duplicates left by the previous workflow.
+          while read -r number; do
+            api --request PATCH --data '{"state":"closed"}' \
+              "$API_URL/repos/$REPOSITORY/pulls/$number"
+          done < <(jq -r '.[1:][].number' <<< "$pulls")
           EOF

@@ -179,7 +179,8 @@ All custom overlay package updates derive from `overlay/registry.nix`; there is 
 Forgejo Actions automate the same maintenance paths on the self-hosted Nix runner:
 
 - Every pull request builds all NixOS targets, the `lotus@note` Home Manager generation, and the reusable-module checks.
-- A weekly and manually dispatched update workflow runs `just update`, pushes a dedicated branch, and opens a pull request when dependencies changed. It requires an `UPDATE_FORGEJO_TOKEN` Actions secret with repository write access so the resulting pull request triggers validation.
+- A weekly and manually dispatched update workflow runs `just update` from `main`. Serialized runs force-push the existing update PR branch, or create `automation/update-dependencies` and a PR when needed. It reuses branches from the previous per-run naming scheme, closes duplicate update PRs, and closes stale update PRs when there are no changes.
+- Publication uses a short-lived OIDC JWT for Git and API authentication, following the [Authorized Application example](https://git.fryuni.dev/Fryuni/llm-agents.nix/src/branch/main/.forgejo/workflows/update.yml). The repository Actions variable `TOKEN_AUDIENCE` identifies the application audience. The application must allow this repository, `.forgejo/workflows/update.yml`, `refs/heads/main`, and the `schedule` and `workflow_dispatch` events, with repository and pull-request write access. Checkout persists no credentials, and the publication JWT is minted after the updaters finish; `UPDATE_FORGEJO_TOKEN` is no longer used. The update step receives the `GITHUB_TOKEN` Actions secret for authenticated GitHub API requests to reduce rate limiting.
 
 For validation, prefer the narrow output that matches the change:
 
