@@ -313,6 +313,11 @@
           inherit (nixpkgs) lib;
           tailscaleFileInboxModule = ./nixos/modules/networking/tailscale-file-inbox.nix;
         };
+        nix-store-cache-module = import ./tests/nix-store-cache-module.nix {
+          inherit pkgs;
+          inherit (nixpkgs) lib;
+          nixStoreCacheModule = ./nixos/modules/nix-store-cache.nix;
+        };
       };
 
       apps = import ./commands.nix {

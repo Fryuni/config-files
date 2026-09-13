@@ -36,6 +36,9 @@
         {
           name = "VictoriaMetrics";
           type = "prometheus";
+          # Pinned so provisioned dashboards can reference the datasource by uid
+          # instead of relying on Grafana's generated one.
+          uid = "victoriametrics";
           url = "http://127.0.0.1:8428";
           isDefault = true;
           editable = false;
