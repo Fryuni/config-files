@@ -6,6 +6,8 @@
 # Script taken from https://github.com/NixOS/nixpkgs/blob/0b20bf89e0035b6d62ad58f9db8fdbc99c2b01e8/pkgs/tools/admin/pulumi/update.sh
 # and slightly modified to use the environment configured by the containing flake.
 
+set -euo pipefail
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Version of Pulumi from
@@ -108,7 +110,7 @@ function genSrcs() {
   local tmpdir
   tmpdir="$(mktemp -d)"
 
-  local i=0
+  local pids=()
 
   for plugVers in "${plugins[@]}"; do
     local plug=${plugVers%=*}
@@ -117,14 +119,20 @@ function genSrcs() {
     # https://github.com/pulumi/pulumi/blob/06d4dde8898b2a0de2c3c7ff8e45f97495b89d82/pkg/workspace/plugins.go#L197
     local url="https://api.pulumi.com/releases/plugins/pulumi-resource-${plug}-v${version}-${1}-${2}.tar.gz"
     genSrc "${url}" "${plug}" "${tmpdir}" &
-    ((++i))
+    pids+=("$!")
   done
 
-  wait
+  for pid in "${pids[@]}"; do
+    wait "$pid"
+  done
 
   find "${tmpdir}" -name '*.nix' -print0 | sort -z | xargs -r0 cat
   rm -r "${tmpdir}"
 }
+
+output_dir=$(mktemp -d "${SCRIPT_DIR}/.pulumi-update.XXXXXX")
+output="${output_dir}/data.nix"
+trap 'rm -rf "$output_dir"' EXIT
 
 {
   cat << EOF
@@ -154,7 +162,9 @@ EOF
   echo "  };"
   echo "}"
 
-} > "${SCRIPT_DIR}/data.nix"
+} > "$output"
 
-nix fmt "${SCRIPT_DIR}/data.nix"
+nix fmt "$output"
+nix-instantiate --eval --strict --expr '{path}: import path {}' --argstr path "$output" >/dev/null
+mv "$output" "${SCRIPT_DIR}/data.nix"
 git commit -m "chore(cli): Update pulumi" -- "${SCRIPT_DIR}/data.nix" || true
