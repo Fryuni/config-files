@@ -110,6 +110,7 @@ in {
               "ubuntu-22.04:docker://ghcr.io/catthehacker/ubuntu:act-22.04"
               "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
               "docker:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+              "nix:host"
             ];
             server.connections.codeberg = {
               url = "https://codeberg.org/";
@@ -129,6 +130,7 @@ in {
               "ubuntu-22.04:docker://ghcr.io/catthehacker/ubuntu:act-22.04"
               "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
               "docker:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
+              "nix:host"
             ];
             server.connections.gitgay = {
               url = "https://git.gay/";
