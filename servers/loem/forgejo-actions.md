@@ -29,9 +29,10 @@ Docker builds run against the host Docker daemon via the mounted Docker socket.
 Only run trusted workflows on this runner because those jobs can control the host
 Docker daemon.
 
-The local Forgejo runner also exposes `nix:host`. Workflows select it with
+All three runners also expose `nix:host`. Workflows select it with
 `runs-on: nix` and execute directly as the unprivileged `DynamicUser` of the
-`forgejo-runner-self` unit. The runner PATH includes the host Nix client, so
+corresponding `forgejo-runner-<name>` unit. Each runner uses the same explicit
+`hostPackages` list, which includes the host Nix client in its PATH, so
 flake builds use the host Nix daemon and its existing `/nix/store` instead of
 creating a second store in a container. The runner is not a Nix trusted user.
 

@@ -7,6 +7,7 @@
   domain = "git.fryuni.dev";
   httpPort = 3333;
   sshPort = 2222;
+  runnerHostPackages = with pkgs; [bash coreutils curl gawk gitMinimal gnused nix nodejs wget];
   runnerSettings = {
     container.docker_host = "automount";
     runner.capacity = 5;
@@ -98,7 +99,7 @@ in {
           }
         ];
         secrets.server.connections.self.token_url = config.age.secrets.self-actions-token.path;
-        hostPackages = with pkgs; [bash coreutils curl gawk gitMinimal gnused nix nodejs wget];
+        hostPackages = runnerHostPackages;
       };
       codeberg = {
         enable = true;
@@ -119,6 +120,7 @@ in {
           }
         ];
         secrets.server.connections.codeberg.token_url = config.age.secrets.codeberg-actions-token.path;
+        hostPackages = runnerHostPackages;
       };
       gitgay = {
         enable = true;
@@ -139,6 +141,7 @@ in {
           }
         ];
         secrets.server.connections.gitgay.token_url = config.age.secrets.gitgay-actions-token.path;
+        hostPackages = runnerHostPackages;
       };
     };
   };
