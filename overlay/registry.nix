@@ -62,6 +62,15 @@
     };
   };
 
+  # Binary and npm toolchain versions/hashes must be updated together.
+  vite-plus = {
+    package = ./packages/vite-plus.nix;
+    update = {
+      kind = "command";
+      command = "overlay/packages/update-vite-plus.py";
+    };
+  };
+
   # --- Override entries: exposure owned by overlay/patches ---
 
   # Fork of nixpkgs-master tailscale carrying the declarative TLS-terminated

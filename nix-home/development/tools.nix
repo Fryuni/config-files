@@ -10,6 +10,7 @@
     nodejs_26
     corepack
     bun
+    vite-plus
     wakatime-cli
 
     libnotify

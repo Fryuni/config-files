@@ -184,6 +184,7 @@ All custom overlay package updates derive from `overlay/registry.nix`; there is 
 - Registry entries pick one of three strategies: ordinary `nix-update` against `legacyPackages` (full argument flexibility), a specialized family updater (`overlay/pulumi/update.sh`, `overlay/rustPackages/update.mjs`), or no automatic updater for intentionally pinned packages (for example the terminal `terraformOSS` pin).
 - Adding an ordinary package means dropping `<name>.nix` into `overlay/packages/` and adding one registry entry; exposure and update dispatch follow automatically.
 - `just update-package forgejo` fetches the latest commit on the fork's `forgejo` branch, then refreshes the source, Go vendor, and npm dependency hashes. It does not select release tags. Run `overlay/packages/update-forgejo.sh --no-commit` to update the pin without committing.
+- `just update-package vite-plus` selects the latest stable GitHub release, refreshes all supported binary hashes and the npm lockfile/dependency hash, and builds the candidate before replacing the package files and committing them as `vite-plus: {old} -> {new}`. Unchanged releases are skipped. It also runs through `just update`; use `overlay/packages/update-vite-plus.py --no-commit` to review an update without staging or committing it.
 
 Forgejo Actions automate the same maintenance paths on the self-hosted Nix runner:
 
