@@ -18,6 +18,10 @@
       else "org-"
     )
     + lib.toLower (lib.replaceStrings ["/"] ["-"] scope);
+  # A dynamic user forces StateDirectory under /var/lib/private (0700 root), which
+  # the workDir BindPaths= cannot traverse, and hands persisted checkouts a UID that
+  # is not stable across starts. A static user keeps one real path for host Docker.
+  runnerUser = scope: "gh-runner-${runnerName scope}";
 in {
   assertions = [
     {
@@ -27,7 +31,20 @@ in {
         lib.length names == lib.length (lib.unique names);
       message = "GitHub runner scopes must produce distinct service names.";
     }
+    {
+      assertion = lib.all (scope: lib.stringLength (runnerUser scope) <= 32) (lib.attrNames registrations);
+      message = "GitHub runner scopes must produce user names of at most 32 characters.";
+    }
   ];
+
+  users.users = lib.mapAttrs' (scope: _:
+    lib.nameValuePair (runnerUser scope) {
+      isSystemUser = true;
+      group = runnerUser scope;
+    })
+  registrations;
+
+  users.groups = lib.mapAttrs' (scope: _: lib.nameValuePair (runnerUser scope) {}) registrations;
 
   age.secrets = lib.genAttrs (map secretName encryptedCredentials) (name: {
     rekeyFile = ../../secrets/loem + "/${name}";
@@ -47,6 +64,8 @@ in {
         else "/var/lib/github-runner-tokens/${credential}";
       tokenType = "access";
       replace = true;
+      user = runnerUser scope;
+      group = runnerUser scope;
       extraLabels = ["nix" "nixos" "docker" config.networking.hostName];
       extraPackages = with pkgs; [bash coreutils curl docker gawk gitMinimal gnused nix nodejs wget];
       # Keep checkouts on disk and visible at the same path to host Docker.

@@ -18,11 +18,14 @@ token also grants access to the new repository:
 "Fryuni/another-repository" = "fryuni";
 ```
 
-Each entry gets a separate service, dynamic user, registration, and disk-backed
-workspace under `/var/lib/github-runner-work/<runner-id>`. Registration state
-lives under `/var/lib/github-runner/<runner-id>`. The upstream module cleans the
-workspace whenever the service starts, not between jobs. Runner names in GitHub
-are prefixed with `loem-`. Changes to registration settings reuse that name.
+Each entry gets a separate service, registration, and disk-backed workspace
+under `/var/lib/github-runner-work/<runner-id>`. Registration state lives under
+`/var/lib/github-runner/<runner-id>`. Each runs as its own static system user
+`gh-runner-<runner-id>`, so the workspace keeps one real path and a stable owner
+rather than the `/var/lib/private` indirection a dynamic user would impose. The
+upstream module cleans the workspace whenever the service starts, not between
+jobs. Runner names in GitHub are prefixed with `loem-`. Changes to registration
+settings reuse that name.
 Removing a map entry stops managing its service; remove its stale registration
 in GitHub as well.
 
