@@ -12,6 +12,7 @@
     ./cli-proxy-api.nix
     ./disko.nix
     ./docker-registry.nix
+    ./executor.nix
     ./forgejo.nix
     ./github-actions.nix
     ./matrix.nix
