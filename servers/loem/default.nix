@@ -13,6 +13,7 @@
     ./disko.nix
     ./docker-registry.nix
     ./forgejo.nix
+    ./github-actions.nix
     ./matrix.nix
     ./metrics
     ./networking.nix
