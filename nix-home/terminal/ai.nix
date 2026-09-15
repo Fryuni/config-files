@@ -77,6 +77,10 @@
             path = "${config.home.homeDirectory}/.omp/agent";
             uri = "git@git-ss.rudd-agama.ts.net:configs/oh-my-pi.git";
           };
+          opencode = {
+            path = "${config.xdg.configHome}/opencode";
+            uri = "git@git-ss.rudd-agama.ts.net:opencode-config.git";
+          };
         };
       };
     };
