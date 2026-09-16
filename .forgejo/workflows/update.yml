@@ -38,7 +38,7 @@ jobs:
 
       - name: Update dependencies
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.READ_ONLY_GITHUB_TOKEN }}
         run: env -u GH_TOKEN nix shell nixpkgs#just --command just update
 
       - name: Publish dependency update pull request

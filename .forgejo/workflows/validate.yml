@@ -40,10 +40,14 @@ jobs:
 
       - name: Build target
         if: matrix.attr != 'checks'
+        env:
+          GITHUB_TOKEN: ${{ secrets.READ_ONLY_GITHUB_TOKEN }}
         run: nix build --no-link --print-out-paths ${{ matrix.flags }} "${{ matrix.attr }}"
 
       - name: Build all x86_64-linux flake checks
         if: matrix.attr == 'checks'
+        env:
+          GITHUB_TOKEN: ${{ secrets.READ_ONLY_GITHUB_TOKEN }}
         run: |
           mapfile -t attrs < <(nix eval --json .#checks.x86_64-linux --apply builtins.attrNames | nix shell nixpkgs#jq --command jq -r '.[] | ".#checks.x86_64-linux." + .')
           nix build --no-link --print-out-paths "${attrs[@]}"
