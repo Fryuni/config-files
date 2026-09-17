@@ -66,7 +66,8 @@ The main exported outputs are:
 - `nixosConfigurations.loem` — x86_64-linux server configuration composed from the disko module and `./servers/loem`.
 - `nixosConfigurations.rpi3` — aarch64-linux Raspberry Pi 3 SD image configuration composed from `./servers/rpi3`.
 - `homeConfigurations."lotus@note"` — Home Manager configuration for the `lotus` user on `note`, composed from `./nix-home` and `./nix-home/notebook.nix`.
-- `legacyPackages` — the repository package set for supported systems, including overlays and channel overlays.
+- `packages` — individual packages from `overlay/registry.nix`, selected from the final overlaid package set by registry name. Specialized families marked `isFamily = true` stay in `legacyPackages`.
+- `legacyPackages` — the full nixpkgs package set for supported systems, including overlays, channel overlays, and specialized package families.
 - `checks` — Linux module checks for selected reusable NixOS modules.
 - `formatter` — the repository Nix formatter.
 - `apps` — command wrappers from `commands.nix` for build, diff, update, and maintenance workflows.
@@ -185,7 +186,7 @@ All custom overlay package updates derive from `overlay/registry.nix`; there is 
 
 - `just update-overlays` dispatches every registry entry that declares an update strategy, in deterministic name order, aborting on the first failure.
 - `just update-package <name>` (or `overlay/update.sh <name>`) dispatches a single entry for targeted maintenance or diagnosis.
-- Registry entries pick one of three strategies: ordinary `nix-update` against `legacyPackages` (full argument flexibility), a specialized family updater (`overlay/pulumi/update.sh`, `overlay/rustPackages/update.mjs`), or no automatic updater for intentionally pinned packages (for example the terminal `terraformOSS` pin).
+- Registry entries pick one of three strategies: ordinary `nix-update` against `packages.x86_64-linux` using short package names (full argument flexibility), a specialized family updater (`overlay/pulumi/update.sh`, `overlay/rustPackages/update.mjs`), or no automatic updater for intentionally pinned packages (for example the terminal `terraformOSS` pin). Short names also become the update commit subjects, without rewriting commits.
 - Adding an ordinary package means dropping `<name>.nix` into `overlay/packages/` and adding one registry entry; exposure and update dispatch follow automatically.
 - `just update-package forgejo` fetches the latest commit on the fork's `forgejo` branch, then refreshes the source, Go vendor, and npm dependency hashes. It does not select release tags. Run `overlay/packages/update-forgejo.sh --no-commit` to update the pin without committing.
 - `just update-package vite-plus` selects the latest stable GitHub release, refreshes all supported binary hashes and the npm lockfile/dependency hash, and builds the candidate before replacing the package files and committing them as `vite-plus: {old} -> {new}`. Unchanged releases are skipped. It also runs through `just update`; use `overlay/packages/update-vite-plus.py --no-commit` to review an update without staging or committing it.

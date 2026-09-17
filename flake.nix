@@ -288,7 +288,11 @@
 
     perSystemConfig = flake-utils.lib.eachSystem ["aarch64-linux" "x86_64-linux" "aarch64-darwin"] (system: let
       pkgs = pkgsFun system;
+      registry = import ./overlay/registry.nix;
+      # Family entries dispatch updates but do not name individual packages.
+      packageEntries = nixpkgs.lib.filterAttrs (_: entry: !(entry.isFamily or false)) registry;
     in {
+      packages = builtins.mapAttrs (name: _: pkgs.${name}) packageEntries;
       legacyPackages = pkgs;
 
       formatter = pkgs.alejandra;

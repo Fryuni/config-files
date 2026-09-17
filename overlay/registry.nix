@@ -8,15 +8,15 @@
 #             `package` are exposed by their own overlay module (utils.nix,
 #             patches/, or a specialized family directory).
 #
+#   isFamily - true for specialized updater families, which are excluded from
+#              the flat flake packages export. All other entries export the
+#              final overlaid package under their registry name.
+#
 #   update  - automatic update strategy. Omitted for entries that are
 #             intentionally not automatically updateable:
 #               { kind = "nix-update"; args = [...]; }
-#                   invokes nix-update against
-#                   legacyPackages.x86_64-linux.<name> with the given extra
-#                   arguments. Attribute paths must be fully qualified because
-#                   overlay packages are only exposed through legacyPackages
-#                   (the full nixpkgs set), which nix-update's flake mode does
-#                   not search by default.
+#                   invokes nix-update against packages.x86_64-linux.<name>
+#                   using the short package name and the given extra arguments.
 #               { kind = "command"; command = "<path>"; }
 #                   delegates to a specialized family updater script. The
 #                   script owns its algorithm, generated data, staging, and
@@ -87,14 +87,20 @@
 
   # --- Specialized families: exposure + updater owned by the family dir ---
 
-  pulumi.update = {
-    kind = "command";
-    command = "overlay/pulumi/update.sh";
+  pulumi = {
+    isFamily = true;
+    update = {
+      kind = "command";
+      command = "overlay/pulumi/update.sh";
+    };
   };
 
-  rustCrates.update = {
-    kind = "command";
-    command = "overlay/rustPackages/update.mjs";
+  rustCrates = {
+    isFamily = true;
+    update = {
+      kind = "command";
+      command = "overlay/rustPackages/update.mjs";
+    };
   };
 
   # --- Intentionally not automatically updateable ---

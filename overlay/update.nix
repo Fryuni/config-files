@@ -18,11 +18,11 @@
   escapeShellArg = arg: "'" + builtins.replaceStrings ["'"] ["'\\''"] arg + "'";
   escapeShellArgs = args: builtins.concatStringsSep " " (map escapeShellArg args);
 
-  # nix-update targets must be fully qualified (legacyPackages.<system>.<attr>)
-  # because overlay packages are only exposed through legacyPackages, which
-  # nix-update's flake mode does not search by default.
+  # Registry packages are exported through packages.<system>, so nix-update
+  # can resolve short names and use them directly in commit subjects.
   nixUpdate = name: args:
-    "nix run nixpkgs#nix-update -- --commit --flake legacyPackages.x86_64-linux.${name}"
+    "nix run nixpkgs#nix-update -- --commit --flake --system x86_64-linux "
+    + escapeShellArg name
     + (
       if args == []
       then ""
