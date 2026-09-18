@@ -106,6 +106,7 @@ jobs:
           fi
 
           git push --force origin "HEAD:refs/heads/$BRANCH"
+          head_sha="$(git rev-parse HEAD)"
 
           if [ -z "$existing" ]; then
             payload="$(jq -n \
@@ -113,7 +114,9 @@ jobs:
               --arg head "$BRANCH" \
               --arg base "main" \
               '{title: $title, head: $head, base: $base}')"
-            api --request POST --data "$payload" "$API_URL/repos/$REPOSITORY/pulls"
+            existing="$(api --request POST --data "$payload" \
+              "$API_URL/repos/$REPOSITORY/pulls" | jq -er '.number')"
+            echo "Opened dependency update PR #$existing."
           else
             echo "Refreshed dependency update PR #$existing."
           fi
@@ -123,4 +126,44 @@ jobs:
             api --request PATCH --data '{"state":"closed"}' \
               "$API_URL/repos/$REPOSITORY/pulls/$number"
           done < <(jq -r '.[1:][].number' <<< "$pulls")
+
+          # Two races have to settle before scheduling is safe:
+          #   * a push leaves the PR conflict-checking, and the merge endpoint
+          #     rejects that state;
+          #   * workflow runs are registered asynchronously, and a commit with no
+          #     runs counts as ready to merge, so scheduling too early can merge
+          #     the PR before CI ever starts. A run always registers its commit
+          #     status, so a present status proves the runs exist.
+          attempt=0
+          until [ "$(api "$API_URL/repos/$REPOSITORY/pulls/$existing" | jq -r '.mergeable')" = "true" ] &&
+            [ "$(api "$API_URL/repos/$REPOSITORY/commits/$head_sha/status" | jq '.statuses | length')" -gt 0 ]; do
+            attempt=$((attempt + 1))
+            if [ "$attempt" -ge 40 ]; then
+              echo "PR #$existing was not ready for auto-merge in time." >&2
+              exit 1
+            fi
+            sleep 3
+          done
+
+          # Schedule the rebase-then-fast-forward merge for when every check
+          # succeeds. This style creates no commit of its own, so it must not be
+          # sent a merge title or body. `api` is not reused here because a
+          # conflicting schedule is an expected outcome.
+          response="$(curl --silent --show-error --write-out '\n%{http_code}' \
+            --request POST \
+            --header "Authorization: Bearer $token" \
+            --header "Content-Type: application/json" \
+            --data '{"Do":"rebase","merge_when_checks_succeed":true,"delete_branch_after_merge":true}' \
+            "$API_URL/repos/$REPOSITORY/pulls/$existing/merge")"
+          code="${response##*$'\n'}"
+          case "$code" in
+            # 409 means an earlier run already scheduled this pull request.
+            201|409) echo "Auto-merge (rebase and fast-forward) enabled on PR #$existing." ;;
+            200) echo "PR #$existing was merged immediately; no checks were pending." ;;
+            *)
+              echo "Enabling auto-merge on PR #$existing failed with HTTP $code:" >&2
+              echo "${response%$'\n'*}" >&2
+              exit 1
+              ;;
+          esac
           EOF
