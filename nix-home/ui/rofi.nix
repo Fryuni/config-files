@@ -7,7 +7,6 @@
     enable = true;
     # pass.enable = true;
 
-    terminal = "${pkgs.ghostty}/bin/ghostty";
     theme = ../../common/rofi/sp.theme.rasi;
 
     plugins = with pkgs; [
@@ -18,7 +17,8 @@
       rofi-power-menu
     ];
 
-    extraConfig = {
+    settings = {
+      terminal = "${pkgs.ghostty}/bin/ghostty";
       modi = "drun,emoji,run,keys,filebrowser";
     };
   };
