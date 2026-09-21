@@ -1,0 +1,11 @@
+--- a/src/proxyicon.vala
++++ b/src/proxyicon.vala
+@@ -115,7 +115,7 @@
+         var pixmap = pixmaps[0]; // TODO: choose the best one
+ 
+         // Convert from ARGB to RGBA
+-        for (int i = 0; i < pixmap.width * pixmap.height * 4; i += 3) {
++        for (int i = 0; i < pixmap.width * pixmap.height * 4; i += 4) {
+             var alpha = pixmap.data[i];
+             pixmap.data[i] = pixmap.data[i + 1];
+             pixmap.data[i + 1] = pixmap.data[i + 2];

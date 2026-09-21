@@ -22,6 +22,11 @@ final: prev: {
     patches = (old.patches or []) ++ [./git-sync-debounce.patch];
   });
 
+  # SNI pixmaps are four-byte ARGB pixels; the upstream stride corrupts icons.
+  snixembed = prev.snixembed.overrideAttrs (old: {
+    patches = (old.patches or []) ++ [./snixembed-pixel-stride.patch];
+  });
+
   # NOTE: Tailscale doesn't support configuring TLS-terminated HTTP services declaratively.
   #   See https://github.com/tailscale/tailscale/issues/18381
   # Use fork with hack fix arround this issue while waiting for official position from Tailscale.

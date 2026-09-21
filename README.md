@@ -80,6 +80,8 @@ The main exported outputs are:
 
 The separate Home Manager output `homeConfigurations."lotus@note"` builds the user environment for `lotus` from the shared `nix-home/` baseline and `nix-home/notebook.nix`, which imports category modules for UI, gaming, terminal, and development concerns. Its desktop module is `nix-home/ui/xsession.nix`; the binding migration review is `common/docs/i3-keybinding-migration.md`.
 
+Polybar uses an XEmbed tray. The `snixembed` user service bridges modern StatusNotifierItem icons (including Slack and OpenWhispr) into it and acquires the D-Bus watcher before Vicinae starts. The package overlay patches snixembed's ARGB pixel stride so bitmap-only icons render correctly.
+
 ### `loem`
 
 `loem` is an x86_64-linux server. Its flake entry includes the disko NixOS module, then delegates host policy to `servers/loem/`. The host configuration imports the shared server baseline, the remote-development server layer, storage and boot policy, and service category modules under `servers/loem/`.

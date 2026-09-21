@@ -654,6 +654,30 @@ in {
       Install.WantedBy = lib.mkForce ["hm-graphical-session.target"];
     };
 
+    # Polybar only embeds X11 tray icons; bridge StatusNotifierItem applications.
+    snixembed = {
+      Unit = {
+        Description = "StatusNotifierItem bridge for Polybar";
+        After = ["graphical-session-pre.target"];
+        Before = ["vicinae.service"];
+        PartOf = ["hm-graphical-session.target"];
+      };
+      Service = {
+        Type = "dbus";
+        BusName = "org.kde.StatusNotifierWatcher";
+        ExecStart = "${pkgs.snixembed}/bin/snixembed";
+        Environment = ["GDK_BACKEND=x11"];
+        Restart = "on-failure";
+      };
+      Install.WantedBy = ["hm-graphical-session.target"];
+    };
+
+    # Wait for the bridge to own the watcher instead of Vicinae's fallback host.
+    vicinae.Unit = {
+      Requires = ["snixembed.service"];
+      After = ["snixembed.service"];
+    };
+
     ydotoold = {
       Unit = {
         Description = "ydotool daemon";
