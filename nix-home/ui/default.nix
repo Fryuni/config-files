@@ -42,6 +42,7 @@
 in {
   imports = [
     ./xsession.nix
+    ./terminal-environment.nix
     ./rofi.nix
     ./plasma.nix
     ./vicinae.nix

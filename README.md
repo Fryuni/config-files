@@ -80,6 +80,8 @@ The main exported outputs are:
 
 The separate Home Manager output `homeConfigurations."lotus@note"` builds the user environment for `lotus` from the shared `nix-home/` baseline and `nix-home/notebook.nix`, which imports category modules for UI, gaming, terminal, and development concerns. Its desktop module is `nix-home/ui/xsession.nix`; the binding migration review is `common/docs/i3-keybinding-migration.md`.
 
+`nix-home/ui/terminal-environment.nix` connects every new Zsh shell to the active local desktop using the graphical environment held by the systemd user manager. This includes SSH login shells, noninteractive SSH commands, and new Herdr panes; their child processes inherit the display, X authentication path, user D-Bus address, runtime directory, and desktop type. The local desktop takes precedence over an SSH-forwarded display. Only these desktop variables are imported, and startup leaves the environment unchanged when no graphical session is active. This module is notebook-only; server shells are unaffected. After applying Home Manager, open a new shell; existing shells can refresh with `exec zsh`. Already-running processes retain their old environment, so restart a Herdr server started without desktop access when convenient. Each new shell reads the current authentication path again after a graphical re-login.
+
 Polybar uses an XEmbed tray. The `snixembed` user service bridges modern StatusNotifierItem icons (including Slack and OpenWhispr) into it and acquires the D-Bus watcher before Vicinae starts. The package overlay patches snixembed's ARGB pixel stride so bitmap-only icons render correctly.
 
 ### `loem`
@@ -118,9 +120,9 @@ Home Manager configuration is centered on `lotus`: `nix-home/default.nix` sets `
 
 ### T3 Code
 
-`note` and `loem` import `nixos/modules/t3code.nix`. It runs `llm-agents.t3code`'s `t3 serve` as `lotus` in a boot-enabled system service, restarting on exit without requiring a login session. The service uses `/home/lotus` for its working directory and home, retaining T3's default per-user state and provider credentials; its PATH includes the user's Nix profiles and system tools.
+`note` and `loem` import `nixos/modules/t3code.nix`. It runs `llm-agents.t3code`'s `t3 serve` as `lotus`, restarting on exit. On hosts with X enabled (`note`), it is a systemd user service attached to `graphical-session.target`: it starts with the desktop, inherits its display and authentication environment, and stops at graphical logout. T3 and its tools therefore have local desktop access even when the client connects remotely. A new graphical login starts it with fresh credentials. On headless hosts (`loem`), it remains a boot-enabled system service without requiring a login session. Both forms use `/home/lotus` for their working directory and home, retaining T3's default per-user state and provider credentials; PATH includes the user's Nix profiles and system tools.
 
-The backend binds only to `127.0.0.1:3773`. The existing tailnet DNS, certificates, and Caddy proxy expose the `t3` alias at `https://t3.note.lferraz.dev` and `https://t3.loem.lferraz.dev`; no public backend port or separate Tailscale Serve configuration is added. T3's own pairing/authentication remains enabled. Inspect startup and pairing details with `journalctl -u t3code.service` on the respective host.
+The backend binds only to `127.0.0.1:3773`. The existing tailnet DNS, certificates, and Caddy proxy expose the `t3` alias at `https://t3.note.lferraz.dev` and `https://t3.loem.lferraz.dev`; no public backend port or separate Tailscale Serve configuration is added. T3's own pairing/authentication remains enabled. Inspect startup and pairing details with `journalctl --user -u t3code.service` on `note`, or `journalctl -u t3code.service` on `loem`. Applying the NixOS change removes the old system service on `note`; the user service starts on the next graphical login, or with `systemctl --user start t3code.service` from the active desktop after applying.
 
 ### Claude Code
 
