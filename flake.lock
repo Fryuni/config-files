@@ -853,11 +853,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1790115801,
-        "narHash": "sha256-+hWZeujbc/uKq/qpS4lbDzH5FOyE7b/BIgz0cMQFYUc=",
+        "lastModified": 1790120233,
+        "narHash": "sha256-Gnc/jD7m+iLkVRd6tCYZeQ+kR36MIfEPzQhZ9EN6qD0=",
         "ref": "main",
-        "rev": "47fc5eb2127d75cdd9667a66f583355b6892a877",
-        "revCount": 18987,
+        "rev": "9edb0d61288494ba20f95b017296886fe8ea9b48",
+        "revCount": 18988,
         "type": "git",
         "url": "https://git.fryuni.dev/Fryuni/llm-agents.nix"
       },
