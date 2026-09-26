@@ -170,7 +170,7 @@
   services.lferrazTailnetAccess.proxy.aliases.hermes = 9120;
   services.tailscale = {
     fileInbox.enable = true;
-    extraSetFlags = ["--exit-node=ch-zrh-wg-503.mullvad.ts.net"];
+    extraSetFlags = ["--exit-node=us-chi-wg-301.mullvad.ts.net"];
   };
 
   boot.kernel.sysctl = {
