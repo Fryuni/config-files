@@ -41,6 +41,23 @@ in {
   programs.discord = {
     enable = true;
     package = pkgs.master.discord;
-    settings.SKIP_HOST_UPDATE = true;
+    settings = {
+      SKIP_HOST_UPDATE = true;
+      openH264Enabled = true;
+      offloadAdmControls = true;
+      DESKTOP_TTI_REMOVE_V8_CACHE_CLEAR = false;
+      DESKTOP_TTI_DNSTCP_WARMUP = true;
+      chromiumSwitches = {};
+      IS_MAXIMIZED = true;
+      IS_MINIMIZED = false;
+      BACKGROUND_COLOR = "#121214";
+      WINDOW_BOUNDS = {
+        x = 3841;
+        y = 49;
+        width = 1910;
+        height = 1050;
+      };
+      DESKTOP_TTI_SPLASH_USE_WEBP = true;
+    };
   };
 }
