@@ -168,7 +168,10 @@
   };
 
   services.lferrazTailnetAccess.proxy.aliases.hermes = 9120;
-  services.tailscale.fileInbox.enable = true;
+  services.tailscale = {
+    fileInbox.enable = true;
+    extraSetFlags = ["--exit-node=ch-zrh-wg-503.mullvad.ts.net"];
+  };
 
   boot.kernel.sysctl = {
     "net.core.rmem_max" = 7500000;
