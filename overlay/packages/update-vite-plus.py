@@ -24,6 +24,33 @@ def replace_once(pattern, replacement, text):
     return result
 
 
+def latest_stable_release(headers):
+    url = "https://api.github.com/repos/voidzero-dev/vite-plus/releases"
+
+    def fetch(url):
+        request = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(request, timeout=60) as response:
+            return json.load(response)
+
+    def is_stable(release):
+        return (re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", release["tag_name"])
+                and not release["prerelease"] and not release["draft"])
+
+    release = fetch(f"{url}/latest")
+    if is_stable(release):
+        return release
+
+    # Upstream has published RC tags with prerelease=false, so GitHub's
+    # "latest" endpoint alone does not guarantee a stable version.
+    page = 1
+    while releases := fetch(f"{url}?per_page=100&page={page}"):
+        for release in releases:
+            if is_stable(release):
+                return release
+        page += 1
+    raise ValueError("No stable Vite+ release found")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--no-commit", action="store_true", help="leave the update uncommitted")
@@ -54,14 +81,8 @@ def main():
     headers = {"Accept": "application/vnd.github+json", "User-Agent": "vite-plus-nix-updater"}
     if token := os.environ.get("GITHUB_TOKEN"):
         headers["Authorization"] = f"Bearer {token}"
-    request = urllib.request.Request(
-        "https://api.github.com/repos/voidzero-dev/vite-plus/releases/latest", headers=headers
-    )
-    with urllib.request.urlopen(request, timeout=60) as response:
-        release = json.load(response)
+    release = latest_stable_release(headers)
     tag = release["tag_name"]
-    if not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", tag) or release["prerelease"] or release["draft"]:
-        raise ValueError(f"Expected a stable Vite+ release, got {tag!r}")
     version = tag[1:]
     if version == current:
         print(f"Vite+ {version} is already current; nothing to update.")

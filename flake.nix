@@ -302,6 +302,18 @@
       };
 
       checks = nixpkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+        vite-plus-updater =
+          pkgs.runCommand "vite-plus-updater-check" {
+            nativeBuildInputs = [pkgs.python3];
+          } ''
+            mkdir -p tests overlay/packages
+            cp ${./tests/vite-plus-updater.py} tests/vite-plus-updater.py
+            cp ${./overlay/packages/update-vite-plus.py} overlay/packages/update-vite-plus.py
+            cp ${./overlay/packages/vite-plus.nix} overlay/packages/vite-plus.nix
+            cp -r ${./overlay/packages/vite-plus} overlay/packages/vite-plus
+            python3 -B tests/vite-plus-updater.py
+            touch $out
+          '';
         cloudflare-tunnel-module = import ./tests/cloudflare-tunnel-module.nix {
           inherit pkgs;
           inherit (nixpkgs) lib;
