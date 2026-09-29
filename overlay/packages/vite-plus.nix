@@ -97,9 +97,17 @@ in
     preInstallCheck = ''
       # Keep checks offline and isolate any runtime state from the user.
       export VP_HOME="$TMPDIR/vite-plus-check"
+      # The build tree still declares a vite-plus dependency after its
+      # node_modules has moved to $out. Check global commands outside it.
+      mkdir -p "$TMPDIR/vite-plus-smoke"
+      cd "$TMPDIR/vite-plus-smoke"
+      $out/bin/vp --help > /dev/null
+      test ! -e "$VP_HOME/bin"
+
+      # Vite+ 1.0 refreshes tool shims here; that is not a self-install.
       $out/bin/vp env off node
       $out/bin/vp create --help > /dev/null
-      test ! -e "$VP_HOME/bin"
+      test ! -e "$VP_HOME/bin/vp"
     '';
 
     meta = {
