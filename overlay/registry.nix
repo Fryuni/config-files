@@ -73,13 +73,6 @@
 
   # --- Override entries: exposure owned by overlay/patches ---
 
-  # Fork of nixpkgs-master tailscale carrying the declarative TLS-terminated
-  # HTTP services hack (nixpkgs#18381) while waiting for an upstream position.
-  tailscale.update = {
-    kind = "nix-update";
-    args = ["--version=branch=main"];
-  };
-
   t-smart-tmux-session-manager.update = {
     kind = "nix-update";
     args = ["--version=branch=main"];

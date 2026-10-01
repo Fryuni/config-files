@@ -1,4 +1,4 @@
-final: prev: {
+_: prev: {
   python312Packages =
     prev.python312Packages
     // {
@@ -25,28 +25,6 @@ final: prev: {
   # SNI pixmaps are four-byte ARGB pixels; the upstream stride corrupts icons.
   snixembed = prev.snixembed.overrideAttrs (old: {
     patches = (old.patches or []) ++ [./snixembed-pixel-stride.patch];
-  });
-
-  # NOTE: Tailscale doesn't support configuring TLS-terminated HTTP services declaratively.
-  #   See https://github.com/tailscale/tailscale/issues/18381
-  # Use fork with hack fix arround this issue while waiting for official position from Tailscale.
-  #   See https://github.com/tailscale/tailscale/issues/18381#issuecomment-4332462281
-  tailscale = prev.master.tailscale.overrideAttrs (attrs: {
-    version = "1.97.0-pre-unstable-2026-07-14";
-    src = final.fetchFromGitHub {
-      owner = "Fryuni";
-      repo = "tailscale";
-      rev = "d3b0435cb1da6f800a62b65ce7788b0aafe669a5";
-      hash = "sha256-XEPI5NuXl9ojVmIo34CQDiGVn62440TCO+E/SjN6p74=";
-    };
-
-    preBuild = ''
-      ${attrs.preBuild}
-
-      go mod edit -go=${attrs.passthru.go.version}
-    '';
-
-    vendorHash = "sha256-y6rBPJtkhTQMsnUoUC/1Up61FEplPpxaU1OkO2FDeio=";
   });
 
   t-smart-tmux-session-manager = prev.tmuxPlugins.t-smart-tmux-session-manager.overrideAttrs (_: {

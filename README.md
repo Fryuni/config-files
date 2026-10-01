@@ -78,6 +78,8 @@ The main exported outputs are:
 
 `note` is the x86_64-linux workstation/notebook. Its NixOS configuration layers the shared `nixos/` baseline with `nixos/notebook/` for hardware configuration, boot setup, notebook networking, GPU support, and notebook-specific system policy. It sets `networking.hostName = "note"`. SDDM defaults to the i3 X11 session; Plasma remains selectable as the fallback desktop.
 
+The shared Tailscale module uses the upstream `nixpkgs-master` package, with updates managed through that flake input.
+
 The notebook uses `ch-zrh-wg-503.mullvad.ts.net` as its Tailscale exit node, configured declaratively through `services.tailscale.extraSetFlags` in `nixos/notebook/default.nix`.
 
 The separate Home Manager output `homeConfigurations."lotus@note"` builds the user environment for `lotus` from the shared `nix-home/` baseline and `nix-home/notebook.nix`, which imports category modules for UI, gaming, terminal, and development concerns. Its desktop module is `nix-home/ui/xsession.nix`; the binding migration review is `common/docs/i3-keybinding-migration.md`.
