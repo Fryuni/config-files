@@ -118,6 +118,7 @@
     caKeyPath = cfg.age.secrets.lferraz-tailnet-ca-key.path;
     caKeySymlink = cfg.age.secrets.lferraz-tailnet-ca-key.symlink;
     coreDnsConfig = dnsEvaluated.config.services.coredns.config;
+    resolvedConfig = dnsEvaluated.config.environment.etc."systemd/resolved.conf".text;
   };
 in
   pkgs.runCommand "tailnet-access-module-check" {
@@ -165,10 +166,16 @@ in
     jq -e '.coreDnsConfig | contains("rewrite stop")' config.json
     jq -e '.coreDnsConfig | contains("name regex ^(?:.*[.])?([^.]+)[.]example[.]test[.]$ {1}.tailnet.test.")' config.json
     jq -e '.coreDnsConfig | contains("answer auto")' config.json
-    jq -e '.coreDnsConfig | contains("forward . 100.100.100.100")' config.json
+    jq -e '.coreDnsConfig | contains("forward . 100.100.100.100 tls://45.90.28.0 tls://2a07:a8c0:: tls://45.90.30.0 tls://2a07:a8c1:: {")' config.json
+    jq -e '.coreDnsConfig | contains("tls_servername f7fd51.dns.nextdns.io")' config.json
+    jq -e '.coreDnsConfig | contains("policy sequential")' config.json
+    jq -e '.coreDnsConfig | contains("failover SERVFAIL REFUSED")' config.json
     jq -e '.coreDnsConfig | contains("1.1.1.1") | not' config.json
     jq -e '.coreDnsConfig | contains("8.8.8.8") | not' config.json
     jq -e '.coreDnsConfig | contains(" IN CNAME ") | not' config.json
+
+    jq -e '.resolvedConfig | contains("DNS=127.0.0.1\n")' config.json
+    jq -e '.resolvedConfig | contains("Domains=~. ~example.test\n")' config.json
 
     grep -F 'basicConstraints = critical,CA:FALSE' "$certificateExecStart"
     grep -F 'keyUsage = critical,digitalSignature,keyEncipherment' "$certificateExecStart"

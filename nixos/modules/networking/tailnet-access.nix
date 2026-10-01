@@ -12,6 +12,10 @@
   regexPublicDomain = lib.replaceStrings ["."] ["[.]"] publicDomain;
   tailnetHost = "${deviceName}.${tailnetDomain}";
 
+  # NextDNS over TLS, used for anything Tailscale's resolver cannot answer.
+  nextDnsServerName = "f7fd51.dns.nextdns.io";
+  nextDnsServers = ["45.90.28.0" "2a07:a8c0::" "45.90.30.0" "2a07:a8c1::"];
+
   caCert = ../../../common/certs/lferraz-tailnet-ca.crt;
   certStateDir = "/var/lib/lferraz-tailnet";
   certDir = "${certStateDir}/certs";
@@ -336,7 +340,14 @@ in {
               answer auto
             }
 
-            forward . 100.100.100.100
+            # Try Tailscale's resolver first, then NextDNS. Tailscale answers
+            # SERVFAIL for names it has no upstream for and stops answering
+            # while disconnected; both cases move on to the next server.
+            forward . 100.100.100.100 ${lib.concatMapStringsSep " " (address: "tls://${address}") nextDnsServers} {
+              tls_servername ${nextDnsServerName}
+              policy sequential
+              failover SERVFAIL REFUSED
+            }
             cache 30
           }
         '';
@@ -350,13 +361,15 @@ in {
         wants = ["tailscaled.service" "network-online.target"];
       };
 
-      # Make this host use its own CoreDNS instance for lferraz.dev while
-      # leaving other names on the normal link-specific DNS servers.
+      # Make this host's CoreDNS the primary resolver: ~. takes every name
+      # away from DHCP-provided link DNS servers. lferraz.dev is listed too so
+      # it stays exclusive to CoreDNS when Tailscale also claims ~. on its
+      # link (exit node or overridden local DNS).
       services.resolved = {
         enable = true;
         settings.Resolve = {
           DNS = "127.0.0.1";
-          Domains = "~${publicDomain}";
+          Domains = ["~." "~${publicDomain}"];
         };
       };
     })
