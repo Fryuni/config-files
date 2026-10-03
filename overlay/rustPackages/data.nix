@@ -198,8 +198,8 @@
     version = "0.52.0";
   };
   cargo-semver-checks = {
-    crateSha256 = "sha256-hoh+WQUhq8MfSjOV5xNAtkHpbjILbKXRhf6CghGaMn8=";
-    depsHash = "sha256-rc3F104atiV+KecsNtThfFwe80jyKOFLHKn53Nhm++w=";
+    crateSha256 = "sha256-Fpf4bwsyPRFAm8KxKMy+C9vo8xI2Xfuvm2mIPSeadV4=";
+    depsHash = "sha256-ZCq8dh/pYFRx1cYgyYtWFDG4C2k2QnPaQmMLR1Wdj50=";
     description = "Scan your Rust crate for semver violations.";
     homepage = null;
     id = "cargo-semver-checks";
@@ -215,7 +215,7 @@
         url = "https://github.com/obi1kenobi";
       }
     ];
-    version = "0.50.0";
+    version = "0.51.0";
   };
   cargo-sort = {
     crateSha256 = "sha256-41Zht2qKulVaYmKOJRGCzmSVGCBa1nglUXpHrACAEgY=";
