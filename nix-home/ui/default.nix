@@ -64,6 +64,7 @@ in {
     vlc
     screenkey
     openwhispr
+    llm-agents.t3code-desktop
 
     master.zeal
     (lib.lowPrio slack)
