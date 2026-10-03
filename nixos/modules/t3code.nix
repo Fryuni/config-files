@@ -5,7 +5,11 @@
   ...
 }: let
   port = 3773;
+  tailnetCfg = config.services.lferrazTailnetAccess;
   graphical = config.services.xserver.enable;
+
+  publicUrl = "https://t3.${tailnetCfg.deviceName}.${tailnetCfg.publicDomain}";
+
   service = {
     description = "T3 Code server";
     wantedBy =
@@ -34,7 +38,7 @@
 
     serviceConfig =
       {
-        ExecStart = "${pkgs.llm-agents.t3code}/bin/t3 serve --mode web --host 127.0.0.1 --port ${toString port}";
+        ExecStart = "${pkgs.llm-agents.t3code}/bin/t3 serve --mode web --host 127.0.0.1 --port ${toString port} --public-url ${publicUrl}";
         WorkingDirectory = "/home/lotus";
         Restart = "always";
         RestartSec = "5s";
