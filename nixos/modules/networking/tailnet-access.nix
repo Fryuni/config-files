@@ -27,10 +27,54 @@
     BUN_OPTIONS = lib.mkDefault "--use-system-ca";
   };
 
+  onDemandAliases = lib.filterAttrs (_: builtins.isAttrs) cfg.proxy.aliases;
+  onDemandRuntimeDir = "/run/lferraz-tailnet-on-demand";
+  onDemandSocket = "${onDemandRuntimeDir}/proxy.sock";
+  onDemandPackage = pkgs.buildGoModule {
+    pname = "tailnet-on-demand";
+    version = "1";
+    src = ./tailnet-on-demand;
+    vendorHash = null;
+    doCheck = true;
+    meta.mainProgram = "tailnet-on-demand";
+  };
+  serviceCommand = target: action:
+    ["${pkgs.systemd}/bin/systemctl"]
+    ++ lib.optionals (target.user != null) ["--user" "--machine=${target.user}@.host"]
+    ++ [action target.service];
+  scriptCommand = alias: action: script:
+    lib.optional (script != null) (toString (pkgs.writeShellScript "tailnet-${alias}-${action}" ''
+      set -euo pipefail
+      ${script}
+    ''));
+  onDemandConfig = pkgs.writeText "tailnet-on-demand.json" (builtins.toJSON {
+    socket = onDemandSocket;
+    stateDir = "${onDemandRuntimeDir}/state";
+    checkInterval = cfg.proxy.idleCheckInterval;
+    targets =
+      lib.mapAttrs (alias: target: {
+        inherit (target) port startupTimeout stopTimeout;
+        idleTimeout =
+          if target.idleTimeout == null
+          then 0
+          else target.idleTimeout;
+        start =
+          if target.service != null
+          then serviceCommand target "start"
+          else scriptCommand alias "start" target.startScript;
+        stop =
+          if target.service != null
+          then serviceCommand target "stop"
+          else scriptCommand alias "stop" target.stopScript;
+      })
+      onDemandAliases;
+  });
+
   portProxyHandlerWithHeaders = {
     upstream,
     hostHeader ? upstream,
     originHeader ? null,
+    preflight ? true,
   }: ''
     header {
       >Access-Control-Allow-Origin "{http.request.header.Origin}"
@@ -42,8 +86,10 @@
       >Vary "Origin"
     }
 
-    @preflight method OPTIONS
-    respond @preflight "" 204
+    ${lib.optionalString preflight ''
+      @preflight method OPTIONS
+      respond @preflight "" 204
+    ''}
 
     reverse_proxy ${upstream} {
       header_up Host ${hostHeader}
@@ -67,6 +113,13 @@
       handler =
         if builtins.isInt target
         then portProxyHandler "127.0.0.1:${toString target}"
+        else if builtins.isAttrs target
+        then
+          portProxyHandlerWithHeaders {
+            upstream = "unix/${onDemandSocket}";
+            hostHeader = alias;
+            preflight = false;
+          }
         else target;
     in ''
       @${matcher} header_regexp ${matcher} Host ${aliasHostRegexp alias}
@@ -259,11 +312,69 @@ in {
     dns.enable = mkEnableOption "CoreDNS lferraz.dev-to-MagicDNS aliasing" // {default = true;};
     proxy = {
       enable = mkEnableOption "Caddy port-subdomain reverse proxy" // {default = true;};
+      idleCheckInterval = mkOption {
+        type = types.ints.positive;
+        default = 30;
+        description = "Seconds between checks for idle on-demand aliases.";
+      };
       aliases = mkOption {
-        type = types.attrsOf (types.either (types.ints.between 1 65535) types.lines);
+        type = types.attrsOf (types.oneOf [
+          (types.ints.between 1 65535)
+          types.lines
+          (types.submodule {
+            options = {
+              port = mkOption {
+                type = types.ints.between 1 65535;
+                description = "Local HTTP port to wait for and proxy to on 127.0.0.1.";
+              };
+              service = mkOption {
+                type = types.nullOr (types.strMatching "[a-zA-Z0-9_@.:-]+[.]service");
+                default = null;
+                example = "ollama.service";
+                description = "Systemd unit to start on demand; mutually exclusive with scripts. Disable its automatic activation separately.";
+              };
+              user = mkOption {
+                type = types.nullOr (types.strMatching "[a-z_][a-z0-9_-]*");
+                default = null;
+                description = "Owner of a systemd user service; null selects the system manager. The user manager must already be running (login or linger).";
+              };
+              startScript = mkOption {
+                type = types.nullOr types.lines;
+                default = null;
+                description = "Root shell script that starts the backend via a service manager. Use absolute command paths. Must be idempotent and exit after starting the service.";
+              };
+              stopScript = mkOption {
+                type = types.nullOr types.lines;
+                default = null;
+                description = "Root shell script that stops the backend; required with startScript when idleTimeout is set.";
+              };
+              idleTimeout = mkOption {
+                type = types.nullOr types.ints.positive;
+                default = null;
+                example = 900;
+                description = "Seconds without requests before stopping; null disables idle shutdown. Open requests and WebSockets prevent shutdown.";
+              };
+              startupTimeout = mkOption {
+                type = types.ints.positive;
+                default = 60;
+                description = "Maximum seconds for the start action and TCP readiness combined; failure returns HTTP 503.";
+              };
+              stopTimeout = mkOption {
+                type = types.ints.positive;
+                default = 30;
+                description = "Maximum seconds for the stop action; failures are retried on the next idle check.";
+              };
+            };
+          })
+        ]);
         default = {};
         example = {
           node-red = 1880;
+          ollama = {
+            port = 11434;
+            service = "ollama.service";
+            idleTimeout = 900;
+          };
           static = ''
             root * /srv/static
             file_server
@@ -276,6 +387,12 @@ in {
 
           A string value is inserted directly into the alias-specific `handle`
           block, after matching `<alias>.${deviceName}.${publicDomain}`.
+
+          An attribute set starts a system/user service or custom script before
+          proxying, with optional idle shutdown. Disable the backend's boot,
+          login, socket and timer activation separately. Traffic must use this
+          named alias to participate in startup and idle tracking. Each backend
+          must have only one on-demand alias.
         '';
       };
     };
@@ -371,6 +488,68 @@ in {
           DNS = "127.0.0.1";
           Domains = ["~." "~${publicDomain}"];
         };
+      };
+    })
+
+    (mkIf (cfg.proxy.enable && onDemandAliases != {}) {
+      assertions =
+        lib.concatLists (lib.mapAttrsToList (alias: target: [
+            {
+              assertion = (target.service != null) != (target.startScript != null);
+              message = "Tailnet alias ${alias} must specify exactly one of service and startScript.";
+            }
+            {
+              assertion = target.service == null || target.stopScript == null;
+              message = "Tailnet alias ${alias}: stopScript cannot be combined with service.";
+            }
+            {
+              assertion = target.user == null || target.service != null;
+              message = "Tailnet alias ${alias}: user requires service; scripts run as root.";
+            }
+            {
+              assertion = target.idleTimeout == null || target.service != null || target.stopScript != null;
+              message = "Tailnet alias ${alias} needs stopScript for idle shutdown.";
+            }
+          ])
+          onDemandAliases)
+        ++ [
+          {
+            assertion = let
+              ports = lib.mapAttrsToList (_: target: target.port) onDemandAliases;
+            in
+              builtins.length ports == builtins.length (lib.unique ports);
+            message = "Tailnet on-demand aliases must use distinct backend ports to share one activity counter per backend.";
+          }
+          {
+            assertion = let
+              units =
+                lib.mapAttrsToList (_: target: [target.user target.service])
+                (lib.filterAttrs (_: target: target.service != null) onDemandAliases);
+            in
+              builtins.length units == builtins.length (lib.unique units);
+            message = "Tailnet on-demand aliases must not manage the same systemd service more than once.";
+          }
+        ];
+
+      systemd.services.lferraz-tailnet-on-demand = {
+        description = "Start Tailnet HTTP backends on demand and stop them after inactivity";
+        wantedBy = ["multi-user.target"];
+        before = ["caddy.service"];
+        serviceConfig = {
+          ExecStart = "${lib.getExe onDemandPackage} ${onDemandConfig}";
+          User = "root";
+          Group = "caddy";
+          RuntimeDirectory = "lferraz-tailnet-on-demand";
+          RuntimeDirectoryMode = "0750";
+          RuntimeDirectoryPreserve = "restart";
+          UMask = "0077";
+          Restart = "on-failure";
+          RestartSec = 1;
+        };
+      };
+      systemd.services.caddy = {
+        after = ["lferraz-tailnet-on-demand.service"];
+        wants = ["lferraz-tailnet-on-demand.service"];
       };
     })
 

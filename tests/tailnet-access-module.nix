@@ -50,6 +50,22 @@
           dns.enable = false;
           proxy.aliases = {
             node-red = 1880;
+            dormant = {
+              port = 8088;
+              service = "example.service";
+              idleTimeout = 300;
+            };
+            desktop = {
+              port = 8089;
+              service = "desktop.service";
+              user = "lotus";
+            };
+            scripted = {
+              port = 8090;
+              startScript = "echo start";
+              stopScript = "echo stop";
+              idleTimeout = 60;
+            };
             static = ''
               root * /srv/static
               file_server
@@ -106,6 +122,15 @@
 
   certificateService = cfg.systemd.services.lferraz-tailnet-certificate;
   certificateExecStart = certificateService.serviceConfig.ExecStart;
+  onDemandService = cfg.systemd.services.lferraz-tailnet-on-demand;
+  onDemandExecStart = onDemandService.serviceConfig.ExecStart;
+  onDemandArguments = lib.splitString " " onDemandExecStart;
+  invalidAliases = aliases: let
+    invalid = evaluated.extendModules {
+      modules = [{services.lferrazTailnetAccess.proxy.aliases = lib.mkForce aliases;}];
+    };
+  in
+    map (assertion: assertion.message) (builtins.filter (assertion: !assertion.assertion) invalid.config.assertions);
 
   configJson = builtins.toJSON {
     extraConfig = cfg.services.caddy.virtualHosts.tailnet.extraConfig;
@@ -119,11 +144,66 @@
     caKeySymlink = cfg.age.secrets.lferraz-tailnet-ca-key.symlink;
     coreDnsConfig = dnsEvaluated.config.services.coredns.config;
     resolvedConfig = dnsEvaluated.config.environment.etc."systemd/resolved.conf".text;
+    onDemandUser = onDemandService.serviceConfig.User;
+    onDemandGroup = onDemandService.serviceConfig.Group;
+    onDemandRuntimeMode = onDemandService.serviceConfig.RuntimeDirectoryMode;
+    onDemandPreserve = onDemandService.serviceConfig.RuntimeDirectoryPreserve;
+    caddyAfter = cfg.systemd.services.caddy.after;
+    emptyHasHelper = emptyAliasesEvaluated.config.systemd.services ? lferraz-tailnet-on-demand;
+    disabledHasHelper =
+      (evaluated.extendModules {
+        modules = [{services.lferrazTailnetAccess.proxy.enable = false;}];
+      }).config.systemd.services ? lferraz-tailnet-on-demand;
+    invalidMissingStart = invalidAliases {bad.port = 8080;};
+    invalidMissingStop = invalidAliases {
+      bad = {
+        port = 8080;
+        startScript = "true";
+        idleTimeout = 1;
+      };
+    };
+    invalidMixedStart = invalidAliases {
+      bad = {
+        port = 8080;
+        service = "example.service";
+        startScript = "true";
+      };
+    };
+    invalidScriptUser = invalidAliases {
+      bad = {
+        port = 8080;
+        startScript = "true";
+        user = "lotus";
+      };
+    };
+    invalidDuplicatePort = invalidAliases {
+      one = {
+        port = 8080;
+        service = "one.service";
+      };
+      two = {
+        port = 8080;
+        service = "two.service";
+      };
+    };
+    invalidDuplicateUnit = invalidAliases {
+      one = {
+        port = 8080;
+        service = "one.service";
+      };
+      two = {
+        port = 8081;
+        service = "one.service";
+      };
+    };
   };
 in
   pkgs.runCommand "tailnet-access-module-check" {
-    nativeBuildInputs = [pkgs.jq pkgs.openssl];
+    nativeBuildInputs = [pkgs.jq pkgs.openssl pkgs.caddy];
     inherit configJson certificateExecStart;
+    onDemandExecutable = builtins.elemAt onDemandArguments 0;
+    onDemandConfig = builtins.elemAt onDemandArguments 1;
+    caddyConfig = cfg.services.caddy.configFile;
   } ''
     printf '%s\n' "$configJson" > config.json
     jq -e '.caddyHostName == "https://note.tailnet.test"' config.json
@@ -156,6 +236,26 @@ in
     jq -e '.extraConfig | contains("<li><a href=\"https://static.note.example.test\">https://static.note.example.test</a></li>")' config.json
     jq -e '.extraConfig | test("</html>` 200\\n[[:space:]]*}")' config.json
     jq -e '.emptyAliasesExtraConfig | contains("<h2>Aliases</h2>") | not' config.json
+
+    jq -e '.extraConfig | contains("reverse_proxy unix//run/lferraz-tailnet-on-demand/proxy.sock")' config.json
+    jq -e '.extraConfig | contains("header_up Host dormant")' config.json
+    jq -e '.onDemandUser == "root" and .onDemandGroup == "caddy" and .onDemandRuntimeMode == "0750" and .onDemandPreserve == "restart"' config.json
+    jq -e '.caddyAfter | index("lferraz-tailnet-on-demand.service")' config.json
+    jq -e '.emptyHasHelper == false and .disabledHasHelper == false' config.json
+    jq -e '.invalidMissingStart | any(contains("exactly one"))' config.json
+    jq -e '.invalidMissingStop | any(contains("needs stopScript"))' config.json
+    jq -e '.invalidMixedStart | any(contains("exactly one"))' config.json
+    jq -e '.invalidScriptUser | any(contains("user requires service"))' config.json
+    jq -e '.invalidDuplicatePort | any(contains("distinct backend ports"))' config.json
+    jq -e '.invalidDuplicateUnit | any(contains("same systemd service"))' config.json
+    jq -e '.targets.dormant.start[1:] == ["start", "example.service"] and .targets.dormant.stop[1:] == ["stop", "example.service"]' "$onDemandConfig"
+    jq -e '.targets.desktop.start[1:] == ["--user", "--machine=lotus@.host", "start", "desktop.service"]' "$onDemandConfig"
+    jq -e '.targets.dormant.idleTimeout == 300 and .targets.desktop.idleTimeout == 0 and .checkInterval == 30' "$onDemandConfig"
+    "$(jq -r '.targets.scripted.start[0]' "$onDemandConfig")" | grep -Fx start
+    "$(jq -r '.targets.scripted.stop[0]' "$onDemandConfig")" | grep -Fx stop
+    test -x "$onDemandExecutable"
+    caddy adapt --config "$caddyConfig" --adapter caddyfile > caddy.json
+    jq -e '[.. | objects | select(.handler? == "reverse_proxy") | .upstreams[]?.dial] | index("unix//run/lferraz-tailnet-on-demand/proxy.sock")' caddy.json
 
     jq -e '.certificateAfter | index("run-agenix.d.mount") | not' config.json
     jq -e '.certificateRequires | index("run-agenix.d.mount") | not' config.json

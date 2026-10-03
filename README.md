@@ -114,6 +114,20 @@ The `pkgs.forgejo` overlay builds both the server and frontend from [Fryuni's fo
 
 `rpi3` is an aarch64-linux Raspberry Pi 3 SD image. Its configuration imports the NixOS aarch64 SD image module, Raspberry Pi 3 hardware support, the shared server baseline, and repository networking modules. It sets `networking.hostName = "rpi3"` and declares x86_64 build-platform defaults so the image can be cross-built from the notebook when needed.
 
+## Tailnet access
+
+`nixos/modules/networking/tailnet-access.nix` supplies private DNS, local CA
+certificates, and Caddy routes for named aliases and numeric port hostnames.
+Aliases can also start a system service, a user service, or a custom script
+before proxying to a local port, with optional shutdown after inactivity.
+These aliases enable a root-owned `lferraz-tailnet-on-demand` helper behind a
+Caddy-accessible Unix socket. It waits for readiness, tracks active HTTP and
+WebSocket connections, and checks idle time periodically. Backend boot/login
+activation must be disabled in the owning service configuration. Configuration
+examples and lifecycle details are in [On-demand Tailnet aliases](common/docs/tailnet-on-demand.md).
+The `tailnet-access-module` check validates the module, generated Caddy routes,
+and the helper's startup, proxying, concurrency, and idle shutdown behavior.
+
 ## Users
 
 `nixos/users.nix` declares the normal user `lotus` with UID 1000, zsh as the login shell, immutable user management, SSH authorized keys, and workstation/server administration and device-access groups. The shared workstation baseline imports this user module, and `servers/interactive.nix` reuses it on interactive servers.
