@@ -43,6 +43,8 @@
     ACTION=="add", SUBSYSTEM=="video4linux", ATTR{index}=="0", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="671f", RUN+="${pkgs.v4l-utils}/bin/v4l2-ctl -d $env{DEVNAME} --set-ctrl=gamma=100,saturation=50,backlight_compensation=3"
   '';
 
+  services.gnome.gnome-keyring.enable = true;
+
   services.autorandr = {
     enable = true;
     defaultTarget = "horizontal";
