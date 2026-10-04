@@ -60,6 +60,11 @@ in {
       service.DISABLE_REGISTRATION = true;
       session.COOKIE_SECURE = true;
       actions.DEFAULT_ACTIONS_URL = "self";
+      "cron.archive_cleanup" = {
+        SCHEDULE = "@every 30m";
+        RUN_AT_START = true;
+        OLDER_THAN = "6h";
+      };
     };
   };
 
