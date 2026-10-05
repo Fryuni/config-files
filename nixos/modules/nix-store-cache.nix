@@ -34,7 +34,8 @@
     ${pkgs.coreutils}/bin/mv ${runtimeDirectory}/netrc.tmp ${runtimeDirectory}/netrc
   '';
 
-  queueDirectory = "/nix/var/nix/gcroots/nix-store-cache";
+  cacheCommands = import ../../common/nix-store-cache.nix {inherit pkgs;};
+  inherit (cacheCommands) queueDirectory;
 
   stateDirectory = "/var/lib/nix-store-cache";
   uploadedCounterName = "uploads-total";
@@ -44,14 +45,8 @@
 
   uploadHook = pkgs.writeShellScript "enqueue-nix-store-paths" ''
     set -eu
-    umask 077
-    ${pkgs.coreutils}/bin/mkdir -p ${queueDirectory}
-    for path in $OUT_PATHS; do
-      # Direct GC roots retain closures until upload succeeds or the entry expires.
-      # Repeated builds coalesce into the same queue entry.
-      ${pkgs.coreutils}/bin/ln -sT "$path" "${queueDirectory}/''${path##*/}" 2>/dev/null \
-        || test -L "${queueDirectory}/''${path##*/}"
-    done
+    # Nix provides OUT_PATHS as a space-separated list of store paths.
+    exec ${cacheCommands.enqueue} ${queueDirectory} $OUT_PATHS
   '';
 
   # Upload workers run concurrently, so the read-modify-write is serialized under a
@@ -246,6 +241,8 @@ in {
   };
 
   config = mkIf cfg.enable {
+    environment.systemPackages = [cacheCommands.command];
+
     assertions = [
       {
         assertion = lib.hasPrefix "/" cfg.tokenFile;

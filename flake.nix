@@ -334,6 +334,9 @@
           inherit (nixpkgs) lib;
           nixStoreCacheModule = ./nixos/modules/nix-store-cache.nix;
         };
+        nix-store-cache-command = import ./tests/nix-store-cache-command.nix {
+          inherit pkgs;
+        };
       };
 
       apps = import ./commands.nix {

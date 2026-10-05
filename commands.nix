@@ -136,6 +136,14 @@
 
     # Utility
     {
+      name = "cache-push";
+      category = "Utility";
+      help = "Queue installable outputs or existing store paths for cache upload";
+      command = ''
+        exec ${pkgs.lib.getExe (import ./common/nix-store-cache.nix {inherit pkgs;}).command} "$@"
+      '';
+    }
+    {
       name = "wallpaper";
       category = "Utility";
       help = "Assign new random wallpapers to all active monitors";

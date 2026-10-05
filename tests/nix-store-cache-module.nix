@@ -42,6 +42,7 @@
       inherit (metricsService.serviceConfig) Type UMask;
     };
     unscraped = {
+      hasManualCommand = builtins.any (package: (package.meta.mainProgram or "") == "nix-store-cache-push") unscrapedCfg.environment.systemPackages;
       metricsEnable = unscrapedCfg.services.nixStoreCache.metrics.enable;
       exporterFlags = unscrapedCfg.services.prometheus.exporters.node.extraFlags;
       tmpfilesRules = unscrapedCfg.systemd.tmpfiles.rules;
@@ -74,6 +75,7 @@ in
     jq -e '.scraped.UMask == "0022"' config.json
 
     jq -e '.unscraped.metricsEnable == false' config.json
+    jq -e '.unscraped.hasManualCommand == true' config.json
     jq -e '.unscraped.exporterFlags == []' config.json
     jq -e '.unscraped.hasMetricsService == false' config.json
     jq -e '.unscraped.hasMetricsTimer == false' config.json
