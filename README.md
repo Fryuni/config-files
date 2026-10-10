@@ -25,7 +25,8 @@ explains the composition and flake outputs.
 
 `note` and `loem` use the reusable [machine backup module](nixos/modules/machine-backups.nix)
 for hourly service captures and home backups every six hours into a shared restic
-repository on Hetzner. Each service module registers its own state directories,
+repository on Hetzner over SFTP on port 22; capacity monitoring runs `df` over SSH
+on port 23. Each service module registers its own state directories,
 capture method, and exclusions; the backup module aggregates NixOS and Home Manager
 registrations. A separate systemd recovery service restarts paused services if a
 backup job is killed. Selected locked flake source inputs support offline recovery

@@ -403,18 +403,33 @@ systemctl list-timers 'machine-backup-*'
 
 The wrapper uses the configured repository password and only the dedicated
 SSH identity, disables the agent and connection sharing, and pins the Box's
-Ed25519 host key. Administrative restic commands use that same connection.
+host keys. Administrative restic commands use that same SFTP connection on port 22;
+capacity monitoring uses the extended SSH service on port 23 to run `df`.
 The shared repository is
-`sftp://u688316@u688316.your-storagebox.de:23/restic`, version 2, with restic's
+`sftp://u688316@u688316.your-storagebox.de:22/restic`, version 2, with restic's
 repository compression. Its empty structural check passed at provisioning.
 No production snapshots are implied by initialization.
 
 The dedicated public key is enrolled on the Box; existing authorized entries
 were preserved. Its fingerprint is
 `SHA256:O01rhYQMwG9wbRHCWRTdLVuFTXZyuXVRSo9dcilH1ag`.
-Hetzner's pinned host-key fingerprint is
-`SHA256:XqONwb1S0zuj5A1CDxpOSuD2hnAArV1A3wKY7Z3sdgM`.
-SSH and SFTP were tested with only the recovered backup private key.
+Hetzner's pinned host-key fingerprints are
+`SHA256:EMlfI8GsRIfpVkoW1H2u0zYVpFGKkIMKHFZIRkf2ioI` (RSA, port 22) and
+`SHA256:XqONwb1S0zuj5A1CDxpOSuD2hnAArV1A3wKY7Z3sdgM` (Ed25519, port 23),
+verified against the [published host keys](https://docs.hetzner.com/storage/storage-box/general/#ssh-host-keys).
+SSH and SFTP on port 23 were tested with only the recovered backup private key.
+On 2026-10-10, a read-only SFTP probe on port 22 passed strict host-key checking
+with that same identity and listed `restic/config`, confirming its enrollment.
+Port 22 requires the public key to be enrolled in RFC4716 format as well as the
+OpenSSH format used by port 23. To add both formats while preserving existing
+authorized keys, use an authenticated administrative connection:
+
+```bash
+ssh -p 23 u688316@u688316.your-storagebox.de install-ssh-key < common/ssh/storagebox-backup.pub
+```
+
+After changing the authorized key, verify SFTP access on port 22 with the dedicated
+backup identity before rollout.
 [Hetzner key enrollment](https://docs.hetzner.com/storage/storage-box/ssh-keys/add-ssh-keys/).
 
 The encrypted sources are `secrets/storagebox-backup-ssh-key`,

@@ -42,7 +42,10 @@ and host key for this workflow.
   by the normal `secrets.nix` recipient policy; its public key is
   [common/ssh/storagebox-backup.pub](../common/ssh/storagebox-backup.pub).
   The public key is authorized on `u688316.your-storagebox.de`, and SSH
-  and SFTP access on port 23 were verified with that identity alone. The
+  and SFTP access on port 23 were verified with that identity alone. SFTP on port
+  22 was also verified with that identity and pinned RSA host trust. Backups use
+  port 22, with RFC4716 public-key enrollment; capacity monitoring retains SSH
+  command access on port 23. The
   [backup module](../nixos/modules/machine-backups.nix) declares it through
   `rekeyFile` with root-only runtime permissions. Future hosts receive the same identity through agenix-rekey,
   without another Storage Box authorization change. See the

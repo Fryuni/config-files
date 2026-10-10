@@ -455,7 +455,8 @@ in
       ownerConfigFile = owner.services.machineBackups.configFile;
       standaloneOwnerConfigFile = standaloneOwner.services.machineBackups.configFile;
     } ''
-      jq -e '.repository == "sftp://u688316@u688316.your-storagebox.de:23/restic"' "$configFile"
+      jq -e '.repository == "sftp://u688316@u688316.your-storagebox.de:22/restic"' "$configFile"
+      jq -e '.ssh.port == 22 and .ssh.commandPort == 23' "$configFile"
       jq -e '.scopes.home.paths == ["/home/lotus"] and .scopes.home.captures == []' "$configFile"
       jq -e '.scopes.home.excludes == [".direnv"] and .scopes.services.excludes == [".direnv"]' "$configFile"
       jq -e '.scopes.services.captures | any(.name == "archive-store" and .kind == "files" and .paths == ["/var/lib/archive-store"] and .excludes == ["/scratch/***"] and .units[0].name == "archive-store.service")' "$configFile"

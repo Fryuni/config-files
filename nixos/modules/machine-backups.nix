@@ -106,7 +106,8 @@
     ssh = {
       host = "u688316.your-storagebox.de";
       user = "u688316";
-      port = 23;
+      port = 22;
+      commandPort = 23;
       identityFile = secretPaths.ssh;
       inherit (cfg) knownHostsFile;
     };
@@ -198,7 +199,7 @@ in {
       };
       repository = lib.mkOption {
         type = lib.types.str;
-        default = "sftp://u688316@u688316.your-storagebox.de:23/restic";
+        default = "sftp://u688316@u688316.your-storagebox.de:22/restic";
         description = "Shared, account-relative restic repository.";
       };
       stateDirectory = lib.mkOption {
@@ -221,6 +222,7 @@ in {
         type = lib.types.path;
         description = "Pinned Storage Box SSH server trust.";
         default = pkgs.writeText "storagebox-backup-known-hosts" ''
+          u688316.your-storagebox.de ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA5EB5p/5Hp3hGW1oHok+PIOH9Pbn7cnUiGmUEBrCVjnAw+HrKyN8bYVV0dIGllswYXwkG/+bgiBlE6IVIBAq+JwVWu1Sss3KarHY3OvFJUXZoZyRRg/Gc/+LRCE7lyKpwWQ70dbelGRyyJFH36eNv6ySXoUYtGkwlU5IVaHPApOxe4LHPZa/qhSRbPo2hwoh0orCtgejRebNtW5nlx00DNFgsvn8Svz2cIYLxsPVzKgUxs8Zxsxgn+Q/UvR7uq4AbAhyBMLxv7DjJ1pc7PJocuTno2Rw9uMZi1gkjbnmiOh6TTXIEWbnroyIhwc8555uto9melEUmWNQ+C+PwAK+MPw==
           [u688316.your-storagebox.de]:23 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIICf9svRenC/PLKIL9nk6K/pxQgoiFC41wTNvoIncOxs
         '';
       };

@@ -54,7 +54,7 @@ class Runner:
             ssh = config["ssh"]
             command = [
                 "ssh", "-F", "/dev/null", "-i", ssh["identityFile"],
-                "-p", str(ssh["port"]), "-o", "IdentitiesOnly=yes",
+                "-o", "IdentitiesOnly=yes",
                 "-o", "IdentityAgent=none", "-o", "BatchMode=yes",
                 "-o", "StrictHostKeyChecking=yes",
                 "-o", "UserKnownHostsFile=" + ssh["knownHostsFile"],
@@ -62,12 +62,14 @@ class Runner:
                 "-o", "ControlMaster=no", "-o", "ControlPath=none",
                 "-o", "ControlPersist=no", "-o", "PasswordAuthentication=no",
                 "-o", "KbdInteractiveAuthentication=no", "-o", "ConnectTimeout=20",
-                "-o", "ConnectionAttempts=1", ssh["user"] + "@" + ssh["host"],
-                "-s", "sftp",
+                "-o", "ConnectionAttempts=1",
             ]
-            self.ssh = command[:-2]
+            target = ssh["user"] + "@" + ssh["host"]
+            # Hetzner's SFTP service and remote command service use separate ports.
+            self.ssh = command + ["-p", str(ssh.get("commandPort", ssh["port"])), target]
             if config["repository"].startswith("sftp:"):
-                self.base.extend(["-o", "sftp.command=" + shlex.join(command)])
+                sftp = command + ["-p", str(ssh["port"]), target, "-s", "sftp"]
+                self.base.extend(["-o", "sftp.command=" + shlex.join(sftp)])
         elif config["repository"].startswith("sftp:"):
             raise Failure("SFTP requires an explicit backup SSH identity and pinned host trust")
 

@@ -7,6 +7,7 @@ import fcntl
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import os
 from pathlib import Path
+import shlex
 import shutil
 import sqlite3
 import subprocess
@@ -391,6 +392,26 @@ else:
         uncovered = {entry["path"] for entry in json.loads(self.cli("status").stdout)["inventory"]["uncoveredPaths"]}
         self.assertEqual(uncovered, {str(unknown), str(volume), str(new_cluster)})
 
+    def test_sftp_uses_port_22_with_dedicated_identity_and_pinned_trust(self):
+        identity = self.root / "dedicated-key"
+        identity.touch()
+        hosts = self.root / "pinned-hosts"
+        hosts.touch()
+        self.config["repository"] = "sftp://backup@storagebox.example:22/restic"
+        self.config["ssh"] = {"host": "storagebox.example", "user": "backup", "port": 22,
+                               "commandPort": 23, "identityFile": str(identity),
+                               "knownHostsFile": str(hosts)}
+        environment = self.failing_restic_boundary("cat", 0, "")
+        self.cli("restic", "--", "cat", "config", env=environment)
+        calls = [json.loads(line) for line in self.boundary_log.read_text().splitlines()]
+        command = shlex.split(next(argument.removeprefix("sftp.command=")
+                                  for argument in calls[-1] if argument.startswith("sftp.command=")))
+        self.assertEqual(command[command.index("-p") + 1], "22")
+        self.assertEqual(command[command.index("-i") + 1], str(identity))
+        self.assertIn("UserKnownHostsFile=" + str(hosts), command)
+        self.assertIn("StrictHostKeyChecking=yes", command)
+        self.assertEqual(command[-3:], ["backup@storagebox.example", "-s", "sftp"])
+
     def test_storage_pressure_uses_dedicated_ssh_and_queues_alerts_without_gotify_credentials(self):
         binary = self.root / "bin"
         binary.mkdir()
@@ -412,7 +433,8 @@ print('storagebox ' + str(available + 100000000) + ' 100000000 ' + str(available
         environment = dict(os.environ, PATH=str(binary) + os.pathsep + os.environ["PATH"],
                            SSH_FIXTURE_ARGUMENTS=str(observed), SSH_FIXTURE_CAPACITY=str(capacity),
                            SSH_AUTH_SOCK="/tmp/untrusted-agent")
-        self.config["ssh"] = {"host": "storagebox.example", "user": "backup", "port": 23,
+        self.config["ssh"] = {"host": "storagebox.example", "user": "backup", "port": 22,
+                               "commandPort": 23,
                                "identityFile": str(self.root / "dedicated-key"),
                                "knownHostsFile": str(self.root / "pinned-hosts")}
         self.config["quotaBytes"] = 1099511627776
@@ -432,6 +454,8 @@ print('storagebox ' + str(available + 100000000) + ' 100000000 ' + str(available
         self.assertIsNone(used["agent"])
         self.assertIn("/dev/null", used["args"])
         self.assertIn(str(self.root / "dedicated-key"), used["args"])
+        self.assertEqual(used["args"][used["args"].index("-p") + 1], "23")
+        self.assertEqual(used["args"][-3:], ["df", "-kP", "."])
         for option in ["IdentityAgent=none", "IdentitiesOnly=yes", "StrictHostKeyChecking=yes",
                        "ControlMaster=no", "ControlPath=none", "PasswordAuthentication=no"]:
             self.assertIn(option, used["args"])
