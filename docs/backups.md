@@ -393,6 +393,8 @@ Manual commands after applying the configuration:
 ```bash
 sudo systemctl start machine-backup-services.service
 sudo systemctl start machine-backup-home.service
+sudo machine-backup backup --scope home
+sudo machine-backup backup --scope services
 sudo machine-backup status
 sudo machine-backup monitor
 sudo machine-backup maintain --dry-run  # loem only
@@ -400,6 +402,14 @@ sudo machine-backup restic -- snapshots --host loem --tag machine-backup,complet
 journalctl -u machine-backup-services -u machine-backup-home -u machine-backup-monitor
 systemctl list-timers 'machine-backup-*'
 ```
+
+Direct backups print timestamped progress to stderr: repository checks, each named
+local capture and its duration, scanning/upload counts and bytes, and snapshot
+completion. Restic progress updates arrive every five seconds. A 15-second
+heartbeat reports the current phase and elapsed time even when a capture or remote
+operation is silent; it shows that the wrapper is still waiting, without claiming
+that the underlying operation is advancing. The same messages appear in the
+systemd journal for scheduled jobs. Stdout retains the final JSON completion record.
 
 The wrapper uses the configured repository password and only the dedicated
 SSH identity, disables the agent and connection sharing, and pins the Box's

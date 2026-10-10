@@ -2,17 +2,20 @@
 """Unattended machine backup operations; secrets remain in runtime files."""
 
 import argparse
+from contextlib import contextmanager
 from datetime import datetime, timezone
 import fcntl
 import json
 import os
 from pathlib import Path
+import selectors
 import shlex
 import shutil
 import sqlite3
 import stat
 import subprocess
 import sys
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -73,6 +76,85 @@ class Runner:
         elif config["repository"].startswith("sftp:"):
             raise Failure("SFTP requires an explicit backup SSH identity and pinned host trust")
 
+    def progress(self, message):
+        self.current_phase = message
+        self.log_progress(message)
+
+    def log_progress(self, message):
+        print("[%s] machine-backup: %s" % (utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"), message),
+              file=sys.stderr, flush=True)
+
+    @contextmanager
+    def phase(self, message):
+        self.progress(message)
+        started = time.monotonic()
+        stopped = threading.Event()
+        def heartbeat():
+            while not stopped.wait(15):
+                self.log_progress("%s (still running, %.0fs elapsed)" %
+                                  (self.current_phase, time.monotonic() - started))
+        # Keep heartbeats separate from work, including blocking capture commands.
+        thread = threading.Thread(target=heartbeat, daemon=True)
+        thread.start()
+        try:
+            yield
+        finally:
+            stopped.set()
+            thread.join()
+
+    def stream_backup(self, arguments):
+        environment = dict(self.env, RESTIC_PROGRESS_FPS="0.2")
+        summary, errors = "", ""
+        with subprocess.Popen(self.base + list(arguments), env=environment,
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+            with selectors.DefaultSelector() as selector:
+                buffers = {process.stdout: b"", process.stderr: b""}
+                for pipe in buffers:
+                    selector.register(pipe, selectors.EVENT_READ)
+                def consume(pipe, line):
+                    nonlocal summary, errors
+                    text = line.decode(errors="replace")
+                    if pipe is process.stderr:
+                        errors = (errors + text + "\n")[-16384:]
+                        if text.strip():
+                            self.progress("restic: " + text)
+                        return
+                    if not text.strip():
+                        return
+                    event = json.loads(text)
+                    if event.get("message_type") == "summary":
+                        summary = text + "\n"
+                    elif event.get("message_type") == "status":
+                        self.progress(
+                            "Uploading: %.1f%%; %d/%d files; %.1f/%.1f MiB; %d errors" % (
+                                event.get("percent_done", 0) * 100,
+                                event.get("files_done", 0), event.get("total_files", 0),
+                                event.get("bytes_done", 0) / 1048576,
+                                event.get("total_bytes", 0) / 1048576,
+                                event.get("error_count", 0),
+                            ))
+                try:
+                    while selector.get_map():
+                        for key, _ in selector.select():
+                            pipe = key.fileobj
+                            chunk = os.read(pipe.fileno(), 65536)
+                            if not chunk:
+                                selector.unregister(pipe)
+                                if buffers[pipe]:
+                                    consume(pipe, buffers[pipe])
+                                continue
+                            buffers[pipe] += chunk
+                            while b"\n" in buffers[pipe]:
+                                line, buffers[pipe] = buffers[pipe].split(b"\n", 1)
+                                consume(pipe, line)
+                    process.wait()
+                except BaseException:
+                    process.kill()
+                    process.wait()
+                    raise
+        # Retain only the summary and bounded diagnostics, not hours of progress.
+        return subprocess.CompletedProcess(process.args, process.returncode, summary, errors)
+
     def update(self, change):
         with (self.state / "state.lock").open("a") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
@@ -130,10 +212,11 @@ class Runner:
                 print("Gotify unavailable; notification queued", file=sys.stderr)
         self.update(deliver)
 
-    def restic(self, *arguments, check=True):
+    def restic(self, *arguments, check=True, stream=False):
         self.credentials()
-        result = subprocess.run(self.base + list(arguments), env=self.env,
-                                capture_output=True, text=True)
+        result = (self.stream_backup(arguments) if stream else
+                  subprocess.run(self.base + list(arguments), env=self.env,
+                                 capture_output=True, text=True))
         if check and result.returncode:
             text = result.stderr.lower()
             if result.returncode == 12 or any(marker in text for marker in [
@@ -167,6 +250,7 @@ class Runner:
     def initialize(self):
         result = self.restic("cat", "config", check=False)
         if result.returncode == 10:
+            self.progress("Initializing backup repository")
             # A concurrent host can win initialization. Verify the final result.
             self.restic("init", "--repository-version", "2", check=False)
             self.restic("cat", "config")
@@ -175,16 +259,19 @@ class Runner:
 
     def backup(self, scope):
         specification = self.config["scopes"][scope]
-        self.initialize()
+        with self.phase("%s: checking backup repository" % scope):
+            self.initialize()
         captured_at = utcnow()
         paths = list(specification.get("paths", []))
         if specification.get("captures"):
             from capture import CaptureError, prepare
             try:
-                paths.extend(map(str, prepare(
-                    specification, self.state / "staging" / scope,
-                    timeout_seconds=self.config.get("timeoutSeconds", 60),
-                )))
+                with self.phase("%s: preparing local captures" % scope):
+                    paths.extend(map(str, prepare(
+                        specification, self.state / "staging" / scope,
+                        timeout_seconds=self.config.get("timeoutSeconds", 60),
+                        progress=self.progress,
+                    )))
             except CaptureError as error:
                 raise Failure("Service capture failed: " + str(error)) from error
         if not paths:
@@ -203,22 +290,26 @@ class Runner:
                 arguments.extend(["--exclude", str(self.state / "staging" / scope / "tree") + exclusion])
         for exclusion in specification.get("directExcludes", []):
             arguments.extend(["--exclude", exclusion])
-        result = self.restic(*arguments, "--", *paths)
+        with self.phase("%s: scanning and uploading backup" % scope):
+            result = self.restic(*arguments, "--", *paths, stream=True)
         summaries = [json.loads(line) for line in result.stdout.splitlines()
                      if line.strip()]
         snapshot = next((item.get("snapshot_id") for item in summaries
                          if item.get("message_type") == "summary"), None)
         if not snapshot:
             raise Failure("Successful upload did not return a restore point")
-        self.restic("tag", "--add", "complete", snapshot)
+        with self.phase("%s: marking snapshot complete" % scope):
+            self.restic("tag", "--add", "complete", snapshot)
         def completed(data):
             data.setdefault("firstCompleteAt", utcnow().isoformat())
             data.setdefault("lastComplete", {})[scope] = {
                 "capturedAt": captured_at.isoformat(), "uploadedAt": utcnow().isoformat(),
             }
             data.setdefault("lastFailure", {}).pop("backup:" + scope, None)
-        self.update(completed)
-        self.transition("backup:" + scope, "ok", scope + " backup succeeded")
+        with self.phase("%s: recording backup status" % scope):
+            self.update(completed)
+            self.transition("backup:" + scope, "ok", scope + " backup succeeded")
+        self.progress("%s: backup complete" % scope)
         print(json.dumps({"host": self.config["host"], "scope": scope,
                           "capturedAt": captured_at.isoformat(), "complete": True}))
 
@@ -601,7 +692,11 @@ def main():
                 runner.restore_test(arguments.host, arguments.scope, arguments.target, arguments.include)
             elif arguments.command == "restic":
                 returncode = runner.admin_restic(arguments.arguments)
-        runner.notify()
+        if arguments.command == "backup" and runner.config.get("gotify"):
+            with runner.phase("Delivering backup notifications"):
+                runner.notify()
+        else:
+            runner.notify()
     except (Failure, OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
         if not isinstance(error, Failure):
             if isinstance(error, subprocess.TimeoutExpired):

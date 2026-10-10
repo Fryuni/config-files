@@ -7,6 +7,7 @@ import fcntl
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import os
 from pathlib import Path
+import select
 import shlex
 import shutil
 import sqlite3
@@ -14,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 import unittest
 
 
@@ -103,6 +105,79 @@ sys.exit(subprocess.run([os.environ['RESTIC_FIXTURE_REAL'], *sys.argv[1:]]).retu
         self.assertEqual(set(snapshots[0]["tags"]), {"machine-backup", "home", "complete"})
         self.assertEqual(self.restic("dump", snapshots[0]["id"],
                                     str(self.source / "project.txt")), b"uncommitted work\n")
+
+    def test_backup_reports_progress_before_upload_finishes(self):
+        binary = self.root / "bin"
+        binary.mkdir()
+        release = self.root / "release-upload"
+        restic = binary / "restic"
+        restic.write_text("#!" + sys.executable + "\n" + """
+import json, os, pathlib, sys, time
+if 'backup' in sys.argv:
+    assert os.environ.get('RESTIC_PROGRESS_FPS') == '0.2'
+    print('fixture: waiting for remote data', file=sys.stderr, flush=True)
+    print(json.dumps({'message_type': 'status', 'percent_done': 0.5,
+                      'files_done': 2, 'total_files': 4,
+                      'bytes_done': 1024, 'total_bytes': 2048}), flush=True)
+    deadline = time.monotonic() + 10
+    while not pathlib.Path(os.environ['BACKUP_RELEASE']).exists():
+        if time.monotonic() > deadline:
+            sys.exit(1)
+        time.sleep(0.01)
+    print(json.dumps({'message_type': 'summary', 'snapshot_id': 'fixture-snapshot'}))
+""")
+        restic.chmod(0o755)
+        # Speed up only the 15-second heartbeat interval, keeping the real CLI,
+        # subprocess pipes and blocking upload unchanged.
+        (binary / "sitecustomize.py").write_text("""
+import threading
+original_wait = threading.Event.wait
+def wait(self, timeout=None):
+    return original_wait(self, 0.05 if timeout == 15 else timeout)
+threading.Event.wait = wait
+""")
+        config = self.root / "config.json"
+        config.write_text(json.dumps(self.config))
+        environment = dict(os.environ, PATH=str(binary) + os.pathsep + os.environ["PATH"],
+                           BACKUP_RELEASE=str(release), PYTHONPATH=str(binary),
+                           PYTHONDONTWRITEBYTECODE="1")
+        with subprocess.Popen(
+            [sys.executable, str(RUNNER), "--config", str(config), "backup", "--scope", "home"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=environment,
+        ) as process:
+            output = b""
+            try:
+                deadline = time.monotonic() + 3
+                while (b"50.0%" not in output or output.count(b"still running") < 2) and time.monotonic() < deadline:
+                    if select.select([process.stderr], [], [], 0.1)[0]:
+                        chunk = os.read(process.stderr.fileno(), 65536)
+                        if not chunk:
+                            break
+                        output += chunk
+                self.assertIn(b"50.0%", output, "No live upload progress: " + output.decode())
+                self.assertIn(b"fixture: waiting for remote data", output)
+                self.assertGreaterEqual(output.count(b"still running"), 2, output.decode())
+                self.assertTrue(all(line.count(b"still running") == 1
+                                    for line in output.splitlines() if b"still running" in line))
+                self.assertIsNone(process.poll(), "Progress arrived only after the backup exited")
+            finally:
+                release.touch()
+                stdout, stderr = process.communicate(timeout=5)
+            self.assertEqual(process.returncode, 0, (output + stderr).decode())
+            self.assertTrue(json.loads(stdout)["complete"])
+
+    def test_backup_reports_named_capture_stages(self):
+        (self.source / "state").write_text("capture this")
+        self.config["scopes"]["home"] = {"captures": [
+            {"name": "fixture-app", "kind": "files", "paths": [str(self.source)]},
+        ]}
+        result = self.cli("backup", "--scope", "home")
+        messages = ["checking backup repository", "preparing local captures",
+                    "Preparing capture fixture-app (files)", "Capture fixture-app prepared",
+                    "scanning and uploading backup", "marking snapshot", "backup complete"]
+        positions = [result.stderr.index(message) for message in messages]
+        self.assertEqual(positions, sorted(positions))
+        self.assertTrue(json.loads(result.stdout)["complete"])
 
     def test_backup_restore_preserves_acl_and_extended_attributes(self):
         source = self.source / "metadata.txt"

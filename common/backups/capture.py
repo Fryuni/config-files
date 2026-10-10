@@ -902,7 +902,7 @@ def _terminated(signum, frame):
     raise CaptureError(f"Capture interrupted by signal {signum}")
 
 
-def prepare(scope_config: dict, staging: Path, *, timeout_seconds: int = 60) -> list[Path]:
+def prepare(scope_config: dict, staging: Path, *, timeout_seconds: int = 60, progress=None) -> list[Path]:
     """Materialize a complete capture, or fail without permitting upload."""
     staging = Path(staging)
     staging.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -916,6 +916,9 @@ def prepare(scope_config: dict, staging: Path, *, timeout_seconds: int = 60) -> 
         signal.signal(signum, _terminated)
     try:
         for entry in scope_config.get("captures", []):
+            started = time.monotonic()
+            if progress:
+                progress("Preparing capture %s (%s)" % (entry["name"], entry["kind"]))
             if entry["kind"] == "files":
                 details = {"paths": _files(entry, staging, timeout_seconds)}
             elif entry["kind"] == "sqlite":
@@ -932,6 +935,8 @@ def prepare(scope_config: dict, staging: Path, *, timeout_seconds: int = 60) -> 
             if entry.get("writerCoverageNote"):
                 record["writerCoverageNote"] = entry["writerCoverageNote"]
             manifest["captures"].append(record)
+            if progress:
+                progress("Capture %s prepared (%.1fs)" % (entry["name"], time.monotonic() - started))
         manifest["completedAt"] = time.time()
         manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
         manifest_path.chmod(0o600)
