@@ -64,6 +64,10 @@ These commands build or inspect changes without applying them. See
 [maintenance and validation](docs/maintenance.md) for other hosts, checks,
 formatting, and dependency updates.
 
+`nh` provides build progress and a package delta for both Home Manager and NixOS.
+The `nix-output-monitor` flake check replays log events to verify compatibility
+with Determinate Nix and preserve build and download reporting.
+
 ## Documentation
 
 | Topic | Guide |

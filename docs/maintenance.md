@@ -126,6 +126,13 @@ Prefer the narrow output that matches the change:
 - Evaluate or build the affected `nixosConfigurations.<machine>` output for host
   changes.
 - Run the relevant `checks` entry when changing a reusable module covered by `tests/`.
+- Run `nix build .#checks.x86_64-linux.nix-output-monitor` for `nh` progress
+  compatibility. The overlay backports upstream handling of unknown activity and
+  result types from [nom PR #321](https://github.com/maralorn/nix-output-monitor/pull/321)
+  until the fix reaches nixpkgs. The replay also verifies build logs and download
+  reporting, and that malformed known events still produce errors.
+  The override asserts version `2.2.0`, so an upstream version change requires
+  reviewing whether the patch is still needed before updating or removing the assertion.
 - Run `nix build .#checks.x86_64-linux.vite-plus-updater` for the Vite+ updater, or
   `python3 -B tests/vite-plus-updater.py` for a fast offline replay without Nix.
 - Run `nix build .#checks.x86_64-linux.machine-backups-module` for evaluated backup

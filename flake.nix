@@ -304,6 +304,24 @@
 
       checks =
         nixpkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+          nix-output-monitor = let
+            # A readable derivation for nom, without importing a full build closure.
+            buildFixture = builtins.derivation {
+              name = "progress-replay";
+              inherit system;
+              builder = "/bin/sh";
+              args = [];
+            };
+          in
+            pkgs.runCommand "nix-output-monitor-check" {
+              nativeBuildInputs = [pkgs.python3 pkgs.nix];
+            } ''
+              export XDG_CACHE_HOME="$TMPDIR/cache"
+              export NIX_REMOTE=dummy://
+              python3 -B ${./tests/nix-output-monitor.py} ${pkgs.lib.getExe pkgs.nix-output-monitor} \
+                ${builtins.unsafeDiscardOutputDependency buildFixture.drvPath}
+              touch $out
+            '';
           vite-plus-updater =
             pkgs.runCommand "vite-plus-updater-check" {
               nativeBuildInputs = [pkgs.python3];

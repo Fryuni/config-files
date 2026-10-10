@@ -1,0 +1,53 @@
+Backport https://github.com/maralorn/nix-output-monitor/pull/321:
+3c2ae037013e840046ed9785c4da82aa1c628872 and
+202f940f96360548dedfb3b9234f6f6f08a9a2ba.
+Paths are relative to the nixpkgs package's sourceRoot.
+
+diff --git a/lib/NOM/NixMessage/JSON.hs b/lib/NOM/NixMessage/JSON.hs
+--- a/lib/NOM/NixMessage/JSON.hs
++++ b/lib/NOM/NixMessage/JSON.hs
+@@ -40,6 +40,7 @@ data ActivityType where
+   PostBuildHookType :: ActivityType
+   BuildWaitingType :: ActivityType
+   FetchTreeType :: ActivityType
++  OtherType :: Int -> ActivityType
+   deriving stock (Show, Eq)
+ 
+ -- | nix src/libutil/include/nix/util/logging.hh ActivityType
+@@ -72,6 +73,7 @@ data ActivityResult where
+   SetExpected :: ActivityType -> Int -> ActivityResult
+   PostBuildLogLine :: Text -> ActivityResult
+   FetchStatus :: Text -> ActivityResult
++  OtherResult :: Int -> ActivityResult
+   deriving stock (Show, Eq)
+ 
+ data ActivityProgress = MkActivityProgress
+diff --git a/lib/NOM/Parser/JSON.hs b/lib/NOM/Parser/JSON.hs
+--- a/lib/NOM/Parser/JSON.hs
++++ b/lib/NOM/Parser/JSON.hs
+@@ -45,7 +45,7 @@ parseActivityType = \case
+   110 -> pure PostBuildHookType
+   111 -> pure BuildWaitingType
+   112 -> pure FetchTreeType
+-  other -> fail ("invalid activity type: " <> show other)
++  other -> pure (OtherType other)
+ 
+ parseAction :: JSON.Decoder NixJSONMessage
+ parseAction = JSON.object $ do
+@@ -121,7 +121,7 @@ parseResultAction = do
+       pure $ SetExpected activityType number
+     107 -> PostBuildLogLine <$> one txt
+     108 -> FetchStatus <$> one txt
+-    other -> fail ("invalid activity result type: " <> show other)
++    other -> pure (OtherResult other)
+   pure MkResultAction{id = idField, result}
+ 
+ parseStopAction :: JSON.FieldsDecoder StopAction
+@@ -136,6 +136,7 @@ parseStartAction = do
+   let txt = textFields
+   activity <- case activityType of
+     UnknownType -> pure Unknown
++    OtherType _ -> pure Unknown
+     CopyPathType ->
+       three txt >>= \(path, from, to) -> do
+         path' <- parseStorePath path
