@@ -242,6 +242,7 @@
                       agenix.nixosModules.age
                       attrs.agenix-rekey.nixosModules.default
                       ./agenix-rekey.nix
+                      ./nixos/modules/machine-backups.nix
                     ]
                     ++ modules
                     ++ nixpkgs.lib.optionals (!isCross) [
@@ -301,43 +302,68 @@
         packages = [];
       };
 
-      checks = nixpkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
-        vite-plus-updater =
-          pkgs.runCommand "vite-plus-updater-check" {
-            nativeBuildInputs = [pkgs.python3];
-          } ''
-            mkdir -p tests overlay/packages
-            cp ${./tests/vite-plus-updater.py} tests/vite-plus-updater.py
-            cp ${./overlay/packages/update-vite-plus.py} overlay/packages/update-vite-plus.py
-            cp ${./overlay/packages/vite-plus.nix} overlay/packages/vite-plus.nix
-            cp -r ${./overlay/packages/vite-plus} overlay/packages/vite-plus
-            python3 -B tests/vite-plus-updater.py
-            touch $out
-          '';
-        cloudflare-tunnel-module = import ./tests/cloudflare-tunnel-module.nix {
-          inherit pkgs;
-          inherit (nixpkgs) lib;
-          cloudflareTunnelModule = ./nixos/modules/networking/cloudflare-tunnel.nix;
+      checks =
+        nixpkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+          vite-plus-updater =
+            pkgs.runCommand "vite-plus-updater-check" {
+              nativeBuildInputs = [pkgs.python3];
+            } ''
+              mkdir -p tests overlay/packages
+              cp ${./tests/vite-plus-updater.py} tests/vite-plus-updater.py
+              cp ${./overlay/packages/update-vite-plus.py} overlay/packages/update-vite-plus.py
+              cp ${./overlay/packages/vite-plus.nix} overlay/packages/vite-plus.nix
+              cp -r ${./overlay/packages/vite-plus} overlay/packages/vite-plus
+              python3 -B tests/vite-plus-updater.py
+              touch $out
+            '';
+          cloudflare-tunnel-module = import ./tests/cloudflare-tunnel-module.nix {
+            inherit pkgs;
+            inherit (nixpkgs) lib;
+            cloudflareTunnelModule = ./nixos/modules/networking/cloudflare-tunnel.nix;
+          };
+          tailnet-access-module = import ./tests/tailnet-access-module.nix {
+            inherit pkgs;
+            inherit (nixpkgs) lib;
+            tailnetAccessModule = ./nixos/modules/networking/tailnet-access.nix;
+          };
+          tailscale-file-inbox-module = import ./tests/tailscale-file-inbox-module.nix {
+            inherit pkgs;
+            inherit (nixpkgs) lib;
+            tailscaleFileInboxModule = ./nixos/modules/networking/tailscale-file-inbox.nix;
+          };
+          nix-store-cache-module = import ./tests/nix-store-cache-module.nix {
+            inherit pkgs;
+            inherit (nixpkgs) lib;
+            nixStoreCacheModule = ./nixos/modules/nix-store-cache.nix;
+          };
+          nix-store-cache-command = import ./tests/nix-store-cache-command.nix {
+            inherit pkgs;
+          };
+          machine-backups-module = import ./tests/machine-backups-module.nix {
+            inherit pkgs;
+            inherit (nixpkgs) lib;
+            machineBackupsModule = ./nixos/modules/machine-backups.nix;
+          };
+          machine-backups-runtime = import ./tests/machine-backups-runtime.nix {
+            inherit pkgs;
+          };
+        }
+        // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
+          machine-backups-coverage = import ./tests/machine-backups-coverage.nix {
+            inherit pkgs;
+            inherit (nixpkgs) lib;
+            profiles = {
+              note = {
+                machine = self.nixosConfigurations.note.config;
+                home = self.homeConfigurations."lotus@note".config;
+              };
+              loem = {
+                machine = self.nixosConfigurations.loem.config;
+                home = self.nixosConfigurations.loem.config.home-manager.users.lotus;
+              };
+            };
+          };
         };
-        tailnet-access-module = import ./tests/tailnet-access-module.nix {
-          inherit pkgs;
-          inherit (nixpkgs) lib;
-          tailnetAccessModule = ./nixos/modules/networking/tailnet-access.nix;
-        };
-        tailscale-file-inbox-module = import ./tests/tailscale-file-inbox-module.nix {
-          inherit pkgs;
-          inherit (nixpkgs) lib;
-          tailscaleFileInboxModule = ./nixos/modules/networking/tailscale-file-inbox.nix;
-        };
-        nix-store-cache-module = import ./tests/nix-store-cache-module.nix {
-          inherit pkgs;
-          inherit (nixpkgs) lib;
-          nixStoreCacheModule = ./nixos/modules/nix-store-cache.nix;
-        };
-        nix-store-cache-command = import ./tests/nix-store-cache-command.nix {
-          inherit pkgs;
-        };
-      };
 
       apps = import ./commands.nix {
         inherit self pkgs;

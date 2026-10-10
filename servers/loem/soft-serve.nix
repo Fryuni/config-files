@@ -1,4 +1,8 @@
-{config, ...}: {
+{
+  config,
+  lib,
+  ...
+}: {
   services.soft-serve = {
     enable = true;
     settings = {
@@ -22,6 +26,14 @@
       initial_admin_keys = config.users.users.root.openssh.authorizedKeys.keys;
     };
   };
+
+  services.machineBackups.directories = lib.mkIf config.services.soft-serve.enable [
+    {
+      name = "soft-serve";
+      paths = [config.systemd.services.soft-serve.environment.SOFT_SERVE_DATA_PATH];
+      units = [{name = "soft-serve.service";}];
+    }
+  ];
 
   services.tailscale.serve.services.git-ss.endpoints = {
     "tcp:22" = "tcp://localhost:23231";

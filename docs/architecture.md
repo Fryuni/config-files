@@ -40,10 +40,25 @@ Important composition rules:
   `overlay/`.
 - `channelOverlays` expose alternate package channels as `pkgs.master` and `pkgs.stable`
   while preserving the active package set as `unstable` inside those channel imports.
-- Every NixOS system gets the agenix and agenix-rekey modules before its machine
-  modules.
+- Every NixOS system gets the agenix, agenix-rekey, and disabled-by-default machine
+  backup modules before its machine modules. Services can declare their backup
+  state on every machine without enrolling it in scheduled backups.
 - Native x86_64 builds use the normal `system` and shared `pkgs`; cross builds set
   host/build platforms and reuse the same overlay policy.
+- `note` and `loem` enable `nixos/modules/machine-backups.nix`, which packages the
+  capture and restic runner in `common/backups/`, declares root-only agenix backup
+  credentials, and schedules system jobs. Each service's defining module registers
+  its state directories, exclusions, and consistency protocol through
+  `services.machineBackups.directories` or a named native capture. Home Manager
+  uses the same registration options; NixOS aggregates the selected user's
+  declarations and supplies their systemd username and UID. Embedded Home Manager
+  is selected automatically; `note` explicitly selects its standalone Home Manager
+  output through `services.machineBackups.homeManager`. Native database
+  captures merge dependent application registrations by capture name. The engine
+  contains no service catalogue or service enable checks. `loem` owns
+  shared repository maintenance. Independent application writers pause during final
+  local captures; transient systemd watchdogs resume them if the backup exits or
+  reaches its pause deadline.
 - The workstation path and server path are separate: `nixos/` is the shared
   workstation/system baseline, while `servers/common.nix` is the shared server baseline.
 
@@ -73,7 +88,8 @@ Important composition rules:
   notebook and interactive-server use.
 - `secrets.nix`, `agenix-rekey.nix`, `secrets/` — age/agenix secret recipient policy,
   rekey integration, and encrypted secret material.
-- `tests/` — module-level Nix checks and offline package-updater regression tests.
+- `tests/` — module-level Nix checks, isolated backup/database recovery fixtures,
+  and offline package-updater regression tests.
 - `commands.nix` — flake apps for local workflows such as build, diff, update, and
   formatting helpers.
 - `templates/` — flake templates exported by this repository.

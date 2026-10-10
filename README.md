@@ -23,6 +23,19 @@ Secrets use agenix and agenix-rekey. The Nix modules are the source of truth for
 exact packages and service settings; the [architecture guide](docs/architecture.md)
 explains the composition and flake outputs.
 
+`note` and `loem` use the reusable [machine backup module](nixos/modules/machine-backups.nix)
+for hourly service captures and home backups every six hours into a shared restic
+repository on Hetzner. Each service module registers its own state directories,
+capture method, and exclusions; the backup module aggregates NixOS and Home Manager
+registrations. A separate systemd recovery service restarts paused services if a
+backup job is killed. Selected locked flake source inputs support offline recovery
+evaluation; package builds use normal network access. The dedicated SSH identity,
+repository password, and backup notification token use agenix and host rekeying.
+See the [backup and recovery guide](docs/backups.md) for coverage, notifications,
+retention, and rollout checks. The `machine-backups-coverage` flake
+check verifies registrations against each machine's actual Home Manager output,
+including coordination of Node-RED's service and configured git-sync writer.
+
 ## Configurations
 
 | Configuration | Platform | Purpose |
@@ -57,6 +70,7 @@ formatting, and dependency updates.
 | Module composition, machines, users, and flake outputs | [Architecture](docs/architecture.md) |
 | Builds, checks, package updates, and CI | [Maintenance and validation](docs/maintenance.md) |
 | Encryption, host identities, and rekeying | [Secrets](docs/secrets.md) |
+| Backup policy, operation, service coverage, and recovery | [Backups and recovery](docs/backups.md) |
 | Desktop sessions, shell display access, and tray icons | [Notebook desktop](docs/desktop.md) |
 | Forgejo, Actions runners, Executor, metrics, and private networking | [Hosted services and Tailnet access](docs/services.md) |
 | T3 Code, Claude Code, and Herdr configuration | [AI tools](docs/ai-tools.md) |

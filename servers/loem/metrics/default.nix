@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }: {
@@ -46,6 +47,28 @@
       ];
     };
   };
+
+  services.machineBackups = lib.mkMerge [
+    (lib.mkIf config.services.victoriametrics.enable {
+      captures.victoriametrics = {
+        kind = "victoria";
+        paths = [];
+        url = "http://${config.services.victoriametrics.listenAddress}";
+        storagePath = "/var/lib/${config.services.victoriametrics.stateDir}";
+      };
+      extraPackages = [config.services.victoriametrics.package];
+    })
+    (lib.mkIf config.services.grafana.enable {
+      directories = [
+        {
+          name = "grafana";
+          kind = "sqlite";
+          paths = [config.services.grafana.dataDir config.age.secrets.grafana-key.path];
+          units = [{name = "grafana.service";}];
+        }
+      ];
+    })
+  ];
 
   services.tailscale.serve = {
     enable = true;

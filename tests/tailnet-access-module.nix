@@ -38,6 +38,7 @@
     inherit pkgs;
     modules = [
       tailnetAccessModule
+      {options.services.machineBackups = import ../common/backups/options.nix {inherit lib;};}
       ageStubModule
       {
         system.stateVersion = "26.05";
@@ -81,6 +82,7 @@
     inherit pkgs;
     modules = [
       tailnetAccessModule
+      {options.services.machineBackups = import ../common/backups/options.nix {inherit lib;};}
       ageStubModule
       {
         system.stateVersion = "26.05";
@@ -101,6 +103,7 @@
     inherit pkgs;
     modules = [
       tailnetAccessModule
+      {options.services.machineBackups = import ../common/backups/options.nix {inherit lib;};}
       ageStubModule
       {
         system.stateVersion = "26.05";
@@ -133,6 +136,11 @@
     map (assertion: assertion.message) (builtins.filter (assertion: !assertion.assertion) invalid.config.assertions);
 
   configJson = builtins.toJSON {
+    dnsOnlyBackupDirectories = dnsEvaluated.config.services.machineBackups.directories;
+    customBackupDirectories =
+      (evaluated.extendModules {
+        modules = [{services.caddy.dataDir = "/srv/tailnet-caddy";}];
+      }).config.services.machineBackups.directories;
     extraConfig = cfg.services.caddy.virtualHosts.tailnet.extraConfig;
     emptyAliasesExtraConfig = emptyAliasesEvaluated.config.services.caddy.virtualHosts.tailnet.extraConfig;
     caddyHostName = cfg.services.caddy.virtualHosts.tailnet.hostName;
@@ -206,6 +214,8 @@ in
     caddyConfig = cfg.services.caddy.configFile;
   } ''
     printf '%s\n' "$configJson" > config.json
+    jq -e '.dnsOnlyBackupDirectories == []' config.json
+    jq -e '.customBackupDirectories | any(.name == "caddy-state" and .paths == ["/srv/tailnet-caddy"] and .optional == true)' config.json
     jq -e '.caddyHostName == "https://note.tailnet.test"' config.json
     jq -e '.caddyServerAliases | index("https://*.note.example.test")' config.json
     jq -e '.caddyServerAliases | index("https://note.example.test")' config.json

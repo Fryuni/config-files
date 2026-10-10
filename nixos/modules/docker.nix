@@ -3,6 +3,8 @@
     docker-compose
   ];
 
+  services.machineBackups.extraPackages = [pkgs.docker];
+
   virtualisation = {
     # containerd.enable = true;
     oci-containers.backend = "docker";

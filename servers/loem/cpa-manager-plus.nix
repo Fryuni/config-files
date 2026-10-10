@@ -43,4 +43,13 @@ in {
       WorkingDirectory = stateDir;
     };
   };
+
+  services.machineBackups.directories = [
+    {
+      name = "cpa-manager-plus";
+      kind = "sqlite";
+      paths = [stateDir];
+      units = [{name = "cpa-manager-plus.service";}];
+    }
+  ];
 }

@@ -16,6 +16,12 @@
 
   # Set your time zone.
   time.timeZone = "America/Sao_Paulo";
+  services.machineBackups.inventory.classifiedRegenerable = [
+    {
+      path = "/var/lib/systemd/timesync";
+      reason = "NTP clock synchronization state is rebuilt from network time; it is not application data.";
+    }
+  ];
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";

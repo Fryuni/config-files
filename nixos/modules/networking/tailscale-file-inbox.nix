@@ -20,6 +20,14 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    services.machineBackups.directories = [
+      {
+        name = "tailscale-file-inbox";
+        paths = [cfg.path];
+        optional = true;
+      }
+    ];
+
     assertions = [
       {
         assertion = config.services.tailscale.enable;

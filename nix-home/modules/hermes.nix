@@ -22,5 +22,22 @@
         uri = "git@git-ss.rudd-agama.ts.net:configs/hermes.git";
       };
     };
+
+    services.machineBackups.directories = [
+      {
+        name = "hermes";
+        kind = "sqlite";
+        paths = [config.services.git-sync.repositories.hermes.path];
+        scopes = ["home" "services"];
+        units = [
+          {
+            name = "git-sync-hermes.service";
+            type = "user";
+          }
+        ];
+        pauseOpenWriters = true;
+        writerCoverageNote = "SQLite DBs are captured consistently. Git-sync and detected processes holding files open under this directory are paused. Processes that open and close files between writes may evade discovery; verify associated files during rehearsal.";
+      }
+    ];
   };
 }

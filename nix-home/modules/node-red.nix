@@ -85,6 +85,27 @@ in {
   config = mkIf cfg.enable {
     programs.git.enable = true;
 
+    services.machineBackups.directories = [
+      {
+        name = "node-red";
+        paths = [(toString cfg.userDir)];
+        scopes = ["home" "services"];
+        units =
+          [
+            {
+              name = "node-red.service";
+              type = "user";
+            }
+          ]
+          ++ optionals (cfg.repo != null) [
+            {
+              name = "git-sync-node-red-config.service";
+              type = "user";
+            }
+          ];
+      }
+    ];
+
     services.git-sync = mkIf (cfg.repo != null) {
       enable = true;
       repositories = {

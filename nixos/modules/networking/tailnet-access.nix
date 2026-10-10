@@ -409,6 +409,14 @@ in {
 
   config = mkIf cfg.enable (mkMerge [
     (mkIf cfg.certificates.enable {
+      services.machineBackups.directories = [
+        {
+          name = "tailnet-certificates";
+          paths = [certStateDir];
+          optional = true;
+        }
+      ];
+
       age.secrets.lferraz-tailnet-ca-key = {
         rekeyFile = ../../../secrets/lferraz-tailnet-ca.key;
         path = caKeyCredential;
@@ -554,6 +562,14 @@ in {
     })
 
     (mkIf cfg.proxy.enable {
+      services.machineBackups.directories = [
+        {
+          name = "caddy-state";
+          paths = [config.services.caddy.dataDir];
+          optional = true;
+        }
+      ];
+
       assertions = [
         {
           assertion = cfg.certificates.enable;

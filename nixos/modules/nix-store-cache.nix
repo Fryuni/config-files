@@ -241,6 +241,13 @@ in {
   };
 
   config = mkIf cfg.enable {
+    services.machineBackups.inventory.classifiedRegenerable = [
+      {
+        path = stateDirectory;
+        reason = "Nix cache upload counters and pending upload queue are rebuildable package-cache metadata.";
+      }
+    ];
+
     environment.systemPackages = [cacheCommands.command];
 
     assertions = [

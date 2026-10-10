@@ -1,4 +1,9 @@
-{pkgs, ...}: let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   domain = "matrix.lferraz.com";
   tuwunel-port = 3340;
 
@@ -26,6 +31,14 @@ in {
       allow_public_room_directory_over_federation = true;
     };
   };
+
+  services.machineBackups.directories = lib.mkIf config.services.matrix-tuwunel.enable [
+    {
+      name = "matrix-tuwunel";
+      paths = ["/var/lib/${config.services.matrix-tuwunel.stateDirectory}"];
+      units = [{name = "tuwunel.service";}];
+    }
+  ];
 
   services.cfTunnel.ingress = {
     "${domain}" = "http://localhost:${toString tuwunel-port}";

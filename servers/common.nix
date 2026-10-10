@@ -69,11 +69,27 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  services.openssh = {
-    enable = lib.mkDefault true;
-    settings = {
-      PasswordAuthentication = false;
-      PermitRootLogin = lib.mkDefault "prohibit-password";
+  services = {
+    machineBackups = {
+      directories = [
+        {
+          name = "machine-identities";
+          paths = ["/etc/ssh"];
+        }
+      ];
+      inventory.classifiedRegenerable = [
+        {
+          path = "/var/lib/systemd/timesync";
+          reason = "NTP clock synchronization state is rebuilt from network time; it is not application data.";
+        }
+      ];
+    };
+    openssh = {
+      enable = lib.mkDefault true;
+      settings = {
+        PasswordAuthentication = false;
+        PermitRootLogin = lib.mkDefault "prohibit-password";
+      };
     };
   };
 }

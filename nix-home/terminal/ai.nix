@@ -10,6 +10,25 @@
   ];
 
   config = lib.mkIf (pkgs.stdenv.buildPlatform.system == pkgs.stdenv.hostPlatform.system) {
+    # The independently installed daemon keeps durable conversations and SQLite
+    # state here; its unit names are generated rather than declared by Nix.
+    services.machineBackups.directories = [
+      {
+        name = "no-mistakes";
+        kind = "sqlite";
+        paths = ["${config.home.homeDirectory}/.no-mistakes"];
+        optional = true;
+        scopes = ["home" "services"];
+        pauseOpenWriters = true;
+        discoverUnits = [
+          {
+            type = "user";
+            pattern = "no-mistakes-daemon-*.service";
+          }
+        ];
+      }
+    ];
+
     home.packages = with pkgs; [
       llm-agents.opencode
       llm-agents.agent-browser

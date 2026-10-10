@@ -20,6 +20,14 @@
     useRoutingFeatures = "both";
   };
 
+  services.machineBackups.directories = lib.mkIf config.services.tailscale.enable [
+    {
+      name = "tailscale-identity";
+      paths = ["/var/lib/tailscale"];
+      optional = true;
+    }
+  ];
+
   networking.firewall = {
     # always allow traffic from your Tailscale network
     trustedInterfaces = [config.services.tailscale.interfaceName];

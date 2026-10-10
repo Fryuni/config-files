@@ -3,6 +3,7 @@
   lib,
   ...
 }: let
+  cfg = config.services.postgresql;
   tailnetHost = "${config.networking.hostName}.${config.services.lferrazTailnetAccess.tailnetDomain}";
 in {
   services.postgresql = {
@@ -19,5 +20,24 @@ in {
   systemd.services.postgresql = {
     after = ["tailscaled.service" "tailscaled-autoconnect.service"];
     wants = ["tailscaled.service" "tailscaled-autoconnect.service"];
+  };
+
+  services.machineBackups = lib.mkIf cfg.enable {
+    captures.postgresql = {
+      kind = "postgres";
+      paths = [];
+      user = "postgres";
+      socket = "/run/postgresql";
+      port = cfg.settings.port;
+      database = "postgres";
+      coveredPaths = [cfg.dataDir];
+    };
+    extraPackages = [cfg.package];
+    inventory.scaffolds = [
+      {
+        path = builtins.dirOf cfg.dataDir;
+        reason = "Parent of natively captured PostgreSQL cluster; other children must be covered separately.";
+      }
+    ];
   };
 }

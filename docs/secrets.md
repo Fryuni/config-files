@@ -37,6 +37,31 @@ and host key for this workflow.
 
 ## Service-specific credentials
 
+- Backups have a dedicated shared SSH identity. Its encrypted private key is
+  [secrets/storagebox-backup-ssh-key](../secrets/storagebox-backup-ssh-key), governed
+  by the normal `secrets.nix` recipient policy; its public key is
+  [common/ssh/storagebox-backup.pub](../common/ssh/storagebox-backup.pub).
+  The public key is authorized on `u688316.your-storagebox.de`, and SSH
+  and SFTP access on port 23 were verified with that identity alone. The
+  [backup module](../nixos/modules/machine-backups.nix) declares it through
+  `rekeyFile` with root-only runtime permissions. Future hosts receive the same identity through agenix-rekey,
+  without another Storage Box authorization change. See the
+  [backup guide](backups.md) and [identity decision](adr/0002-shared-backup-access-identity.md).
+  The random repository password is encrypted in `secrets/restic-backup-password`;
+  both hosts receive the same password. The separate Gotify backup application
+  token is encrypted in `secrets/restic-backup-gotify-token` and rekeyed to both hosts.
+  Rotate the separate Gotify backup
+  application token with `bash common/backups/provision-gotify.sh`, then run
+  `just rekey` and stage the affected host outputs. The helper writes only
+  `secrets/restic-backup-gotify-token` ciphertext. Until that source is provisioned,
+  the module uses a root-only bootstrap token path at
+  `/var/lib/machine-backups/credentials/gotify-token`; notifications remain queued
+  without a valid token. Keep the repository password, backup SSH private key,
+  agenix recovery identity, and independent Storage Box administrative access in
+  the external recovery vault. Repository initialization has already succeeded
+  with the dedicated identity. Rotating its password requires changing the
+  restic repository key as well as the encrypted source; replacing the source
+  alone does not rotate the existing repository.
 - [Shared Nix cache](nix-store-cache.md#credential-maintenance) covers the cache write
   token and daemon credentials.
 - [Forgejo Actions runners](../servers/loem/forgejo-actions.md) covers runner UUIDs and

@@ -9,6 +9,7 @@
       inherit pkgs;
       modules = [
         nixStoreCacheModule
+        {options.services.machineBackups = import ../common/backups/options.nix {inherit lib;};}
         {
           system.stateVersion = "26.05";
 

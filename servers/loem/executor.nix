@@ -33,5 +33,13 @@ in {
     };
   };
 
+  services.machineBackups.directories = [
+    {
+      name = "executor";
+      paths = [stateDir];
+      units = [{name = "${config.virtualisation.oci-containers.backend}-executor.service";}];
+    }
+  ];
+
   services.lferrazTailnetAccess.proxy.aliases.${alias} = port;
 }

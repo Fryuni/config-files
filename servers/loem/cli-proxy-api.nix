@@ -96,5 +96,15 @@ in {
     };
   };
 
+  services.machineBackups.directories = [
+    {
+      name = "cli-proxy-api";
+      paths = [stateDir];
+      units = [{name = "cli-proxy-api.service";}];
+      # Request/response exchanges are retained; only diagnostic logs are disposable.
+      excludes = ["/logs/main.log" "/logs/main-*.log"];
+    }
+  ];
+
   services.lferrazTailnetAccess.proxy.aliases.llm = cpaManagerPlusHandler;
 }

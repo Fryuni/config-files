@@ -40,4 +40,20 @@
   };
 
   services.fail2ban.enable = false;
+
+  services.machineBackups = {
+    directories = lib.mkIf config.networking.networkmanager.enable [
+      {
+        name = "networkmanager-connections";
+        paths = ["/etc/NetworkManager/system-connections"];
+        optional = true;
+      }
+    ];
+    inventory.classifiedRegenerable = [
+      {
+        path = "/var/lib/dhcpcd";
+        reason = "DHCP leases are reacquired from the network after boot.";
+      }
+    ];
+  };
 }

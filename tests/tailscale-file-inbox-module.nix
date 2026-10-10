@@ -9,6 +9,7 @@
       inherit pkgs;
       modules = [
         tailscaleFileInboxModule
+        {options.services.machineBackups = import ../common/backups/options.nix {inherit lib;};}
         {
           system.stateVersion = "26.05";
 
@@ -43,6 +44,7 @@
   configJson = builtins.toJSON {
     disabled = {
       fileInbox = disabledCfg.services.tailscale.fileInbox;
+      backupDirectories = disabledCfg.services.machineBackups.directories;
       hasService = disabledCfg.systemd.services ? tailscale-file-inbox;
       hasDefaultTmpfilesRule = builtins.elem "d /opt/tailscale-inbox 0755 root root - -" disabledCfg.systemd.tmpfiles.rules;
     };
@@ -54,6 +56,7 @@
     };
     customPath = {
       fileInbox = customCfg.services.tailscale.fileInbox;
+      backupDirectories = customCfg.services.machineBackups.directories;
       inherit (customServiceConfig) ExecStart WorkingDirectory;
       tmpfilesRules = customCfg.systemd.tmpfiles.rules;
     };
@@ -69,6 +72,7 @@ in
     jq -e '.disabled.fileInbox.path == "/opt/tailscale-inbox"' config.json
     jq -e '.disabled.hasService == false' config.json
     jq -e '.disabled.hasDefaultTmpfilesRule == false' config.json
+    jq -e '.disabled.backupDirectories == []' config.json
 
     jq -e '.defaultEnabled.fileInbox.enable == true' config.json
     jq -e '.defaultEnabled.fileInbox.path == "/opt/tailscale-inbox"' config.json
@@ -86,6 +90,7 @@ in
 
     jq -e '.customPath.fileInbox.enable == true' config.json
     jq -e '.customPath.fileInbox.path == "/srv/taildrop-inbox"' config.json
+    jq -e '.customPath.backupDirectories | any(.name == "tailscale-file-inbox" and .paths == ["/srv/taildrop-inbox"] and .optional == true)' config.json
     jq -e '.customPath.tmpfilesRules | any(. == "d /srv/taildrop-inbox 0755 root root - -")' config.json
     jq -e '.customPath.WorkingDirectory == "/srv/taildrop-inbox"' config.json
     jq -e '.customPath.ExecStart | contains("/bin/tailscale file get --loop --wait --conflict=rename /srv/taildrop-inbox")' config.json

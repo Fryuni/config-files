@@ -128,6 +128,11 @@ Prefer the narrow output that matches the change:
 - Run the relevant `checks` entry when changing a reusable module covered by `tests/`.
 - Run `nix build .#checks.x86_64-linux.vite-plus-updater` for the Vite+ updater, or
   `python3 -B tests/vite-plus-updater.py` for a fast offline replay without Nix.
+- Run `nix build .#checks.x86_64-linux.machine-backups-module` for evaluated backup
+  module behavior, `nix build .#checks.x86_64-linux.machine-backups-coverage` for
+  actual `note`/`loem` registrations (including the standalone Home Manager bridge),
+  and `nix build .#checks.x86_64-linux.machine-backups-runtime` for isolated capture, database recovery and restic operations. See the
+  [backup guide](backups.md) for production rollout checks.
 - Use the diff helpers to inspect prospective system or Home Manager changes before
   applying them.
 

@@ -12,6 +12,20 @@
     container.docker_host = "automount";
     runner.capacity = 5;
   };
+  cfg = config.services.forgejo;
+  roots = paths: lib.filter (path: !(lib.any (other: other != path && lib.hasPrefix "${other}/" path) paths)) (lib.unique paths);
+  forgejoPaths = roots (
+    [cfg.stateDir cfg.customDir cfg.repositoryRoot]
+    ++ lib.optional cfg.lfs.enable cfg.lfs.contentDir
+  );
+  enabledRunners = lib.filterAttrs (_: instance: instance.enable) config.services.forgejo-runner.instances;
+  dependentRunnerUnits = map (name: {name = "forgejo-runner-${name}.service";}) (
+    lib.filter (name: let
+      service = config.systemd.services."forgejo-runner-${name}";
+    in
+      lib.elem "forgejo.service" (service.requires ++ service.bindsTo))
+    (lib.attrNames enabledRunners)
+  );
 in {
   age.secrets = {
     self-actions-token = {
@@ -149,6 +163,29 @@ in {
         hostPackages = runnerHostPackages;
       };
     };
+  };
+
+  services.machineBackups = {
+    # Stop Forgejo and its dependent runners together with the database dump so
+    # repositories and database references describe the same application state.
+    captures.postgresql = lib.mkIf cfg.enable {
+      coordinated = [
+        {
+          name = "forgejo";
+          database = cfg.database.name;
+          paths = forgejoPaths;
+          # Captures restart in reverse order, bringing Forgejo back before runners.
+          units = dependentRunnerUnits ++ [{name = "forgejo.service";}];
+        }
+      ];
+    };
+    directories =
+      lib.mapAttrsToList (name: _: {
+        name = "forgejo-runner-${name}";
+        paths = [config.systemd.services."forgejo-runner-${name}".serviceConfig.WorkingDirectory];
+        units = [{name = "forgejo-runner-${name}.service";}];
+      })
+      enabledRunners;
   };
 
   services.tailscale.serve.services.git.endpoints = {

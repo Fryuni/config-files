@@ -62,6 +62,11 @@
   };
 
   services.nixStoreCache.uploadConcurrency = 4;
+  services.machineBackups = {
+    enable = true;
+    peerHost = "note";
+    maintenance.enable = true;
+  };
 
   home-manager.users.lotus.hermes.enabled = true;
 }

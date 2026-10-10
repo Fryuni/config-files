@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   pkgs,
   ...
 }: {
@@ -36,6 +37,11 @@
   boot.kernel.sysctl."net.ipv4.conf.wlp61s0.force_igmp_version" = 2;
 
   services.vmagent.enable = true;
+  services.machineBackups = {
+    enable = true;
+    peerHost = "loem";
+    homeManager = inputs.self.homeConfigurations."lotus@note".config.services.machineBackups;
+  };
   # The Microdia webcam can report valid V4L2 control values while its
   # internal image processor remains misconfigured after power-on. Rewrite
   # the known-good controls whenever its capture node is initialized.
@@ -168,6 +174,13 @@
       ChallengeResponseAuthentication = "no";
     };
   };
+
+  services.machineBackups.directories = [
+    {
+      name = "machine-identities";
+      paths = ["/etc/ssh"];
+    }
+  ];
 
   services.lferrazTailnetAccess.proxy.aliases.hermes = 9120;
   services.tailscale = {

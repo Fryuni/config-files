@@ -1,4 +1,8 @@
-{...}: {
+{
+  config,
+  lib,
+  ...
+}: {
   # Let home-manager manage itself.
   home.stateVersion = "26.05";
   home.enableNixpkgsReleaseCheck = false;
@@ -17,6 +21,42 @@
   # ];
 
   services.syncthing.enable = true;
+
+  services.machineBackups = {
+    exclude = map (path: "${config.home.homeDirectory}/${path}") [
+      ".cache"
+      ".npm/_cacache"
+      ".npm/_logs"
+      ".cargo/registry"
+      ".cargo/target"
+    ];
+    directories = lib.mkIf config.services.syncthing.enable [
+      {
+        name = "syncthing";
+        paths = ["${config.xdg.stateHome}/syncthing"];
+        scopes = ["home" "services"];
+        units = [
+          {
+            name = "syncthing.service";
+            type = "user";
+          }
+        ];
+      }
+      {
+        # Home Manager also supports Syncthing's pre-XDG-state location.
+        name = "syncthing-legacy-config";
+        paths = ["${config.xdg.configHome}/syncthing"];
+        optional = true;
+        scopes = ["home" "services"];
+        units = [
+          {
+            name = "syncthing.service";
+            type = "user";
+          }
+        ];
+      }
+    ];
+  };
 
   # Disable manual generation to work around upstream home-manager bug:
   # both html and manpages depend on hmOptionsDocs.optionsJSON, whose

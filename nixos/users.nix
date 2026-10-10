@@ -25,4 +25,11 @@
   };
 
   programs.zsh.enable = true;
+
+  services.machineBackups.inventory.classifiedRegenerable = [
+    {
+      path = "/var/lib/systemd/linger";
+      reason = "User linger state is recreated by the declared users.users.<name>.linger configuration.";
+    }
+  ];
 }
