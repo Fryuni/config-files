@@ -23,6 +23,19 @@
   brightnessctl = lib.getExe pkgs.brightnessctl;
   pamixer = lib.getExe pkgs.pamixer;
   playerctl = lib.getExe pkgs.playerctl;
+  t3CodeLaunchOrFocus = pkgs.writeShellApplication {
+    name = "t3-code-launch-or-focus";
+    runtimeInputs = [pkgs.i3 pkgs.jq];
+    text = ''
+      # Match both the runtime WM_CLASS and the desktop entry's StartupWMClass.
+      if i3-msg '[class="(?i)^(com[.]t3tools[.])?t3code$"] focus' |
+        jq -e 'any(.[]; .success)' >/dev/null; then
+        exit 0
+      fi
+
+      exec ${lib.getExe pkgs.llm-agents.t3code-desktop}
+    '';
+  };
   findCursor = "${lib.getExe pkgs.find-cursor} --size 280 --distance 35 --line-width 6 --color ${lib.escapeShellArg colors.primary} --repeat 2 --grow";
   workspaceOutputsConfig = "${config.xdg.cacheHome}/i3/workspace-outputs.conf";
   generateWorkspaceOutputs = pkgs.writeShellApplication {
@@ -278,6 +291,7 @@ in {
           "${modifier}+Shift+n" = "exec ${pkgs.networkmanagerapplet}/bin/nm-connection-editor";
           "${modifier}+d" = "exec ${rofi} -show drun";
           "${modifier}+space" = "exec vicinae toggle";
+          "${modifier}+t" = "exec --no-startup-id ${lib.getExe t3CodeLaunchOrFocus}";
           "${modifier}+b" = "exec ${lib.getExe config.programs.chromium.package}";
           "${modifier}+Shift+b" = "exec ${lib.getExe pkgs.master.google-chrome}";
 

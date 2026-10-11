@@ -11,6 +11,9 @@ the notebook and interactive-server Home Manager layers. The tools come from the
 The notebook's Home Manager UI module installs `llm-agents.t3code-desktop` from the same
 pinned `llm-agents.nix` flake as the CLI and backend.
 
+In the notebook's i3 session, `Super+T` focuses an existing T3 Code Desktop window
+on any workspace, or launches the desktop app when no matching window is open.
+
 `note` and `loem` import `nixos/modules/t3code.nix`. It runs `llm-agents.t3code`'s
 `t3 serve` as `lotus`, restarting on exit. On hosts with X enabled (`note`), it is a
 systemd user service attached to `graphical-session.target`: it starts with the desktop,
