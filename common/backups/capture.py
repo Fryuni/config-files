@@ -1,12 +1,13 @@
-"""Create recoverable local service captures before any off-machine upload.
+"""Select service files and prepare native database artifacts for restic.
 
-Only ``prepare`` and ``CaptureError`` are public. System commands are located
-through PATH, supplied by the NixOS backup unit. Staging must be root-owned and
-private; it is reusable across runs so large file captures can be preseeded.
+``prepare`` runs its consumer while managed services and open writers are
+paused; ``restore_victoria`` reconstructs native snapshots in an isolated
+restore. System commands use PATH supplied by the NixOS backup unit. Staging
+must be root-owned and private.
 """
 from __future__ import annotations
 
-from contextlib import closing, contextmanager
+from contextlib import closing, contextmanager, ExitStack
 import json
 import fnmatch
 import fcntl
@@ -29,6 +30,61 @@ from urllib.error import URLError
 
 class CaptureError(RuntimeError):
     """A capture is incomplete; its data must not become a complete restore point."""
+
+
+class Selection:
+    def __init__(self, staging):
+        self.staging = staging
+        self.paths = []
+        self.excludes = [".direnv"]
+        self.deadlines = []
+        self.paused_units = set()
+        self.stack = ExitStack()
+        self.result = None
+
+    @property
+    def deadline(self):
+        return min(self.deadlines, default=None)
+
+    def pause(self, entry, timeout_seconds):
+        if entry.get("units") or entry.get("discoverUnits") or entry.get("pauseOpenWriters"):
+            units = []
+            for unit in _capture_units(entry):
+                identity = (unit.get("type", "system"), unit.get("user"), unit["name"])
+                if identity not in self.paused_units:
+                    self.paused_units.add(identity)
+                    units.append(unit)
+            if not units and not entry.get("pauseOpenWriters"):
+                return []
+            deadline = self.stack.enter_context(_paused(units, timeout_seconds, self.staging))
+            self.deadlines.append(deadline)
+            return self.stack.enter_context(_suspended_writers(entry, self.staging, deadline))
+        return []
+
+    def select(self, source, excludes=()):
+        resolved = source.resolve()
+        if self.staging.resolve().is_relative_to(resolved):
+            raise CaptureError(f"Source must not contain the staging directory: {source}")
+        # Restic preserves symlinks instead of following them. Select the real
+        # root of private StateDirectories, while retaining its logical name in
+        # the recovery manifest. Internal symlinks remain ordinary symlinks.
+        root = resolved if source.is_symlink() else source
+        self.paths.append(root)
+        for pattern in excludes:
+            negate = pattern.startswith("!")
+            pattern = pattern[1:] if negate else pattern
+            # Anchor source-relative patterns to this root. Unanchored names
+            # match at any depth within this source, never a different service.
+            suffix = pattern.lstrip("/") if pattern.startswith("/") else "**/" + pattern
+            self.excludes.append(("!" if negate else "") + escape_pattern(str(root)) + "/" + suffix)
+        metadata = source.stat()
+        return {"path": str(source), "resolvedSource": str(resolved), "snapshotPath": str(root),
+                "uid": metadata.st_uid, "gid": metadata.st_gid, "mode": stat.S_IMODE(metadata.st_mode)}
+
+
+def escape_pattern(path):
+    """Quote a literal path prefix for restic's Go filepath.Match syntax."""
+    return "".join("\\" + character if character in "\\*?[" else character for character in path)
 
 
 def _run(args, *, timeout=None, stdout=None, accepted_codes=(0,)):
@@ -94,33 +150,23 @@ def _remove(path):
 
 
 def _trim_staging(scope_config, staging):
-    selected = []
     names = set()
     for entry in scope_config.get("captures", []):
         name = entry["name"]
         if not name or any(character not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_" for character in name) or name in names:
             raise CaptureError(f"Capture name must be unique and contain letters, digits, '-' or '_': {name}")
         names.add(name)
-        selected.extend(_paths(entry))
+        _paths(entry)
         for coordinated in entry.get("coordinated", []):
-            selected.extend(_paths(coordinated))
-        if entry.get("kind") == "nix":
-            selected.append(Path(entry["flakePath"]))
+            _paths(coordinated)
     tree = staging / "tree"
-    roots = [tree / source.relative_to("/") for source in selected]
-    def trim(directory):
-        for child in directory.iterdir():
-            if any(child == root or root in child.parents for root in roots):
-                continue
-            if any(child in root.parents for root in roots) and child.is_dir() and not child.is_symlink():
-                trim(child)
-            else:
-                _remove(child)
     if tree.exists():
         if tree.is_symlink():
             raise CaptureError("Staging tree must not be a symlink")
-        trim(tree)
-    for group, allowed in (("databases", {entry["name"] for entry in scope_config.get("captures", []) if entry["kind"] in ("postgres", "victoria")}), ("recovery", {entry["name"] for entry in scope_config.get("captures", []) if entry["kind"] == "nix"})):
+        # Remove legacy bulk copies before preparing any new artifacts. Only
+        # native SQLite backup files may repopulate this tree.
+        _remove(tree)
+    for group, allowed in (("databases", {entry["name"] for entry in scope_config.get("captures", []) if entry["kind"] == "postgres"}), ("recovery", {entry["name"] for entry in scope_config.get("captures", []) if entry["kind"] == "nix"})):
         directory = staging / group
         if directory.exists():
             for child in directory.iterdir():
@@ -145,25 +191,6 @@ def _destination(source, staging):
     if destination.is_symlink():
         destination.unlink()
     return destination
-
-def _copy(source, staging, excludes=(), *, timeout=None, preseed=False):
-    if staging.resolve().is_relative_to(source.resolve()):
-        raise CaptureError(f"Source must not contain the staging directory: {source}")
-    destination = _destination(source, staging)
-    args = ["rsync", "--archive", "--hard-links", "--acls", "--xattrs", "--numeric-ids", "--modify-window=-1", "--delete", "--delete-excluded", "--exclude=.direnv/"]
-    args += [f"--exclude={pattern}" for pattern in excludes]
-    # A service StateDirectory is often a /var/lib/private symlink. Dereference
-    # only the selected root; symlinks *inside* it keep their original meaning.
-    if source.is_dir():
-        destination.mkdir(parents=True, exist_ok=True)
-        args += [str(source) + "/", str(destination) + "/"]
-    else:
-        args += [str(source.resolve()) if source.is_symlink() else str(source), str(destination)]
-    _run(args, timeout=timeout, accepted_codes=(0, 24) if preseed else (0,))
-    metadata = source.stat()
-    return {"path": str(source), "resolvedSource": str(source.resolve()), "uid": metadata.st_uid, "gid": metadata.st_gid, "mode": stat.S_IMODE(metadata.st_mode)}
-
-
 
 def _unit_command(unit, action):
     command = ["systemctl", action, unit["name"]]
@@ -246,7 +273,7 @@ def _check_service_recovery(units, directory):
 def _paused(units, timeout_seconds, staging):
     directory = staging.parent / "service-watchdogs"
     # A retry must not mistake a service awaiting old recovery for an originally
-    # inactive service: that old guardian could start it during the new copy.
+    # inactive service: that old guardian could start it during the new backup.
     _check_service_recovery(units, directory)
     active = []
     for unit in units:
@@ -380,17 +407,11 @@ def _recover_service_lease(plan_path):
             os.close(parent_handle)
 
 
-def _files(entry, staging, timeout_seconds):
+def _files(entry, selection, timeout_seconds):
     sources = _paths(entry)
-    excludes = entry.get("excludes", [])
-    if sources and (entry.get("units") or entry.get("discoverUnits")):
-        # Preseed bulk state while the service is running; only its incremental
-        # final copy consumes the downtime budget.
-        for source in sources:
-            _copy(source, staging, excludes, preseed=True)
-        with _paused(_capture_units(entry), timeout_seconds, staging) as deadline:
-            return [_copy(source, staging, excludes, timeout=_remaining(deadline)) for source in sources]
-    return [_copy(source, staging, excludes) for source in sources]
+    if sources:
+        selection.pause(entry, timeout_seconds)
+    return [selection.select(source, entry.get("excludes", [])) for source in _paths(entry)]
 
 
 
@@ -717,37 +738,30 @@ def _suspended_writers(entry, staging, deadline):
             raise CaptureError("Writer resumption failed: " + "; ".join(failures))
 
 
-def _sqlite(entry, staging, timeout_seconds):
+def _sqlite(entry, selection, timeout_seconds):
     sources = _paths(entry)
-    def materialize(*, preseed=False, deadline=None):
-        details, databases = [], []
-        for source in sources:
-            captured = _sqlite_files(source, deadline=deadline)
-            excludes = list(entry.get("excludes", []))
-            if source.is_dir():
-                for database in captured:
-                    pattern = "/" + database.relative_to(source).as_posix()
-                    excludes.extend([pattern, pattern + "-wal", pattern + "-shm", pattern + "-journal"])
-                details.append(_copy(source, staging, excludes, timeout=_remaining(deadline) if deadline is not None else None, preseed=preseed))
-            elif source not in captured:
-                details.append(_copy(source, staging, excludes, timeout=_remaining(deadline) if deadline is not None else None, preseed=preseed))
-            else:
-                source_stat = source.stat()
-                details.append({"path": str(source), "resolvedSource": str(source.resolve()), "uid": source_stat.st_uid, "gid": source_stat.st_gid, "mode": stat.S_IMODE(source_stat.st_mode)})
-            if not preseed:
-                databases.extend(_sqlite_backup(database, staging, deadline=deadline) for database in captured)
-        return {"paths": details, "databases": databases}
-    if sources and (entry.get("units") or entry.get("discoverUnits") or entry.get("pauseOpenWriters")):
-        # Configs, attachments and database references must share the same
-        # quiescent interval. A native DB backup alone does not make earlier
-        # copies of associated mutable files coherent with that database.
-        materialize(preseed=True)
-        with _paused(_capture_units(entry), timeout_seconds, staging) as deadline:
-            with _suspended_writers(entry, staging, deadline) as writers:
-                result = materialize(deadline=deadline)
-                result["pausedOpenWriters"] = writers
-            return result
-    return materialize()
+    writers = selection.pause(entry, timeout_seconds) if sources else []
+    details, databases = [], []
+    for source in _paths(entry):
+        captured = _sqlite_files(source, deadline=selection.deadline)
+        for database in captured:
+            metadata = _sqlite_backup(database, selection.staging, deadline=selection.deadline)
+            destination = _destination(database, selection.staging)
+            selection.paths.append(selection.staging / "tree")
+            metadata["snapshotPath"] = str(destination)
+            databases.append(metadata)
+            # The native artifact replaces the live DB and all journal files.
+            for suffix in ("", "-wal", "-shm", "-journal"):
+                selection.excludes.append(escape_pattern(str(database) + suffix))
+                selection.excludes.append(escape_pattern(str(database.resolve()) + suffix))
+        if source not in captured:
+            details.append(selection.select(source, entry.get("excludes", [])))
+        else:
+            metadata = source.stat()
+            details.append({"path": str(source), "resolvedSource": str(source.resolve()),
+                            "snapshotPath": str(_destination(source, selection.staging)),
+                            "uid": metadata.st_uid, "gid": metadata.st_gid, "mode": stat.S_IMODE(metadata.st_mode)})
+    return {"paths": details, "databases": databases, "pausedOpenWriters": writers}
 
 
 def _postgres_command(entry, executable, database=None):
@@ -778,7 +792,8 @@ def _postgres_dump(entry, database, destination, *, timeout=None):
         temporary.unlink(missing_ok=True)
 
 
-def _postgres(entry, staging, timeout_seconds):
+def _postgres(entry, selection, timeout_seconds):
+    staging = selection.staging
     destination = staging / "databases" / entry["name"]
     destination.mkdir(parents=True, exist_ok=True)
     databases = _postgres_query(entry, "SELECT coalesce(json_agg(row_to_json(d)), '[]'::json) FROM (SELECT datname AS name, pg_get_userbyid(datdba) AS owner, pg_encoding_to_char(encoding) AS encoding, datcollate AS collate, datctype AS ctype, datistemplate AS template, datallowconn AS allows_connections FROM pg_database WHERE datname != 'template0' ORDER BY datname) d")
@@ -799,25 +814,23 @@ def _postgres(entry, staging, timeout_seconds):
         if name not in indexed:
             raise CaptureError(f"Coordinated service database is missing: {name}")
         index, database = indexed[name]
-        sources = _paths(coordinated)
-        for source in sources:
-            _copy(source, staging, coordinated.get("excludes", []), preseed=True)
+        selection.pause(coordinated, timeout_seconds)
         dump_path = destination / f"database-{index:03d}.dump"
-        with _paused(_capture_units(coordinated), timeout_seconds, staging) as deadline:
-            _postgres_dump(entry, name, dump_path, timeout=_remaining(deadline))
-            file_details.extend(_copy(source, staging, coordinated.get("excludes", []), timeout=_remaining(deadline)) for source in sources)
+        _postgres_dump(entry, name, dump_path, timeout=_remaining(selection.deadline) if selection.deadline is not None else None)
+        file_details.extend(selection.select(source, coordinated.get("excludes", [])) for source in _paths(coordinated))
         captured_names.add(name)
     for index, database in enumerate(databases):
         name = database["name"]
         dump_path = destination / f"database-{index:03d}.dump"
         if name not in captured_names:
-            _postgres_dump(entry, name, dump_path)
-        extensions = _postgres_query(entry, "SELECT coalesce(json_agg(row_to_json(e)), '[]'::json) FROM (SELECT extname AS name, extversion AS version FROM pg_extension ORDER BY extname) e", name)
+            _postgres_dump(entry, name, dump_path, timeout=_remaining(selection.deadline) if selection.deadline is not None else None)
+        extensions = _postgres_query(entry, "SELECT coalesce(json_agg(row_to_json(e)), '[]'::json) FROM (SELECT extname AS name, extversion AS version FROM pg_extension ORDER BY extname) e", name, timeout=_remaining(selection.deadline) if selection.deadline is not None else None)
         database_details.append({**database, "dump": str(dump_path.relative_to(staging)), "extensions": extensions})
     valid = {Path(database["dump"]).name for database in database_details} | {"globals.sql"}
     for stale in destination.iterdir():
         if stale.name not in valid and stale.is_file():
             stale.unlink()
+    selection.paths.append(destination)
     return {"paths": file_details, "databases": database_details, "globals": str(globals_path.relative_to(staging)), "server": server, "tablespaces": tablespaces, "simultaneousClusterSnapshot": False}
 
 
@@ -833,7 +846,7 @@ def _victoria_api(url):
         raise CaptureError(f"VictoriaMetrics snapshot API failed: {error}") from error
 
 
-def _victoria(entry, staging, timeout_seconds):
+def _victoria(entry, selection, timeout_seconds):
     source = Path(entry["storagePath"])
     if not source.is_absolute() or not source.is_dir():
         raise CaptureError(f"VictoriaMetrics storage path is missing: {source}")
@@ -841,13 +854,58 @@ def _victoria(entry, staging, timeout_seconds):
     snapshot = _victoria_api(url + "/snapshot/create").get("snapshot")
     if not snapshot or "/" in snapshot or snapshot in (".", ".."):
         raise CaptureError("VictoriaMetrics returned an invalid snapshot name")
-    destination = staging / "databases" / entry["name"]
-    try:
-        _run(["vmbackup", "-storageDataPath=" + str(source.resolve()), "-snapshotName=" + snapshot, "-dst=fs://" + str(destination)])
-    finally:
-        # No delete_all: snapshots created by an operator or another job remain.
-        _victoria_api(url + "/snapshot/delete?" + urlencode({"snapshot": snapshot}))
-    return {"paths": _files(entry, staging, timeout_seconds), "storagePath": str(source), "resolvedSource": str(source.resolve()), "backup": str(destination.relative_to(staging)), "captureMethod": "vmbackup", "snapshot": snapshot}
+    # Keep native snapshot hardlinks alive until restic has finished. Register
+    # cleanup immediately, including when snapshot inspection or upload fails.
+    selection.stack.callback(_victoria_api, url + "/snapshot/delete?" + urlencode({"snapshot": snapshot}))
+    root = source.resolve() / "snapshots" / snapshot
+    if not root.is_dir():
+        raise CaptureError(f"VictoriaMetrics snapshot is missing: {root}")
+    selection.paths.append(root)
+    links = {}
+    def inspect(directory, relative=Path("."), ancestors=()):
+        resolved = directory.resolve()
+        if resolved in ancestors or not resolved.is_relative_to(source.resolve()):
+            raise CaptureError("VictoriaMetrics snapshot has a cyclic or external symlink")
+        for child in directory.iterdir():
+            logical = relative / child.name
+            if child.is_symlink():
+                target = child.resolve(strict=True)
+                if not target.is_relative_to(source.resolve()):
+                    raise CaptureError("VictoriaMetrics snapshot link escapes its storage directory")
+                links[logical.as_posix()] = str(target)
+                selection.paths.append(target)
+            if child.is_dir():
+                inspect(child, logical, (*ancestors, resolved))
+    inspect(root)
+    return {"paths": _files(entry, selection, timeout_seconds), "storagePath": str(source),
+            "resolvedSource": str(source.resolve()), "snapshotPath": str(root), "links": links,
+            "captureMethod": "restic-native-snapshot", "snapshot": snapshot}
+
+
+def restore_victoria(entry, restored_root, target):
+    """Reconstruct a portable native snapshot using only isolated restored files."""
+    restored_root, target = Path(restored_root), Path(target)
+    def restored(path):
+        source = restored_root / Path(path).relative_to("/")
+        if not source.resolve().is_relative_to(restored_root.resolve()) or source.is_symlink():
+            raise CaptureError("Restored VictoriaMetrics source escapes the restore directory")
+        return source
+    def materialize(source, destination, relative=Path(".")):
+        if relative.as_posix() in entry["links"]:
+            source = restored(entry["links"][relative.as_posix()])
+        if source.is_symlink():
+            raise CaptureError("Restored VictoriaMetrics snapshot has an unrecorded symlink")
+        if source.is_dir():
+            destination.mkdir(parents=True, exist_ok=True)
+            for child in source.iterdir():
+                materialize(child, destination / child.name, relative / child.name)
+        else:
+            shutil.copyfile(source, destination)
+        if os.geteuid() == 0:
+            attributes = source.stat()
+            os.chown(destination, attributes.st_uid, attributes.st_gid)
+        shutil.copystat(source, destination)
+    materialize(restored(entry["snapshotPath"]), target)
 
 def _archive_paths(archive):
     paths = {archive["path"]} if archive.get("path") else set()
@@ -856,7 +914,8 @@ def _archive_paths(archive):
     return paths
 
 
-def _nix(entry, staging, timeout_seconds):
+def _nix(entry, selection, timeout_seconds):
+    staging = selection.staging
     flake = Path(entry["flakePath"])
     if not flake.is_absolute() or not (flake / "flake.nix").is_file() or not (flake / "flake.lock").is_file():
         raise CaptureError(f"Recovery configuration and flake.lock are required: {flake}")
@@ -892,7 +951,8 @@ def _nix(entry, staging, timeout_seconds):
     (recovery / "archive.json").write_text(json.dumps(archive, indent=2) + "\n")
     (recovery / "closure.json").write_text(json.dumps(sorted(closure_paths), indent=2) + "\n")
     sources = [flake, *_paths(entry)]
-    paths = [_copy(source, staging, entry.get("excludes", [])) for source in sources]
+    paths = [selection.select(source, entry.get("excludes", [])) for source in sources]
+    selection.paths.append(recovery)
     system = Path("/run/current-system")
     system_version = str(system.resolve()) if system.exists() else None
     version = _run(["nix", "--version"]).decode().strip()
@@ -902,48 +962,57 @@ def _terminated(signum, frame):
     raise CaptureError(f"Capture interrupted by signal {signum}")
 
 
-def prepare(scope_config: dict, staging: Path, *, timeout_seconds: int = 60, progress=None) -> list[Path]:
-    """Materialize a complete capture, or fail without permitting upload."""
+def prepare(scope_config: dict, staging: Path, *, timeout_seconds: int = 3600, progress=None, consume=None):
+    """Run a file consumer inside the consistency interval; return its selection."""
     staging = Path(staging)
     staging.mkdir(mode=0o700, parents=True, exist_ok=True)
     staging.chmod(0o700)
     manifest_path = staging / "capture-manifest.json"
     manifest_path.unlink(missing_ok=True)
-    manifest = {"version": 1, "startedAt": time.time(), "captures": []}
+    manifest = {"version": 2, "startedAt": time.time(), "captures": []}
     _trim_staging(scope_config, staging)
     previous_handlers = {signum: signal.getsignal(signum) for signum in (signal.SIGTERM, signal.SIGINT)}
     for signum in previous_handlers:
         signal.signal(signum, _terminated)
+    selection = Selection(staging)
     try:
-        for entry in scope_config.get("captures", []):
-            started = time.monotonic()
-            if progress:
-                progress("Preparing capture %s (%s)" % (entry["name"], entry["kind"]))
-            if entry["kind"] == "files":
-                details = {"paths": _files(entry, staging, timeout_seconds)}
-            elif entry["kind"] == "sqlite":
-                details = _sqlite(entry, staging, timeout_seconds)
-            elif entry["kind"] == "postgres":
-                details = _postgres(entry, staging, timeout_seconds)
-            elif entry["kind"] == "nix":
-                details = _nix(entry, staging, timeout_seconds)
-            elif entry["kind"] == "victoria":
-                details = _victoria(entry, staging, timeout_seconds)
-            else:
-                raise CaptureError(f"Unknown capture kind: {entry['kind']}")
-            record = {"name": entry["name"], "kind": entry["kind"], **details}
-            if entry.get("writerCoverageNote"):
-                record["writerCoverageNote"] = entry["writerCoverageNote"]
-            manifest["captures"].append(record)
-            if progress:
-                progress("Capture %s prepared (%.1fs)" % (entry["name"], time.monotonic() - started))
-        manifest["completedAt"] = time.time()
-        manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
-        manifest_path.chmod(0o600)
-        return [path for path in (staging / "tree", staging / "databases", staging / "recovery", manifest_path) if path.exists()]
+        with selection.stack:
+            for entry in scope_config.get("captures", []):
+                started = time.monotonic()
+                if progress:
+                    progress("Preparing capture %s (%s)" % (entry["name"], entry["kind"]))
+                if entry["kind"] == "files":
+                    details = {"paths": _files(entry, selection, timeout_seconds)}
+                elif entry["kind"] == "sqlite":
+                    details = _sqlite(entry, selection, timeout_seconds)
+                elif entry["kind"] == "postgres":
+                    details = _postgres(entry, selection, timeout_seconds)
+                elif entry["kind"] == "nix":
+                    details = _nix(entry, selection, timeout_seconds)
+                elif entry["kind"] == "victoria":
+                    details = _victoria(entry, selection, timeout_seconds)
+                else:
+                    raise CaptureError(f"Unknown capture kind: {entry['kind']}")
+                record = {"name": entry["name"], "kind": entry["kind"], **details}
+                if entry.get("writerCoverageNote"):
+                    record["writerCoverageNote"] = entry["writerCoverageNote"]
+                manifest["captures"].append(record)
+                if progress:
+                    progress("Capture %s prepared (%.1fs)" % (entry["name"], time.monotonic() - started))
+            manifest["preparedAt"] = time.time()
+            manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+            manifest_path.chmod(0o600)
+            selection.paths.append(manifest_path)
+            if consume:
+                selection.result = consume(selection)
+            if selection.deadline is not None:
+                _remaining(selection.deadline)
+        return selection
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         raise CaptureError(f"Local capture failed: {error}") from error
     finally:
+        if sys.exc_info()[0] is not None:
+            manifest_path.unlink(missing_ok=True)
         for signum, handler in previous_handlers.items():
             signal.signal(signum, handler)
 

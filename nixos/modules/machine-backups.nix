@@ -90,7 +90,7 @@
   runner = pkgs.writeShellApplication {
     name = "machine-backup";
     runtimeInputs = with pkgs;
-      [python3 restic rsync openssh util-linux coreutils nix systemd]
+      [python3 restic openssh util-linux coreutils nix systemd]
       ++ cfg.extraPackages
       ++ (homeDeclarations.extraPackages or []);
     text = ''
@@ -102,7 +102,7 @@
     inherit (cfg) repository;
     passwordFile = secretPaths.password;
     inherit (cfg) stateDirectory;
-    timeoutSeconds = 60;
+    timeoutSeconds = cfg.interruptionTimeoutSeconds;
     ssh = {
       host = "u688316.your-storagebox.de";
       user = "u688316";
@@ -135,7 +135,6 @@
         paths = [cfg.homeDirectory];
         captures = homeCaptures;
         inherit excludes;
-        directExcludes = lib.concatMap (entry: entry.paths) homeCaptures;
       };
       services = {
         paths = [];
@@ -206,6 +205,11 @@ in {
         type = lib.types.str;
         default = "/var/lib/machine-backups";
         description = "Root-only capture staging and backup monitoring state.";
+      };
+      interruptionTimeoutSeconds = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 3600;
+        description = "Maximum service/writer interruption while preparing native artifacts and uploading selected files; includes time reserved for recovery.";
       };
       peerHost = lib.mkOption {
         type = lib.types.nullOr lib.types.str;

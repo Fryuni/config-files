@@ -2,6 +2,7 @@
 """Exercise the machine-backup CLI against disposable real restic repositories."""
 
 import json
+import importlib.util
 from datetime import datetime, timedelta, timezone
 import fcntl
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -178,6 +179,145 @@ threading.Event.wait = wait
         positions = [result.stderr.index(message) for message in messages]
         self.assertEqual(positions, sorted(positions))
         self.assertTrue(json.loads(result.stdout)["complete"])
+
+    def test_service_files_are_backed_up_without_a_staging_copy(self):
+        payload = self.source / "service-data.bin"
+        payload.write_bytes(os.urandom(1024 * 1024))
+        self.config["scopes"] = {"services": {"captures": [
+            {"name": "fixture-service", "kind": "files", "paths": [str(self.source)]},
+        ]}}
+        self.cli("backup", "--scope", "services")
+        staging = Path(self.config["stateDirectory"]) / "staging/services"
+        self.assertFalse((staging / "tree").exists(), "Service payload was duplicated into staging")
+        self.assertEqual(self.restic("dump", self.snapshots()[0]["id"], str(payload)), payload.read_bytes())
+
+    def test_direct_selection_is_literal_and_exclusions_stay_with_their_service(self):
+        service = self.source / "service [one]*\nstate"
+        other = self.source / "other-service"
+        for root in [service, other]:
+            (root / "logs").mkdir(parents=True)
+            (root / "logs/main.log").write_text("diagnostic")
+            (root / "logs/v1-responses-request.log").write_text("valuable exchange")
+            (root / "nested/cache").mkdir(parents=True)
+            (root / "nested/cache/temp").write_text("regenerable")
+            (root / "nested/.direnv").mkdir()
+            (root / "nested/.direnv/temp").write_text("environment")
+        self.config["scopes"] = {"services": {"captures": [
+            {"name": "one", "kind": "files", "paths": [str(service)], "excludes": ["/logs/main.log", "cache"]},
+            {"name": "other", "kind": "files", "paths": [str(other)]},
+        ]}}
+        stale = Path(self.config["stateDirectory"]) / "staging/services/tree/obsolete"
+        stale.mkdir(parents=True)
+        (stale / "payload").write_text("old duplicate")
+        self.cli("backup", "--scope", "services")
+        target = self.root / "restored-selection"
+        self.cli("restore-test", "--host", "loem", "--scope", "services", "--target", str(target))
+        selected = target / service.relative_to("/")
+        retained = target / other.relative_to("/")
+        self.assertFalse((selected / "logs/main.log").exists())
+        self.assertFalse((selected / "nested/cache").exists())
+        self.assertEqual((selected / "logs/v1-responses-request.log").read_text(), "valuable exchange")
+        self.assertTrue((retained / "logs/main.log").exists())
+        self.assertTrue((retained / "nested/cache/temp").exists())
+        self.assertFalse((retained / "nested/.direnv").exists())
+        self.assertFalse(stale.parent.exists())
+
+    def test_direct_private_state_includes_the_target_and_preserves_internal_links(self):
+        private = self.root / "private/app"
+        private.mkdir(parents=True, mode=0o750)
+        (private / "identity.key").write_text("service identity")
+        (private / "identity.key").chmod(0o600)
+        (private / "alias").symlink_to("identity.key")
+        logical = self.source / "app"
+        logical.symlink_to(private, target_is_directory=True)
+        self.config["scopes"] = {"services": {"captures": [
+            {"name": "private-app", "kind": "files", "paths": [str(logical)]},
+        ]}}
+        self.cli("backup", "--scope", "services")
+        target = self.root / "private-restore"
+        self.cli("restore-test", "--host", "loem", "--scope", "services", "--target", str(target))
+        restored = target / private.relative_to("/")
+        self.assertEqual((restored / "identity.key").read_text(), "service identity")
+        self.assertEqual((restored / "alias").readlink(), Path("identity.key"))
+        self.assertEqual((restored / "identity.key").stat().st_mode & 0o777, 0o600)
+
+    def test_stalled_direct_upload_is_aborted_and_managed_services_recover(self):
+        spec = importlib.util.spec_from_file_location("capture_fixture", Path(__file__).with_name("backups-capture.py"))
+        fixture = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(fixture)
+        services = fixture.CaptureTests()
+        services.setUp()
+        self.addCleanup(services.doCleanups)
+        services.fake_services({"app.service": True})
+        real_restic = shutil.which("restic")
+        wrapper = services.root / "bin/restic"
+        wrapper.write_text("#!" + sys.executable + "\n" + """
+import json, os, pathlib, sys, time
+if 'backup' in sys.argv:
+    assert not json.loads(pathlib.Path(os.environ['CAPTURE_TEST_UNITS']).read_text())['app.service']
+    time.sleep(30)
+else:
+    os.execv(REAL, [REAL, *sys.argv[1:]])
+""".replace("REAL", repr(real_restic)))
+        wrapper.chmod(0o755)
+        self.config["timeoutSeconds"] = 1
+        self.config["scopes"] = {"services": {"captures": [
+            {"name": "app", "kind": "files", "paths": [str(self.source)], "units": [{"name": "app.service"}]},
+        ]}}
+        result = self.cli("backup", "--scope", "services", expected=1)
+        self.assertIn("interruption limit expired", result.stderr)
+        self.assertTrue(json.loads(services.service_state.read_text())["app.service"])
+        self.assertFalse(self.snapshots())
+
+    def test_native_victoria_links_are_recoverable_after_snapshot_cleanup(self):
+        storage = self.source / "metrics"
+        snapshots = {"unrelated"}
+        root = storage / "snapshots/backup"
+        chunks = storage / "immutable/backup"
+        class API(BaseHTTPRequestHandler):
+            def do_GET(self):
+                if self.path == "/snapshot/create":
+                    root.mkdir(parents=True)
+                    chunks.mkdir(parents=True)
+                    (chunks / "metric.chunk").write_bytes(b"recoverable native metrics")
+                    (root / "data").symlink_to(chunks, target_is_directory=True)
+                    snapshots.add("backup")
+                    result = {"status": "ok", "snapshot": "backup"}
+                elif self.path == "/snapshot/delete?snapshot=backup":
+                    snapshots.remove("backup")
+                    shutil.rmtree(root)
+                    shutil.rmtree(chunks)
+                    result = {"status": "ok"}
+                else:
+                    self.send_error(404)
+                    return
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(json.dumps(result).encode())
+            def log_message(self, *args):
+                pass
+        server = ThreadingHTTPServer(("127.0.0.1", 0), API)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        self.config["scopes"] = {"services": {"captures": [
+            {"name": "victoria", "kind": "victoria", "storagePath": str(storage),
+             "url": "http://127.0.0.1:" + str(server.server_port)},
+        ]}}
+        storage.mkdir()
+        self.cli("backup", "--scope", "services")
+        self.assertEqual(snapshots, {"unrelated"})
+        self.assertFalse(chunks.exists())
+        staging = Path(self.config["stateDirectory"]) / "staging/services"
+        self.assertFalse((staging / "databases/victoria").exists())
+        target = self.root / "restored-metrics"
+        self.cli("restore-test", "--host", "loem", "--scope", "services", "--target", str(target))
+        reconstructed = target / staging.relative_to("/") / "native-snapshots/victoria/data/metric.chunk"
+        self.assertEqual(reconstructed.read_bytes(), b"recoverable native metrics")
+        environment = self.failing_restic_boundary("backup", 1, "connection reset")
+        self.cli("backup", "--scope", "services", expected=75, env=environment)
+        self.assertEqual(snapshots, {"unrelated"})
+        self.assertFalse(root.exists())
 
     def test_backup_restore_preserves_acl_and_extended_attributes(self):
         source = self.source / "metadata.txt"
@@ -367,20 +507,22 @@ threading.Event.wait = wait
         (app / "v1-responses-1.log").write_text("valuable corpus")
         (self.source / "notes.txt").write_text("home work")
         self.config["scopes"]["home"].update({
-            "directExcludes": [str(app)], "excludes": [str(app / "main.log")],
+            "excludes": [str(app / "main.log")],
             "captures": [{"name": "app", "kind": "sqlite", "paths": [str(app)]}],
         })
         self.cli("backup", "--scope", "home")
         target = self.root / "isolated-restore"
         result = self.cli("restore-test", "--host", "loem", "--scope", "home", "--target", str(target))
         self.assertGreater(json.loads(result.stdout)["verifiedSqliteDatabases"], 0)
-        self.assertFalse((target / str(app).lstrip("/")).exists())
+        direct = target / str(app).lstrip("/")
+        self.assertTrue(direct.is_dir())
+        self.assertFalse((direct / "history.db").exists())
         copied = target / str(Path(self.config["stateDirectory"]) / "staging/home/tree").lstrip("/") / str(app).lstrip("/")
         with sqlite3.connect(copied / "history.db") as database:
             self.assertEqual(database.execute("SELECT value FROM work").fetchall(), [("valuable service history",)])
-        self.assertEqual((copied / "generated.key").read_text(), "application identity")
-        self.assertEqual((copied / "v1-responses-1.log").read_text(), "valuable corpus")
-        self.assertFalse((copied / "main.log").exists())
+        self.assertEqual((direct / "generated.key").read_text(), "application identity")
+        self.assertEqual((direct / "v1-responses-1.log").read_text(), "valuable corpus")
+        self.assertFalse((direct / "main.log").exists())
         self.assertEqual((target / str(self.source / "notes.txt").lstrip("/")).read_text(), "home work")
         self.cli("restore-test", "--host", "loem", "--scope", "home", "--target", str(target), expected=1)
 

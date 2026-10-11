@@ -46,7 +46,7 @@
       };
       ignoredPaths = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        default = ["/scratch/***"];
+        default = ["/scratch/**"];
       };
     };
     config = lib.mkIf cfg.enable {
@@ -70,7 +70,7 @@
         name = "mail-ledger";
         kind = "sqlite";
         paths = ["/srv/mail-ledger"];
-        excludes = ["/generated/***"];
+        excludes = ["/generated/**"];
         units = [{name = "mail-ledger.service";}];
       }
     ];
@@ -90,7 +90,7 @@
       {
         services.archiveStore = {
           stateDirectory = "/srv/relocated/archive";
-          ignoredPaths = ["/temporary/***" "/diagnostics.log"];
+          ignoredPaths = ["/temporary/**" "/diagnostics.log"];
         };
       }
     ]);
@@ -133,7 +133,7 @@
                   }
                 ];
                 pauseOpenWriters = true;
-                excludes = ["/scratch/***"];
+                excludes = ["/scratch/**"];
               }
             ];
             exclude = ["/srv/alice/.cache"];
@@ -457,20 +457,20 @@ in
     } ''
       jq -e '.repository == "sftp://u688316@u688316.your-storagebox.de:22/restic"' "$configFile"
       jq -e '.ssh.port == 22 and .ssh.commandPort == 23' "$configFile"
+      jq -e '.timeoutSeconds == 3600 and (.scopes.home | has("directExcludes") | not)' "$configFile"
       jq -e '.scopes.home.paths == ["/home/lotus"] and .scopes.home.captures == []' "$configFile"
       jq -e '.scopes.home.excludes == [".direnv"] and .scopes.services.excludes == [".direnv"]' "$configFile"
-      jq -e '.scopes.services.captures | any(.name == "archive-store" and .kind == "files" and .paths == ["/var/lib/archive-store"] and .excludes == ["/scratch/***"] and .units[0].name == "archive-store.service")' "$configFile"
-      jq -e '.scopes.services.captures | any(.name == "mail-ledger" and .kind == "sqlite" and .paths == ["/srv/mail-ledger"] and .excludes == ["/generated/***"])' "$configFile"
+      jq -e '.scopes.services.captures | any(.name == "archive-store" and .kind == "files" and .paths == ["/var/lib/archive-store"] and .excludes == ["/scratch/**"] and .units[0].name == "archive-store.service")' "$configFile"
+      jq -e '.scopes.services.captures | any(.name == "mail-ledger" and .kind == "sqlite" and .paths == ["/srv/mail-ledger"] and .excludes == ["/generated/**"])' "$configFile"
       jq -e '.scopes.services.captures | any(.name == "recovery-inputs" and .kind == "nix" and .flakePath == "/home/lotus/ZShutils")' "$configFile"
-      jq -e '.scopes.services.captures | any(.name == "archive-store" and .paths == ["/srv/relocated/archive"] and .excludes == ["/temporary/***", "/diagnostics.log"])' "$movedConfigFile"
+      jq -e '.scopes.services.captures | any(.name == "archive-store" and .paths == ["/srv/relocated/archive"] and .excludes == ["/temporary/**", "/diagnostics.log"])' "$movedConfigFile"
       jq -e '.inventory.coveredPaths | index("/srv/relocated/archive") != null and index("/var/lib/archive-store") == null' "$movedConfigFile"
       jq -e '[.scopes.services.captures[].name] == ["recovery-inputs"]' "$disabledServiceConfigFile"
       jq -e '[.scopes.services.captures[].name] == ["recovery-inputs"]' "$uninferredConfigFile"
       jq -e '.ssh.identityFile == "/run/agenix/storagebox-backup-ssh-key" and .passwordFile == "/run/agenix/restic-backup-password"' "$configFile"
       jq -e '.scopes.home.paths == ["/srv/alice"]' "$ownerConfigFile"
-      jq -e '.scopes.home.directExcludes == ["/srv/alice/.local/state/user-journal"]' "$ownerConfigFile"
       jq -e '.scopes.home.excludes == [".direnv", "/srv/shared/build-cache", "/srv/alice/.cache"] and .scopes.services.excludes == .scopes.home.excludes' "$ownerConfigFile"
-      jq -e '[.scopes.home.captures[], .scopes.services.captures[]] | map(select(.name == "user-journal")) | length == 2 and all(.[]; .kind == "sqlite" and .excludes == ["/scratch/***"] and .units[0] == {name: "user-journal.service", type: "user", user: "alice", uid: 2000} and .units[1] == {name: "journal-sidecar.service", type: "system"} and .discoverUnits[0] == {pattern: "user-journal-worker-*.service", type: "user", user: "alice", uid: 2000} and .pauseOpenWriters == true and .writerUid == 2000)' "$ownerConfigFile"
+      jq -e '[.scopes.home.captures[], .scopes.services.captures[]] | map(select(.name == "user-journal")) | length == 2 and all(.[]; .kind == "sqlite" and .excludes == ["/scratch/**"] and .units[0] == {name: "user-journal.service", type: "user", user: "alice", uid: 2000} and .units[1] == {name: "journal-sidecar.service", type: "system"} and .discoverUnits[0] == {pattern: "user-journal-worker-*.service", type: "user", user: "alice", uid: 2000} and .pauseOpenWriters == true and .writerUid == 2000)' "$ownerConfigFile"
       jq -e '.scopes.services.captures | map(select(.name == "catalog-db")) | length == 1 and .[0].kind == "postgres" and .[0].user == "catalog-user" and .[0].socket == "/run/catalog-db" and .[0].port == 5434 and .[0].database == "catalog" and (.[0].coordinated | map(.name) | sort) == ["media-records", "shop-records"]' "$ownerConfigFile"
       jq -e '.scopes.services.captures[] | select(.name == "catalog-db") | .coordinated | any(.name == "shop-records" and .database == "shop" and .paths == ["/srv/shop-records"] and [.units[].name] == ["shop-worker.service", "shop.service"])' "$ownerConfigFile"
       jq -e '.scopes.services.captures | any(.name == "telemetry-db" and .kind == "victoria" and .url == "http://127.0.0.1:18428" and .storagePath == "/srv/telemetry-db")' "$ownerConfigFile"

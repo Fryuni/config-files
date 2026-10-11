@@ -29,7 +29,10 @@ repository on Hetzner over SFTP on port 22; capacity monitoring runs `df` over S
 on port 23. Each service module registers its own state directories,
 capture method, and exclusions; the backup module aggregates NixOS and Home Manager
 registrations. A separate systemd recovery service restarts paused services if a
-backup job is killed. Selected locked flake source inputs support offline recovery
+backup job is killed. Restic reads registered files directly using literal file
+lists and scoped exclusions; staging holds only native database exports and
+recovery artifacts. Writers remain paused through upload, with a configurable
+one-hour interruption limit. Selected locked flake source inputs support offline recovery
 evaluation; package builds use normal network access. The dedicated SSH identity,
 repository password, and backup notification token use agenix and host rekeying.
 See the [backup and recovery guide](docs/backups.md) for coverage, notifications,

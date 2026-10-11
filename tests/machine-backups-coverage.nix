@@ -84,7 +84,7 @@ in
                 assert capture["paths"] == entry["paths"], (case["host"], scope, "wrong paths", entry)
                 assert capture["kind"] == entry["kind"], (case["host"], scope, "wrong protocol", entry)
                 if scope == "home":
-                    assert set(entry["paths"]) <= set(config["scopes"][scope]["directExcludes"])
+                    assert "directExcludes" not in config["scopes"][scope], "Home application files must be read directly"
             if case["nodeRed"]:
                 node_red = actual["node-red"]
                 owner = case["nodeRed"]

@@ -56,9 +56,10 @@ Important composition rules:
   output through `services.machineBackups.homeManager`. Native database
   captures merge dependent application registrations by capture name. The engine
   contains no service catalogue or service enable checks. `loem` owns
-  shared repository maintenance. Independent application writers pause during final
-  local captures; transient systemd watchdogs resume them if the backup exits or
-  reaches its pause deadline.
+  shared repository maintenance. Restic reads selected files directly; staging
+  holds native database exports and recovery artifacts. Application writers pause
+  through upload, with a configurable one-hour limit; transient systemd watchdogs
+  resume them if the backup exits or reaches its interruption deadline.
 - The workstation path and server path are separate: `nixos/` is the shared
   workstation/system baseline, while `servers/common.nix` is the shared server baseline.
 

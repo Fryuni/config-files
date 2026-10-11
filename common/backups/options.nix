@@ -24,7 +24,7 @@
       // {
         name = lib.mkOption {
           type = lib.types.nonEmptyStr;
-          description = "Service unit to stop and restart around the local capture.";
+          description = "Service unit to stop and restart around the direct backup.";
         };
       };
   };
@@ -47,7 +47,7 @@
     units = lib.mkOption {
       type = lib.types.listOf unitType;
       default = [];
-      description = "System or user service units to pause during the final local copy.";
+      description = "System or user service units to pause until restic finishes reading and uploading selected state.";
     };
     discoverUnits = lib.mkOption {
       type = lib.types.listOf discoveryType;
@@ -57,7 +57,7 @@
     excludes = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [];
-      description = "Exclusions relative to each registered source, using rsync patterns.";
+      description = "Restic exclusion patterns relative to each registered source; a leading slash anchors at that source, otherwise the pattern matches at any depth.";
     };
     optional = lib.mkOption {
       type = lib.types.bool;
@@ -114,7 +114,7 @@
           pauseOpenWriters = lib.mkOption {
             type = lib.types.bool;
             default = false;
-            description = "Suspend detected processes holding SQLite source files open during the consistent local capture.";
+            description = "Suspend detected processes holding SQLite source files open until the consistent direct backup finishes.";
           };
           writerUid = lib.mkOption {
             type = lib.types.nullOr lib.types.ints.unsigned;

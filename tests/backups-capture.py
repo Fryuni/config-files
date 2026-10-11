@@ -26,6 +26,40 @@ spec = importlib.util.spec_from_file_location("backup_capture", pathlib.Path(__f
 capture = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(capture)
 
+prepare_selection = capture.prepare
+
+
+def prepare_fixture(scope_config, staging, **kwargs):
+    """Read the real selection into a disposable restore while writers pause.
+
+    rsync is only this fixture's fast file consumer. CLI tests separately
+    exercise restic's file-list and exclusion semantics against real repos.
+    """
+    restored = pathlib.Path(staging).parent / "fixture-restore"
+    shutil.rmtree(restored, ignore_errors=True)
+    restored.mkdir()
+    def consume(selection):
+        for source in dict.fromkeys(selection.paths):
+            destination = restored / source.relative_to("/")
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            args = ["rsync", "-aHAX", "--numeric-ids"]
+            for pattern in selection.excludes:
+                if pattern.startswith(str(source) + "/"):
+                    pattern = "/" + pattern[len(str(source)) + 1:]
+                elif pattern.startswith("/"):
+                    continue
+                args.append("--exclude=" + pattern)
+            if source.is_dir():
+                destination.mkdir(exist_ok=True)
+                args += [str(source) + "/", str(destination) + "/"]
+            else:
+                args += [str(source), str(destination)]
+            capture._run(args, timeout=capture._remaining(selection.deadline) if selection.deadline is not None else None)
+    return prepare_selection(scope_config, pathlib.Path(staging), consume=consume, **kwargs)
+
+
+capture.prepare = prepare_fixture
+
 
 def isolated_writers(test):
     """Use a private /proc so these signal tests can only reach fixture processes."""
@@ -50,7 +84,19 @@ class CaptureTests(unittest.TestCase):
         self.staging = self.root / "staging"
 
     def copied(self, source):
-        return self.staging / "tree" / pathlib.Path(source).relative_to("/")
+        source = pathlib.Path(source)
+        restored = self.root / "fixture-restore"
+        database = restored / self.staging.relative_to("/") / "tree" / source.relative_to("/")
+        if database.is_file():
+            return database
+        manifest = self.staging / "capture-manifest.json"
+        if manifest.exists():
+            for entry in json.loads(manifest.read_text())["captures"]:
+                for metadata in entry.get("paths", []):
+                    logical = pathlib.Path(metadata["path"])
+                    if source == logical or source.is_relative_to(logical):
+                        return restored / pathlib.Path(metadata["snapshotPath"]).relative_to("/") / source.relative_to(logical)
+        return restored / source.relative_to("/")
 
     def fake_services(self, states, *, stop_file=None, remove_on_stop=None, signal_on_stop=None, failed_restart=None):
         self.service_state = self.root / "units.json"
@@ -156,18 +202,14 @@ if action == 'stop' and os.environ.get('CAPTURE_TEST_SIGNAL'):
         self.assertTrue(json.loads(self.service_state.read_text())["proxy.service"])
         self.assertFalse((self.staging / "capture-manifest.json").exists())
 
-    def test_vanished_preseed_files_are_tolerated_before_a_complete_final_corpus_capture(self):
+    def test_direct_corpus_read_excludes_diagnostics_and_preserves_exchange_files(self):
         logs = self.source / "logs"
         logs.mkdir()
         (logs / "main.log").write_text("diagnostic")
         (logs / "main-2026.log").write_text("rotated diagnostic")
         (logs / "v1-responses-request.log").write_text("full request response")
         (logs / "unknown-error-exchange.log").write_text("valuable error exchange")
-        real_rsync = shutil.which("rsync")
         self.fake_services({"proxy.service": True})
-        wrapper = self.root / "bin/rsync"
-        wrapper.write_text("#!" + sys.executable + "\nimport json, os, subprocess, sys\nsubprocess.run([" + repr(real_rsync) + "] + sys.argv[1:], check=True)\nsys.exit(24 if json.load(open(os.environ['CAPTURE_TEST_UNITS']))['proxy.service'] else 0)\n")
-        wrapper.chmod(0o755)
         capture.prepare({"captures": [{"name": "proxy", "kind": "files", "paths": [str(self.source)], "excludes": ["/logs/main.log", "/logs/main-*.log"], "units": [{"name": "proxy.service"}]}]}, self.staging)
         self.assertEqual(self.copied(logs / "v1-responses-request.log").read_text(), "full request response")
         self.assertEqual(self.copied(logs / "unknown-error-exchange.log").read_text(), "valuable error exchange")
@@ -180,7 +222,7 @@ if action == 'stop' and os.environ.get('CAPTURE_TEST_SIGNAL'):
         capture.prepare({"captures": [{"name": "node-red", "kind": "files", "paths": [str(self.source)], "units": [{"name": "node-red.service", "type": "user", "user": "unlogged-user", "uid": 99999999}]}]}, self.staging)
         self.assertEqual(self.copied(self.source / "flows.json").read_text(), '[{"id":"recoverable flow"}]')
 
-    def test_node_red_and_sync_writers_are_both_paused_during_final_materialization(self):
+    def test_node_red_and_sync_writers_are_both_paused_during_direct_read(self):
         flows = self.source / "flows.json"
         flows.write_text("earlier flow revision")
         expected = {"node-red.service": True, "git-sync-node-red-config.service": True}
@@ -228,16 +270,13 @@ if action == 'stop' and os.environ.get('CAPTURE_TEST_SIGNAL'):
             writer.execute("INSERT INTO attachments VALUES ('old.txt')")
         (self.source / "old.txt").write_text("existing attachment")
         self.fake_services({"t3code.service": True})
-        real_rsync = shutil.which("rsync")
-        wrapper = self.root / "bin/rsync"
-        wrapper.write_text("#!" + sys.executable + "\n" + "import json, os, pathlib, sqlite3, subprocess, sys\n" +
-                           "subprocess.run([" + repr(real_rsync) + "] + sys.argv[1:], check=True)\n" +
-                           "source = pathlib.Path(" + repr(str(self.source)) + ")\n" +
-                           "if json.load(open(os.environ['CAPTURE_TEST_UNITS']))['t3code.service'] and not (source / 'new.txt').exists():\n" +
-                           "    (source / 'new.txt').write_text('committed attachment')\n" +
-                           "    with sqlite3.connect(source / 'state.sqlite') as writer:\n" +
-                           "        writer.execute(\"INSERT INTO attachments VALUES ('new.txt')\")\n")
-        wrapper.chmod(0o755)
+        systemctl = self.root / "bin/systemctl"
+        settle = "    states[name] = False\n" + \
+            "    source = pathlib.Path(" + repr(str(self.source)) + ")\n" + \
+            "    (source / 'new.txt').write_text('committed attachment')\n" + \
+            "    with __import__('sqlite3').connect(source / 'state.sqlite') as writer:\n" + \
+            "        writer.execute(\"INSERT INTO attachments VALUES ('new.txt')\")"
+        systemctl.write_text(systemctl.read_text().replace("    states[name] = False", settle))
         capture.prepare({"captures": [{"name": "t3code", "kind": "sqlite", "paths": [str(self.source)], "units": [{"name": "t3code.service"}]}]}, self.staging)
         with closing(sqlite3.connect(self.copied(database))) as restored:
             references = restored.execute("SELECT path FROM attachments ORDER BY path").fetchall()
@@ -373,8 +412,8 @@ while True:
         config = {"captures": [{"name": "managed", "kind": "files", "paths": [str(self.source)],
                                 "units": [{"name": name} for name in json.loads(self.service_state.read_text())]}]}
         program = "import importlib.util, pathlib\n" + \
-            "spec = importlib.util.spec_from_file_location('fixture_capture', " + repr(capture.__file__) + ")\n" + \
-            "capture = importlib.util.module_from_spec(spec); spec.loader.exec_module(capture)\n" + \
+            "spec = importlib.util.spec_from_file_location('fixture_capture', " + repr(str(pathlib.Path(__file__).resolve())) + ")\n" + \
+            "fixture = importlib.util.module_from_spec(spec); spec.loader.exec_module(fixture); capture = fixture.capture\n" + \
             "capture.prepare(" + repr(config) + ", pathlib.Path(" + repr(str(self.staging)) + "), timeout_seconds=" + repr(timeout) + ")\n"
         process = subprocess.Popen([sys.executable, "-c", program], start_new_session=True,
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -412,7 +451,7 @@ while True:
         os.killpg(child.pid, signal.SIGKILL)
         child.wait(timeout=5)
         self.await_service_states(expected)
-        self.assertFalse((self.staging / "capture-manifest.json").exists())
+        self.assertNotIn("completedAt", json.loads((self.staging / "capture-manifest.json").read_text()))
         (self.root / "bin/rsync").unlink()
         capture.prepare({"captures": [{"name": "managed", "kind": "files", "paths": [str(self.source)],
                                         "units": [{"name": name} for name in expected]}]}, self.staging)
@@ -432,7 +471,7 @@ while True:
         os.killpg(child.pid, signal.SIGKILL)
         child.wait(timeout=5)
         self.await_service_states(expected)
-        self.assertFalse((self.staging / "capture-manifest.json").exists())
+        self.assertNotIn("completedAt", json.loads((self.staging / "capture-manifest.json").read_text()))
 
     def test_failed_service_guardian_launch_cannot_stop_managed_units(self):
         (self.source / "state").write_text("recoverable service data")
@@ -494,7 +533,7 @@ while True:
         calls = [json.loads(line) for line in self.service_calls.read_text().splitlines()]
         self.assertEqual([entry for entry in calls if entry["action"] == "start"],
                          [{"action": "start", "name": "managed.service"}])
-        self.assertFalse((self.staging / "capture-manifest.json").exists())
+        self.assertNotIn("completedAt", json.loads((self.staging / "capture-manifest.json").read_text()))
 
     def test_service_guardian_recovers_when_capture_is_descheduled_past_its_deadline(self):
         (self.source / "state").write_text("recoverable service data")
@@ -515,8 +554,8 @@ while True:
 
     def capture_child(self, *, setup="", timeout=1):
         program = "import importlib.util, pathlib, signal, os, time\n" + \
-            "spec = importlib.util.spec_from_file_location('fixture_capture', " + repr(capture.__file__) + ")\n" + \
-            "capture = importlib.util.module_from_spec(spec); spec.loader.exec_module(capture)\n" + \
+            "spec = importlib.util.spec_from_file_location('fixture_capture', " + repr(str(pathlib.Path(__file__).resolve())) + ")\n" + \
+            "fixture = importlib.util.module_from_spec(spec); spec.loader.exec_module(fixture); capture = fixture.capture\n" + \
             setup + "\ncapture.prepare(" + repr(self.writer_config()) + ", pathlib.Path(" + repr(str(self.staging)) + "), timeout_seconds=" + repr(timeout) + ")\n"
         process = subprocess.Popen([sys.executable, "-c", program], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def cleanup():
@@ -615,7 +654,7 @@ signal.pidfd_send_signal = delayed_signal
         child.kill()
         child.wait(timeout=5)
         self.await_resumed(writer)
-        self.assertFalse((self.staging / "capture-manifest.json").exists())
+        self.assertNotIn("completedAt", json.loads((self.staging / "capture-manifest.json").read_text()))
 
     @isolated_writers
     def test_capture_preserves_a_writer_already_stopped_by_its_owner(self):
@@ -859,7 +898,13 @@ signal.pidfd_send_signal = delayed_signal
         result = subprocess.run(["nix", "eval", "--offline", "--raw", recovery["path"] + "#recoveryValue"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.assertEqual(result.stdout.decode(), "independent bootstrap")
 
-    def test_victoria_online_capture_materializes_backup_and_only_deletes_own_snapshot(self):
+    def test_victoria_online_capture_reads_native_links_and_only_deletes_own_snapshot(self):
+        chunks = self.source / "native-chunks" / "capture-snapshot"
+        chunks.mkdir(parents=True)
+        (chunks / "metric.chunk").write_bytes(b"portable VictoriaMetrics chunk")
+        native = self.source / "snapshots" / "capture-snapshot"
+        native.mkdir(parents=True)
+        (native / "data").symlink_to(chunks, target_is_directory=True)
         snapshots = {"unrelated-snapshot"}
         class API(BaseHTTPRequestHandler):
             def do_GET(self):
@@ -882,24 +927,15 @@ signal.pidfd_send_signal = delayed_signal
         threading.Thread(target=server.serve_forever, daemon=True).start()
         self.addCleanup(server.server_close)
         self.addCleanup(server.shutdown)
-        binary = self.root / "bin"
-        binary.mkdir()
-        vmbackup = binary / "vmbackup"
-        vmbackup.write_text("#!" + sys.executable + "\n" + """import pathlib, sys
-assert '-snapshotName=capture-snapshot' in sys.argv
-path = pathlib.Path(next(arg.split('fs://', 1)[1] for arg in sys.argv if arg.startswith('-dst=fs://')))
-path.mkdir(parents=True, exist_ok=True)
-(path / 'metric.chunk').write_bytes(b'portable VictoriaMetrics chunk')
-""")
-        vmbackup.chmod(0o755)
-        previous_path = os.environ["PATH"]
-        os.environ["PATH"] = str(binary) + os.pathsep + previous_path
-        self.addCleanup(lambda: os.environ.__setitem__("PATH", previous_path))
         capture.prepare({"captures": [{"name": "victoria", "kind": "victoria", "url": f"http://127.0.0.1:{server.server_port}", "storagePath": str(self.source)}]}, self.staging)
-        self.assertEqual((self.staging / "databases/victoria/metric.chunk").read_bytes(), b"portable VictoriaMetrics chunk")
+        entry = json.loads((self.staging / "capture-manifest.json").read_text())["captures"][0]
+        restored = self.root / "restored-victoria"
+        capture.restore_victoria(entry, self.root / "fixture-restore", restored)
+        self.assertEqual((restored / "data/metric.chunk").read_bytes(), b"portable VictoriaMetrics chunk")
+        self.assertFalse((self.staging / "databases/victoria").exists())
         self.assertEqual(snapshots, {"unrelated-snapshot"})
 
-    @unittest.skipUnless(all(shutil.which(command) for command in ("victoria-metrics", "vmbackup", "vmrestore")), "VictoriaMetrics tools not installed")
+    @unittest.skipUnless(shutil.which("victoria-metrics"), "VictoriaMetrics not installed")
     def test_native_victoria_capture_restores_queryable_metric_without_removing_unrelated_snapshot(self):
         def start_server(data):
             listener = socket.socket()
@@ -939,7 +975,8 @@ path.mkdir(parents=True, exist_ok=True)
         with urlopen(original_url + "/snapshot/list", timeout=10) as response:
             self.assertEqual(json.load(response)["snapshots"], [unrelated])
         restored_data = self.root / "restored-metrics"
-        subprocess.run(["vmrestore", "-src=fs://" + str(self.staging / "databases/victoria"), "-storageDataPath=" + str(restored_data)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        entry = json.loads((self.staging / "capture-manifest.json").read_text())["captures"][0]
+        capture.restore_victoria(entry, self.root / "fixture-restore", restored_data)
         restored_url = start_server(restored_data)
         with urlopen(restored_url + "/api/v1/query?query=backup_recovery_fixture&nocache=1&time=" + str(sample_time / 1000), timeout=10) as response:
             result = json.load(response)
@@ -961,7 +998,7 @@ path.mkdir(parents=True, exist_ok=True)
         self.assertEqual(self.copied(self.source / "link").readlink(), pathlib.Path("project/notes.txt"))
         self.assertFalse(self.copied(self.source / ".direnv").exists())
         self.assertFalse(self.copied(self.source / "project/.direnv").exists())
-        self.assertTrue(all(root.exists() for root in roots))
+        self.assertTrue(all(root.exists() for root in roots.paths))
         self.assertEqual(json.loads((self.staging / "capture-manifest.json").read_text())["captures"][0]["name"], "files")
 
     @isolated_writers

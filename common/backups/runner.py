@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import selectors
+import signal
 import shlex
 import shutil
 import sqlite3
@@ -97,16 +98,17 @@ class Runner:
         thread = threading.Thread(target=heartbeat, daemon=True)
         thread.start()
         try:
-            yield
+            yield stopped.set
         finally:
             stopped.set()
             thread.join()
 
-    def stream_backup(self, arguments):
+    def stream_backup(self, arguments, deadline=None):
         environment = dict(self.env, RESTIC_PROGRESS_FPS="0.2")
         summary, errors = "", ""
         with subprocess.Popen(self.base + list(arguments), env=environment,
-                              stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                              start_new_session=True) as process:
             with selectors.DefaultSelector() as selector:
                 buffers = {process.stdout: b"", process.stderr: b""}
                 for pipe in buffers:
@@ -135,7 +137,10 @@ class Runner:
                             ))
                 try:
                     while selector.get_map():
-                        for key, _ in selector.select():
+                        if deadline is not None and time.monotonic() >= deadline:
+                            raise Failure("Service interruption limit expired during backup")
+                        wait = max(0, deadline - time.monotonic()) if deadline is not None else None
+                        for key, _ in selector.select(timeout=wait):
                             pipe = key.fileobj
                             chunk = os.read(pipe.fileno(), 65536)
                             if not chunk:
@@ -147,9 +152,12 @@ class Runner:
                             while b"\n" in buffers[pipe]:
                                 line, buffers[pipe] = buffers[pipe].split(b"\n", 1)
                                 consume(pipe, line)
-                    process.wait()
+                    process.wait(timeout=max(0, deadline - time.monotonic()) if deadline is not None else None)
                 except BaseException:
-                    process.kill()
+                    try:
+                        os.killpg(process.pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
                     process.wait()
                     raise
         # Retain only the summary and bounded diagnostics, not hours of progress.
@@ -212,9 +220,9 @@ class Runner:
                 print("Gotify unavailable; notification queued", file=sys.stderr)
         self.update(deliver)
 
-    def restic(self, *arguments, check=True, stream=False):
+    def restic(self, *arguments, check=True, stream=False, deadline=None):
         self.credentials()
-        result = (self.stream_backup(arguments) if stream else
+        result = (self.stream_backup(arguments, deadline=deadline) if stream else
                   subprocess.run(self.base + list(arguments), env=self.env,
                                  capture_output=True, text=True))
         if check and result.returncode:
@@ -262,36 +270,26 @@ class Runner:
         with self.phase("%s: checking backup repository" % scope):
             self.initialize()
         captured_at = utcnow()
-        paths = list(specification.get("paths", []))
+        end_preparation = None
+        def consume(selection):
+            if end_preparation:
+                end_preparation()
+            return self.upload(scope, specification, captured_at, selection)
         if specification.get("captures"):
             from capture import CaptureError, prepare
             try:
-                with self.phase("%s: preparing local captures" % scope):
-                    paths.extend(map(str, prepare(
+                with self.phase("%s: preparing local captures" % scope) as end_preparation:
+                    selection = prepare(
                         specification, self.state / "staging" / scope,
-                        timeout_seconds=self.config.get("timeoutSeconds", 60),
+                        timeout_seconds=self.config.get("timeoutSeconds", 3600),
                         progress=self.progress,
-                    )))
+                        consume=consume,
+                    )
+                    result = selection.result
             except CaptureError as error:
                 raise Failure("Service capture failed: " + str(error)) from error
-        if not paths:
-            raise Failure("Backup scope has no source paths")
-        if any(not Path(path).is_absolute() or not (Path(path).exists() or Path(path).is_symlink())
-               for path in paths):
-            raise Failure("A required backup source is missing or is not an absolute path")
-        arguments = ["backup", "--json", "--host", self.config["host"],
-                     "--tag", "machine-backup", "--tag", scope,
-                     "--group-by", "host,paths", "--time",
-                     captured_at.strftime("%Y-%m-%d %H:%M:%S"),
-                     "--exclude", ".direnv"]
-        for exclusion in specification.get("excludes", []):
-            arguments.extend(["--exclude", exclusion])
-            if exclusion.startswith("/"):
-                arguments.extend(["--exclude", str(self.state / "staging" / scope / "tree") + exclusion])
-        for exclusion in specification.get("directExcludes", []):
-            arguments.extend(["--exclude", exclusion])
-        with self.phase("%s: scanning and uploading backup" % scope):
-            result = self.restic(*arguments, "--", *paths, stream=True)
+        else:
+            result = consume(None)
         summaries = [json.loads(line) for line in result.stdout.splitlines()
                      if line.strip()]
         snapshot = next((item.get("snapshot_id") for item in summaries
@@ -312,6 +310,37 @@ class Runner:
         self.progress("%s: backup complete" % scope)
         print(json.dumps({"host": self.config["host"], "scope": scope,
                           "capturedAt": captured_at.isoformat(), "complete": True}))
+
+    def upload(self, scope, specification, captured_at, selection):
+        paths = list(map(Path, specification.get("paths", [])))
+        if selection:
+            paths.extend(selection.paths)
+        paths = list(dict.fromkeys(paths))
+        if not paths:
+            raise Failure("Backup scope has no source paths")
+        if any(not Path(path).is_absolute() or not (Path(path).exists() or Path(path).is_symlink())
+               for path in paths):
+            raise Failure("A required backup source is missing or is not an absolute path")
+        arguments = ["backup", "--json", "--host", self.config["host"],
+                     "--tag", "machine-backup", "--tag", scope,
+                     "--group-by", "host,tags", "--time",
+                     captured_at.strftime("%Y-%m-%d %H:%M:%S"),
+                     "--exclude", ".direnv"]
+        for exclusion in specification.get("excludes", []):
+            arguments.extend(["--exclude", exclusion])
+            if exclusion.startswith("/"):
+                arguments.extend(["--exclude", str(self.state / "staging" / scope / "tree") + exclusion])
+        if selection:
+            for exclusion in selection.excludes:
+                arguments.extend(["--exclude", exclusion])
+        # File selection is literal and NUL-delimited: spaces, globs and even
+        # newlines in source names cannot alter the backup scope.
+        sources = self.state / ("sources-" + scope + ".raw")
+        sources.write_bytes(b"".join(os.fsencode(path) + b"\0" for path in paths))
+        sources.chmod(0o600)
+        arguments.extend(["--files-from-raw", str(sources)])
+        with self.phase("%s: scanning and uploading backup" % scope):
+            return self.restic(*arguments, stream=True, deadline=selection.deadline if selection else None)
 
     def snapshots(self, complete=False):
         tags = "machine-backup,complete" if complete else "machine-backup"
@@ -602,7 +631,13 @@ class Runner:
                             logical = Path(metadata["path"])
                             if not logical.is_absolute() or ".." in logical.parts:
                                 raise Failure("Capture manifest contains an invalid source path")
-                            restored = path.parent / "tree" / logical.relative_to("/")
+                            if manifest.get("version", 1) >= 2:
+                                snapshot_path = Path(metadata["snapshotPath"])
+                                if not snapshot_path.is_absolute() or ".." in snapshot_path.parts:
+                                    raise Failure("Capture manifest contains an invalid snapshot path")
+                                restored = destination / snapshot_path.relative_to("/")
+                            else:
+                                restored = path.parent / "tree" / logical.relative_to("/")
                             if not restored.exists():
                                 if includes:
                                     continue
@@ -615,6 +650,12 @@ class Runner:
                         for database in entry.get("databases", []):
                             if "dump" in database and not (path.parent / database["dump"]).is_file() and not includes:
                                 raise Failure("A database listed in the recovery manifest is missing")
+                        if entry.get("captureMethod") == "restic-native-snapshot" and not includes:
+                            from capture import CaptureError, restore_victoria
+                            try:
+                                restore_victoria(entry, destination, path.parent / "native-snapshots" / entry["name"])
+                            except (CaptureError, OSError, ValueError) as error:
+                                raise Failure("Restored VictoriaMetrics snapshot cannot be reconstructed") from error
                     manifest_count += 1
         if not file_count:
             raise Failure("Restore rehearsal did not restore any regular files")

@@ -47,11 +47,12 @@ data referenced by any retained restore point.
   deletion. The user has configured snapshot contents to be hidden from within
   the Box; the actual automatic snapshot schedule has not been independently
   verified.
-- Allow up to one minute of interruption per service per hourly backup where a
-  verified online capture is unavailable. Capture locally, restart the service,
-  then upload. Validate that this budget is achievable; failure handling must
-  restore service availability without reporting an incomplete capture as a
-  successful backup.
+- Read selected service files directly with restic instead of duplicating file
+  trees locally. Keep affected services and detected writers paused through
+  preparation and upload where an online capture is unavailable. The default
+  interruption limit is one hour, configurable through
+  `services.machineBackups.interruptionTimeoutSeconds`; expiry aborts the backup
+  and triggers recovery without marking the snapshot complete.
 - Run notebook backups at low priority while awake and connected, including on
   battery. Do not wake the notebook. Catch up after resume or reconnection.
   The user reports that the notebook is on almost all the time.
@@ -173,9 +174,10 @@ a substitute for the dedicated consistent service captures.
   and generated secrets. See [hosted services](services.md) and the active
   imports in [the loem module](../servers/loem/default.nix).
 - Read-only runtime discovery on `loem` found PostgreSQL databases beyond
-  Forgejo, including `agentsview`, `honcho`, `litellm`, `paperclip`, `scopegate`,
+  Forgejo, including `agentsview`, `litellm`, `paperclip`, `scopegate`,
   and test databases. A Forgejo-only database dump would not provide complete
-  coverage.
+  coverage. The retired `honcho` database was deleted on 2026-10-11 with the
+  user's authorization after its missing `vector` extension blocked capture.
 - Some services keep their state in `/home/lotus`, including user applications
   and the notebook's Node-RED. Their service state needs the hourly target even
   though the surrounding home directory has a six-hour target. The service modules
@@ -230,9 +232,9 @@ and [repository encryption](https://restic.readthedocs.io/en/stable/070_encrypti
 
 ## Capture strategy and validation
 
-Use application-supported online captures where verified. Otherwise prepare an
-incremental local copy and coordinate the final capture with the affected
-service, within the accepted interruption budget. Preserve ownership, modes,
+Use application-supported online captures where verified. Otherwise pause the
+affected writers while restic backs up the selected source files directly,
+within the configured interruption budget. Preserve ownership, modes,
 symlinks, and relevant ACLs/xattrs. A service capture succeeds only when its
 database, associated files, and required keys form a recoverable set.
 
@@ -243,8 +245,8 @@ Implementation must validate these mechanisms against the installed versions:
   simultaneous cluster-wide snapshot.
   [PostgreSQL 17 documentation](https://www.postgresql.org/docs/17/app-pgdump.html)
 - Forgejo requires coordination across database and file storage. On the
-  current ext4 setup, coordinate a native database dump and prepared file capture
-  while writes are paused; service downtime must not extend through remote upload.
+  current ext4 setup, coordinate a native database dump and direct file backup
+  while writes are paused, including remote upload within the configured limit.
   [Forgejo backup guidance](https://forgejo.org/docs/v16.0/admin/upgrade/#backup)
 - Tuwunel 1.9.3 offers online RocksDB backups/checkpoints, but media needs
   separate coverage and checkpoint completion must be verified.
@@ -258,16 +260,18 @@ Implementation must validate these mechanisms against the installed versions:
   connection must not be assumed safe; clean stop and local capture is a
   candidate under the accepted service-interruption budget.
   [Pinned database implementation](https://github.com/UsefulSoftwareCo/executor/blob/2dc399e51094fccd2a45103a38d77179c6d648ff/apps/host-selfhost/src/db/self-host-db.ts)
-- VictoriaMetrics supports online snapshots materialized through `vmbackup`
-  to a local staging directory; its snapshot directory contains internal
-  symlinks and should not simply be archived as ordinary files.
-  [vmbackup documentation](https://docs.victoriametrics.com/victoriametrics/vmbackup/)
+- VictoriaMetrics creates native snapshots without copying its data. Snapshot
+  directories contain symlinks, so the capture selects both the snapshot and
+  the resolved targets, records their mappings, and retains the snapshot until
+  upload finishes. The restore wrapper reconstructs a portable snapshot using
+  only the isolated restored files.
+  [VictoriaMetrics snapshot documentation](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#how-to-work-with-snapshots)
 - CLIProxyAPI creates unique request filenames but writes directly to the final
   filename, so a `.log` name does not prove that capture is complete. Transient
   request/response parts also disappear during normal operation. A completion
-  or quiescence strategy is required. Prepare bulk copies while running and
-  validate only a bounded final capture while quiesced; copying the whole
-  38 GiB corpus from scratch while stopped is not an established viable method.
+  or quiescence strategy is required. Pause the writer while restic reads and
+  uploads the corpus directly. Benchmark the full transfer against the
+  configurable interruption limit, especially on the first backup.
 
 ## Shared-repository operation
 
@@ -297,10 +301,10 @@ an offline machine's history must not age out merely because the other machine
 continues backing up. Restic's `--keep-within-*` semantics support these windows.
 [Retention and grouping](https://restic.readthedocs.io/en/stable/060_forget.html#removing-snapshots-according-to-a-policy)
 
-Source services stopped during preparation must restart immediately after local
-capture, including on capture failure. Restarting only in the NixOS module's
-post-backup cleanup would keep them stopped throughout upload and violate the
-accepted downtime policy.
+Source services stopped during preparation remain paused through the direct
+restic backup. Recovery runs after upload, on failure, or at the configured
+interruption deadline. A complete tag is added only after both upload and
+service/writer recovery succeed.
 
 ## Declaring service state
 
@@ -319,15 +323,23 @@ services.machineBackups.directories = lib.mkIf cfg.enable [
 ];
 ```
 
-Exclusions use rsync patterns relative to each registered source. The service
-module owns their classification. `.direnv` remains a global exclusion at every
-depth. Shared absolute exclusions, such as user cache paths, use
-`services.machineBackups.exclude`.
+Exclusions use restic patterns relative to each registered source. A leading
+slash anchors at that source; unanchored patterns match at any depth within it.
+For example, `/logs/main.log` excludes only that service's diagnostic log.
+Use `**` for matching across directories. The capture prefixes patterns with the
+selected root so one service's exclusions cannot remove another service's data.
+The service module owns their classification. `.direnv` remains a global
+exclusion at every depth. Shared absolute exclusions, such as user cache paths,
+use `services.machineBackups.exclude`.
+[Restic including files](https://restic.readthedocs.io/en/stable/040_backup.html#including-files)
+and [excluding files](https://restic.readthedocs.io/en/stable/040_backup.html#excluding-files)
+describe the file lists and pattern syntax.
 
 Set `kind = "sqlite"` when the directory needs SQLite's native backup protocol.
 Capture-specific settings such as writer suspension and unit discovery stay with
 that declaration. Set `scopes = ["home" "services"]` for application state that
-must appear in both schedules; the home job excludes those live paths from its
+must appear in both schedules; the home job excludes only live databases and
+their journal companions from its
 ordinary file scan and substitutes their consistent captures.
 
 Home Manager exposes the same options through
@@ -464,38 +476,41 @@ Choose only one maintenance owner.
 
 ## Capture layout and consistency
 
-[Capture preparation](../common/backups/capture.py) finishes before
-[the runner](../common/backups/runner.py) uploads. Large file trees are preseeded
-while services are running; only stop, final incremental copy, and restart consume
-the service interruption budget. Exceptions and timeouts request service restart.
-Services that were already inactive are left inactive. Benchmark the initial
-preseed separately; it needs local space, including the AI exchange corpus.
+[Capture preparation](../common/backups/capture.py) supplies a literal,
+NUL-delimited `--files-from-raw` list to [the runner](../common/backups/runner.py).
+Restic reads the selected source files directly and applies scoped `--exclude`
+patterns. There is no local preseed or final rsync copy. The next run of each
+scope removes its legacy staged file tree before preparing native artifacts.
+Staging still needs space for SQLite backup files, PostgreSQL dumps and the
+compressed locked Nix source cache; ordinary files and the AI exchange corpus
+require no duplicate payload.
 
 The capture delegates managed-unit stop and restart operations to a separate
 transient systemd recovery service. Before stopping anything, that service records
-a lease for the units that were active; it acknowledges the stop before the final
-local copy begins. It runs outside the backup job's cgroup and restarts units in
-reverse order if the capture or entire backup job dies, including SIGKILL, or
-reaches the interruption deadline. Normal cleanup requests restart immediately
-after local capture and waits for acknowledgement before removing the lease.
-The recovery service retries unsuccessful starts and resumes a saved lease if
-it restarts. An unfinished lease blocks another capture of the same units, and
-each lease has a single recovery owner. Timed-out service commands terminate
-their whole process group before recovery so no delayed stop can follow restart.
+a lease for the units that were active and acknowledges the stop before the
+backup reads their state. It runs outside the backup job's cgroup and restarts
+units in reverse order if the entire job dies, including SIGKILL, or reaches the
+interruption deadline. Restic is killed on timeout; its snapshot remains
+incomplete. Normal cleanup requests restart after upload and waits for
+acknowledgement before the runner adds the complete tag. Services that were
+already inactive stay inactive. Recovery retries unsuccessful starts and resumes
+saved leases after restarting. An unfinished lease blocks another backup of the
+same units. Timed-out service commands terminate their whole process group so
+no delayed stop can follow recovery.
 
-SQLite uses the native backup API, excludes copied WAL/SHM companions, and
-checks the result. Managed writers such as T3 Code, CPA Manager Plus and Grafana
-pause for the final database/file capture after live preseed; revision-named
-no-mistakes user daemons are discovered dynamically. T3, Hermes and no-mistakes
-also pause independently launched processes holding writable files in their
-selected state directories. This includes the T3 desktop's separate backend,
-which shares the web service's database and attachments. The desktop window
-stays open while its backend pauses.
+SQLite uses the native backup API, checks its result, and excludes the live
+database and WAL/SHM/journal companions from restic's direct selection. Associated
+keys, configurations and attachments are read directly during the same paused
+interval. Managed writers such as T3 Code, CPA Manager Plus and Grafana remain
+paused until upload finishes; revision-named no-mistakes user daemons are
+discovered dynamically. T3, Hermes and no-mistakes also pause independently
+launched processes holding writable files in their selected state directories.
+This includes T3's desktop backend. The window stays open while the backend pauses.
 
 The writer pause uses Linux process descriptors to preserve process identity.
 An independent transient systemd watchdog is armed before suspension and resumes
 the writers if the backup exits or reaches its interruption deadline. Normal
-cleanup resumes them before restarting managed services and uploading. A writer
+cleanup resumes them after upload and before restarting managed services. A writer
 that cannot be safely paused, or a newly appearing writer, fails the capture.
 An already stopped process remains stopped. Run manual captures from a terminal
 outside the backed-up application so its backend is not an ancestor of the
@@ -510,31 +525,35 @@ PostgreSQL dump and repository/LFS files are captured while Forgejo is paused.
 Forgejo-dependent runners are paused and restarted with Forgejo, preserving their
 initial availability. PostgreSQL remains online; databases are independent
 consistent captures rather than a simultaneous cluster-wide transaction. Executor uses a clean stop and
-final file copy to preserve its libSQL data and keys. Soft Serve, Tuwunel,
+direct file backup to preserve its libSQL data and keys. Soft Serve, Tuwunel,
 Syncthing, the registry, and request-exchange files use bounded stopped captures.
 Node-RED pauses both its service and, when configured, its git-sync service so
-both writers are stopped during the final file copy.
-VictoriaMetrics uses its native snapshot and `vmbackup` filesystem format.
+both writers are stopped during the direct file backup.
+VictoriaMetrics uses its native snapshot and recorded symlink-target mappings.
 
-Home snapshots include `/home/lotus` directly, with live application state paths
-replaced by prepared consistent copies. Both scopes include these selected home
+Home snapshots include `/home/lotus` directly, with only native database
+artifacts replacing live database files. Both scopes include selected home
 application captures. Restic snapshot paths are:
 
-- `/home/lotus/...` for ordinary home files.
-- `/var/lib/machine-backups/staging/SCOPE/tree/...` for captured files, with the
-  original absolute path below `tree` (for example `tree/home/lotus/.t3/userdata`).
+- Original absolute source paths for ordinary home and service files.
+- Resolved root paths for selected symlinks, including private StateDirectories.
+- `/var/lib/machine-backups/staging/SCOPE/tree/...` only for native SQLite files,
+  with their original absolute path below `tree`.
 - `.../databases/postgresql/globals.sql` and indexed `database-000.dump` archives.
   The manifest maps each archive to its database name, owner, locale and extensions.
-- `.../databases/victoriametrics/` for `vmbackup` data.
+- VictoriaMetrics' native snapshot directory and its referenced snapshot targets.
 - `.../recovery/recovery-inputs/input-cache/`, `archive.json`, and `closure.json`
-  for locked flake inputs. The configuration and encrypted secrets are in `tree`.
-- `.../capture-manifest.json` for source/resolved paths, ownership, modes, versions,
-  database mappings, and capture times.
+  for locked flake inputs. The mutable configuration stays at its original path.
+- `.../capture-manifest.json` for source/resolved/snapshot paths, ownership, modes,
+  versions, database mappings, snapshot links, and preparation times.
 
-Selected root symlinks into `/var/lib/private` are materialized; symlinks inside
-captured trees remain symlinks. Captures preserve numeric ownership, modes,
-symlinks, ACLs and xattrs. Restore paths from the manifest; do not copy staging
-prefixes into their production locations by accident. Runtime coverage checks
+Root symlink targets are selected explicitly because restic does not follow
+symlinks. Internal symlinks remain symlinks. Restic preserves numeric ownership,
+modes, ACLs and xattrs. Version-2 manifest entries record `snapshotPath`; older
+version-1 snapshots retain their original staging layout. `restore-test` supports
+both layouts and reconstructs native VictoriaMetrics snapshots for a full restore.
+Restore paths from the manifest; do not copy staging prefixes into production.
+Runtime coverage checks
 report unclassified service state and container mounts. DHCP leases, synchronized-clock state and
 declaratively configured systemd linger are classified as regenerable; they
 are not a blanket exclusion of application state. PostgreSQL parent directories
@@ -592,19 +611,23 @@ application checks and coverage gaps. Repeat quarterly.
    is authenticated by the encrypted, verified backup and contains source inputs,
    not the package/build closure or the entire original Nix store. A fully offline
    rebuild would also need those package and build artifacts preserved separately.
-   Recover the mutable configuration checkout and encrypted secrets from `tree`
+   Recover the mutable configuration checkout and encrypted secrets from their
+   original snapshot paths
    if editing/rekeying for replacement hardware. Record new host public keys and
    rekey when changing identities; preserve `/etc/ssh` before activation when
    retaining the old agenix host identity. Restore SSH host private/public keys
    selectively; let the rebuilt configuration regenerate SSH configuration
    symlinks instead of retaining links into the old Nix store. Reinstall NixOS with the recovered
    machine configuration and reviewed hardware/disk settings.
-4. Keep applications stopped while restoring their state. First restore ordinary
-   home files, then overlay prepared home application captures from `tree/home/lotus`.
-   Overlay captured non-database service files to their manifest source paths,
-   preserving numeric ownership and metadata (for example `rsync -aHAX --numeric-ids`).
-   Recreate declared private `StateDirectory` layouts and restore materialized
-   data into their resolved targets rather than replacing systemd's symlinks.
+4. Keep applications stopped while restoring their state. Restore ordinary home
+   and service files from their original snapshot paths. Overlay native SQLite
+   artifacts from `tree` onto their recorded database paths, omitting old journals.
+   Use each version-2 manifest entry's `snapshotPath` to locate its restored files
+   and its `path`/`resolvedSource` to identify their production destinations.
+   Preserve numeric ownership and metadata (for example `rsync -aHAX --numeric-ids`).
+   Recreate declared private `StateDirectory` layouts and restore data into their
+   resolved targets rather than replacing systemd's symlinks. Older version-1
+   snapshots keep their complete file captures under `tree` and remain readable.
    Restore generated keys and encrypted-secret access before starting services.
 5. Restore PostgreSQL using the recorded major version and extensions. Review
    roles, tablespace locations, database names and locales before importing:
@@ -626,8 +649,11 @@ application checks and coverage gaps. Repeat quarterly.
    for the captured inventory. Do not copy a live raw PostgreSQL directory.
 6. SQLite captures are standalone database files; restore associated keys and
    application files from the same capture and omit old WAL/SHM files. Soft Serve,
-   Tuwunel and Executor restore their complete prepared file trees while stopped.
-   Restore VictoriaMetrics into an empty compatible storage directory with
+   Tuwunel and Executor restore their selected file trees while stopped.
+   Full `restore-test` runs reconstruct VictoriaMetrics snapshots under
+   `CAPTURE/native-snapshots/victoriametrics`; copy that directory's contents into
+   an empty compatible storage directory while VictoriaMetrics is stopped.
+   For older `vmbackup` captures, continue using
    `vmrestore -src=fs://CAPTURE/databases/victoriametrics -storageDataPath=STATE`.
    Restore Grafana's encryption key alongside its database, Node-RED credential
    secret alongside its state, Syncthing/Tailscale identities, runner registration
@@ -645,9 +671,9 @@ application checks and coverage gaps. Repeat quarterly.
   independently retrievable recovery credentials, and the provider's daily
   ten-snapshot policy. Snapshot invisibility alone cannot verify that policy.
 - Demonstrate consistent capture and reliable service restart within the
-  one-minute interruption budget, including failure/timeout paths and forced
-  backup-job termination. Benchmark
-  first-run staging separately from recurring captures.
+  configured interruption budget, including failure/timeout paths and forced
+  backup-job termination. Benchmark first uploads separately from recurring
+  incremental backups, and verify there is no bulk file copy in local staging.
 - Verify `.direnv` exclusion at arbitrary depth and preservation of all AI
   exchange families, even under `logs` and with `.log` extensions. The diagnostic
   exclusions must not match request exchanges.
@@ -682,3 +708,13 @@ evidence, and remain required before calling the setup ready. After the first
 month, review capacity, compression/deduplication and growth against the provisional
 one-year retention policy. Both hosts being unavailable can silence their mutual
 monitoring; this rollout has no third independent heartbeat monitor.
+
+Direct-file backup validation on 2026-10-11 passed the module and actual-profile
+coverage checks, 39 capture fixtures and 28 runner fixtures in the Nix sandbox.
+The ACL/xattr fixture was skipped on the sandbox filesystem and passed separately
+on the host. Both NixOS configurations and standalone Home Manager built
+successfully. Regressions verify absence of bulk staging copies, literal source
+names, scoped exclusions, private StateDirectory targets, timeout recovery, and
+VictoriaMetrics recovery after its source snapshot and referenced files are
+deleted. No configuration was applied or production service capture run. Measure
+production upload time against the new interruption limit during rollout.
