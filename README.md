@@ -35,10 +35,22 @@ recovery artifacts. Writers remain paused through upload, with a configurable
 one-hour interruption limit. Selected locked flake source inputs support offline recovery
 evaluation; package builds use normal network access. The dedicated SSH identity,
 repository password, and backup notification token use agenix and host rekeying.
+Backup jobs push their persisted status directly to VictoriaMetrics through its
+portable Tailnet service; a separate five-minute heartbeat also retries delivery
+without contacting the backup repository or interrupting captures.
 See the [backup and recovery guide](docs/backups.md) for coverage, notifications,
 retention, and rollout checks. The `machine-backups-coverage` flake
 check verifies registrations against each machine's actual Home Manager output,
 including coordination of Node-RED's service and configured git-sync writer.
+
+Loem hosts Grafana at `https://grafana.loem.lferraz.dev` through the private
+Tailnet Caddy proxy. VictoriaMetrics ingestion retains its independent Tailscale
+service name, `victoriametrics.rudd-agama.ts.net`, so collectors do not depend on
+the storage host's identity. Versioned dashboards cover fleet health, Tailnet
+traffic, ingestion and hosted services, automated backup freshness and recovery
+evidence, bare-metal server thermals and hardware, notebook hardware, and the shared Nix
+cache. Grafana automation credentials use agenix and host rekeying. See
+[metrics operation](docs/services.md#metrics) and the [coverage audit](docs/metrics-audit.md).
 
 ## Configurations
 
@@ -70,6 +82,8 @@ formatting, and dependency updates.
 `nh` provides build progress and a package delta for both Home Manager and NixOS.
 The `nix-output-monitor` flake check replays log events to verify compatibility
 with Determinate Nix and preserve build and download reporting.
+The `metrics-dashboards` check runs dashboard queries in a disposable VictoriaMetrics
+instance to verify collection gaps and restore evidence from another machine.
 
 ## Documentation
 

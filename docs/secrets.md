@@ -37,6 +37,12 @@ and host key for this workflow.
 
 ## Service-specific credentials
 
+- Grafana's browser Editor login and automation service-account token are stored
+  in [secrets/loem/grafana-automation-credentials](../secrets/loem/grafana-automation-credentials)
+  as an encrypted JSON document. Loem receives a root-only runtime file through
+  agenix-rekey. These are separate from `grafana-key`, which protects Grafana's
+  own encrypted database settings. See [metrics operation](services.md#metrics)
+  for identities, usage, rotation, and database recovery requirements.
 - Backups have a dedicated shared SSH identity. Its encrypted private key is
   [secrets/storagebox-backup-ssh-key](../secrets/storagebox-backup-ssh-key), governed
   by the normal `secrets.nix` recipient policy; its public key is

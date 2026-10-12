@@ -1,0 +1,1566 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "Hardware temperatures, reported limits, thermal alarms, CPU throttling and Linux software RAID for bare-metal servers. Loem is selected initially. Host discovery includes machines with hardware temperature metrics and no reported battery. Fan RPM and SMART are not currently exported by Loem.",
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": true,
+      "icon": "dashboard",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "infrastructure"
+      ],
+      "targetBlank": false,
+      "title": "Infrastructure dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [
+    "infrastructure",
+    "nixos",
+    "hardware",
+    "bare-metal"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "loem"
+          ],
+          "value": [
+            "loem"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "victoriametrics"
+        },
+        "definition": "query_result(count by(host)(node_hwmon_temp_celsius{job=\"node\"} unless on(host) node_power_supply_capacity{job=\"node\",power_supply=~\"BAT.*\"}))",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Host",
+        "multi": true,
+        "name": "host",
+        "options": [],
+        "query": {
+          "query": "query_result(count by(host)(node_hwmon_temp_celsius{job=\"node\"} unless on(host) node_power_supply_capacity{job=\"node\",power_supply=~\"BAT.*\"}))",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery",
+          "qryType": 3
+        },
+        "refresh": 1,
+        "regex": "/host=\"([^\"]+)\"/",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Bare metal · thermals and hardware",
+  "uid": "bare-metal-hardware",
+  "version": 1,
+  "weekStart": "",
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Highest hwmon reading on each selected server. Use the hardware-reported margins below to interpret a temperature for this specific machine. Current value uses only source samples received within two minutes; missing telemetry is unavailable. Historical charts use the selected time range separately.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "celsius",
+          "decimals": 1,
+          "noValue": "Unavailable"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 5
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "max by(host)((node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"} and (time() - timestamp(node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"}) < 120)))",
+          "legendFormat": "{{host}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Peak hardware temperature",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Smallest difference between a reported critical limit and its matching sensor. Only sensors that export a critical limit participate; missing limits are not treated as safe. Current value uses only source samples received within two minutes; missing telemetry is unavailable. Historical charts use the selected time range separately.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "green",
+                "value": 20
+              }
+            ]
+          },
+          "unit": "celsius",
+          "decimals": 1,
+          "noValue": "Unavailable"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 5
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "min by(host)((node_hwmon_temp_crit_celsius{host=~\"$host\",job=\"node\"} and (time() - timestamp(node_hwmon_temp_crit_celsius{host=~\"$host\",job=\"node\"}) < 120)) - (node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"} and (time() - timestamp(node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"}) < 120)))",
+          "legendFormat": "{{host}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Critical-temperature headroom",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Maximum hardware critical-alarm flag by host. Despite the metric name ending in _celsius, this is a flag, not a temperature. Missing alarm telemetry remains No data. Current value uses only source samples received within two minutes; missing telemetry is unavailable. Historical charts use the selected time range separately.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Normal"
+                },
+                "1": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "Alarm"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none",
+          "decimals": 1,
+          "noValue": "Unavailable"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 5
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "max by(host)((node_hwmon_temp_crit_alarm_celsius{host=~\"$host\",job=\"node\"} and (time() - timestamp(node_hwmon_temp_crit_alarm_celsius{host=~\"$host\",job=\"node\"}) < 120)))",
+          "legendFormat": "{{host}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Hardware thermal alarms",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Recent hardware package thermal-throttle events. Counter increases show activity in this window rather than keeping old incidents lit indefinitely. Core events are shown separately below. Current value uses only source samples received within two minutes; missing telemetry is unavailable. Historical charts use the selected time range separately.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short",
+          "decimals": 1,
+          "noValue": "Unavailable"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 5
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "sum by(host)((increase(node_cpu_package_throttles_total{host=~\"$host\",job=\"node\"}[1h]) and (time() - timestamp(node_cpu_package_throttles_total{host=~\"$host\",job=\"node\"}) < 120)))",
+          "legendFormat": "{{host}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Package throttles · last hour",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 5,
+      "panels": [],
+      "title": "Hardware temperatures and reported limits",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "All hwmon temperatures with friendly chip and sensor names where available. Metadata joins retain sensors without labels, including both chipset sensors on Loem.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "celsius",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "((label_replace((((label_replace((node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"}), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\")) * on(host,instance,job,chip,sensor) group_left(sensor_name) (label_replace(node_hwmon_sensor_label{host=~\"$host\",job=\"node\"}, \"sensor_name\", \"$1\", \"label\", \"(.*)\"))) or on(host,instance,job,chip,sensor) (label_replace((node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"}), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\"))), \"chip_name\", \"$1\", \"chip\", \"(.*)\")) * on(host,instance,job,chip) group_left(chip_name) node_hwmon_chip_names{host=~\"$host\",job=\"node\"}) or on(host,instance,job,chip,sensor) (label_replace((((label_replace((node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"}), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\")) * on(host,instance,job,chip,sensor) group_left(sensor_name) (label_replace(node_hwmon_sensor_label{host=~\"$host\",job=\"node\"}, \"sensor_name\", \"$1\", \"label\", \"(.*)\"))) or on(host,instance,job,chip,sensor) (label_replace((node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"}), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\"))), \"chip_name\", \"$1\", \"chip\", \"(.*)\"))",
+          "legendFormat": "{{host}} · {{chip_name}} · {{sensor_name}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Temperatures by physical sensor",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Reported high (max) and critical limits minus each matching temperature. A negative margin exceeds that limit. Only sensors with reported limits appear; chipset sensors currently have no such limits.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "green",
+                "value": 20
+              }
+            ]
+          },
+          "unit": "celsius",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "((label_replace((((label_replace(((node_hwmon_temp_max_celsius{host=~\"$host\",job=\"node\"} - node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"})), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\")) * on(host,instance,job,chip,sensor) group_left(sensor_name) (label_replace(node_hwmon_sensor_label{host=~\"$host\",job=\"node\"}, \"sensor_name\", \"$1\", \"label\", \"(.*)\"))) or on(host,instance,job,chip,sensor) (label_replace(((node_hwmon_temp_max_celsius{host=~\"$host\",job=\"node\"} - node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"})), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\"))), \"chip_name\", \"$1\", \"chip\", \"(.*)\")) * on(host,instance,job,chip) group_left(chip_name) node_hwmon_chip_names{host=~\"$host\",job=\"node\"}) or on(host,instance,job,chip,sensor) (label_replace((((label_replace(((node_hwmon_temp_max_celsius{host=~\"$host\",job=\"node\"} - node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"})), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\")) * on(host,instance,job,chip,sensor) group_left(sensor_name) (label_replace(node_hwmon_sensor_label{host=~\"$host\",job=\"node\"}, \"sensor_name\", \"$1\", \"label\", \"(.*)\"))) or on(host,instance,job,chip,sensor) (label_replace(((node_hwmon_temp_max_celsius{host=~\"$host\",job=\"node\"} - node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"})), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\"))), \"chip_name\", \"$1\", \"chip\", \"(.*)\"))",
+          "legendFormat": "{{host}} · {{chip_name}} · {{sensor_name}} · high margin",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "((label_replace((((label_replace(((node_hwmon_temp_crit_celsius{host=~\"$host\",job=\"node\"} - node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"})), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\")) * on(host,instance,job,chip,sensor) group_left(sensor_name) (label_replace(node_hwmon_sensor_label{host=~\"$host\",job=\"node\"}, \"sensor_name\", \"$1\", \"label\", \"(.*)\"))) or on(host,instance,job,chip,sensor) (label_replace(((node_hwmon_temp_crit_celsius{host=~\"$host\",job=\"node\"} - node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"})), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\"))), \"chip_name\", \"$1\", \"chip\", \"(.*)\")) * on(host,instance,job,chip) group_left(chip_name) node_hwmon_chip_names{host=~\"$host\",job=\"node\"}) or on(host,instance,job,chip,sensor) (label_replace((((label_replace(((node_hwmon_temp_crit_celsius{host=~\"$host\",job=\"node\"} - node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"})), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\")) * on(host,instance,job,chip,sensor) group_left(sensor_name) (label_replace(node_hwmon_sensor_label{host=~\"$host\",job=\"node\"}, \"sensor_name\", \"$1\", \"label\", \"(.*)\"))) or on(host,instance,job,chip,sensor) (label_replace(((node_hwmon_temp_crit_celsius{host=~\"$host\",job=\"node\"} - node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"})), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\"))), \"chip_name\", \"$1\", \"chip\", \"(.*)\"))",
+          "legendFormat": "{{host}} · {{chip_name}} · {{sensor_name}} · critical margin",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Temperature margins by sensor",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Kernel thermal-zone readings include chipset and x86 package temperature on Loem. Some zones describe hardware also exposed through hwmon; they are separate kernel interfaces, not additional physical sensors.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "celsius",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 12,
+        "h": 8
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "node_thermal_zone_temp{host=~\"$host\",job=\"node\"}",
+          "legendFormat": "{{host}} · {{type}} · zone {{zone}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Kernel thermal zones",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Per-sensor critical-alarm flags. Readings are 0/1 despite the _celsius metric suffix. No exported alarm is kept as missing telemetry.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Normal"
+                },
+                "1": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "Alarm"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 14,
+        "w": 12,
+        "h": 8
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "((label_replace((((label_replace((node_hwmon_temp_crit_alarm_celsius{host=~\"$host\",job=\"node\"}), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\")) * on(host,instance,job,chip,sensor) group_left(sensor_name) (label_replace(node_hwmon_sensor_label{host=~\"$host\",job=\"node\"}, \"sensor_name\", \"$1\", \"label\", \"(.*)\"))) or on(host,instance,job,chip,sensor) (label_replace((node_hwmon_temp_crit_alarm_celsius{host=~\"$host\",job=\"node\"}), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\"))), \"chip_name\", \"$1\", \"chip\", \"(.*)\")) * on(host,instance,job,chip) group_left(chip_name) node_hwmon_chip_names{host=~\"$host\",job=\"node\"}) or on(host,instance,job,chip,sensor) (label_replace((((label_replace((node_hwmon_temp_crit_alarm_celsius{host=~\"$host\",job=\"node\"}), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\")) * on(host,instance,job,chip,sensor) group_left(sensor_name) (label_replace(node_hwmon_sensor_label{host=~\"$host\",job=\"node\"}, \"sensor_name\", \"$1\", \"label\", \"(.*)\"))) or on(host,instance,job,chip,sensor) (label_replace((node_hwmon_temp_crit_alarm_celsius{host=~\"$host\",job=\"node\"}), \"sensor_name\", \"$1\", \"sensor\", \"(.*)\"))), \"chip_name\", \"$1\", \"chip\", \"(.*)\"))",
+          "legendFormat": "{{host}} · {{chip_name}} · {{sensor_name}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Critical alarms by sensor",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 10,
+      "panels": [],
+      "title": "CPU workload and thermal throttling",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Peak hwmon temperature uses the left axis; average logical CPU busy time uses the right axis. Compare rising temperature with builds or sustained service load.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "celsius",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 23,
+        "w": 12,
+        "h": 8
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "max by(host)(node_hwmon_temp_celsius{host=~\"$host\",job=\"node\"})",
+          "legendFormat": "{{host}} · peak temperature",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "100 * (1 - avg by(host)(rate(node_cpu_seconds_total{host=~\"$host\",job=\"node\",mode=\"idle\"}[$__rate_interval])))",
+          "legendFormat": "{{host}} · CPU busy",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Temperature alongside CPU workload",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Current scaling frequency for each logical CPU. Frequency varies with load, idle states and power policy as well as temperature; a lower frequency alone does not prove throttling.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "hertz",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 23,
+        "w": 12,
+        "h": 8
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "node_cpu_scaling_frequency_hertz{host=~\"$host\",job=\"node\"}",
+          "legendFormat": "{{host}} · CPU {{cpu}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "CPU scaling frequency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "One-hour increases for each physical core. Keep these separate from package events because both counters can describe one incident.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 31,
+        "w": 12,
+        "h": 7
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "increase(node_cpu_core_throttles_total{host=~\"$host\",job=\"node\"}[1h])",
+          "legendFormat": "{{host}} · package {{package}} · core {{core}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Core throttle events · last hour",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "One-hour increases for each CPU package. A rising count with shrinking temperature headroom points to thermal constraints.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 31,
+        "w": 12,
+        "h": 7
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "increase(node_cpu_package_throttles_total{host=~\"$host\",job=\"node\"}[1h])",
+          "legendFormat": "{{host}} · package {{package}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Package throttle events · last hour",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      },
+      "id": 15,
+      "panels": [],
+      "title": "Local storage hardware · Linux software RAID",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Missing array members according to the kernel. Loem exposes md126 and md127. These gauges describe array redundancy; SMART wear and predictive disk health require additional telemetry.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 39,
+        "w": 8,
+        "h": 7
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "node_md_degraded{host=~\"$host\",job=\"node\"}",
+          "legendFormat": "{{host}} · {{device}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "RAID degraded members",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Active, failed and spare member counts by array. A spare count of zero is not itself a failure.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 39,
+        "w": 8,
+        "h": 7
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "node_md_disks{host=~\"$host\",job=\"node\"}",
+          "legendFormat": "{{host}} · {{device}} · {{state}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "RAID member states",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Synchronized blocks as a percentage of each array. Servers without Linux MD arrays will have no RAID series.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 95
+              },
+              {
+                "color": "green",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "percent",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 39,
+        "w": 8,
+        "h": 7
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "100 * node_md_blocks_synced{host=~\"$host\",job=\"node\"} / node_md_blocks{host=~\"$host\",job=\"node\"}",
+          "legendFormat": "{{host}} · {{device}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "RAID synchronization",
+      "type": "timeseries"
+    }
+  ]
+}

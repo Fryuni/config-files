@@ -126,6 +126,8 @@ Prefer the narrow output that matches the change:
 - Evaluate or build the affected `nixosConfigurations.<machine>` output for host
   changes.
 - Run the relevant `checks` entry when changing a reusable module covered by `tests/`.
+- Run `nix build .#checks.x86_64-linux.metrics-dashboards` for current-status
+  freshness and cross-host restore evidence queries in isolated VictoriaMetrics.
 - Run `nix build .#checks.x86_64-linux.nix-output-monitor` for `nh` progress
   compatibility. The overlay backports upstream handling of unknown activity and
   result types from [nom PR #321](https://github.com/maralorn/nix-output-monitor/pull/321)

@@ -178,17 +178,71 @@ class Runner:
     def transition(self, key, level, message):
         def change(data):
             components = data.setdefault("health", {})
-            previous = components.get(key, {}).get("level", "ok")
+            previous = components.get(key, {}).get("level")
             if previous == level:
                 return
             components[key] = {"level": level, "message": message,
                                "changedAt": utcnow().isoformat()}
+            if previous is None and level == "ok":
+                return
             data.setdefault("notifications", []).append({
                 "title": "Backups: " + self.config["host"],
                 "message": ("Recovered: " if level == "ok" else "") + message,
                 "priority": 8 if level == "critical" else 5 if level != "ok" else 2,
             })
         self.update(change)
+
+    def record_run(self, key, started, success):
+        def change(data):
+            data.setdefault("lastRun", {})[key] = {
+                "finishedAt": utcnow().isoformat(), "seconds": round(time.monotonic() - started, 3),
+                "success": success,
+            }
+            counts = data.setdefault("runs", {}).setdefault(key, {"success": 0, "failure": 0})
+            counts["success" if success else "failure"] += 1
+        self.update(change)
+
+    def push_metrics(self):
+        metrics = self.config.get("metrics", {})
+        if not metrics.get("url"):
+            return True
+        try:
+            # Long captures must not block heartbeats. Serialize sends so an
+            # older state cannot arrive after a newer push from this machine.
+            with (self.state / "metrics.lock").open("a") as lock:
+                try:
+                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    return False
+                from metrics import render
+                attempted_at = utcnow()
+                try:
+                    state = self.update(lambda data: dict(data))
+                    request = urllib.request.Request(
+                        metrics["url"], data=render(self.config, state, attempted_at.timestamp()).encode(),
+                        headers={"Content-Type": "text/plain; version=0.0.4; charset=utf-8"},
+                    )
+                    with urllib.request.build_opener(NoRedirect()).open(
+                        request, timeout=metrics.get("timeoutSeconds", 10),
+                    ) as response:
+                        if not 200 <= response.status < 300:
+                            raise OSError("Metrics endpoint rejected the push")
+                    def delivered(data):
+                        delivery = data.setdefault("metricsDelivery", {})
+                        delivery.update(lastAttemptAt=attempted_at.isoformat(),
+                                        lastSuccessAt=utcnow().isoformat(), success=True)
+                    self.update(delivered)
+                    return True
+                except (OSError, ValueError, KeyError, TypeError):
+                    def failed(data):
+                        delivery = data.setdefault("metricsDelivery", {})
+                        delivery.update(lastAttemptAt=attempted_at.isoformat(), success=False,
+                                        failures=delivery.get("failures", 0) + 1)
+                    self.update(failed)
+        except (OSError, ValueError, KeyError, TypeError):
+            pass
+        print("Backup metrics push unavailable; persisted state will be retried", file=sys.stderr)
+        return False
 
     def notify(self):
         gotify = self.config.get("gotify")
@@ -302,6 +356,10 @@ class Runner:
             data.setdefault("firstCompleteAt", utcnow().isoformat())
             data.setdefault("lastComplete", {})[scope] = {
                 "capturedAt": captured_at.isoformat(), "uploadedAt": utcnow().isoformat(),
+                "summary": {key: value for item in summaries if item.get("message_type") == "summary"
+                            for key, value in item.items() if key in [
+                                "total_bytes_processed", "data_added_packed", "total_files_processed",
+                            ]},
             }
             data.setdefault("lastFailure", {}).pop("backup:" + scope, None)
         with self.phase("%s: recording backup status" % scope):
@@ -661,12 +719,14 @@ class Runner:
             raise Failure("Restore rehearsal did not restore any regular files")
         report = {"host": host, "scope": scope, "snapshotId": snapshot["id"],
                   "capturedAt": snapshot["time"], "partialSelection": bool(includes),
+                  "verifiedAt": utcnow().isoformat(),
                   "target": str(destination), "seconds": round(time.monotonic() - started, 3),
                   "verifiedFiles": file_count, "verifiedSqliteDatabases": sqlite_count,
                   "readablePostgresArchives": archive_count, "captureManifests": manifest_count,
                   "applicationStartupVerified": False}
         def completed(data):
             data["lastRestoreRehearsal"] = report
+            data.setdefault("restoreRehearsals", {})[host + ":" + scope] = report
             data.setdefault("lastFailure", {}).pop("restore-test:" + scope, None)
         self.update(completed)
         self.transition("restore-test:" + scope, "ok", scope + " restore rehearsal succeeded")
@@ -694,6 +754,7 @@ def main():
     backup = commands.add_parser("backup")
     backup.add_argument("--scope", required=True, choices=["home", "services"])
     commands.add_parser("status")
+    commands.add_parser("metrics", help="Push persisted state without contacting the backup repository")
     maintain = commands.add_parser("maintain")
     maintain.add_argument("--dry-run", action="store_true")
     commands.add_parser("rehearsal-reminder")
@@ -707,8 +768,11 @@ def main():
     restic = commands.add_parser("restic")
     restic.add_argument("arguments", nargs=argparse.REMAINDER)
     arguments = parser.parse_args()
+    run_key = None
     try:
         runner = Runner(json.loads(Path(arguments.config).read_text()))
+        if arguments.command == "metrics":
+            return 0 if runner.push_metrics() else 75
         returncode = 0
         lock_name = "monitor.lock" if arguments.command in ["monitor", "status", "inventory", "rehearsal-reminder"] else "operation.lock"
         with (runner.state / lock_name).open("a") as lock:
@@ -716,6 +780,9 @@ def main():
                 fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError as error:
                 raise Failure("Another local backup operation is running", transient=True) from error
+            if arguments.command in ["backup", "monitor", "restore-test", "maintain"] and not getattr(arguments, "dry_run", False):
+                run_key = arguments.command + ":" + getattr(arguments, "scope", "repository")
+                started = time.monotonic()
             if arguments.command == "backup":
                 runner.backup(arguments.scope)
             elif arguments.command == "status":
@@ -733,6 +800,9 @@ def main():
                 runner.restore_test(arguments.host, arguments.scope, arguments.target, arguments.include)
             elif arguments.command == "restic":
                 returncode = runner.admin_restic(arguments.arguments)
+            if run_key:
+                runner.record_run(run_key, started, True)
+                run_key = None
         if arguments.command == "backup" and runner.config.get("gotify"):
             with runner.phase("Delivering backup notifications"):
                 runner.notify()
@@ -750,6 +820,8 @@ def main():
             key = ("repository" if arguments.command == "monitor" else
                    arguments.command + ":" + getattr(arguments, "scope", "repository"))
             try:
+                if run_key:
+                    runner.record_run(run_key, started, False)
                 runner.update(lambda data: data.setdefault("lastFailure", {}).update({
                     key: {"at": utcnow().isoformat(), "message": str(error),
                           "transient": error.transient},
@@ -761,6 +833,10 @@ def main():
                 print("Cannot persist backup health in local state", file=sys.stderr)
         print(str(error), file=sys.stderr)
         return 75 if error.transient else 1
+    finally:
+        if "runner" in locals() and arguments.command in ["backup", "monitor", "maintain", "inventory", "restore-test", "rehearsal-reminder"]:
+            # Telemetry availability never changes the backup's exit status.
+            runner.push_metrics()
     return returncode
 
 

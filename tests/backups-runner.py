@@ -8,6 +8,7 @@ import fcntl
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import os
 from pathlib import Path
+import re
 import select
 import shlex
 import shutil
@@ -62,6 +63,125 @@ class BackupRunnerTest(unittest.TestCase):
 
     def snapshots(self):
         return json.loads(self.restic("snapshots", "--json")) or []
+
+    def metrics_receiver(self):
+        self.metrics_requests = []
+        testcase = self
+        class Receiver(BaseHTTPRequestHandler):
+            def do_POST(self):
+                testcase.metrics_requests.append((self.path, self.headers,
+                    self.rfile.read(int(self.headers["Content-Length"])).decode()))
+                self.send_response(self.server.response_code)
+                if self.server.response_code == 302:
+                    self.send_header("Location", "/redirected")
+                self.end_headers()
+
+            def log_message(self, *arguments):
+                pass
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Receiver)
+        server.response_code = 204
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        self.config["metrics"] = {
+            "url": "http://127.0.0.1:%d/api/v1/import/prometheus" % server.server_port,
+            "timeoutSeconds": 1,
+        }
+        return server
+
+    def metric(self, name, **labels):
+        values = []
+        for line in self.metrics_requests[-1][2].splitlines():
+            match = re.fullmatch(re.escape("machine_backup_" + name) + r'\{(.*)\} (\S+)', line)
+            if not match:
+                continue
+            fields = {key: json.loads('"' + value + '"')
+                      for key, value in re.findall(r'(\w+)="((?:[^"\\]|\\.)*)"', match[1])}
+            if all(fields.get(key) == value for key, value in labels.items()):
+                self.assertEqual(fields["job"], "machine-backups")
+                values.append(float(match[2]))
+        self.assertEqual(len(values), 1, (name, labels, values))
+        return values[0]
+
+    def test_push_reports_complete_points_and_failed_attempts_independently(self):
+        self.metrics_receiver()
+        (self.source / "file").write_text("recoverable data")
+        self.cli("backup", "--scope", "home")
+        complete = self.metric("complete_timestamp_seconds", scope="home")
+        self.assertGreater(complete, 0)
+        self.assertEqual(self.metric("run_success", operation="backup", scope="home"), 1)
+        self.assertEqual(self.metric("runs_total", operation="backup", scope="home", outcome="success"), 1)
+        self.assertEqual(self.metric("source_bytes", scope="home"), 16)
+        self.assertGreater(self.metric("added_bytes", scope="home"), 0)
+        self.assertEqual(self.metric("health_status", check="backup", scope="home"), 0)
+        boundary = self.failing_restic_boundary("backup", 3, "unreadable source")
+        self.cli("backup", "--scope", "home", expected=1, env=boundary)
+        self.assertEqual(self.metric("complete_timestamp_seconds", scope="home"), complete)
+        self.assertEqual(self.metric("run_success", operation="backup", scope="home"), 0)
+        self.assertEqual(self.metric("runs_total", operation="backup", scope="home", outcome="failure"), 1)
+        self.assertEqual(self.metric("health_status", check="backup", scope="home"), 2)
+        self.assertGreater(self.metric("run_duration_seconds", operation="backup", scope="home"), 0)
+        self.assertEqual(self.metrics_requests[-1][0], "/api/v1/import/prometheus")
+        self.assertTrue(self.metrics_requests[-1][1]["Content-Type"].startswith("text/plain"))
+        self.assertNotIn("unreadable source", self.metrics_requests[-1][2])
+        self.assertNotIn(str(self.password), self.metrics_requests[-1][2])
+
+    def test_metrics_delivery_failure_preserves_backups_and_retries_current_state(self):
+        server = self.metrics_receiver()
+        server.response_code = 503
+        (self.source / "file").write_text("data")
+        result = self.cli("backup", "--scope", "home")
+        self.assertIn("metrics push unavailable", result.stderr)
+        state = json.loads(self.cli("status").stdout)
+        self.assertEqual(state["metricsDelivery"]["failures"], 1)
+        self.assertTrue(state["lastRun"]["backup:home"]["success"])
+        self.assertEqual(len(self.snapshots()), 1)
+        server.response_code = 302
+        self.cli("metrics", expected=75)
+        self.assertEqual(len(self.metrics_requests), 2)  # Never followed the redirect.
+        server.response_code = 204
+        # A broken backup repository and held upload/monitor locks must not stop
+        # persisted-state telemetry. No repository command should be attempted.
+        state_path = Path(self.config["stateDirectory"])
+        self.password.unlink()
+        with (state_path / "operation.lock").open("a") as operation, (state_path / "monitor.lock").open("a") as monitor:
+            fcntl.flock(operation, fcntl.LOCK_EX)
+            fcntl.flock(monitor, fcntl.LOCK_EX)
+            self.cli("metrics")
+        recovered = json.loads(self.cli("status").stdout)
+        self.assertEqual(recovered["lastComplete"], state["lastComplete"])
+        self.assertTrue(recovered["metricsDelivery"]["success"])
+        self.assertIn("lastSuccessAt", recovered["metricsDelivery"])
+        self.assertEqual(self.metric("metrics_push_failures_total"), 2)
+        self.assertEqual(len(self.metrics_requests), 3)  # Status is not a telemetry trigger.
+
+    def test_monitor_push_keeps_peer_observations_and_missing_restore_points_explicit(self):
+        self.metrics_receiver()
+        self.config["peerHost"] = "note"
+        self.restic("init")
+        (self.source / "file").write_text("data")
+        self.historical_point("note", "services", 1 / 24)
+        self.historical_point("note", "home", 0, complete=False)
+        self.cli("monitor")
+        self.assertGreater(self.metric("observed_complete_timestamp_seconds", host="loem", source_host="note", scope="services"), 0)
+        self.assertEqual(self.metric("observed_complete_timestamp_seconds", source_host="note", scope="home"), 0)
+        self.assertEqual(self.metric("complete_timestamp_seconds", scope="home"), 0)
+        self.assertEqual(self.metric("health_status", check="freshness", source_host="note", scope="services"), 0)
+        self.assertEqual(self.metric("health_status", check="freshness", source_host="note", scope="home"), 1)
+        self.assertEqual(self.metric("run_success", operation="monitor", scope="repository"), 1)
+        self.assertGreater(self.metric("repository_contact_timestamp_seconds"), 0)
+        self.assertEqual(self.metric("integrity_check_timestamp_seconds"), 0)
+
+    def test_restore_push_reports_verification_time_and_scope_without_claiming_application_recovery(self):
+        self.metrics_receiver()
+        self.restic("init")
+        (self.source / "file").write_text("data")
+        self.historical_point("loem", "home", 2)
+        self.cli("restore-test", "--host", "loem", "--scope", "home", "--target", str(self.root / "restore"))
+        self.assertGreater(self.metric("restore_rehearsal_timestamp_seconds", source_host="loem", scope="home"), time.time() - 60)
+        self.assertEqual(self.metric("restore_rehearsal_application_verified", source_host="loem", scope="home"), 0)
+        self.assertEqual(self.metric("restore_rehearsal_partial", source_host="loem", scope="home"), 0)
+        self.assertGreater(self.metric("restore_rehearsal_duration_seconds", source_host="loem", scope="home"), 0)
 
     def historical_point(self, host, scope, days, complete=True):
         time = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")

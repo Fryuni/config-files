@@ -365,6 +365,9 @@
           machine-backups-runtime = import ./tests/machine-backups-runtime.nix {
             inherit pkgs;
           };
+          metrics-dashboards = import ./tests/metrics-dashboards.nix {
+            inherit pkgs;
+          };
         }
         // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
           machine-backups-coverage = import ./tests/machine-backups-coverage.nix {

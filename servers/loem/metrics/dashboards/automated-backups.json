@@ -1,0 +1,2575 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "Pushed machine-backup state for Loem and Note: complete restore point freshness, independent telemetry heartbeats, operation results, shared Storage Box quota, integrity checks, coverage and restore rehearsals. A complete capture is required for freshness; peer observations retain their observer identity.",
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": true,
+      "icon": "dashboard",
+      "includeVars": true,
+      "keepTime": true,
+      "tags": [
+        "infrastructure"
+      ],
+      "targetBlank": false,
+      "title": "Infrastructure dashboards",
+      "type": "dashboards"
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 39,
+  "tags": [
+    "infrastructure",
+    "nixos",
+    "backups"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "victoriametrics"
+        },
+        "definition": "label_values(machine_backup_enrolled_host_info, source_host)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Host",
+        "multi": true,
+        "name": "host",
+        "options": [],
+        "query": {
+          "query": "label_values(machine_backup_enrolled_host_info, source_host)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Automated backups · recovery and storage",
+  "uid": "automated-backups",
+  "version": 1,
+  "weekStart": "",
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Time since the latest received push for each enrolled machine. Heartbeats run every five minutes independently of backup and monitor locks. A peer-declared host that has never pushed reads Never recorded. Old values remain visible for the one-month retention window; overdue telemetry is not proof of a backup failure.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "range",
+              "options": {
+                "from": 1000000000,
+                "to": 1e+20,
+                "result": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "No report"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 600
+              },
+              {
+                "color": "red",
+                "value": 900
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 5
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "time() - (max by(host)(last_over_time(machine_backup_telemetry_timestamp_seconds{host=~\"$host\"}[31d])) or on(host) (max by(host)(label_replace(last_over_time(machine_backup_enrolled_host_info{source_host=~\"$host\"}[31d]),\"host\",\"$1\",\"source_host\",\"(.*)\")) * 0))",
+          "legendFormat": "{{host}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Telemetry age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Age from capture, using the newest complete restore point known by any observer. Limit: two hours. Zero completion timestamps mean no complete point; failed or partial candidates cannot advance this value. Cross-check telemetry and repository contact age.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "range",
+              "options": {
+                "from": 1000000000,
+                "to": 1e+20,
+                "result": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "No point"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5400
+              },
+              {
+                "color": "red",
+                "value": 7200
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 5
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "time() - max by(source_host)(last_over_time(machine_backup_observed_complete_timestamp_seconds{source_host=~\"$host\",scope=\"services\"}[31d]))",
+          "legendFormat": "{{source_host}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Services data age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Age from capture of complete home data. Limit: twelve hours, with uploads every six hours. Peer observations cover clients that have not yet sent their own telemetry. Never recorded means no complete point is known.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "range",
+              "options": {
+                "from": 1000000000,
+                "to": 1e+20,
+                "result": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "No point"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 36000
+              },
+              {
+                "color": "red",
+                "value": 43200
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 5
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "time() - max by(source_host)(last_over_time(machine_backup_observed_complete_timestamp_seconds{source_host=~\"$host\",scope=\"home\"}[31d]))",
+          "legendFormat": "{{source_host}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Home data age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Recorded backup health by host and scope, including failures from before telemetry was installed. Unknown or unchecked components remain absent. This records health transitions; the operation results below record individual attempts after activation.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Healthy",
+                  "color": "green",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Warning",
+                  "color": "yellow",
+                  "index": 1
+                },
+                "2": {
+                  "text": "Critical",
+                  "color": "red",
+                  "index": 2
+                },
+                "3": {
+                  "text": "Unknown",
+                  "color": "gray",
+                  "index": 3
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          },
+          "unit": "none",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 5
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_health_status{host=~\"$host\",check=\"backup\"}[31d])",
+          "legendFormat": "{{host}} · {{scope}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Backup health",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 5,
+      "panels": [],
+      "title": "Restore point freshness and operation results",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Latest complete restore point age by source host and scope, across observer reports. Thirty-minute hold spans the five-minute push interval; it stops bridging long telemetry outages. Review the heartbeat stat for stale senders.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "h",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "(time() - max by(source_host,scope)(last_over_time(machine_backup_observed_complete_timestamp_seconds{source_host=~\"$host\"}[30m]) > 0)) / 3600",
+          "legendFormat": "{{source_host}} · {{scope}}",
+          "range": true,
+          "refId": "A",
+          "instant": false
+        }
+      ],
+      "title": "Complete data age · services and home",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Warnings and critical states from freshness, repository, capacity, capture and inventory checks. Peer freshness series retain both observer host and source_host. No messages, source paths, credentials or snapshot IDs are metric labels.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Healthy",
+                  "color": "green",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Warning",
+                  "color": "yellow",
+                  "index": 1
+                },
+                "2": {
+                  "text": "Critical",
+                  "color": "red",
+                  "index": 2
+                },
+                "3": {
+                  "text": "Unknown",
+                  "color": "gray",
+                  "index": 3
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          },
+          "unit": "none",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_health_status{host=~\"$host\"}[30m])",
+          "legendFormat": "{{host}} · {{check}} · {{source_host}} {{scope}}",
+          "range": true,
+          "refId": "A",
+          "instant": false
+        }
+      ],
+      "title": "Recorded health checks",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Final results for backups, monitoring, maintenance and rehearsals since telemetry was installed. Delivery failures do not change these outcomes. A killed operation is detected through missing completion and freshness rather than being fabricated as a finished run.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Failed",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Succeeded",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 8,
+        "h": 7
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_run_success{host=~\"$host\"}[31d])",
+          "legendFormat": "{{host}} · {{operation}} · {{scope}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Last operation result",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Wall-clock duration of each last finished operation, including failed attempts. Available after a new operation completes with the updated runner.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 14,
+        "w": 8,
+        "h": 7
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_run_duration_seconds{host=~\"$host\"}[30m])",
+          "legendFormat": "{{host}} · {{operation}} · {{scope}}",
+          "range": true,
+          "refId": "A",
+          "instant": false
+        }
+      ],
+      "title": "Last operation duration",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Cumulative successes and failures since this machine’s local backup state was created. Counts survive telemetry outages and reset if local state is lost; these are not lifetime repository totals.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 14,
+        "w": 8,
+        "h": 7
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_runs_total{host=~\"$host\"}[30m])",
+          "legendFormat": "{{host}} · {{operation}} · {{scope}} · {{outcome}}",
+          "range": true,
+          "refId": "A",
+          "instant": false
+        }
+      ],
+      "title": "Finished operation counts",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Bytes scanned for the last completed upload. Older completions lack summary fields and remain No data until a new successful upload.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "bytes",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 21,
+        "w": 12,
+        "h": 7
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_source_bytes{host=~\"$host\"}[30m])",
+          "legendFormat": "{{host}} · {{scope}}",
+          "range": true,
+          "refId": "A",
+          "instant": false
+        }
+      ],
+      "title": "Last complete backup · source size",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Packed repository bytes added by the last complete upload. This reflects deduplication and compression, rather than total source size. It is a per-run gauge, not a cumulative bandwidth counter.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "bytes",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 21,
+        "w": 12,
+        "h": 7
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_added_bytes{host=~\"$host\"}[30m])",
+          "legendFormat": "{{host}} · {{scope}}",
+          "range": true,
+          "refId": "A",
+          "instant": false
+        }
+      ],
+      "title": "Last complete backup · new packed data",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "id": 13,
+      "panels": [],
+      "title": "Shared repository and Storage Box",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Estimate from purchased capacity minus df free quota, including space unavailable due to provider snapshots. Warnings at 70%, critical at 85%. Each observer is separate; verify accounting in Hetzner Console and check measurement age.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 6,
+        "h": 5
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_quota_used_percent{host=~\"$host\"}[31d])",
+          "legendFormat": "{{host}} · observed usage",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Storage Box quota used",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Age of the last successful quota measurement, separate from the telemetry heartbeat. A failed capacity check retains the old measurement instead of reporting zero usage. The monitor warns after twelve hours without a measurement.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "range",
+              "options": {
+                "from": 1000000000,
+                "to": 1e+20,
+                "result": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "Never recorded"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 3600
+              },
+              {
+                "color": "red",
+                "value": 43200
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 29,
+        "w": 6,
+        "h": 5
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "time() - last_over_time(machine_backup_capacity_check_timestamp_seconds{host=~\"$host\"}[31d])",
+          "legendFormat": "{{host}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Capacity measurement age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Last successful repository freshness check on each observer. The monitor runs every fifteen minutes. Heartbeats can still arrive while repository access fails, so heartbeat freshness alone does not imply reachable restore data.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "range",
+              "options": {
+                "from": 1000000000,
+                "to": 1e+20,
+                "result": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "Never recorded"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1800
+              },
+              {
+                "color": "red",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 29,
+        "w": 6,
+        "h": 5
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "time() - last_over_time(machine_backup_repository_contact_timestamp_seconds{host=~\"$host\"}[31d])",
+          "legendFormat": "{{host}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Repository contact age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Last successful structure check plus a rotating quarter of repository data, from the shared maintenance owner Loem. Weekly checks rotate through four quarters. This does not establish an application restore.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "range",
+              "options": {
+                "from": 1000000000,
+                "to": 1e+20,
+                "result": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "Never recorded"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 691200
+              },
+              {
+                "color": "red",
+                "value": 1209600
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 29,
+        "w": 6,
+        "h": 5
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "time() - last_over_time(machine_backup_integrity_check_timestamp_seconds{host=\"loem\"}[31d])",
+          "legendFormat": "{{host}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Integrity check age · Loem",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Fixed purchased quota and free bytes observed by each host. Provider snapshots affect free quota; usage is not obtained by summing restic snapshot sizes.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "bytes",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 34,
+        "w": 12,
+        "h": 8
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_quota_bytes{host=~\"$host\"}[30m])",
+          "legendFormat": "{{host}} · purchased quota",
+          "range": true,
+          "refId": "A",
+          "instant": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_quota_free_bytes{host=~\"$host\"}[30m])",
+          "legendFormat": "{{host}} · free quota",
+          "range": true,
+          "refId": "B",
+          "instant": false
+        }
+      ],
+      "title": "Purchased quota and available space",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Last successfully finished integrity check, retention and prune on Loem. A dry run does not update this timestamp.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [
+            {
+              "type": "range",
+              "options": {
+                "from": 1000000000,
+                "to": 1e+20,
+                "result": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "Never recorded"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 691200
+              },
+              {
+                "color": "red",
+                "value": 1209600
+              }
+            ]
+          },
+          "unit": "s",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 34,
+        "w": 12,
+        "h": 8
+      },
+      "id": 19,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "time() - last_over_time(machine_backup_maintenance_timestamp_seconds{host=\"loem\"}[31d])",
+          "legendFormat": "{{host}}",
+          "range": true,
+          "refId": "A",
+          "instant": false
+        }
+      ],
+      "title": "Maintenance age · Loem",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 42
+      },
+      "id": 20,
+      "panels": [],
+      "title": "Coverage, notification delivery and restore evidence",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Unclassified persistent-state paths and inspection issues, counted without exposing paths in metrics. Inspect machine-backup status or the inventory report to identify the sources.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 43,
+        "w": 8,
+        "h": 8
+      },
+      "id": 21,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_inventory_uncovered_paths{host=~\"$host\"}[30m])",
+          "legendFormat": "{{host}} · uncovered paths",
+          "range": true,
+          "refId": "A",
+          "instant": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_inventory_inspection_issues{host=~\"$host\"}[30m])",
+          "legendFormat": "{{host}} · inspection issues",
+          "range": true,
+          "refId": "B",
+          "instant": false
+        }
+      ],
+      "title": "Coverage inspection findings",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Age of the last completed service-state inventory. A current telemetry heartbeat can carry a stale inventory after a failed monitor.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "range",
+              "options": {
+                "from": 1000000000,
+                "to": 1e+20,
+                "result": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "Never recorded"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1800
+              },
+              {
+                "color": "red",
+                "value": 3600
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 43,
+        "w": 8,
+        "h": 8
+      },
+      "id": 22,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "time() - last_over_time(machine_backup_inventory_check_timestamp_seconds{host=~\"$host\"}[31d])",
+          "legendFormat": "{{host}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Coverage inspection age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Undelivered health transitions retained by the runner. Queue depth zero does not establish successful delivery; check the separate delivery result.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "short",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 43,
+        "w": 8,
+        "h": 8
+      },
+      "id": 23,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_notifications_pending{host=~\"$host\"}[30m])",
+          "legendFormat": "{{host}}",
+          "range": true,
+          "refId": "A",
+          "instant": false
+        }
+      ],
+      "title": "Pending Gotify notifications",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Last notification delivery check. Missing credentials or network errors keep transitions queued. No delivery check remains No data.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Failed",
+                  "color": "red",
+                  "index": 0
+                },
+                "1": {
+                  "text": "Succeeded",
+                  "color": "green",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 51,
+        "w": 8,
+        "h": 7
+      },
+      "id": 24,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_notification_delivery_success{host=~\"$host\"}[31d])",
+          "legendFormat": "{{host}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Gotify delivery result",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Cumulative failed pushes retained in local state and exported on the next successful delivery. During an outage, use heartbeat age; the unreachable sink cannot receive its own failure immediately.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 51,
+        "w": 8,
+        "h": 7
+      },
+      "id": 25,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_metrics_push_failures_total{host=~\"$host\"}[30m])",
+          "legendFormat": "{{host}}",
+          "range": true,
+          "refId": "A",
+          "instant": false
+        }
+      ],
+      "title": "Telemetry delivery failures",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Age since verification completed, keyed by restored host and scope and labeled with the observer that performed it. The restored snapshot capture time does not substitute for rehearsal time. No completed rehearsal remains No data.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 7776000
+              },
+              {
+                "color": "red",
+                "value": 8640000
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 51,
+        "w": 8,
+        "h": 7
+      },
+      "id": 26,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "time() - last_over_time(machine_backup_restore_rehearsal_timestamp_seconds{source_host=~\"$host\"}[31d])",
+          "legendFormat": "{{host}} → {{source_host}} · {{scope}}",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "title": "Restore rehearsal age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "Duration of the last successful isolated file/database rehearsal. Application startup is a separate confirmation; the runner checks files and archive readability.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s",
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 58,
+        "w": 12,
+        "h": 7
+      },
+      "id": 27,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_restore_rehearsal_duration_seconds{source_host=~\"$host\"}[30m])",
+          "legendFormat": "{{host}} → {{source_host}} · {{scope}}",
+          "range": true,
+          "refId": "A",
+          "instant": false
+        }
+      ],
+      "title": "Restore verification duration",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "description": "A partial selection cannot prove complete scope recovery. Application startup currently remains unverified by the runner, even after file integrity checks succeed.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none",
+          "decimals": 1
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "Full selection",
+                        "color": "green",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "Partial selection",
+                        "color": "yellow",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "Startup unverified",
+                        "color": "yellow",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "Startup verified",
+                        "color": "green",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 58,
+        "w": 12,
+        "h": 7
+      },
+      "id": 28,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "text": {
+          "valueSize": 20,
+          "titleSize": 12
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_restore_rehearsal_partial{source_host=~\"$host\"}[31d])",
+          "legendFormat": "{{host}} → {{source_host}} · {{scope}} · partial selection",
+          "range": false,
+          "refId": "A",
+          "instant": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(machine_backup_restore_rehearsal_application_verified{source_host=~\"$host\"}[31d])",
+          "legendFormat": "{{host}} → {{source_host}} · {{scope}} · application startup verified",
+          "range": false,
+          "refId": "B",
+          "instant": true
+        }
+      ],
+      "title": "Restore evidence limitations",
+      "type": "stat"
+    }
+  ]
+}

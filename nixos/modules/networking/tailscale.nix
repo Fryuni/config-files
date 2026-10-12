@@ -28,6 +28,8 @@
     }
   ];
 
+  services.machineBackups.metrics.url = lib.mkDefault "http://victoriametrics.rudd-agama.ts.net/api/v1/import/prometheus";
+
   networking.firewall = {
     # always allow traffic from your Tailscale network
     trustedInterfaces = [config.services.tailscale.interfaceName];

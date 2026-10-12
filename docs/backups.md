@@ -386,6 +386,7 @@ are under `/var/lib/machine-backups`, mode `0700`.
 | `machine-backup-services` | Every hour | Consistent service data and recovery inputs |
 | `machine-backup-home` | 00:00, 06:00, 12:00, 18:00 | Home files and consistent application captures |
 | `machine-backup-monitor` | Every 15 minutes | Mutual freshness, capacity, coverage, queued notifications |
+| `machine-backup-metrics` | Every 5 minutes, plus pushes after jobs | Publish persisted state to VictoriaMetrics without repository access |
 | `machine-backup-maintain` | Sunday 03:30, on `loem` | Retention, prune, structure check, rotating data check |
 | `machine-backup-rehearsal-reminder` | First day of each quarter, on `loem` | Reminder to perform isolated recovery rehearsals |
 
@@ -409,11 +410,76 @@ sudo machine-backup backup --scope home
 sudo machine-backup backup --scope services
 sudo machine-backup status
 sudo machine-backup monitor
+sudo machine-backup metrics           # publish persisted state only
 sudo machine-backup maintain --dry-run  # loem only
 sudo machine-backup restic -- snapshots --host loem --tag machine-backup,complete
 journalctl -u machine-backup-services -u machine-backup-home -u machine-backup-monitor
 systemctl list-timers 'machine-backup-*'
 ```
+
+### Pushed backup telemetry
+
+The shared Tailnet module configures
+`services.machineBackups.metrics.url` as
+`http://victoriametrics.rudd-agama.ts.net/api/v1/import/prometheus` for both clients.
+VictoriaMetrics accepts [Prometheus text through this import endpoint](https://docs.victoriametrics.com/victoriametrics/#how-to-import-data-in-prometheus-exposition-format).
+The portable Tailscale Service name survives moving storage to another device.
+Standalone backup users can set a different URL; `null` disables telemetry and
+its timer. This is push telemetry, with no exporter listener or scrape job.
+
+The runner pushes after backups, monitoring, maintenance, coverage inspections,
+rehearsals, and reminder jobs, including handled failures. A separate five-minute
+timer republishes persisted state and retries delivery even while captures or
+repository checks are blocked. Its lock only serializes outbound pushes, with
+short atomic state-file updates. Each HTTP request has a configurable ten-second
+timeout; redirects are rejected. A failed push records `metricsDelivery` in
+`state.json`, retaining cumulative failures and the last successful delivery.
+It leaves the backup's result and complete restore point intact. The standalone
+`metrics` command returns a transient failure, and its service retries after one
+minute independently of backup jobs. No restic command runs
+when publishing telemetry.
+
+Metric names start with `machine_backup_`, with `job="machine-backups"`, the
+reporting `host`, and bounded operation/check/scope labels. Peer observations
+retain `source_host` separately so clients do not overwrite each other's checks.
+Messages, credentials, source paths and snapshot IDs are excluded from labels.
+
+| Signals | Meaning |
+| --- | --- |
+| `telemetry_timestamp_seconds`, `enrolled_host_info` | Received push time and expected clients, including clients that have never reported |
+| `complete_timestamp_seconds`, `upload_timestamp_seconds`, `observed_complete_timestamp_seconds` | Capture and upload completion times; only complete restore points establish freshness |
+| `freshness_limit_seconds` | Existing limits: services 7,200 seconds, home 43,200 seconds |
+| `run_success`, `run_duration_seconds`, `run_timestamp_seconds`, `runs_total` | Last finished result/duration and persistent counts of successes and failures after instrumentation |
+| `source_bytes`, `source_files`, `added_bytes` | Last completed backup's scanned bytes/files and newly added packed repository bytes |
+| `health_status` | Recorded check result: 0 healthy, 1 warning, 2 critical, 3 unknown |
+| `quota_bytes`, `quota_free_bytes`, `quota_used_percent`, `capacity_check_timestamp_seconds` | Purchased quota and free-space estimate, with independent measurement age |
+| `repository_contact_timestamp_seconds`, `integrity_check_timestamp_seconds`, `maintenance_timestamp_seconds` | Successful repository check, rotating-quarter data check, and retention/prune completion |
+| `inventory_*`, `notifications_pending`, `notification_delivery_success` | Coverage inspection time/counts and notification queue/delivery state |
+| `restore_rehearsal_*` | Verification time/duration, scope/host, partial selection and application-startup confirmation |
+| `metrics_push_failures_total` | Persistent failed pushes, visible remotely once delivery recovers |
+
+Timestamp gauges carry event times as values, while their samples are ingested at
+the current push time. Zero completion/check timestamps explicitly mean no
+successful event is recorded. Unchecked health components and unavailable byte
+summaries remain absent. Failed or partial uploads do not advance completion
+timestamps; an older successful result is preserved. Operation counters survive
+delivery outages but reset if local state is lost. SIGKILL cannot produce a
+finished-run record; missing completion and overdue freshness expose that case.
+
+The [backup dashboard](../servers/loem/metrics/dashboards/automated-backups.json)
+uses explicit `last_over_time` windows to span batch pushes. Its heartbeat stats
+retain the latest received state for the one-month retention window and flag
+missing telemetry after fifteen minutes; charts hold gauges for thirty minutes
+and stop bridging longer outages. A current heartbeat does not refresh the last
+repository contact, quota measurement, inventory, or restore point. Shared
+maintenance panels use Loem, the configured maintenance owner.
+
+Byte summaries and operation outcomes appear after new jobs complete with the
+updated runner. Restore telemetry appears after a new successful rehearsal and
+uses its `verifiedAt`, rather than the restored snapshot's capture time. It
+preserves separate results for each restored host and scope; partial selection
+and unverified application startup remain explicit limitations. Existing reports
+without a verification timestamp are not backfilled with invented evidence.
 
 Direct backups print timestamped progress to stderr: repository checks, each named
 local capture and its duration, scanning/upload counts and bytes, and snapshot

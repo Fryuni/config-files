@@ -117,6 +117,9 @@
     };
     inherit (cfg) peerHost;
     capacity.quotaBytes = cfg.capacity.quotaBytes;
+    metrics = {
+      inherit (cfg.metrics) url timeoutSeconds;
+    };
     inventory = {
       enabled = true;
       inherit coveredPaths;
@@ -222,6 +225,18 @@ in {
         default = 1099511627776;
         description = "Contracted Storage Box capacity in bytes; compare free space against this fixed quota to count provider snapshots.";
       };
+      metrics = {
+        url = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = null;
+          description = "VictoriaMetrics Prometheus import URL for pushed backup telemetry; null disables delivery.";
+        };
+        timeoutSeconds = lib.mkOption {
+          type = lib.types.ints.positive;
+          default = 10;
+          description = "HTTP timeout for backup telemetry; delivery failures do not fail backups.";
+        };
+      };
       knownHostsFile = lib.mkOption {
         type = lib.types.path;
         description = "Pinned Storage Box SSH server trust.";
@@ -314,6 +329,9 @@ in {
         machine-backup-services = job "backup --scope services";
         machine-backup-home = job "backup --scope home";
         machine-backup-monitor = job "monitor";
+        machine-backup-metrics = lib.mkIf (cfg.metrics.url != null) (lib.recursiveUpdate (job "metrics") {
+          serviceConfig.RestartSec = "1min";
+        });
         machine-backup-maintain = lib.mkIf cfg.maintenance.enable (job "maintain");
         machine-backup-rehearsal-reminder = lib.mkIf cfg.maintenance.enable (job "rehearsal-reminder");
       };
@@ -344,6 +362,13 @@ in {
           timerConfig = {
             OnCalendar = "Sun *-*-* 03:30:00 UTC";
             Persistent = true;
+          };
+        };
+        machine-backup-metrics = lib.mkIf (cfg.metrics.url != null) {
+          wantedBy = ["timers.target"];
+          timerConfig = {
+            OnBootSec = "2min";
+            OnUnitActiveSec = "5min";
           };
         };
         machine-backup-rehearsal-reminder = lib.mkIf cfg.maintenance.enable {

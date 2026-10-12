@@ -63,14 +63,83 @@ Tailnet and this host's loopback services.
 
 `servers/loem/metrics/` runs VictoriaMetrics on loopback with one month of retention,
 publishes it inside the Tailnet as `victoriametrics.rudd-agama.ts.net` through Tailscale
-Serve, and runs Grafana on loopback with provisioned datasources and dashboards. The
-VictoriaMetrics datasource pins `uid = "victoriametrics"` so provisioned dashboards can
+Serve, and runs Grafana on loopback with provisioned datasources and dashboards.
+The private Caddy alias serves Grafana at `https://grafana.loem.lferraz.dev`, using
+the existing Tailnet DNS and CA. Grafana's domain, root URL, and secure cookies
+match that HTTPS URL. Grafana has no separate Tailscale Serve service; the
+Grafana-specific proxy preserves the browser's Host and Origin headers for CSRF
+and Grafana Live checks. The generic numeric-port proxy rewrites Host and is
+unsuitable for authenticated Grafana browser operations. The VictoriaMetrics
+service remains independent of Loem and collectors keep writing
+to `http://victoriametrics.rudd-agama.ts.net/api/v1/write` after a host migration.
+The VictoriaMetrics datasource pins `uid = "victoriametrics"` so provisioned dashboards can
 reference it without depending on a generated identifier.
 `servers/loem/metrics/dashboards/nix-store-cache.json` charts the remote cache upload
 queue for the whole fleet: pending entries and the oldest pending entry, paths sent to
 the cache over the last 24 hours and in total, a per-host breakdown, and failed or
 expired entries. It is filterable by host and reads the
 [shared Nix cache metrics](nix-store-cache.md#metrics).
+
+Additional versioned dashboards in the same directory cover fleet CPU, memory,
+storage, RAID and pressure; Tailnet paths and per-service traffic; scrape and
+ingestion health plus hosted service activity; and notebook battery and thermals.
+`bare-metal-hardware.json` adds server hardware temperatures with sensor names,
+hardware-reported temperature margins and alarm flags, CPU workload and frequency,
+core and package throttling, and Linux software RAID. It selects Loem initially;
+its host inventory discovers machines reporting hwmon temperatures without battery
+metrics, and All expands that inventory. Sensors without name metadata are retained.
+Loem currently provides no fan RPM or SMART series, so those require additional
+instrumentation before they can be charted.
+The current summary stats in these new fleet, Tailnet, pipeline, notebook and
+bare-metal dashboards use instant queries with a two-minute source-sample age
+limit. Collection gaps produce unavailable data instead of retaining a historical
+healthy value. Historical charts retain their selected time range separately.
+`automated-backups.json` charts complete restore point ages, independent push
+heartbeats, operation results and durations, source and newly added packed bytes,
+Storage Box quota, integrity and maintenance ages, coverage findings, queued
+notifications, and isolated restore evidence. Hosts are discovered from configured
+backup peer relationships; restore panels filter the restored `source_host` and
+identify the observing `host` in their legends. Hosts with no reports are
+visible as missing telemetry. The backup runner posts Prometheus text directly to
+`http://victoriametrics.rudd-agama.ts.net/api/v1/import/prometheus` after jobs and
+every five minutes; this does not require a scrape endpoint or Pushgateway.
+See [backup telemetry](backups.md#pushed-backup-telemetry) for state, retries and
+freshness semantics.
+They use the live `host`, `job`, `service`, and `path` labels and keep lifetime
+counters separate from current error rates. The local Loem scrape jobs also collect
+VictoriaMetrics (`8428`), vmagent (`8429`), Soft Serve (`23233`), cloudflared
+(`20241`), and Caddy's admin metrics (`2019`). Exporters stay on loopback. See the
+[metrics coverage audit](metrics-audit.md) for observed coverage and remaining gaps.
+
+The `metrics-automation` user has the Editor role for browser dashboard work.
+The separate `repository-automation` service account has an Editor API token.
+Both credentials are stored as one JSON document in
+`secrets/loem/grafana-automation-credentials`, encrypted to the repository's
+normal recipients and rekeyed for Loem. Its root-only runtime path is
+`/run/agenix/grafana-automation-credentials`. Use `.browser.username` and
+`.browser.password` for a browser login, or `.service_account.token` for a Bearer
+API request. Decrypt directly into the consuming process; avoid printing the
+document or placing credentials in command arguments. Service accounts cannot
+sign in to the UI. Account identities and password/token hashes are persisted in
+Grafana's database and included in its service backup; the encrypted secret
+records their credentials, rather than automatically creating accounts on a
+fresh empty database. Recreate the accounts and re-encrypt/rekey the document if
+restoring the database is not possible. Revoke and replace the token when rotating
+credentials.
+
+### Datasource UID migration
+
+When adopting the pinned `victoriametrics` UID on an existing Grafana database,
+Grafana 13 can fail during provisioning if the datasource with the same name has
+an old generated UID. The observed failure was
+`Datasource provisioning error: data source not found`. With Grafana stopped,
+back up its SQLite database, reconcile that existing datasource row's UID, and
+update matching `permission.scope` (`datasources:uid:<uid>`) and
+`permission.identifier` rows. Audit stored dashboard and resource definitions for
+old references as well; Grafana 13 stores dashboards in the unified resource
+tables. Preserve the existing datasource and database instead of deleting their
+state. This migration was performed on Loem on 2026-10-11 and startup and scrape
+health were verified afterward.
 
 ## Tailnet access
 

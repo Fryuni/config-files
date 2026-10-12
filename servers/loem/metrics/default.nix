@@ -3,7 +3,9 @@
   lib,
   pkgs,
   ...
-}: {
+}: let
+  grafanaHost = "grafana.${config.services.lferrazTailnetAccess.baseHost}";
+in {
   services.victoriametrics = {
     enable = true;
     listenAddress = "127.0.0.1:8428";
@@ -16,14 +18,29 @@
     group = "grafana";
   };
 
+  age.secrets.grafana-automation-credentials = {
+    rekeyFile = ../../../secrets/loem/grafana-automation-credentials;
+    mode = "0400";
+  };
+
+  # Preserve the browser's Host and Origin for Grafana's CSRF and Live checks.
+  services.lferrazTailnetAccess.proxy.aliases.grafana = ''
+    reverse_proxy 127.0.0.1:${toString config.services.grafana.settings.server.http_port}
+  '';
+
   services.grafana = {
     enable = true;
     settings = {
       server = {
         http_addr = "127.0.0.1";
         http_port = 3000;
+        domain = grafanaHost;
+        root_url = "https://${grafanaHost}/";
       };
-      security.secret_key = "$__file{${config.age.secrets.grafana-key.path}}";
+      security = {
+        secret_key = "$__file{${config.age.secrets.grafana-key.path}}";
+        cookie_secure = true;
+      };
     };
     provision = {
       enable = true;
@@ -81,17 +98,29 @@
 
   services.vmagent = {
     enable = true;
+    extraArgs = ["-httpListenAddr=127.0.0.1:8429"];
     prometheusConfig = {
-      scrape_configs = [
-        {
-          job_name = "grafana";
-          static_configs = [
-            {
-              targets = ["http://127.0.0.1:3000/metrics"];
-            }
-          ];
-        }
-      ];
+      scrape_configs =
+        [
+          {
+            job_name = "grafana";
+            static_configs = [
+              {
+                targets = ["http://127.0.0.1:3000/metrics"];
+              }
+            ];
+          }
+        ]
+        ++ lib.mapAttrsToList (job: port: {
+          job_name = job;
+          static_configs = [{targets = ["127.0.0.1:${toString port}"];}];
+        }) {
+          victoriametrics = 8428;
+          vmagent = 8429;
+          soft-serve = 23233;
+          cloudflared = 20241;
+          caddy = 2019;
+        };
     };
   };
 }

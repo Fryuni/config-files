@@ -13,6 +13,7 @@ pkgs.runCommand "machine-backups-runtime-check" {
   export NIX_REMOTE="local?store=$TMPDIR/nix/store&state=$TMPDIR/nix/state&log=$TMPDIR/nix/log"
   cp ${../common/backups/capture.py} common/backups/capture.py
   cp ${../common/backups/runner.py} common/backups/runner.py
+  cp ${../common/backups/metrics.py} common/backups/metrics.py
   cp ${./backups-capture.py} tests/backups-capture.py
   cp ${./backups-runner.py} tests/backups-runner.py
   python3 -B tests/backups-capture.py

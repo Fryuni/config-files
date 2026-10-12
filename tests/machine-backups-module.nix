@@ -85,6 +85,7 @@
   ];
   disabled = evaluate [directoryService {services.archiveStore.enable = true;}];
   enabled = evaluate enrolled;
+  withMetrics = evaluate (enrolled ++ [{services.machineBackups.metrics.url = "http://metrics.internal/api/v1/import/prometheus";}]);
   moved = evaluate (enrolled
     ++ [
       {
@@ -368,6 +369,11 @@
     (check (!(disabled.systemd.services ? machine-backup-home)) "Disabled machines must have no backup job")
     (check (!(disabled.systemd.timers ? machine-backup-services)) "Disabled machines must have no backup timer")
     (check (disabled.age.secrets == {}) "Unenrolled machines must receive no backup credentials")
+    (check (!(enabled.systemd.timers ? machine-backup-metrics)) "Telemetry must be optional for standalone backup users")
+    (check (withMetrics.systemd.timers.machine-backup-metrics.timerConfig.OnUnitActiveSec == "5min") "Push heartbeats must refresh every five minutes")
+    (check (!(withMetrics.systemd.timers.machine-backup-metrics.timerConfig.WakeSystem or false)) "Backup telemetry must not wake the notebook")
+    (check (withMetrics.systemd.services.machine-backup-metrics.serviceConfig.RestartSec == "1min") "An unavailable metric sink must retry independently of backup jobs")
+    (check (lib.hasSuffix " metrics" withMetrics.systemd.services.machine-backup-metrics.serviceConfig.ExecStart) "The telemetry timer must only publish persisted state")
     (check (lib.length disabled.services.machineBackups.directories == 1) "Services may declare state without enrolling the machine")
     (check (lib.length enabled.services.machineBackups.directories == 2) "Independent service declarations must concatenate")
     (check (disabledService.services.machineBackups.directories == []) "A disabled service must contribute no state")
@@ -449,6 +455,7 @@ in
     pkgs.runCommand "machine-backups-module-check" {
       nativeBuildInputs = [pkgs.jq];
       configFile = enabled.services.machineBackups.configFile;
+      metricsConfigFile = withMetrics.services.machineBackups.configFile;
       movedConfigFile = moved.services.machineBackups.configFile;
       disabledServiceConfigFile = disabledService.services.machineBackups.configFile;
       uninferredConfigFile = uninferred.services.machineBackups.configFile;
@@ -456,6 +463,8 @@ in
       standaloneOwnerConfigFile = standaloneOwner.services.machineBackups.configFile;
     } ''
       jq -e '.repository == "sftp://u688316@u688316.your-storagebox.de:22/restic"' "$configFile"
+      jq -e '.metrics.url == null and .metrics.timeoutSeconds == 10' "$configFile"
+      jq -e '.metrics.url == "http://metrics.internal/api/v1/import/prometheus"' "$metricsConfigFile"
       jq -e '.ssh.port == 22 and .ssh.commandPort == 23' "$configFile"
       jq -e '.timeoutSeconds == 3600 and (.scopes.home | has("directExcludes") | not)' "$configFile"
       jq -e '.scopes.home.paths == ["/home/lotus"] and .scopes.home.captures == []' "$configFile"
