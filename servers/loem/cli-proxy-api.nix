@@ -100,7 +100,8 @@ in {
     {
       name = "cli-proxy-api";
       paths = [stateDir];
-      units = [{name = "cli-proxy-api.service";}];
+      # Keep multi-hour request streams running throughout the backup.
+      writerCoverageNote = "State and the AI exchange corpus are read live. In-flight exchanges may be incomplete and rotating credentials may need manual recovery; these races are accepted to avoid disrupting requests.";
       # Request/response exchanges are retained; only diagnostic logs are disposable.
       excludes = ["/logs/main.log" "/logs/main-*.log"];
     }

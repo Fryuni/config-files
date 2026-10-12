@@ -61,21 +61,8 @@ in {
       kind = "sqlite";
       paths = ["${homeDirectory}/.t3/userdata"];
       scopes = ["home" "services"];
-      pauseOpenWriters = true;
-      writerUid = userConfig.uid;
-      units = [
-        ({
-            name = "t3code.service";
-            type =
-              if graphical
-              then "user"
-              else "system";
-          }
-          // lib.optionalAttrs graphical {
-            inherit user;
-            inherit (userConfig) uid;
-          })
-      ];
+      # Long-running sessions stay online, including independent desktop backends.
+      writerCoverageNote = "SQLite databases use consistent online exports. Associated files are read live; concurrent changes and incomplete recent files are accepted to avoid disrupting sessions.";
     }
   ];
 }

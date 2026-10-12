@@ -31,9 +31,11 @@ capture method, and exclusions; the backup module aggregates NixOS and Home Mana
 registrations. A separate systemd recovery service restarts paused services if a
 backup job is killed. Restic reads registered files directly using literal file
 lists and scoped exclusions; staging holds only native database exports and
-recovery artifacts. Writers remain paused through upload, with a configurable
-one-hour interruption limit. Selected locked flake source inputs support offline recovery
-evaluation; package builds use normal network access. The dedicated SSH identity,
+recovery artifacts. CLIProxyAPI and T3 Code remain online, with consistent SQLite
+exports for T3 and accepted live-file races for associated state and request
+exchanges. Other writers requiring pauses remain paused through upload, with a
+configurable one-hour interruption limit. Selected locked flake source inputs
+support offline recovery evaluation; package builds use normal network access. The dedicated SSH identity,
 repository password, and backup notification token use agenix and host rekeying.
 Backup jobs push their persisted status directly to VictoriaMetrics through its
 portable Tailnet service; a separate five-minute heartbeat also retries delivery

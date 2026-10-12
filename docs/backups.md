@@ -53,6 +53,13 @@ data referenced by any retained restore point.
   interruption limit is one hour, configurable through
   `services.machineBackups.interruptionTimeoutSeconds`; expiry aborts the backup
   and triggers recovery without marking the snapshot complete.
+- Keep CLIProxyAPI and T3 Code online throughout both backup scopes to avoid
+  disrupting multi-hour requests and coding sessions. T3's SQLite databases
+  still use consistent native online exports. Associated files, CLIProxyAPI
+  credentials/configuration, and the AI exchange corpus are read live; concurrent
+  changes and incomplete recent exchanges are accepted. Credentials affected by
+  rotation can be restored manually. Preserve the existing paths and corpus
+  coverage.
 - Run notebook backups at low priority while awake and connected, including on
   battery. Do not wake the notebook. Catch up after resume or reconnection.
   The user reports that the notebook is on almost all the time.
@@ -234,9 +241,10 @@ and [repository encryption](https://restic.readthedocs.io/en/stable/070_encrypti
 
 Use application-supported online captures where verified. Otherwise pause the
 affected writers while restic backs up the selected source files directly,
-within the configured interruption budget. Preserve ownership, modes,
-symlinks, and relevant ACLs/xattrs. A service capture succeeds only when its
-database, associated files, and required keys form a recoverable set.
+within the configured interruption budget, except for the explicitly accepted
+live-file policy for CLIProxyAPI and T3 Code. Preserve ownership, modes,
+symlinks, and relevant ACLs/xattrs. A service capture succeeds when the selected
+data meets its declared recovery policy, including the live-file exceptions above.
 
 Implementation must validate these mechanisms against the installed versions:
 
@@ -268,10 +276,14 @@ Implementation must validate these mechanisms against the installed versions:
   [VictoriaMetrics snapshot documentation](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#how-to-work-with-snapshots)
 - CLIProxyAPI creates unique request filenames but writes directly to the final
   filename, so a `.log` name does not prove that capture is complete. Transient
-  request/response parts also disappear during normal operation. A completion
-  or quiescence strategy is required. Pause the writer while restic reads and
-  uploads the corpus directly. Benchmark the full transfer against the
-  configurable interruption limit, especially on the first backup.
+  request/response parts also disappear during normal operation. Keep the service
+  running while restic reads its state and corpus directly; incomplete in-flight
+  exchanges and credential-rotation races are accepted to avoid disrupting
+  long-running requests. Read failures still follow the normal failed/partial
+  backup handling.
+- T3 Code uses consistent online SQLite exports while all managed and independent
+  backends remain running. Associated settings, attachments and terminal history
+  are read live; a common capture boundary with the database is not required.
 
 ## Shared-repository operation
 
@@ -565,13 +577,16 @@ same units. Timed-out service commands terminate their whole process group so
 no delayed stop can follow recovery.
 
 SQLite uses the native backup API, checks its result, and excludes the live
-database and WAL/SHM/journal companions from restic's direct selection. Associated
+database and WAL/SHM/journal companions from restic's direct selection. T3 Code's
+managed services and independent desktop backends remain running throughout
+capture and upload. Its associated files are read live under the accepted policy
+above. Both T3 and CLIProxyAPI record their live-file limitations in the capture
+manifest. For other SQLite captures requiring coordinated state, associated
 keys, configurations and attachments are read directly during the same paused
-interval. Managed writers such as T3 Code, CPA Manager Plus and Grafana remain
+interval. Managed writers such as CPA Manager Plus and Grafana remain
 paused until upload finishes; revision-named no-mistakes user daemons are
-discovered dynamically. T3, Hermes and no-mistakes also pause independently
+discovered dynamically. Hermes and no-mistakes also pause independently
 launched processes holding writable files in their selected state directories.
-This includes T3's desktop backend. The window stays open while the backend pauses.
 
 The writer pause uses Linux process descriptors to preserve process identity.
 An independent transient systemd watchdog is armed before suspension and resumes
@@ -592,7 +607,9 @@ Forgejo-dependent runners are paused and restarted with Forgejo, preserving thei
 initial availability. PostgreSQL remains online; databases are independent
 consistent captures rather than a simultaneous cluster-wide transaction. Executor uses a clean stop and
 direct file backup to preserve its libSQL data and keys. Soft Serve, Tuwunel,
-Syncthing, the registry, and request-exchange files use bounded stopped captures.
+Syncthing and the registry use bounded stopped captures. CLIProxyAPI reads
+request-exchange files and mutable state online, accepting incomplete recent
+files and credential-rotation races.
 Node-RED pauses both its service and, when configured, its git-sync service so
 both writers are stopped during the direct file backup.
 VictoriaMetrics uses its native snapshot and recorded symlink-target mappings.
