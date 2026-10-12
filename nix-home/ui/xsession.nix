@@ -284,7 +284,7 @@ in {
         keybindings = {
           # Core applications and session controls.
           "${modifier}+Return" = "exec ${terminal}";
-          "${modifier}+Shift+Return" = "exec ${terminal} -e t";
+          "${modifier}+Shift+Return" = "exec ${terminal} -e herdr";
           "${modifier}+q" = "kill";
           "${modifier}+m" = "exit";
           "${modifier}+n" = "exec thunar";
