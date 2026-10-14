@@ -73,6 +73,11 @@
 
   # --- Override entries: exposure owned by overlay/patches ---
 
+  restic.update = {
+    kind = "nix-update";
+    args = ["--version=branch=master"];
+  };
+
   t-smart-tmux-session-manager.update = {
     kind = "nix-update";
     args = ["--version=branch=main"];

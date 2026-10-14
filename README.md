@@ -26,7 +26,11 @@ explains the composition and flake outputs.
 `note` and `loem` use the reusable [machine backup module](nixos/modules/machine-backups.nix)
 for hourly service captures and home backups every six hours into a shared restic
 repository on Hetzner over SFTP on port 22; capacity monitoring runs `df` over SSH
-on port 23. Each service module registers its own state directories,
+on port 23. The pinned [Restic fork](https://git.fryuni.dev/Fryuni/restic) marks
+completed snapshots with `tag --keep-original --add complete` under a shared
+lock, allowing uploads from other machines to continue. Maintenance removes
+the original snapshots without `complete` once they are older than seven days.
+Each service module registers its own state directories,
 capture method, and exclusions; the backup module aggregates NixOS and Home Manager
 registrations. A separate systemd recovery service restarts paused services if a
 backup job is killed. Restic reads registered files directly using literal file

@@ -351,7 +351,7 @@ class Runner:
         if not snapshot:
             raise Failure("Successful upload did not return a restore point")
         with self.phase("%s: marking snapshot complete" % scope):
-            self.restic("tag", "--add", "complete", snapshot)
+            self.restic("tag", "--keep-original", "--add", "complete", snapshot)
         def completed(data):
             data.setdefault("firstCompleteAt", utcnow().isoformat())
             data.setdefault("lastComplete", {})[scope] = {

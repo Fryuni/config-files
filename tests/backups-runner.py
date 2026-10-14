@@ -43,12 +43,12 @@ class BackupRunnerTest(unittest.TestCase):
             "scopes": {"home": {"paths": [str(self.source)], "excludes": []}},
         }
 
-    def cli(self, *arguments, config=None, expected=0, env=None):
+    def cli(self, *arguments, config=None, expected=0, env=None, timeout=None):
         path = self.root / "config.json"
         path.write_text(json.dumps(config or self.config))
         result = subprocess.run(
             [sys.executable, str(RUNNER), "--config", str(path), *arguments],
-            text=True, capture_output=True, env=env,
+            text=True, capture_output=True, env=env, timeout=timeout,
         )
         self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
         return result
@@ -61,8 +61,9 @@ class BackupRunnerTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr.decode())
         return result.stdout
 
-    def snapshots(self):
-        return json.loads(self.restic("snapshots", "--json")) or []
+    def snapshots(self, complete=False):
+        tags = ["--tag", "complete"] if complete else []
+        return json.loads(self.restic("snapshots", "--json", *tags)) or []
 
     def metrics_receiver(self):
         self.metrics_requests = []
@@ -135,7 +136,7 @@ class BackupRunnerTest(unittest.TestCase):
         state = json.loads(self.cli("status").stdout)
         self.assertEqual(state["metricsDelivery"]["failures"], 1)
         self.assertTrue(state["lastRun"]["backup:home"]["success"])
-        self.assertEqual(len(self.snapshots()), 1)
+        self.assertEqual(len(self.snapshots()), 2)
         server.response_code = 302
         self.cli("metrics", expected=75)
         self.assertEqual(len(self.metrics_requests), 2)  # Never followed the redirect.
@@ -221,11 +222,43 @@ sys.exit(subprocess.run([os.environ['RESTIC_FIXTURE_REAL'], *sys.argv[1:]]).retu
         (self.source / "project.txt").write_text("uncommitted work\n")
         self.cli("backup", "--scope", "home")
         snapshots = self.snapshots()
-        self.assertEqual(len(snapshots), 1)
-        self.assertEqual(snapshots[0]["hostname"], "loem")
-        self.assertEqual(set(snapshots[0]["tags"]), {"machine-backup", "home", "complete"})
-        self.assertEqual(self.restic("dump", snapshots[0]["id"],
+        self.assertEqual(len(snapshots), 2)
+        original, = [point for point in snapshots if "complete" not in point["tags"]]
+        completed, = self.snapshots(complete=True)
+        self.assertEqual(set(original["tags"]), {"machine-backup", "home"})
+        self.assertEqual(completed["original"], original["id"])
+        self.assertEqual(completed["hostname"], "loem")
+        self.assertEqual(set(completed["tags"]), {"machine-backup", "home", "complete"})
+        self.assertEqual(completed["tree"], original["tree"])
+        self.assertEqual(self.restic("dump", completed["id"],
                                     str(self.source / "project.txt")), b"uncommitted work\n")
+
+    def test_completion_tag_does_not_wait_for_another_machines_upload(self):
+        self.restic("init")
+        uploader = subprocess.Popen(
+            ["restic", "--repo", str(self.repo), "--password-file", str(self.password),
+             "backup", "--host", "note", "--stdin", "--stdin-filename", "pending.txt"],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
+        try:
+            deadline = time.monotonic() + 10
+            while not any((self.repo / "locks").iterdir()):
+                self.assertIsNone(uploader.poll(), "Concurrent upload exited before acquiring its lock")
+                self.assertLess(time.monotonic(), deadline, "Concurrent upload did not acquire its lock")
+                time.sleep(0.05)
+            (self.source / "project.txt").write_text("backup while note is uploading\n")
+            self.cli("backup", "--scope", "home", timeout=20)
+            self.assertIsNone(uploader.poll(), "Concurrent upload must still hold its shared lock")
+            self.assertEqual(len(self.snapshots()), 2)
+            self.assertEqual(len(self.snapshots(complete=True)), 1)
+        finally:
+            try:
+                stdout, stderr = uploader.communicate(b"note upload\n", timeout=10)
+            except subprocess.TimeoutExpired:
+                uploader.kill()
+                uploader.communicate()
+                raise
+        self.assertEqual(uploader.returncode, 0, stdout.decode() + stderr.decode())
 
     def test_backup_reports_progress_before_upload_finishes(self):
         binary = self.root / "bin"
@@ -309,7 +342,7 @@ threading.Event.wait = wait
         self.cli("backup", "--scope", "services")
         staging = Path(self.config["stateDirectory"]) / "staging/services"
         self.assertFalse((staging / "tree").exists(), "Service payload was duplicated into staging")
-        self.assertEqual(self.restic("dump", self.snapshots()[0]["id"], str(payload)), payload.read_bytes())
+        self.assertEqual(self.restic("dump", self.snapshots(complete=True)[0]["id"], str(payload)), payload.read_bytes())
 
     def test_direct_selection_is_literal_and_exclusions_stay_with_their_service(self):
         service = self.source / "service [one]*\nstate"
@@ -465,7 +498,7 @@ else:
         (self.source / "project.txt").write_text("note work\n")
         notebook = dict(self.config, host="note", stateDirectory=str(self.root / "note-state"))
         self.cli("backup", "--scope", "home", config=notebook)
-        snapshots = {snapshot["hostname"]: snapshot for snapshot in self.snapshots()}
+        snapshots = {snapshot["hostname"]: snapshot for snapshot in self.snapshots(complete=True)}
         for host in ["loem", "note"]:
             self.assertEqual(self.restic("dump", snapshots[host]["id"],
                                         str(self.source / "project.txt")), (host + " work\n").encode())
@@ -483,7 +516,7 @@ else:
             (logs / name).write_text(name)
         self.config["scopes"]["home"]["excludes"] = [str(logs / "main.log"), str(logs / "main-*.log")]
         self.cli("backup", "--scope", "home")
-        point = self.snapshots()[0]["id"]
+        point = self.snapshots(complete=True)[0]["id"]
         restored = self.root / "restore"
         self.restic("restore", point, "--target", str(restored))
         tree = restored / str(self.source).lstrip("/")
@@ -507,7 +540,7 @@ else:
         after = json.loads(self.cli("status").stdout)["lastComplete"]["home"]
         self.assertEqual(after, before)
         snapshots = self.snapshots()
-        self.assertEqual(len(snapshots), 2)
+        self.assertEqual(len(snapshots), 3)
         complete = [point for point in snapshots if "complete" in point.get("tags", [])]
         self.assertEqual(len(complete), 1)
         self.assertEqual(self.restic("dump", complete[0]["id"], str(readable)), b"restorable")
@@ -539,10 +572,16 @@ else:
         offline_home = self.historical_point("note", "home", 901)
         offline_services = self.historical_point("loem", "services", 901)
         candidate = self.historical_point("loem", "services", 900, complete=False)
+        original = self.historical_point("note", "home", 900, complete=False)
+        self.restic("tag", "--keep-original", "--add", "complete", original)
+        completed, = [point["id"] for point in self.snapshots(complete=True)
+                      if point.get("original") == original]
         self.cli("maintain")
         ids = {point["id"] for point in self.snapshots()}
         self.assertNotIn(obsolete, ids)
         self.assertNotIn(candidate, ids)
+        self.assertNotIn(original, ids)
+        self.assertIn(completed, ids)
         self.assertIn(offline_home, ids)
         self.assertIn(offline_services, ids)
         status = json.loads(self.cli("status").stdout)
@@ -876,7 +915,7 @@ subprocess.run = run
             fcntl.flock(lock, fcntl.LOCK_EX)
             self.cli("backup", "--scope", "home", expected=75)
             self.cli("monitor")
-        self.assertEqual(len(self.snapshots()), 2)
+        self.assertEqual(len(self.snapshots()), 3)
         self.cli("maintain", expected=1)
 
     def test_admin_restic_uses_configured_repository_and_rejects_credential_overrides(self):

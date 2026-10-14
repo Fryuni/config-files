@@ -1,4 +1,32 @@
 _: prev: {
+  # Completion tagging must share the repository with other machines' uploads.
+  restic = prev.restic.overrideAttrs (old: rec {
+    version = "0.19.1-unstable-2026-10-14";
+    src = prev.fetchFromGitea {
+      domain = "git.fryuni.dev";
+      owner = "Fryuni";
+      repo = "restic";
+      rev = "3a273c6407cea8f2c06329e39c35ce9dc838a75c";
+      hash = "sha256-3lFwlSMmoKv15fEt9ZyrYIfPauZh7fOtxMs9JmomVT4=";
+    };
+    vendorHash = "sha256-o8+r0GJgtv/4cbrAeAP36sZW4A4kXV2rWRuxzxirHeI=";
+    # The fork refactored this test, so nixpkgs' sandbox skip patch no longer applies.
+    patches = [];
+    checkFlags = (old.checkFlags or []) ++ ["-skip=^TestRestoreWithPermissionFailure$"];
+    postPatch =
+      (old.postPatch or "")
+      + ''
+        substituteInPlace internal/global/global.go \
+          --replace-fail 'const Version = "0.19.1-dev (compiled manually)"' 'const Version = "${version}"'
+      '';
+    meta =
+      old.meta
+      // {
+        homepage = "https://git.fryuni.dev/Fryuni/restic";
+        changelog = "https://git.fryuni.dev/Fryuni/restic/src/commit/${src.rev}/CHANGELOG.md";
+      };
+  });
+
   # Determinate Nix 3.23 adds activity 10113 and result 10111 to internal-json.
   # Remove once nixpkgs carries https://github.com/maralorn/nix-output-monitor/pull/321.
   nix-output-monitor = assert prev.lib.assertMsg (prev.nix-output-monitor.version == "2.2.0")

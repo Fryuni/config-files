@@ -306,6 +306,13 @@ Only exit-zero uploads receive the additional `complete` tag; freshness and
 normal retention select that tag. Interrupted uploads or a failed tagging step
 remain candidates and cannot replace a complete restore point.
 
+The package overlay pins [Fryuni's Restic fork](https://git.fryuni.dev/Fryuni/restic),
+whose `tag --keep-original --add complete` creates a tagged copy under a shared
+repository lock. Completion tagging can therefore overlap another machine's
+upload. The original snapshot retains its initial tags without `complete`;
+the maintenance job removes these originals alongside other candidates once
+they are older than seven days.
+
 The accepted retention wording uses elapsed windows from each host/scope's most
 recent restore point: all points within 7 days, daily within 30 days, weekly
 within 84 days, and monthly within 1 year. It is not a legal deletion deadline;
