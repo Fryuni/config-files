@@ -81,6 +81,16 @@ These commands build or inspect changes without applying them. See
 [maintenance and validation](docs/maintenance.md) for other hosts, checks,
 formatting, and dependency updates.
 
+The Bun scripts in [common/shellscripts/](common/shellscripts/) are installed in
+`~/.local/bin` without their extensions. With `fj` and `gh` authenticated,
+`fj-to-github <forgejo-host>/<owner>/<repo> <github-owner>/<repo>` configures an
+SSH push mirror and a writable GitHub deploy key. `fj-fork-square <github-owner>/<repo>
+[forgejo-host]` creates an upstream pull mirror in the `mirror` namespace, forks
+it under your Forgejo account, and push-mirrors that fork to your GitHub fork.
+The default Forgejo host is `git.fryuni.dev`; rerunning either script resumes a
+partial setup. Push mirrors sync on commits and every eight hours.
+Private sources require private targets, including existing upstream pull mirrors.
+
 `nh` provides build progress and a package delta for both Home Manager and NixOS.
 The `nix-output-monitor` flake check replays log events to verify compatibility
 with Determinate Nix and preserve build and download reporting.

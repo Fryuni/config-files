@@ -8,6 +8,7 @@ const repoInfo = await $`gh repo view ${githubRepoRef} --json ${[
   'name',
   'url',
   'description',
+  'isPrivate',
 ].join(',')} `.json();
 
 const token = (await $`gh auth token`.arrayBuffer());
@@ -15,6 +16,7 @@ const token = (await $`gh auth token`.arrayBuffer());
 await $`fj -H ${forgejoTarget} repo migrate ${[
   '--mirror',
   '--service=github',
+  ...(repoInfo.isPrivate ? ['--private'] : []),
   '--token',
   repoInfo.url,
   `mirror/${repoInfo.name}`,
