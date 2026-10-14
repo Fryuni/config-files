@@ -30,6 +30,8 @@ on port 23. The pinned [Restic fork](https://git.fryuni.dev/Fryuni/restic) marks
 completed snapshots with `tag --keep-original --add complete` under a shared
 lock, allowing uploads from other machines to continue. Maintenance removes
 the original snapshots without `complete` once they are older than seven days.
+Before backups, monitoring, maintenance, and restore rehearsals, the runner removes
+stale repository locks with restic's normal `unlock`, preserving active locks.
 Each service module registers its own state directories,
 capture method, and exclusions; the backup module aggregates NixOS and Home Manager
 registrations. A separate systemd recovery service restarts paused services if a

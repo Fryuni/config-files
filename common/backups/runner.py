@@ -279,7 +279,12 @@ class Runner:
         result = (self.stream_backup(arguments, deadline=deadline) if stream else
                   subprocess.run(self.base + list(arguments), env=self.env,
                                  capture_output=True, text=True))
-        if check and result.returncode:
+        if check:
+            self.check_restic_result(result)
+        return result
+
+    def check_restic_result(self, result):
+        if result.returncode:
             text = result.stderr.lower()
             if result.returncode == 12 or any(marker in text for marker in [
                 "permission denied", "authentication failed", "unable to authenticate",
@@ -294,9 +299,20 @@ class Runner:
             if any(marker in text for marker in ["repository contains errors", "repository is damaged",
                                                  "does not match hash", "does not match id"]):
                 raise Failure("Repository integrity verification failed")
+            if result.returncode == 11:
+                raise Failure("Repository lock contention: another restic operation holds the lock",
+                              transient=True)
             raise Failure("Repository operation failed (exit %d)" % result.returncode,
                           transient=True)
-        return result
+
+    def unlock_stale(self, allow_missing=False):
+        # Restic retries lock contention without removing abandoned locks. Its
+        # normal unlock checks staleness; never use --remove-all on this shared repo.
+        with self.phase("Removing stale repository locks"):
+            result = self.restic("unlock", check=False)
+            if allow_missing and result.returncode == 10:
+                return
+            self.check_restic_result(result)
 
     def credentials(self):
         password = self.config["passwordFile"]
@@ -317,10 +333,12 @@ class Runner:
             self.restic("init", "--repository-version", "2", check=False)
             self.restic("cat", "config")
         elif result.returncode:
-            self.restic("cat", "config")
+            # Preserve the first failure instead of waiting another lock interval.
+            self.check_restic_result(result)
 
     def backup(self, scope):
         specification = self.config["scopes"][scope]
+        self.unlock_stale(allow_missing=True)
         with self.phase("%s: checking backup repository" % scope):
             self.initialize()
         captured_at = utcnow()
@@ -407,6 +425,8 @@ class Runner:
     def maintain(self, dry_run=False):
         if self.config["host"] != "loem":
             raise Failure("Shared repository maintenance is owned by loem")
+        if not dry_run:
+            self.unlock_stale()
         # Verify repository structure and one deterministic quarter before deleting data.
         quarter = self.update(lambda data: data.get("nextCheckQuarter", 1))
         if not dry_run:
@@ -488,6 +508,7 @@ class Runner:
     def monitor(self):
         failure = None
         try:
+            self.unlock_stale()
             snapshots = self.snapshots(complete=True)
             latest = {}
             for snapshot in snapshots:
@@ -646,6 +667,7 @@ class Runner:
             resolved = source.resolve()
             if destination == resolved or destination in resolved.parents or resolved in destination.parents:
                 raise Failure("Restore target overlaps backup source or staging state")
+        self.unlock_stale()
         points = [point for point in self.snapshots(complete=True)
                   if point["hostname"] == host and scope in point.get("tags", [])]
         if not points:

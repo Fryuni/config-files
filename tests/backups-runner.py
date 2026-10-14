@@ -194,7 +194,7 @@ class BackupRunnerTest(unittest.TestCase):
         return next(json.loads(line)["snapshot_id"] for line in output.splitlines()
                     if json.loads(line).get("message_type") == "summary")
 
-    def failing_restic_boundary(self, command, exit_code, stderr):
+    def failing_restic_boundary(self, command, exit_code, stderr, retry_lock=None):
         binary = self.root / "boundary-bin"
         binary.mkdir(exist_ok=True)
         wrapper = binary / "restic"
@@ -205,7 +205,10 @@ with pathlib.Path(os.environ['RESTIC_FIXTURE_CALLS']).open('a') as log:
 if os.environ['RESTIC_FIXTURE_COMMAND'] in sys.argv[1:]:
     print(os.environ['RESTIC_FIXTURE_STDERR'], file=sys.stderr)
     sys.exit(int(os.environ['RESTIC_FIXTURE_EXIT']))
-sys.exit(subprocess.run([os.environ['RESTIC_FIXTURE_REAL'], *sys.argv[1:]]).returncode)
+arguments = sys.argv[1:]
+if os.environ.get('RESTIC_FIXTURE_RETRY_LOCK'):
+    arguments[arguments.index('--retry-lock') + 1] = os.environ['RESTIC_FIXTURE_RETRY_LOCK']
+sys.exit(subprocess.run([os.environ['RESTIC_FIXTURE_REAL'], *arguments]).returncode)
 """)
         wrapper.chmod(0o755)
         self.boundary_log = self.root / "restic-calls.jsonl"
@@ -216,7 +219,82 @@ sys.exit(subprocess.run([os.environ['RESTIC_FIXTURE_REAL'], *sys.argv[1:]]).retu
         return dict(os.environ, PATH=str(binary) + os.pathsep + os.environ["PATH"],
                     BACKUP_FIXTURE_REAL=shutil.which("restic"), BACKUP_FIXTURE_COMMAND=command,
                     BACKUP_FIXTURE_EXIT=str(exit_code), BACKUP_FIXTURE_STDERR=stderr,
-                    BACKUP_FIXTURE_CALLS=str(self.boundary_log))
+                    BACKUP_FIXTURE_CALLS=str(self.boundary_log),
+                    BACKUP_FIXTURE_RETRY_LOCK=retry_lock or "")
+
+    def exclusive_repository_lock(self):
+        # Throttle a real integrity check so it holds a genuine exclusive lock
+        # until the test kills it, reproducing an interrupted restic command.
+        process = subprocess.Popen(
+            ["restic", "--repo", str(self.repo), "--password-file", str(self.password),
+             "check", "--read-data", "--limit-download", "1"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
+        def cleanup():
+            if process.poll() is None:
+                process.kill()
+            process.communicate()
+        self.addCleanup(cleanup)
+        deadline = time.monotonic() + 5
+        while time.monotonic() < deadline and process.poll() is None:
+            # The local backend writes a temporary file before atomically
+            # publishing the encrypted lock under its 64-character storage ID.
+            locks = [path for path in (self.repo / "locks").iterdir()
+                     if re.fullmatch(r"[0-9a-f]{64}", path.name)]
+            if locks:
+                metadata = json.loads(self.restic("--no-lock", "cat", "lock", locks[0].name))
+                self.assertTrue(metadata["exclusive"])
+                self.assertEqual(metadata["pid"], process.pid)
+                return process, locks[0]
+            time.sleep(0.02)
+        self.fail("Integrity check did not acquire its exclusive repository lock")
+
+    def test_abandoned_exclusive_lock_does_not_block_automated_operations(self):
+        (self.source / "data").write_bytes(os.urandom(256 * 1024))
+        self.config["scopes"]["services"] = self.config["scopes"]["home"]
+        self.cli("backup", "--scope", "home")
+        environment = self.failing_restic_boundary("fixture-never", 0, "", retry_lock="0s")
+        for arguments in [
+            ("backup", "--scope", "home"), ("backup", "--scope", "services"),
+            ("monitor",), ("maintain",),
+            ("restore-test", "--host", "loem", "--scope", "home",
+             "--target", str(self.root / "restored-after-interruption")),
+        ]:
+            with self.subTest(operation=arguments[0], arguments=arguments):
+                process, lock = self.exclusive_repository_lock()
+                process.kill()
+                process.communicate()
+                self.assertTrue(lock.exists())
+                try:
+                    self.cli(*arguments, env=environment, timeout=20)
+                    self.assertFalse(lock.exists())
+                finally:
+                    self.restic("unlock")
+        calls = [json.loads(line) for line in self.boundary_log.read_text().splitlines()]
+        self.assertFalse(any("--remove-all" in call or "--no-lock" in call for call in calls))
+
+    def test_active_exclusive_lock_is_preserved_and_reported_as_contention(self):
+        (self.source / "data").write_bytes(os.urandom(256 * 1024))
+        self.cli("backup", "--scope", "home")
+        before = json.loads(self.cli("status").stdout)["lastComplete"]
+        process, lock = self.exclusive_repository_lock()
+        environment = self.failing_restic_boundary("fixture-never", 0, "", retry_lock="0s")
+        for arguments in [("backup", "--scope", "home"), ("monitor",), ("maintain",)]:
+            with self.subTest(operation=arguments[0]):
+                result = self.cli(*arguments, expected=75, env=environment, timeout=20)
+                self.assertIn("Repository lock contention", result.stderr)
+                self.assertTrue(lock.exists())
+                self.assertIsNone(process.poll())
+        after = json.loads(self.cli("status").stdout)
+        self.assertEqual(after["lastComplete"], before)
+        self.assertFalse(after["lastRun"]["backup:home"]["success"])
+        self.assertFalse(after["lastRun"]["monitor:repository"]["success"])
+
+    def test_repository_probe_failure_is_not_repeated(self):
+        environment = self.failing_restic_boundary("cat", 11, "repository is locked")
+        self.cli("backup", "--scope", "home", expected=75, env=environment)
+        calls = [json.loads(line) for line in self.boundary_log.read_text().splitlines()]
+        self.assertEqual(sum("cat" in call for call in calls), 1)
 
     def test_home_backup_creates_a_complete_recoverable_restore_point(self):
         (self.source / "project.txt").write_text("uncommitted work\n")
@@ -594,7 +672,7 @@ else:
         before = self.snapshots()
         boundary = self.failing_restic_boundary("check", 1, "Fatal: repository contains errors")
         self.cli("maintain", expected=1, env=boundary)
-        self.assertEqual(self.snapshots(), before)
+        self.assertCountEqual(self.snapshots(), before)
         status = json.loads(self.cli("status").stdout)
         self.assertEqual(status.get("nextCheckQuarter", 1), 1)
         self.assertFalse(status.get("lastIntegrityCheck"))

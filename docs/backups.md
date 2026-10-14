@@ -413,8 +413,14 @@ Calendar timers catch up when a machine returns. Jobs use low CPU/I/O priority,
 do not wake the notebook, and can run on battery. A local lock serializes capture,
 upload, and maintenance; monitoring has a separate lock so a long upload cannot
 hide stale data. Restic repository locks coordinate both hosts, with a bounded
-15-minute lock wait. Transient failures retry after 15 minutes; permanent failures
-wait for intervention and generate alerts. Never unlock an active operation. Capacity monitoring compares available quota
+15-minute lock wait. Backups, monitoring, maintenance, and restore rehearsals first
+run normal `restic unlock` to remove abandoned locks. Active locks remain subject
+to the bounded wait; cleanup never uses `--remove-all`. Maintenance dry runs and
+administrative commands leave lock cleanup explicit. A failed repository probe
+is reported once rather than repeating the lock wait. Exit code 11 is reported as
+repository lock contention. Transient failures retry after 15 minutes; permanent
+failures wait for intervention and generate alerts.
+Capacity monitoring compares available quota
 with the configured full Box size, including space unavailable because of retained
 snapshots. Verify it against the Console during rollout and monthly review; Hetzner
 recommends Console/API values for authoritative accounting.
@@ -435,6 +441,44 @@ sudo machine-backup restic -- snapshots --host loem --tag machine-backup,complet
 journalctl -u machine-backup-services -u machine-backup-home -u machine-backup-monitor
 systemctl list-timers 'machine-backup-*'
 ```
+
+### Repository lock failures
+
+An interrupted restic process can leave a repository lock after its process exits.
+Because both machines share the repository, an abandoned exclusive lock can block
+both scopes on both machines. `--retry-lock` only waits for the lock to disappear;
+it does not remove it. Normal `unlock` removes locks restic considers stale, based
+on the refresh timestamp or a dead process on the local host. Live operations
+refresh their locks. Never use `unlock --remove-all` for automated recovery.
+[Restic unlock implementation](https://git.fryuni.dev/Fryuni/restic/src/commit/3a273c6407cea8f2c06329e39c35ce9dc838a75c/cmd/restic/cmd_unlock.go).
+
+The runner performs that cleanup before its next repository operation. With an
+older installed runner, first wait for local backup operations to finish, or stop
+the backup units if they are only waiting for repository access. Then use the
+configured identity and repository to remove stale locks:
+
+```bash
+sudo machine-backup restic -- list locks
+sudo machine-backup restic -- unlock
+sudo systemctl start machine-backup-services.service
+sudo systemctl start machine-backup-home.service
+sudo systemctl start machine-backup-monitor.service
+```
+
+Run the starts sequentially so home and services do not contend for the local
+operation lock. Confirm fresh complete restore points and successful automated
+runs afterward. Do not remove an active lock or bypass locking to run a backup.
+
+On 2026-10-14, read-only inspection on `loem` found exclusive lock `e1e3693a`,
+created at 01:48:38 UTC by root PID `3355312` on `loem`. That PID no longer existed,
+and the lock remained unrefreshed more than 14 hours later. A repository config
+probe using the service environment and zero lock wait returned exit code 11;
+authentication succeeded. The installed runner retried the same failed probe,
+spending two 15-minute waits while blocking the other local backup scope. The
+available logs did not identify which command originally abandoned the lock.
+No production lock was removed during the investigation. Regression fixtures
+reproduce the failure by killing a real restic integrity check and verify stale
+lock recovery and preservation of a live integrity check's exclusive lock.
 
 ### Pushed backup telemetry
 
