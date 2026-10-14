@@ -34,6 +34,7 @@
       {
         name = "syncthing";
         paths = ["${config.xdg.stateHome}/syncthing"];
+        optional = true;
         scopes = ["home" "services"];
         units = [
           {

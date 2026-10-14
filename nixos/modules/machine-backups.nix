@@ -47,9 +47,7 @@
       writerUid = entry.writerUid or cfg.userUid;
     };
   registeredCaptures =
-    map stripNulls (cfg.directories ++ lib.attrValues cfg.captures)
-    ++ map normalizeHomeCapture ((homeDeclarations.directories or []) ++ lib.attrValues (homeDeclarations.captures or {}))
-    ++ [
+    [
       {
         name = "recovery-inputs";
         kind = "nix";
@@ -57,7 +55,9 @@
         scopes = ["services"];
         flakePath = cfg.recovery.flakePath;
       }
-    ];
+    ]
+    ++ map stripNulls (cfg.directories ++ lib.attrValues cfg.captures)
+    ++ map normalizeHomeCapture ((homeDeclarations.directories or []) ++ lib.attrValues (homeDeclarations.captures or {}));
   registeredUnits =
     lib.concatMap (
       entry:
