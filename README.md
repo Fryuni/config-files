@@ -41,8 +41,10 @@ recovery artifacts. CLIProxyAPI and T3 Code remain online, with consistent SQLit
 exports for T3 and accepted live-file races for associated state and request
 exchanges. Other writers requiring pauses remain paused through upload, with a
 configurable one-hour interruption limit. Selected locked flake source inputs
-support offline recovery evaluation; package builds use normal network access. The dedicated SSH identity,
-repository password, and backup notification token use agenix and host rekeying.
+support offline recovery evaluation; the backup module declares their configured
+checkouts as safe Git directories for root's Nix capture. Package builds use normal
+network access. The dedicated SSH identity, repository password, and backup
+notification token use agenix and host rekeying.
 Backup jobs push their persisted status directly to VictoriaMetrics through its
 portable Tailnet service; a separate five-minute heartbeat also retries delivery
 without contacting the backup repository or interrupting captures.

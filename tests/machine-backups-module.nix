@@ -85,6 +85,21 @@
   ];
   disabled = evaluate [directoryService {services.archiveStore.enable = true;}];
   enabled = evaluate enrolled;
+  extraRecovery = evaluate (enrolled
+    ++ [
+      {
+        services.machineBackups.captures = {
+          same-checkout = {
+            kind = "nix";
+            flakePath = "/home/lotus/ZShutils";
+          };
+          other-checkout = {
+            kind = "nix";
+            flakePath = "/srv/recovery/configuration";
+          };
+        };
+      }
+    ]);
   withMetrics = evaluate (enrolled ++ [{services.machineBackups.metrics.url = "http://metrics.internal/api/v1/import/prometheus";}]);
   moved = evaluate (enrolled
     ++ [
@@ -369,6 +384,7 @@
     (check (!(disabled.systemd.services ? machine-backup-home)) "Disabled machines must have no backup job")
     (check (!(disabled.systemd.timers ? machine-backup-services)) "Disabled machines must have no backup timer")
     (check (disabled.age.secrets == {}) "Unenrolled machines must receive no backup credentials")
+    (check (!(disabled.environment.etc ? gitconfig)) "Disabled backups must not add Git trust")
     (check (!(enabled.systemd.timers ? machine-backup-metrics)) "Telemetry must be optional for standalone backup users")
     (check (withMetrics.systemd.timers.machine-backup-metrics.timerConfig.OnUnitActiveSec == "5min") "Push heartbeats must refresh every five minutes")
     (check (!(withMetrics.systemd.timers.machine-backup-metrics.timerConfig.WakeSystem or false)) "Backup telemetry must not wake the notebook")
@@ -453,7 +469,10 @@
 in
   assert lib.all (value: value) checks;
     pkgs.runCommand "machine-backups-module-check" {
-      nativeBuildInputs = [pkgs.jq];
+      nativeBuildInputs = [pkgs.jq pkgs.git];
+      gitConfigFile = enabled.environment.etc.gitconfig.source;
+      ownerGitConfigFile = owner.environment.etc.gitconfig.source;
+      extraRecoveryGitConfigFile = extraRecovery.environment.etc.gitconfig.source;
       configFile = enabled.services.machineBackups.configFile;
       metricsConfigFile = withMetrics.services.machineBackups.configFile;
       movedConfigFile = moved.services.machineBackups.configFile;
@@ -462,6 +481,9 @@ in
       ownerConfigFile = owner.services.machineBackups.configFile;
       standaloneOwnerConfigFile = standaloneOwner.services.machineBackups.configFile;
     } ''
+      test "$(git config --file "$gitConfigFile" --get-all safe.directory)" = /home/lotus/ZShutils
+      test "$(git config --file "$ownerGitConfigFile" --get-all safe.directory)" = /srv/alice/ZShutils
+      diff -u <(printf '%s\n' /home/lotus/ZShutils /srv/recovery/configuration) <(git config --file "$extraRecoveryGitConfigFile" --get-all safe.directory)
       jq -e '.repository == "sftp://u688316@u688316.your-storagebox.de:22/restic"' "$configFile"
       jq -e '.metrics.url == null and .metrics.timeoutSeconds == 10' "$configFile"
       jq -e '.metrics.url == "http://metrics.internal/api/v1/import/prometheus"' "$metricsConfigFile"

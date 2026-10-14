@@ -319,6 +319,15 @@ in {
         };
       };
 
+    # Nix's libgit2 opens these user-owned checkouts as the root backup user.
+    # Declare exact paths in /etc/gitconfig; libgit2 ignores Git's config env overrides.
+    programs.git = {
+      enable = true;
+      config.safe.directory =
+        lib.unique (map (entry: entry.flakePath)
+          (lib.filter (entry: entry.kind == "nix" && entry ? flakePath) registeredCaptures));
+    };
+
     environment.systemPackages = [runner];
     systemd = {
       tmpfiles.rules = [

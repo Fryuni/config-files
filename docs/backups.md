@@ -158,6 +158,13 @@ For both machines, include:
   inputs. Preserve these selected recovery inputs without backing up the entire
   regenerable Nix store.
 
+Backup jobs run as root. The backup module adds each registered Nix capture's
+`flakePath` to the system Git `safe.directory` list so Nix's libgit2 can archive
+user-owned checkouts from systemd. Trust is limited to those configured paths;
+disabled backups add no entries. Keep these paths pointed at trusted recovery
+repositories. Git configuration environment overrides do not configure the
+libgit2 used by the installed Nix.
+
 Additional `loem` coverage comprises every PostgreSQL database and cluster
 globals; Forgejo; Soft Serve; Tuwunel including media; Executor; CLIProxyAPI and
 the AI exchange corpus; CPA Manager Plus; the Docker registry; Grafana;
