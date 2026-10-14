@@ -34,6 +34,61 @@ and pairing details with `journalctl --user -u t3code.service` on `note`, or
 service starts on the next graphical login, or with
 `systemctl --user start t3code.service` from the active desktop.
 
+## Hollama
+
+`servers/loem/hollama.nix` runs [Hollama](https://github.com/fmaclen/hollama)
+0.36.0 from its upstream container image, pinned by multi-architecture digest.
+The container listens on `127.0.0.1:3080` through Docker's loopback port binding;
+the private Tailnet Caddy proxy publishes it at `https://chat.loem.lferraz.dev`.
+It has no sign-in, database, or persistent volumes and runs with a read-only
+container filesystem. Conversations, connection settings, and preferences live
+in each browser's `localStorage`, surviving page reloads and container restarts.
+Clearing site data removes that browser's history; use Hollama's import/export
+controls to keep or move it.
+
+The root page in `common/hollama/index.html` seeds a CLIProxyAPI connection on
+first visit and verifies model discovery before opening the chat interface.
+It preserves existing browser connection settings. Browser requests to `/v1/*`
+are proxied directly to `http://127.0.0.1:8317`, including `/v1/models`, avoiding
+CPA Manager Plus's model-list routing on the `llm` hostname. This keeps the API
+on the same origin as the UI without CORS configuration. CLIProxyAPI currently
+needs no client key; Hollama supplies its non-secret SDK placeholder. No model
+filter is configured, so all proxy models can be selected, including newly added
+ones after model discovery refreshes.
+
+Hollama supports text, vision, and streamed reasoning responses. Its OpenAI-compatible
+chat path sends the selected model and message history with streaming enabled;
+advanced sampling controls are currently specific to Ollama. It provides no
+function/tool-calling workflow. The interface is suited to quick conversational
+proxy checks rather than exhaustive endpoint conformance tests.
+
+There is no Hollama state to register for machine backups. CLIProxyAPI's separate
+request/exchange retention remains governed by its own configuration. Any old
+`/var/lib/open-webui` data is left untouched; the OpenWebUI service is no longer
+part of the host configuration.
+
+Build before the separate user activation step:
+
+```bash
+nix build .#nixosConfigurations.loem.config.system.build.toplevel --no-link
+```
+
+After activation, validate on `loem`:
+
+```bash
+systemctl is-active cli-proxy-api.service docker-hollama.service
+curl --fail http://127.0.0.1:3080/api/metadata
+curl --fail https://chat.loem.lferraz.dev/v1/models
+journalctl -u docker-hollama.service -u cli-proxy-api.service --since '10 minutes ago'
+```
+
+From a Tailnet-connected browser, open the chat URL and check that it goes straight
+to the interface without sign-in. Select a model and send a short prompt. Verify
+that its response streams and the exchange appears in CPA Manager Plus at
+`https://llm.loem.lferraz.dev`. Reload the page and confirm the conversation remains
+in that browser. Start a new chat after adding a proxy model to refresh discovery.
+Model discovery alone does not prove inference works.
+
 ## Claude Code
 
 The shared terminal AI module installs `llm-agents.claude-code` with a wrapper that

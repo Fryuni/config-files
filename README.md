@@ -54,6 +54,11 @@ evidence, bare-metal server thermals and hardware, notebook hardware, and the sh
 cache. Grafana automation credentials use agenix and host rekeying. See
 [metrics operation](docs/services.md#metrics) and the [coverage audit](docs/metrics-audit.md).
 
+Loem also hosts Hollama at `https://chat.loem.lferraz.dev` through the private
+Tailnet proxy, connected directly to its local CLIProxyAPI for model testing.
+It needs no sign-in or server database: chats and settings stay in each browser's
+local storage. See [Hollama operation and validation](docs/ai-tools.md#hollama).
+
 ## Configurations
 
 | Configuration | Platform | Purpose |
@@ -107,5 +112,5 @@ instance to verify collection gaps and restore evidence from another machine.
 | Backup policy, operation, service coverage, and recovery | [Backups and recovery](docs/backups.md) |
 | Desktop sessions, shell display access, and tray icons | [Notebook desktop](docs/desktop.md) |
 | Forgejo, Actions runners, Executor, metrics, and private networking | [Hosted services and Tailnet access](docs/services.md) |
-| T3 Code, Claude Code, and Herdr configuration | [AI tools](docs/ai-tools.md) |
+| T3 Code, Hollama, Claude Code, and Herdr configuration | [AI tools](docs/ai-tools.md) |
 | Cache authentication, upload queues, and telemetry | [Shared Nix cache](docs/nix-store-cache.md) |

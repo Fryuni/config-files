@@ -15,6 +15,7 @@
     ./executor.nix
     ./forgejo.nix
     ./github-actions.nix
+    ./hollama.nix
     ./matrix.nix
     ./metrics
     ./networking.nix

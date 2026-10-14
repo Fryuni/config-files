@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><title>Hollama</title></head>
+  <body>
+    <p>Connecting to CLIProxyAPI…</p>
+    <noscript>Enable JavaScript to use Hollama.</noscript>
+    <script>
+      (async () => {
+        const key = 'hollama-servers';
+        if (localStorage.getItem(key) === null) {
+          const server = {
+            id: 'cli-proxy-api',
+            label: 'CLIProxyAPI',
+            baseUrl: window.location.origin + '/v1',
+            connectionType: 'openai-compatible',
+            apiKey: '',
+            isEnabled: true,
+            isVerified: null
+          };
+          try {
+            const response = await fetch('/v1/models');
+            if (response.ok && Array.isArray((await response.json()).data)) {
+              server.isVerified = new Date().toISOString();
+            }
+          } catch (error) {
+            console.error('CLIProxyAPI model discovery failed', error);
+          }
+          localStorage.setItem(key, JSON.stringify([server]));
+          window.location.replace(server.isVerified ? '/sessions' : '/settings');
+        } else {
+          window.location.replace('/sessions');
+        }
+      })();
+    </script>
+  </body>
+</html>
