@@ -13,9 +13,9 @@ in {
   ];
 
   virtualisation.oci-containers.containers.executor = {
-    # Pinned to the multi-arch index digest of :latest as of 2026-09-15. Re-pin with:
+    # Pinned to the multi-arch index digest of :latest (v1.6.10) as of 2026-10-15. Re-pin with:
     #   docker buildx imagetools inspect ghcr.io/rhyssullivan/executor-selfhost:latest --format '{{.Manifest.Digest}}'
-    image = "ghcr.io/rhyssullivan/executor-selfhost@sha256:200315d519a8c19685de05e88aa9a3cf1e1cb9869a2b0aecf604f6ebf47c6ea1";
+    image = "ghcr.io/rhyssullivan/executor-selfhost@sha256:b9e001775d3eb7d662d347c8f7054333c78c1a4fd97cb5a86dc1d1d1406093b9";
 
     # Docker publishes ports past the NixOS firewall, so bind to loopback and
     # let Caddy be the only reachable entrypoint.
