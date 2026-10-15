@@ -60,8 +60,8 @@
       tirith # Used by Hermes
     ];
 
-    home.file.".agents".source =
-      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.omp/agent/universal-link";
+    # home.file.".agents".source =
+    #   config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.omp/agent/universal-link";
 
     programs = {
       zsh.shellAliases = {
