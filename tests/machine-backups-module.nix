@@ -394,7 +394,7 @@
     (check (lib.length enabled.services.machineBackups.directories == 2) "Independent service declarations must concatenate")
     (check (disabledService.services.machineBackups.directories == []) "A disabled service must contribute no state")
     (check (enabled.systemd.timers.machine-backup-services.timerConfig.OnCalendar == "*-*-* *:00:00 UTC") "Services must be scheduled hourly")
-    (check (enabled.systemd.timers.machine-backup-home.timerConfig.OnCalendar == "*-*-* 00,06,12,18:00:00 UTC") "Home must be scheduled every six hours")
+    (check (enabled.systemd.timers.machine-backup-home.timerConfig.OnCalendar == "*-*-* 00,06,12,18:15:00 UTC") "Home must be scheduled every six hours")
     (check enabled.systemd.timers.machine-backup-home.timerConfig.Persistent "Home must catch up after downtime")
     (check (enabled.systemd.services.machine-backup-services.serviceConfig.Nice == 19) "Backups must run at low CPU priority")
     (check (enabled.systemd.services.machine-backup-services.serviceConfig.IOSchedulingClass == "idle") "Backups must run at low IO priority")

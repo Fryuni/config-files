@@ -798,10 +798,22 @@ def main():
         returncode = 0
         lock_name = "monitor.lock" if arguments.command in ["monitor", "status", "inventory", "rehearsal-reminder"] else "operation.lock"
         with (runner.state / lock_name).open("a") as lock:
-            try:
-                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError as error:
-                raise Failure("Another local backup operation is running", transient=True) from error
+            # Scheduled jobs queue behind each other instead of failing, which
+            # would leave the unit failed until its retry.
+            waits = arguments.command in ["backup", "maintain"]
+            deadline = time.monotonic() + (runner.config.get("localLockWaitSeconds", 900) if waits else 0)
+            reported = False
+            while True:
+                try:
+                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except BlockingIOError as error:
+                    if time.monotonic() >= deadline:
+                        raise Failure("Another local backup operation is running", transient=True) from error
+                    if not reported:
+                        runner.log_progress("Waiting for another local backup operation to finish")
+                        reported = True
+                    time.sleep(1)
             if arguments.command in ["backup", "monitor", "restore-test", "maintain"] and not getattr(arguments, "dry_run", False):
                 run_key = arguments.command + ":" + getattr(arguments, "scope", "repository")
                 started = time.monotonic()

@@ -290,6 +290,29 @@ sys.exit(subprocess.run([os.environ['RESTIC_FIXTURE_REAL'], *arguments]).returnc
         self.assertFalse(after["lastRun"]["backup:home"]["success"])
         self.assertFalse(after["lastRun"]["monitor:repository"]["success"])
 
+    def test_scheduled_operations_queue_behind_a_local_operation_for_a_bounded_time(self):
+        (self.source / "data").write_text("queued\n")
+        state_path = Path(self.config["stateDirectory"])
+        state_path.mkdir(parents=True)
+        self.config["localLockWaitSeconds"] = 2
+        with (state_path / "operation.lock").open("a") as operation:
+            fcntl.flock(operation, fcntl.LOCK_EX)
+            result = self.cli("backup", "--scope", "home", expected=75, timeout=20)
+            self.assertIn("Waiting for another local backup operation", result.stderr)
+            self.assertIn("Another local backup operation is running", result.stderr)
+            self.config["localLockWaitSeconds"] = 30
+            path = self.root / "config.json"
+            path.write_text(json.dumps(self.config))
+            queued = subprocess.Popen(
+                [sys.executable, str(RUNNER), "--config", str(path), "backup", "--scope", "home"],
+                text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            )
+            time.sleep(2)
+            self.assertIsNone(queued.poll())
+        stdout, stderr = queued.communicate(timeout=60)
+        self.assertEqual(queued.returncode, 0, stdout + stderr)
+        self.assertEqual(len(self.snapshots(complete=True)), 1)
+
     def test_repository_probe_failure_is_not_repeated(self):
         environment = self.failing_restic_boundary("cat", 11, "repository is locked")
         self.cli("backup", "--scope", "home", expected=75, env=environment)

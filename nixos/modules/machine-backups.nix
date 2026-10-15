@@ -355,7 +355,7 @@ in {
         machine-backup-home = {
           wantedBy = ["timers.target"];
           timerConfig = {
-            OnCalendar = "*-*-* 00,06,12,18:00:00 UTC";
+            OnCalendar = "*-*-* 00,06,12,18:15:00 UTC";
             Persistent = true;
           };
         };

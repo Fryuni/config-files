@@ -410,7 +410,7 @@ are under `/var/lib/machine-backups`, mode `0700`.
 | Job | Schedule (UTC) | Purpose |
 | --- | --- | --- |
 | `machine-backup-services` | Every hour | Consistent service data and recovery inputs |
-| `machine-backup-home` | 00:00, 06:00, 12:00, 18:00 | Home files and consistent application captures |
+| `machine-backup-home` | 00:15, 06:15, 12:15, 18:15 | Home files and consistent application captures |
 | `machine-backup-monitor` | Every 15 minutes | Mutual freshness, capacity, coverage, queued notifications |
 | `machine-backup-metrics` | Every 5 minutes, plus pushes after jobs | Publish persisted state to VictoriaMetrics without repository access |
 | `machine-backup-maintain` | Sunday 03:30, on `loem` | Retention, prune, structure check, rotating data check |
@@ -418,8 +418,10 @@ are under `/var/lib/machine-backups`, mode `0700`.
 
 Calendar timers catch up when a machine returns. Jobs use low CPU/I/O priority,
 do not wake the notebook, and can run on battery. A local lock serializes capture,
-upload, and maintenance; monitoring has a separate lock so a long upload cannot
-hide stale data. Restic repository locks coordinate both hosts, with a bounded
+upload, and maintenance; backups and maintenance wait up to 15 minutes for it
+before failing transiently, and home runs at quarter past to avoid colliding
+with the hourly services run. Monitoring has a separate lock so a long upload
+cannot hide stale data. Restic repository locks coordinate both hosts, with a bounded
 15-minute lock wait. Backups, monitoring, maintenance, and restore rehearsals first
 run normal `restic unlock` to remove abandoned locks. Active locks remain subject
 to the bounded wait; cleanup never uses `--remove-all`. Maintenance dry runs and
