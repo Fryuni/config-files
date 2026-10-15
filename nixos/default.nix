@@ -87,9 +87,11 @@
   # Configure console keymap
   console.keyMap = "us";
 
-  # Temporary hardening for CVE-2026-46333 until all systems boot a fixed kernel.
-  # 3 disables ptrace attachment entirely, including same-UID debugging.
-  boot.kernel.sysctl."kernel.yama.ptrace_scope" = 3;
+  # Restrict ptrace to descendants and declared tracers. Wine's
+  # ReadProcessMemory needs this: each Wine process declares its wineserver as
+  # tracer (PR_SET_PTRACER), which scope 2 or 3 would refuse. CVE-2026-46333,
+  # which motivated scope 3, is fixed since kernel 6.18.31.
+  boot.kernel.sysctl."kernel.yama.ptrace_scope" = 1;
 
   # Enable CUPS to print documents.
   services.printing.enable = false;
