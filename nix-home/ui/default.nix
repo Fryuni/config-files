@@ -116,8 +116,12 @@ in {
   programs.chromium = {
     enable = true;
     package = brave;
+    # Vulkan is already enabled through the package's `vulkanSupport`, which
+    # adds it to the wrapper's `--enable-features`. Don't pass another
+    # `--enable-features` here: Chromium only honors the last one, which
+    # would drop the wrapper's VA-API features.
     commandLineArgs = [
-      "--enable-features=Vulkan"
+      "--enable-unsafe-webgpu"
     ];
   };
 
