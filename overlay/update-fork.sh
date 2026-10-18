@@ -9,9 +9,10 @@
 #   branch - fork branch to follow
 #   file   - repository-relative file that declares the version, rev, and hashes
 #
-# nix-update cannot discover versions on git.fryuni.dev: Cloudflare blocks its
-# feed and API probes. The branch head is resolved here through the Forgejo
-# API instead, and nix-update only refreshes hashes for that exact commit.
+# For forks whose tags don't give a usable version prefix, such as one carrying
+# upstream's backport tags, which nix-update's branch mode would pick from.
+# The branch head is resolved here through the Forgejo API, the existing version
+# prefix is kept, and nix-update only refreshes hashes for that exact commit.
 set -euo pipefail
 
 usage() {
@@ -45,7 +46,7 @@ if [[ ! "$repo_url" =~ ^(https://[^/]+)/([^/]+/[^/]+)\.git$ ]]; then
 fi
 api_url="${BASH_REMATCH[1]}/api/v1/repos/${BASH_REMATCH[2]}/commits?sha=${branch}&limit=1&stat=false&verification=false&files=false"
 
-# Cloudflare also rejects User-Agents starting with "curl".
+# Cloudflare only lets curl User-Agents through when they identify as Nix.
 commits=$(curl --fail --silent --show-error --location \
   --user-agent "nix-files-fork-updater" \
   "$api_url")

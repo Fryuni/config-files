@@ -66,10 +66,11 @@ hand-maintained package list anywhere else:
   adding one registry entry; exposure and update dispatch follow automatically.
 - `just update-package forgejo` and `just update-package restic` pin each fork on
   `git.fryuni.dev` to the latest commit of its tracked branch (`forgejo` and `master`),
-  then refresh the source and dependency hashes. They do not select release tags. Both
-  go through `overlay/update-fork.sh`, which resolves the branch head through the
-  Forgejo API because Cloudflare blocks nix-update's own version discovery on that host.
-  Run `overlay/update-fork.sh <name> <branch> <file> --no-commit` (arguments as in the
+  then refresh the source and dependency hashes. They do not select release tags.
+  restic uses nix-update's branch mode. forgejo goes through `overlay/update-fork.sh`,
+  which keeps the existing version prefix: the fork carries upstream's backport tags,
+  and nix-update would take the prefix from whichever release line tagged last. Run
+  `overlay/update-fork.sh <name> <branch> <file> --no-commit` (arguments as in the
   registry entry) to update a pin without committing.
 - `just update-package vite-plus` selects the latest stable GitHub release, refreshes
   all supported binary hashes and the npm lockfile/dependency hash, and builds the

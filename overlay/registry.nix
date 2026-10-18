@@ -44,6 +44,8 @@
     };
   };
 
+  # The fork carries upstream's backport tags, so nix-update's branch mode
+  # would take the version prefix from whichever release line tagged last.
   forgejo = {
     package = ./packages/forgejo.nix;
     update = {
@@ -78,11 +80,9 @@
 
   # --- Override entries: exposure owned by overlay/patches ---
 
-  # Forks on git.fryuni.dev go through overlay/update-fork.sh, since
-  # nix-update cannot discover versions there.
   restic.update = {
-    kind = "command";
-    command = "overlay/update-fork.sh restic master overlay/patches/default.nix";
+    kind = "nix-update";
+    args = ["--version=branch=master"];
   };
 
   t-smart-tmux-session-manager.update = {
