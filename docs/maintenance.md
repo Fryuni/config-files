@@ -64,10 +64,13 @@ hand-maintained package list anywhere else:
   update commit subjects, without rewriting commits.
 - Adding an ordinary package means dropping `<name>.nix` into `overlay/packages/` and
   adding one registry entry; exposure and update dispatch follow automatically.
-- `just update-package forgejo` fetches the latest commit on the fork's `forgejo`
-  branch, then refreshes the source, Go vendor, and npm dependency hashes. It does not
-  select release tags. Run `overlay/packages/update-forgejo.sh --no-commit` to update
-  the pin without committing.
+- `just update-package forgejo` and `just update-package restic` pin each fork on
+  `git.fryuni.dev` to the latest commit of its tracked branch (`forgejo` and `master`),
+  then refresh the source and dependency hashes. They do not select release tags. Both
+  go through `overlay/update-fork.sh`, which resolves the branch head through the
+  Forgejo API because Cloudflare blocks nix-update's own version discovery on that host.
+  Run `overlay/update-fork.sh <name> <branch> <file> --no-commit` (arguments as in the
+  registry entry) to update a pin without committing.
 - `just update-package vite-plus` selects the latest stable GitHub release, refreshes
   all supported binary hashes and the npm lockfile/dependency hash, and builds the
   candidate before replacing the package files and committing them as

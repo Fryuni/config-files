@@ -27,7 +27,7 @@ in
     passthru =
       old.passthru
       // {
-        updateScript = [./update-forgejo.sh "--no-commit"];
+        updateScript = [../update-fork.sh "forgejo" "forgejo" "overlay/packages/forgejo.nix" "--no-commit"];
       };
     meta =
       old.meta

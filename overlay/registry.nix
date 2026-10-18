@@ -17,10 +17,10 @@
 #               { kind = "nix-update"; args = [...]; }
 #                   invokes nix-update against packages.x86_64-linux.<name>
 #                   using the short package name and the given extra arguments.
-#               { kind = "command"; command = "<path>"; }
-#                   delegates to a specialized family updater script. The
-#                   script owns its algorithm, generated data, staging, and
-#                   commit behavior.
+#               { kind = "command"; command = "<path> [args...]"; }
+#                   delegates to a specialized updater script. The script
+#                   owns its algorithm, generated data, staging, and commit
+#                   behavior.
 #
 # The aggregate update command (`just update-overlays`) and single-package
 # dispatch (`just update-package <name>` / `overlay/update.sh <name>`) are both
@@ -31,11 +31,16 @@
 {
   # --- Ordinary packages: registry-owned exposure + nix-update ---
 
+  # Upstream also publishes `qualification-*` prerelease tags; only follow
+  # stable semver releases.
   cpa-manager-plus = {
     package = ./packages/cpa-manager-plus.nix;
     update = {
       kind = "nix-update";
-      args = [];
+      args = [
+        "--version-regex"
+        ''^v?([0-9]+\.[0-9]+\.[0-9]+)$''
+      ];
     };
   };
 
@@ -43,7 +48,7 @@
     package = ./packages/forgejo.nix;
     update = {
       kind = "command";
-      command = "overlay/packages/update-forgejo.sh";
+      command = "overlay/update-fork.sh forgejo forgejo overlay/packages/forgejo.nix";
     };
   };
 
@@ -73,9 +78,11 @@
 
   # --- Override entries: exposure owned by overlay/patches ---
 
+  # Forks on git.fryuni.dev go through overlay/update-fork.sh, since
+  # nix-update cannot discover versions there.
   restic.update = {
-    kind = "nix-update";
-    args = ["--version=branch=master"];
+    kind = "command";
+    command = "overlay/update-fork.sh restic master overlay/patches/default.nix";
   };
 
   t-smart-tmux-session-manager.update = {
