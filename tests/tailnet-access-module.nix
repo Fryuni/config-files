@@ -225,8 +225,8 @@ in
     jq -e '.extraConfig | contains("reverse_proxy 127.0.0.1:1880")' config.json
     jq -e '.extraConfig | contains("header_up Host 127.0.0.1:1880")' config.json
 
-    # T3 Code's Effect HTTP client sends tracing headers on cross-origin discovery.
-    jq -e '[.extraConfig | capture("Access-Control-Allow-Headers \"(?<headers>[^\"]+)\""; "g") | .headers | ascii_downcase | split(", ") | (index("b3") != null and index("traceparent") != null)] | length > 0 and all' config.json
+    # T3 Code's Effect HTTP client sends tracing and orchestration headers on cross-origin discovery.
+    jq -e '[.extraConfig | capture("Access-Control-Allow-Headers \"(?<headers>[^\"]+)\""; "g") | .headers | ascii_downcase | split(", ") | (index("b3") != null and index("traceparent") != null and index("x-t3-orchestration-protocol") != null)] | length > 0 and all' config.json
 
     jq -e '.extraConfig | contains("@port_local header_regexp port_local Host ^([0-9]+)-local\\.note\\.example\\.test(?::[0-9]+)?$")' config.json
     jq -e '.extraConfig | contains("reverse_proxy localhost:{re.port_local.1}")' config.json
