@@ -39,6 +39,11 @@ tree-sys:
 
 update: update-flake update-overlays
 
+update-llm:
+  nix flake update llm-agents
+  @git add flake.lock
+  git commit -m 'chore: update LLM tools' -- flake.lock
+
 update-flake-master:
   nix flake update nixpkgs-master
   git add flake.lock
