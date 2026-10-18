@@ -292,7 +292,7 @@ in {
           "${modifier}+d" = "exec ${rofi} -show drun";
           "${modifier}+space" = "exec vicinae toggle";
           "${modifier}+t" = "exec --no-startup-id ${lib.getExe t3CodeLaunchOrFocus}";
-          "${modifier}+b" = "exec ${lib.getExe config.programs.chromium.package}";
+          "${modifier}+b" = "exec ${lib.getExe config.programs.chromium.finalPackage}";
           "${modifier}+Shift+b" = "exec ${lib.getExe pkgs.master.google-chrome}";
 
           # Window state. i3's global fullscreen is the closest X11 equivalent

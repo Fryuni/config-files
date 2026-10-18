@@ -120,8 +120,14 @@ in {
     # adds it to the wrapper's `--enable-features`. Don't pass another
     # `--enable-features` here: Chromium only honors the last one, which
     # would drop the wrapper's VA-API features.
+    #
+    # The feature alone leaves Vulkan disabled: the wrapper doesn't put a
+    # Vulkan loader on the library path, so the GPU process fails to load
+    # `libvulkan.so.1`. Running ANGLE on Vulkan loads the copy bundled with
+    # Brave first, which lets the Vulkan initialization succeed.
     commandLineArgs = [
       "--enable-unsafe-webgpu"
+      "--use-angle=vulkan"
     ];
   };
 
