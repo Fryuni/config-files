@@ -8,9 +8,13 @@
   httpPort = 3333;
   sshPort = 2222;
   runnerHostPackages = with pkgs; [bash coreutils curl gawk gitMinimal gnused nix nodejs wget];
-  runnerSettings = {
+  runnerSettings = name: {
     container.docker_host = "automount";
     runner.capacity = 5;
+    # DynamicUser makes /var/lib/forgejo-runner/<name> a symlink into /var/lib/private.
+    # Host jobs default to $HOME/.cache/act under that symlink, and actions/checkout v6+
+    # scopes its credentials by the workspace path, which git resolves to the real path.
+    host.workdir_parent = "/var/lib/private/forgejo-runner/${name}/.cache/act";
   };
   cfg = config.services.forgejo;
   roots = paths: lib.filter (path: !(lib.any (other: other != path && lib.hasPrefix "${other}/" path) paths)) (lib.unique paths);
@@ -104,7 +108,7 @@ in {
       self = {
         enable = true;
         settings = lib.mkMerge [
-          runnerSettings
+          (runnerSettings "self")
           {
             runner.labels = [
               "ubuntu-latest:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
@@ -123,7 +127,7 @@ in {
       codeberg = {
         enable = true;
         settings = lib.mkMerge [
-          runnerSettings
+          (runnerSettings "codeberg")
           {
             runner.labels = [
               "ubuntu-24.04:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
@@ -144,7 +148,7 @@ in {
       gitgay = {
         enable = true;
         settings = lib.mkMerge [
-          runnerSettings
+          (runnerSettings "gitgay")
           {
             runner.labels = [
               "ubuntu-24.04:docker://ghcr.io/catthehacker/ubuntu:act-24.04"
