@@ -4,6 +4,7 @@
   ...
 }: let
   stateDir = "/var/lib/cpa-manager-plus";
+  port = 18317;
 in {
   users.groups."cpa-manager-plus" = {};
   users.users."cpa-manager-plus" = {
@@ -18,9 +19,7 @@ in {
     after = ["network-online.target" "cli-proxy-api.service"];
 
     environment = {
-      HTTP_ADDR = "127.0.0.1:18317";
-      # The public hostname routes /v0/management/* back to this service, so
-      # use CLIProxyAPI's loopback listener for CPAMP's own upstream requests.
+      HTTP_ADDR = "127.0.0.1:${toString port}";
       CPA_UPSTREAM_URL = "http://127.0.0.1:8317";
       USAGE_COLLECTOR_MODE = "http";
       USAGE_DATA_DIR = stateDir;
@@ -52,4 +51,6 @@ in {
       units = [{name = "cpa-manager-plus.service";}];
     }
   ];
+
+  services.lferrazTailnetAccess.proxy.aliases.llm-manager = port;
 }

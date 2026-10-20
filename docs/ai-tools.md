@@ -34,6 +34,15 @@ and pairing details with `journalctl --user -u t3code.service` on `note`, or
 service starts on the next graphical login, or with
 `systemctl --user start t3code.service` from the active desktop.
 
+## CLIProxyAPI
+
+`servers/loem/cli-proxy-api.nix` runs CLIProxyAPI on `127.0.0.1:8317`, and
+`servers/loem/cpa-manager-plus.nix` runs CPA Manager Plus on `127.0.0.1:18317`.
+The private Tailnet Caddy proxy publishes each on its own hostname, without
+path-specific routing: `https://llm.loem.lferraz.dev` is the API only, and
+`https://llm-manager.loem.lferraz.dev` serves the manager and its UI. CPA Manager
+Plus reaches CLIProxyAPI through the loopback listener.
+
 ## Hollama
 
 `servers/loem/hollama.nix` runs [Hollama](https://github.com/fmaclen/hollama)
@@ -49,9 +58,8 @@ controls to keep or move it.
 The root page in `common/hollama/index.html` seeds a CLIProxyAPI connection on
 first visit and verifies model discovery before opening the chat interface.
 It preserves existing browser connection settings. Browser requests to `/v1/*`
-are proxied directly to `http://127.0.0.1:8317`, including `/v1/models`, avoiding
-CPA Manager Plus's model-list routing on the `llm` hostname. This keeps the API
-on the same origin as the UI without CORS configuration. CLIProxyAPI currently
+are proxied directly to `http://127.0.0.1:8317`, including `/v1/models`. This
+keeps the API on the same origin as the UI without CORS configuration. CLIProxyAPI currently
 needs no client key; Hollama supplies its non-secret SDK placeholder. No model
 filter is configured, so all proxy models can be selected, including newly added
 ones after model discovery refreshes.
@@ -85,8 +93,8 @@ journalctl -u docker-hollama.service -u cli-proxy-api.service --since '10 minute
 From a Tailnet-connected browser, open the chat URL and check that it goes straight
 to the interface without sign-in. Select a model and send a short prompt. Verify
 that its response streams and the exchange appears in CPA Manager Plus at
-`https://llm.loem.lferraz.dev`. Reload the page and confirm the conversation remains
-in that browser. Start a new chat after adding a proxy model to refresh discovery.
+`https://llm-manager.loem.lferraz.dev`. Reload the page and confirm the
+conversation remains in that browser. Start a new chat after adding a proxy model to refresh discovery.
 Model discovery alone does not prove inference works.
 
 ## Claude Code
