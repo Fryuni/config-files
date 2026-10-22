@@ -48,7 +48,6 @@
       })
 
       # AI auxiliary tools
-      llm-agents.skills-installer
       llm-agents.workmux
       llm-agents.tuicr
       llm-agents.plannotator
