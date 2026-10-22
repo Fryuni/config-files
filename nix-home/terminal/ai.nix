@@ -34,7 +34,6 @@
       llm-agents.agent-browser
       llm-agents.t3code
       llm-agents.crush
-      llm-agents.openfang
       llm-agents.code
       (pkgs.lib.makeAuthWrapper llm-agents.claude-code {
         ANTHROPIC_BASE_URL = "https://llm.loem.lferraz.dev";
