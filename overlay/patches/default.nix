@@ -1,13 +1,13 @@
 _: prev: {
   # Completion tagging must share the repository with other machines' uploads.
   restic = prev.restic.overrideAttrs (old: rec {
-    version = "0.19.1-unstable-2026-10-14";
+    version = "0.19.1-unstable-2026-10-20";
     src = prev.fetchFromGitea {
       domain = "git.fryuni.dev";
       owner = "Fryuni";
       repo = "restic";
-      rev = "3a273c6407cea8f2c06329e39c35ce9dc838a75c";
-      hash = "sha256-3lFwlSMmoKv15fEt9ZyrYIfPauZh7fOtxMs9JmomVT4=";
+      rev = "c8a8b88279264892d11a0ec3938fa9cb7f5c3310";
+      hash = "sha256-uuNOyT3e4WthmrvGdGmccYitit66rVLzJQEPb1yXWZk=";
     };
     vendorHash = "sha256-o8+r0GJgtv/4cbrAeAP36sZW4A4kXV2rWRuxzxirHeI=";
     # The fork refactored this test, so nixpkgs' sandbox skip patch no longer applies.
