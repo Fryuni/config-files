@@ -18,7 +18,6 @@
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
   boot.blacklistedKernelModules = ["ideapad_laptop"];
-  boot.extraModulePackages = with config.boot.kernelPackages; [zenpower];
 
   boot.binfmt.emulatedSystems = [
     "aarch64-linux"
