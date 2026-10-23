@@ -126,8 +126,8 @@ in {
     # `libvulkan.so.1`. Running ANGLE on Vulkan loads the copy bundled with
     # Brave first, which lets the Vulkan initialization succeed.
     commandLineArgs = [
-      "--enable-unsafe-webgpu"
-      "--use-angle=vulkan"
+      # "--enable-unsafe-webgpu"
+      # "--use-angle=vulkan"
     ];
   };
 
