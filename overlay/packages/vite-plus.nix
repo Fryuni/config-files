@@ -10,19 +10,19 @@
   versionCheckHook,
 }: let
   # Update binaries and the npm toolchain together with update-vite-plus.py.
-  version = "1.3.0";
+  version = "1.4.0";
   releases = {
     x86_64-linux = {
       target = "x86_64-unknown-linux-gnu";
-      hash = "sha256-P7OmaEcuExLu3XWYs/bFEazrwvZJfCk6XuBOuiSO7n4=";
+      hash = "sha256-mSVYq8liE4RDSiLYDgbhF2FWgPFKPheljrKH/TCgdpQ=";
     };
     aarch64-linux = {
       target = "aarch64-unknown-linux-gnu";
-      hash = "sha256-yKOckqxlJB9YwlAR5BvjwRH8SNuww6q/oYkZFetM3/Q=";
+      hash = "sha256-ju4tPppb+GVPUVAEj1qCuG1PVGw0xTDwUlRfUFjbYN4=";
     };
     aarch64-darwin = {
       target = "aarch64-apple-darwin";
-      hash = "sha256-TwIac9Z1/8eKx3NZ/9QNiaYvJirHViXl4P1WciES+Dg=";
+      hash = "sha256-1U0ljOZ9Q8De/7CTKYJSQdsZfC8g5yhxEhIn8D+0AxI=";
     };
   };
   release = releases.${stdenv.hostPlatform.system} or (throw "Unsupported Vite+ system: ${stdenv.hostPlatform.system}");
@@ -45,7 +45,7 @@ in
       name = "vite-plus-${version}-npm-deps";
       src = ./vite-plus;
       fetcherVersion = 1;
-      hash = "sha256-64eWkW0bCmwNYn3jQvpKnxQbSi/f1IOigNfM0nmo0pA=";
+      hash = "sha256-f5TEnyFVvNfJFr+UIWPdQ739Lh36J5oQBRNLC3ER13k=";
     };
 
     nativeBuildInputs =
