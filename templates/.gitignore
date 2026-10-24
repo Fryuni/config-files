@@ -1,0 +1,4 @@
+flake.lock
+Cargo.lock
+pnpm-lock.yaml
+_generated/

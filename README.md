@@ -113,6 +113,24 @@ with Determinate Nix and preserve build and download reporting.
 The `metrics-dashboards` check runs dashboard queries in a disposable VictoriaMetrics
 instance to verify collection gaps and restore evidence from another machine.
 
+## Project templates
+
+Initialize a new project directly from this flake:
+
+```bash
+# TypeScript Convex backend with pnpm and a Nix development shell
+nix flake init -t git+https://git.fryuni.dev/Fryuni/nix-files#convex
+
+# Rust SpacetimeDB module with the CLI and Rust WebAssembly toolchain
+nix flake init -t git+https://git.fryuni.dev/Fryuni/nix-files#spacetimedb
+```
+
+Both project templates include a flake, `.envrc`, Forgejo Actions for PR tests
+and `main` deployment, and usage instructions. Convex also creates a backend
+preview for each PR. The template READMEs document their required Forgejo
+secrets. Dependency lockfiles and generated code are created locally and
+ignored. The existing `basic` template remains available as `#basic`.
+
 ## Documentation
 
 | Topic | Guide |

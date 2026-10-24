@@ -1,0 +1,32 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: spacetimedb-production
+
+jobs:
+  deploy:
+    runs-on: nix
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Publish module
+        run: |
+          config_dir="$(mktemp -d)"
+          trap 'rm -rf "$config_dir"' EXIT
+          nix develop -c spacetime --root-dir "$config_dir" login \
+            --token "$SPACETIMEDB_TOKEN"
+          nix develop -c spacetime --root-dir "$config_dir" publish \
+            --server "$SPACETIMEDB_HOST" \
+            --yes=remote,migrate,skip-login \
+            "$SPACETIMEDB_DATABASE"
+        env:
+          SPACETIMEDB_TOKEN: ${{ secrets.SPACETIMEDB_TOKEN }}
+          SPACETIMEDB_HOST: ${{ secrets.SPACETIMEDB_HOST }}
+          SPACETIMEDB_DATABASE: ${{ secrets.SPACETIMEDB_DATABASE }}

@@ -1,0 +1,27 @@
+{
+  "name": "convex-template",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "convex dev",
+    "predev": "convex dev --until-success && convex dashboard",
+    "logs": "convex logs",
+    "typecheck": "tsc -p convex",
+    "lint": "pnpm typecheck && eslint . --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "convex": "^1.44.0"
+  },
+  "devDependencies": {
+    "@convex-dev/eslint-plugin": "^5.0.0",
+    "@eslint/eslintrc": "^3.3.6",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.13.3",
+    "@typescript-eslint/eslint-plugin": "^8.66.0",
+    "@typescript-eslint/parser": "^8.66.0",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "eslint": "^10.8.0",
+    "globals": "^17.9.0",
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
+  }
+}

@@ -95,7 +95,10 @@ Important composition rules:
   and offline package-updater regression tests.
 - `commands.nix` — flake apps for local workflows such as build, diff, update, and
   formatting helpers.
-- `templates/` — flake templates exported by this repository.
+- `templates/` — flake templates exported by this repository: `basic`, `convex`
+  (TypeScript and pnpm), and `spacetimedb` (Rust with the WebAssembly target).
+  Both project templates include Forgejo PR tests and `main` deployment
+  workflows; Convex additionally deploys a backend preview for each PR.
 
 ## Flake outputs
 
@@ -117,6 +120,8 @@ The main exported outputs are:
 - `legacyPackages` — the full nixpkgs package set for supported systems, including
   overlays, channel overlays, and specialized package families.
 - `checks` — Linux checks for selected reusable NixOS modules and the Vite+ updater.
+- `templates` — project starters for `nix flake init`: `basic`, `convex`, and
+  `spacetimedb`.
 - `formatter` — the repository Nix formatter.
 - `apps` — command wrappers from `commands.nix` for build, diff, update, and maintenance
   workflows.
