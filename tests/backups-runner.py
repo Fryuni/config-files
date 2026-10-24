@@ -1012,6 +1012,8 @@ subprocess.run = run
         (self.source / "work").write_text("future machine work")
         self.cli("backup", "--scope", "home")
         self.historical_point("future", "services", 0)
+        # Fail at once instead of queueing for the production 15-minute wait.
+        self.config["localLockWaitSeconds"] = 0
         with (Path(self.config["stateDirectory"]) / "operation.lock").open("a") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             self.cli("backup", "--scope", "home", expected=75)
@@ -1033,6 +1035,178 @@ subprocess.run = run
         self.assertNotIn("Traceback", result.stderr)
         state = json.loads(self.cli("status").stdout)
         self.assertEqual(state["health"]["backup:home"]["level"], "critical")
+
+    def corpus(self):
+        logs = self.root / "service/logs"
+        logs.mkdir(parents=True)
+        self.config["archives"] = [{
+            "name": "fixture-corpus", "directory": str(logs),
+            "namePattern": r".+-[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{6}(_[0-9]+)?-.+\.log",
+            "contentPrefix": "=== REQUEST INFO ===\n", "minAgeSeconds": 2 * 86400,
+        }]
+        self.archive_staging = Path(self.config["stateDirectory"]) / "archives/fixture-corpus"
+        return logs
+
+    def exchange(self, logs, name, body="exchange", days=3, header=True):
+        path = logs / name
+        path.write_text(("=== REQUEST INFO ===\n" if header else "") + body)
+        moment = time.time() - days * 86400
+        os.utime(path, (moment, moment))
+        return path
+
+    def test_archive_moves_only_settled_exchanges_after_an_operator_run(self):
+        self.metrics_receiver()
+        logs = self.corpus()
+        self.restic("init")
+        settled = self.exchange(logs, "v1-responses-2026-10-20T101500-a1b2c3d4.log", "settled exchange")
+        sequenced = self.exchange(logs, "error-v1-messages-2026-10-20T101500_1-b2c3d4e5.log", "error exchange")
+        recent = self.exchange(logs, "v1-responses-2026-10-24T101500-c3d4e5f6.log", days=0)
+        reserved = self.exchange(logs, "v1-responses-2026-10-20T101501-d4e5f6a7.log", body="", header=False)
+        (logs / "request-log-parts-0123").mkdir()
+        kept = [recent, reserved] + [
+            self.exchange(logs, "main.log", "diagnostic", days=5, header=False),
+            self.exchange(logs, "main-2026-10-20T10-15-00.000.log", "diagnostic", days=5, header=False),
+            self.exchange(logs, "request-log-0123abcd.tmp", days=5),
+            self.exchange(logs, "v1-chat-completions-2026-10-20T101500-e5f6a7b8.log", "foreign", days=5, header=False),
+        ]
+
+        planned = json.loads(self.cli("archive", "--dry-run").stdout)
+        self.assertEqual((planned["files"], planned["pendingFiles"]), (2, 1))
+        self.assertEqual(planned["bytes"], settled.stat().st_size + sequenced.stat().st_size)
+        self.assertEqual(self.snapshots(), [])
+
+        waiting = json.loads(self.cli("archive", "--scheduled").stdout)
+        self.assertTrue(waiting["awaitingFirstArchive"])
+        self.assertTrue(settled.exists() and sequenced.exists())
+        self.assertEqual(self.snapshots(), [])
+        self.assertEqual(json.loads(self.cli("status").stdout)["health"]["archive:repository"]["level"], "warning")
+
+        report = json.loads(self.cli("archive").stdout)
+        self.assertEqual(report["files"], 2)
+        self.assertFalse(settled.exists() or sequenced.exists())
+        for path in kept:
+            self.assertTrue(path.exists(), path)
+        self.assertEqual(list(self.archive_staging.iterdir()), [])
+        point, = self.snapshots()
+        self.assertEqual(set(point["tags"]), {"permanent-archive", "fixture-corpus"})
+        self.assertEqual(point["paths"], [str(self.archive_staging)])
+        self.assertEqual(self.restic("dump", point["id"], str(self.archive_staging / settled.name)),
+                         b"=== REQUEST INFO ===\nsettled exchange")
+        self.assertEqual(self.metric("archived_files_total", archive="fixture-corpus"), 2)
+        self.assertEqual(self.metric("archive_pending_files", archive="fixture-corpus"), 1)
+        self.assertGreater(self.metric("archive_timestamp_seconds", archive="fixture-corpus"), time.time() - 60)
+        self.assertEqual(self.metric("run_success", operation="archive", scope="repository"), 1)
+        self.assertEqual(self.metric("health_status", check="archive", scope="repository"), 0)
+
+        later = self.exchange(logs, "v1-responses-2026-10-21T101500-f6a7b8c9.log", "later exchange")
+        self.cli("archive", "--scheduled")
+        self.assertFalse(later.exists())
+        self.assertEqual(len(self.snapshots()), 2)
+        self.assertEqual(json.loads(self.cli("status").stdout)["archives"]["fixture-corpus"]["files"], 3)
+
+    def test_maintenance_preserves_permanent_archives_beyond_retention(self):
+        logs = self.corpus()
+        (self.source / "state").write_text("home data")
+        self.restic("init")
+        exchange = self.exchange(logs, "v1-responses-2026-10-20T101500-a1b2c3d4.log", "permanent exchange")
+        self.cli("archive")
+        recent, = self.snapshots()
+        expired = self.historical_point("loem", "home", 900)
+        self.historical_point("loem", "home", 0)
+        ancient_time = (datetime.now(timezone.utc) - timedelta(days=900)).strftime("%Y-%m-%d %H:%M:%S")
+        output = self.restic("backup", "--json", "--host", "loem", "--time", ancient_time,
+                             "--tag", "permanent-archive", "--tag", "fixture-corpus", str(self.source))
+        ancient = next(json.loads(line)["snapshot_id"] for line in output.splitlines()
+                       if json.loads(line).get("message_type") == "summary")
+        self.cli("maintain")
+        ids = {point["id"] for point in self.snapshots()}
+        self.assertNotIn(expired, ids)
+        self.assertIn(recent["id"], ids)
+        self.assertIn(ancient, ids)
+        self.restic("check", "--read-data")
+        self.assertEqual(self.restic("dump", recent["id"], str(self.archive_staging / exchange.name)),
+                         b"=== REQUEST INFO ===\npermanent exchange")
+
+    def test_failed_archive_upload_keeps_every_exchange_local(self):
+        logs = self.corpus()
+        self.restic("init")
+        exchange = self.exchange(logs, "v1-responses-2026-10-20T101500-a1b2c3d4.log")
+        boundary = self.failing_restic_boundary("backup", 3, "unreadable source")
+        self.cli("archive", expected=1, env=boundary)
+        self.assertTrue(exchange.exists())
+        self.assertEqual(exchange.stat().st_nlink, 1)
+        self.assertEqual(list(self.archive_staging.iterdir()), [])
+        self.assertEqual(json.loads(self.cli("status").stdout)["health"]["archive:repository"]["level"], "critical")
+
+    def test_archive_deletes_only_files_matching_the_restore_point(self):
+        logs = self.corpus()
+        self.restic("init")
+        stable = self.exchange(logs, "v1-responses-2026-10-20T101500-a1b2c3d4.log", "stable")
+        mismatched = self.exchange(logs, "v1-responses-2026-10-20T101501-b2c3d4e5.log", "mismatched")
+        modified = self.exchange(logs, "v1-responses-2026-10-20T101502-c3d4e5f6.log", "modified")
+        binary = self.root / "changing-bin"
+        binary.mkdir()
+        wrapper = binary / "restic"
+        # Writers share the staged inode. One file differs only in the restore
+        # point; the other changes locally only after it was uploaded.
+        wrapper.write_text("#!" + sys.executable + "\n" + """
+import os, subprocess, sys
+if 'backup' in sys.argv:
+    path = os.environ['ARCHIVE_FIXTURE_MISMATCHED']
+    before = os.stat(path)
+    os.utime(path)
+    code = subprocess.run([REAL, *sys.argv[1:]]).returncode
+    os.utime(path, ns=(before.st_atime_ns, before.st_mtime_ns))
+    sys.exit(code)
+if 'ls' in sys.argv:
+    os.utime(os.environ['ARCHIVE_FIXTURE_MODIFIED'])
+os.execv(REAL, [REAL, *sys.argv[1:]])
+""".replace("REAL", repr(shutil.which("restic"))))
+        wrapper.chmod(0o755)
+        environment = dict(os.environ, PATH=str(binary) + os.pathsep + os.environ["PATH"],
+                           ARCHIVE_FIXTURE_MISMATCHED=str(mismatched), ARCHIVE_FIXTURE_MODIFIED=str(modified))
+        result = self.cli("archive", expected=1, env=environment)
+        self.assertIn("2 archived files did not match the restore point", result.stderr)
+        self.assertFalse(stable.exists())
+        for path in [mismatched, modified]:
+            self.assertTrue(path.exists(), path)
+            self.assertEqual(path.stat().st_nlink, 1)
+        status = json.loads(self.cli("status").stdout)["archives"]["fixture-corpus"]
+        self.assertEqual(status["files"], 1)
+        self.assertNotIn("succeededAt", status)
+        self.assertEqual(status["pending"], {"files": 2, "bytes": mismatched.stat().st_size + modified.stat().st_size})
+
+    def test_interrupted_archive_recovers_a_lone_staged_copy(self):
+        logs = self.corpus()
+        self.restic("init")
+        self.archive_staging.mkdir(parents=True)
+        # A run interrupted after deleting this original left the only copy in staging.
+        orphan = self.archive_staging / "v1-responses-2026-10-19T101500-0a1b2c3d.log"
+        orphan.write_text("=== REQUEST INFO ===\nlast copy")
+        exchange = self.exchange(logs, "v1-responses-2026-10-20T101500-a1b2c3d4.log")
+        os.link(exchange, self.archive_staging / exchange.name)
+        self.assertEqual(json.loads(self.cli("archive").stdout)["files"], 2)
+        point, = self.snapshots()
+        self.assertEqual(self.restic("dump", point["id"], str(orphan)), b"=== REQUEST INFO ===\nlast copy")
+        self.assertFalse(exchange.exists())
+        self.assertEqual(list(self.archive_staging.iterdir()), [])
+
+    def test_archive_export_restores_every_restore_point_without_overwriting(self):
+        logs = self.corpus()
+        self.restic("init")
+        name = "v1-responses-2026-10-20T101500-a1b2c3d4.log"
+        for body in ["first exchange", "reused name"]:
+            self.exchange(logs, name, body)
+            self.cli("archive")
+        target = self.root / "corpus-export"
+        report = json.loads(self.cli("archive-export", "--name", "fixture-corpus", "--target", str(target)).stdout)
+        self.assertEqual((report["restorePoints"], report["files"]), (2, 2))
+        batches = sorted(target.iterdir())
+        self.assertTrue(all(batch.name.startswith("loem-") for batch in batches))
+        self.assertEqual(sorted((batch / name).read_text() for batch in batches),
+                         ["=== REQUEST INFO ===\nfirst exchange", "=== REQUEST INFO ===\nreused name"])
+        self.cli("archive-export", "--name", "fixture-corpus", "--target", str(target), expected=1)
+        self.cli("archive-export", "--name", "fixture-corpus", "--target", str(logs / "export"), expected=1)
 
     def test_restore_rehearsal_refuses_targets_inside_native_service_storage(self):
         (self.source / "work").write_text("valuable")

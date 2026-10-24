@@ -250,6 +250,36 @@
       services.machineBackups.enable = true;
     }
   ];
+  exchangeArchive = {
+    directory = "/var/lib/exchange-proxy/logs";
+    namePattern = ".+\\.log";
+    contentPrefix = "=== REQUEST INFO ===\n";
+    minAgeSeconds = 172800;
+  };
+  archived = evaluate (enrolled ++ [{services.machineBackups.archives.exchange-corpus = exchangeArchive;}]);
+  homeArchive =
+    (lib.evalModules {
+      modules = [
+        ../nix-home/modules/machine-backups.nix
+        {services.machineBackups.archives.exchange-corpus = exchangeArchive;}
+      ];
+    }).config;
+  homeArchiveOwner = extra:
+    evaluate [
+      extra
+      {
+        services.machineBackups = {
+          enable = true;
+          user = "alice";
+          userUid = 2000;
+          homeDirectory = "/srv/alice";
+          homeManager = homeArchive.services.machineBackups;
+        };
+      }
+    ];
+  homeArchived = homeArchiveOwner {};
+  duplicateArchive = homeArchiveOwner {services.machineBackups.archives.exchange-corpus = exchangeArchive;};
+  reservedArchive = evaluate (enrolled ++ [{services.machineBackups.archives.complete = exchangeArchive;}]);
   duplicate = evaluate (enrolled ++ [independentService]);
   emptySource = evaluate [
     {
@@ -465,6 +495,14 @@
     (check (failedAssertion missingUnitIdentity "user units require user and uid") "NixOS user units must declare their owner and UID")
     (check (failedAssertion wrongNativeFields "require kind = postgres") "Native connection settings must match the capture strategy")
     (check (failedAssertion wrongCoordinatedStrategy "coordinated database captures require kind = postgres") "Associated database captures must use the PostgreSQL protocol")
+    (check (!(enabled.systemd.timers ? machine-backup-archive)) "Machines without archives must not schedule archive deletions")
+    (check (archived.systemd.timers.machine-backup-archive.timerConfig.OnCalendar == "*-*-* 04:40:00 UTC") "Archives must run daily")
+    (check archived.systemd.timers.machine-backup-archive.timerConfig.Persistent "Archives must catch up after downtime")
+    (check (lib.hasSuffix " archive --scheduled" archived.systemd.services.machine-backup-archive.serviceConfig.ExecStart) "Scheduled archives must wait for an operator-run first archive")
+    (check (failedAssertion duplicateArchive "archives must have unique names") "Duplicate archive names must be rejected across NixOS and Home Manager")
+    (check (failedAssertion reservedArchive "must not reuse the restore point tags") "Archives must not share tags selected by retention or monitoring")
+    (check (rejectsDeclaration {archives.exchange-corpus = exchangeArchive // {minAge = 1;};}) "Misspelled archive settings must be rejected")
+    (check (rejectsDeclaration {archives.exchange-corpus = exchangeArchive // {directory = "relative/logs";};}) "Archive sources must be absolute paths")
   ];
 in
   assert lib.all (value: value) checks;
@@ -480,6 +518,8 @@ in
       uninferredConfigFile = uninferred.services.machineBackups.configFile;
       ownerConfigFile = owner.services.machineBackups.configFile;
       standaloneOwnerConfigFile = standaloneOwner.services.machineBackups.configFile;
+      archivedConfigFile = archived.services.machineBackups.configFile;
+      homeArchivedConfigFile = homeArchived.services.machineBackups.configFile;
     } ''
       test "$(git config --file "$gitConfigFile" --get-all safe.directory)" = /home/lotus/ZShutils
       test "$(git config --file "$ownerGitConfigFile" --get-all safe.directory)" = /srv/alice/ZShutils
@@ -513,5 +553,8 @@ in
       jq -e '.scopes.services.captures | any(.name == "user-journal" and .units[0].user == "alice" and .units[0].uid == 2000 and .writerUid == 2000)' "$standaloneOwnerConfigFile"
       jq -e '[.scopes.home.captures[], .scopes.services.captures[]] | [.. | select(. == null)] | length == 0' "$ownerConfigFile"
       jq -e '.capacity.quotaBytes == 1099511627776' "$ownerConfigFile"
+      jq -e '.archives == []' "$configFile"
+      jq -e '.archives == [{name: "exchange-corpus", directory: "/var/lib/exchange-proxy/logs", namePattern: ".+\\.log", contentPrefix: "=== REQUEST INFO ===\n", minAgeSeconds: 172800}]' "$archivedConfigFile"
+      jq -e --slurpfile system "$archivedConfigFile" '.archives == $system[0].archives' "$homeArchivedConfigFile"
       touch $out
     ''

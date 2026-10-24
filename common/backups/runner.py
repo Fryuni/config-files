@@ -8,6 +8,7 @@ import fcntl
 import json
 import os
 from pathlib import Path
+import re
 import selectors
 import signal
 import shlex
@@ -40,6 +41,21 @@ def utcnow():
 
 def parsed_time(value):
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def timestamp_ns(value):
+    # Restic records nanosecond file times; datetime keeps only microseconds.
+    match = re.fullmatch(r"(.+T\d\d:\d\d:\d\d)(?:\.(\d{1,9}))?(Z|[+-]\d\d:\d\d)", value)
+    if not match:
+        raise ValueError("Unrecognized restic timestamp")
+    offset = "+00:00" if match[3] == "Z" else match[3]
+    seconds = int(datetime.fromisoformat(match[1] + offset).timestamp())
+    return seconds * 10**9 + int((match[2] or "").ljust(9, "0"))
+
+
+# Archive restore points never carry the machine-backup tag that retention
+# selects, so maintenance cannot forget or prune them.
+ARCHIVE_TAG = "permanent-archive"
 
 
 class Runner:
@@ -453,6 +469,208 @@ class Runner:
             }))
             self.transition("maintain:repository", "ok", "Repository maintenance succeeded")
 
+    def archive_snapshots(self, name, host=None):
+        arguments = ["snapshots", "--json", "--tag", ARCHIVE_TAG + "," + name]
+        if host:
+            arguments.extend(["--host", host])
+        return json.loads(self.restic(*arguments).stdout) or []
+
+    def archive_candidates(self, archive):
+        try:
+            pattern = re.compile(archive["namePattern"])
+        except re.error as error:
+            raise Failure("Archive %s has an invalid name pattern" % archive["name"]) from error
+        prefix = archive.get("contentPrefix", "").encode()
+        cutoff = time.time_ns() - archive["minAgeSeconds"] * 10**9
+        ready, pending = [], []
+        try:
+            entries = list(os.scandir(archive["directory"]))
+        except FileNotFoundError as error:
+            raise Failure("Archive %s source directory is missing" % archive["name"]) from error
+        for entry in entries:
+            if not pattern.fullmatch(entry.name):
+                continue
+            try:
+                if not entry.is_file(follow_symlinks=False):
+                    continue
+                info = entry.stat(follow_symlinks=False)
+                # Empty files are names reserved by writers that have not finished.
+                if not info.st_size:
+                    continue
+                if prefix:
+                    descriptor = os.open(entry.path, os.O_RDONLY | os.O_NOFOLLOW)
+                    with os.fdopen(descriptor, "rb") as stream:
+                        if stream.read(len(prefix)) != prefix:
+                            continue
+            except FileNotFoundError:
+                continue
+            (ready if info.st_mtime_ns <= cutoff else pending).append((entry.name, info))
+        return sorted(ready, key=lambda item: item[0]), pending
+
+    def archive(self, dry_run=False, scheduled=False):
+        archives = self.config.get("archives", [])
+        if not archives:
+            raise Failure("No archives are registered on this machine")
+        if not dry_run:
+            self.unlock_stale()
+        reports = [self.archive_one(archive, dry_run, scheduled) for archive in archives]
+        if not dry_run:
+            waiting = [report["archive"] for report in reports if report.get("awaitingFirstArchive")]
+            if waiting:
+                self.transition("archive:repository", "warning",
+                                "Archive %s awaits its first manual run of machine-backup archive" %
+                                ", ".join(waiting))
+            else:
+                self.update(lambda data: data.setdefault("lastFailure", {}).pop("archive:repository", None))
+                self.transition("archive:repository", "ok", "Permanent archive succeeded")
+        for report in reports:
+            print(json.dumps(report))
+
+    def archive_one(self, archive, dry_run, scheduled):
+        name = archive["name"]
+        directory = Path(archive["directory"])
+        staging = self.state / "archives" / name
+        ready, pending = self.archive_candidates(archive)
+        report = {"archive": name, "files": len(ready), "bytes": sum(info.st_size for _, info in ready),
+                  "pendingFiles": len(pending)}
+        if dry_run:
+            report["dryRun"] = True
+            if ready:
+                oldest = min(ready, key=lambda item: item[1].st_mtime_ns)
+                newest = max(ready, key=lambda item: item[1].st_mtime_ns)
+                report.update(oldest=oldest[0], newest=newest[0])
+            return report
+        def record_pending(record, files):
+            record["pending"] = {"files": len(files), "bytes": sum(info.st_size for _, info in files)}
+        if scheduled and not self.archive_snapshots(name, self.config["host"]):
+            # Deletion starts only after an operator has reviewed and run the first archive.
+            def awaiting(data):
+                record_pending(data.setdefault("archives", {}).setdefault(name, {"files": 0, "bytes": 0}),
+                               ready + pending)
+            self.update(awaiting)
+            report["awaitingFirstArchive"] = True
+            return report
+        staging.mkdir(parents=True, exist_ok=True, mode=0o700)
+        staged = {}
+        try:
+            for entry in os.scandir(staging):
+                if not entry.is_file(follow_symlinks=False):
+                    raise Failure("Archive %s staging contains an unexpected entry" % name)
+                info = entry.stat(follow_symlinks=False)
+                # An interrupted run leaves its links behind. A lone link is the only
+                # remaining copy of that file, so it is archived rather than discarded.
+                if info.st_nlink > 1:
+                    os.unlink(entry.path)
+                else:
+                    staged[entry.name] = (None, info)
+            # Eligible files this run leaves on the machine still count as backlog.
+            retained = []
+            for file_name, selected in ready:
+                if file_name in staged:
+                    retained.append((file_name, selected))
+                    continue
+                link = staging / file_name
+                try:
+                    os.link(directory / file_name, link, follow_symlinks=False)
+                except FileNotFoundError:
+                    continue
+                except OSError as error:
+                    if error.errno == 18:
+                        raise Failure("Archive %s source must share a filesystem with %s" %
+                                      (name, self.state)) from error
+                    raise
+                info = link.stat(follow_symlinks=False)
+                if (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns) != (
+                        selected.st_dev, selected.st_ino, selected.st_size, selected.st_mtime_ns):
+                    link.unlink()
+                    continue
+                staged[file_name] = (directory / file_name, info)
+            if not staged:
+                def unchanged(data):
+                    record = data.setdefault("archives", {}).setdefault(name, {"files": 0, "bytes": 0})
+                    record_pending(record, pending)
+                    record["succeededAt"] = utcnow().isoformat()
+                self.update(unchanged)
+                report.update(files=0, bytes=0)
+                return report
+            with self.phase("archive %s: uploading %d files" % (name, len(staged))):
+                result = self.restic("backup", "--json", "--host", self.config["host"],
+                                     "--tag", ARCHIVE_TAG, "--tag", name, "--group-by", "host,tags",
+                                     str(staging), stream=True)
+            snapshot = next((json.loads(line).get("snapshot_id") for line in result.stdout.splitlines()
+                             if line.strip() and json.loads(line).get("message_type") == "summary"), None)
+            if not snapshot:
+                raise Failure("Successful archive upload did not return a restore point")
+            with self.phase("archive %s: verifying restore point" % name):
+                listing = self.restic("ls", "--json", snapshot).stdout
+            nodes = {}
+            for line in listing.splitlines():
+                node = json.loads(line) if line.strip() else {}
+                if node.get("type") == "file" and Path(node.get("path", "")).parent == staging:
+                    nodes[node["name"]] = (node["size"], timestamp_ns(node["mtime"]))
+            archived_files, archived_bytes, unverified = 0, 0, []
+            for file_name, (original, info) in sorted(staged.items()):
+                if nodes.get(file_name) != (info.st_size, info.st_mtime_ns):
+                    unverified.append((file_name, info))
+                    continue
+                if original is not None:
+                    try:
+                        current = original.lstat()
+                    except FileNotFoundError:
+                        current = None
+                    if current and (current.st_dev, current.st_ino) == (info.st_dev, info.st_ino):
+                        if (current.st_size, current.st_mtime_ns) != (info.st_size, info.st_mtime_ns):
+                            unverified.append((file_name, current))
+                            continue
+                        original.unlink()
+                (staging / file_name).unlink()
+                archived_files += 1
+                archived_bytes += info.st_size
+            def archived(data):
+                record = data.setdefault("archives", {}).setdefault(name, {"files": 0, "bytes": 0})
+                record["files"] += archived_files
+                record["bytes"] += archived_bytes
+                record["lastArchive"] = {"at": utcnow().isoformat(), "files": archived_files,
+                                         "bytes": archived_bytes, "snapshot": snapshot}
+                record_pending(record, pending + retained + unverified)
+                if not unverified:
+                    record["succeededAt"] = utcnow().isoformat()
+            self.update(archived)
+            report.update(files=archived_files, bytes=archived_bytes, snapshot=snapshot,
+                          pendingFiles=len(pending) + len(retained) + len(unverified))
+            if unverified:
+                raise Failure("%d archived files did not match the restore point and remain local" %
+                              len(unverified))
+            return report
+        finally:
+            # Discarding extra links leaves every unarchived original in place.
+            for entry in os.scandir(staging):
+                if entry.is_file(follow_symlinks=False) and entry.stat(follow_symlinks=False).st_nlink > 1:
+                    os.unlink(entry.path)
+
+    def archive_export(self, name, target, host=None):
+        destination = self.isolated_target(target)
+        self.unlock_stale()
+        points = sorted(self.archive_snapshots(name, host), key=lambda point: parsed_time(point["time"]))
+        if not points:
+            raise Failure("No archive restore points exist for that archive")
+        destination.mkdir(parents=True, exist_ok=True, mode=0o700)
+        destination.chmod(0o700)
+        file_count = 0
+        for point in points:
+            if len(point.get("paths", [])) != 1:
+                raise Failure("Archive restore point has an unexpected layout")
+            # One directory per restore point: a name reused by a later batch
+            # cannot overwrite an earlier exchange.
+            batch = destination / "-".join([point["hostname"],
+                                            parsed_time(point["time"]).strftime("%Y%m%dT%H%M%SZ"),
+                                            point["short_id"]])
+            with self.phase("Exporting archive restore point %s" % point["short_id"]):
+                self.restic("restore", point["id"] + ":" + point["paths"][0], "--target", str(batch), "--verify")
+            file_count += sum(1 for path in batch.rglob("*") if path.is_file() and not path.is_symlink())
+        print(json.dumps({"archive": name, "restorePoints": len(points), "files": file_count,
+                          "target": str(destination)}))
+
     def rehearsal_reminder(self):
         quarter = str(utcnow().year) + "-Q" + str((utcnow().month - 1) // 3 + 1)
         def change(data):
@@ -645,15 +863,15 @@ class Runner:
                         "Persistent service state coverage has %d unclassified paths and %d inspection issues" %
                         (len(uncovered), len(issues)))
 
-    def restore_test(self, host, scope, target, includes):
-        started = time.monotonic()
+    def isolated_target(self, target):
         destination = Path(target).absolute()
         if destination.is_symlink() or (destination.exists() and
                                         (not destination.is_dir() or any(destination.iterdir()))):
-            raise Failure("Restore rehearsal requires a new or empty isolated directory")
+            raise Failure("Restore requires a new or empty isolated directory")
         destination = destination.resolve()
         sources = [self.state]
         sources.extend(map(Path, self.config.get("inventory", {}).get("coveredPaths", [])))
+        sources.extend(Path(archive["directory"]) for archive in self.config.get("archives", []))
         for specification in self.config["scopes"].values():
             sources.extend(map(Path, specification.get("paths", [])))
             for entry in specification.get("captures", []):
@@ -667,6 +885,11 @@ class Runner:
             resolved = source.resolve()
             if destination == resolved or destination in resolved.parents or resolved in destination.parents:
                 raise Failure("Restore target overlaps backup source or staging state")
+        return destination
+
+    def restore_test(self, host, scope, target, includes):
+        started = time.monotonic()
+        destination = self.isolated_target(target)
         self.unlock_stale()
         points = [point for point in self.snapshots(complete=True)
                   if point["hostname"] == host and scope in point.get("tags", [])]
@@ -787,6 +1010,14 @@ def main():
     restore.add_argument("--scope", required=True, choices=["home", "services"])
     restore.add_argument("--target", required=True)
     restore.add_argument("--include", action="append", default=[])
+    archive = commands.add_parser("archive", help="Move settled files into permanent archive restore points")
+    archive.add_argument("--dry-run", action="store_true", help="Report what would be archived; change nothing")
+    archive.add_argument("--scheduled", action="store_true",
+                         help="Archive only after an operator-run first archive exists")
+    export = commands.add_parser("archive-export", help="Restore every archive restore point into a new directory")
+    export.add_argument("--name", required=True)
+    export.add_argument("--target", required=True)
+    export.add_argument("--host")
     restic = commands.add_parser("restic")
     restic.add_argument("arguments", nargs=argparse.REMAINDER)
     arguments = parser.parse_args()
@@ -796,11 +1027,14 @@ def main():
         if arguments.command == "metrics":
             return 0 if runner.push_metrics() else 75
         returncode = 0
-        lock_name = "monitor.lock" if arguments.command in ["monitor", "status", "inventory", "rehearsal-reminder"] else "operation.lock"
+        # Exports only read the repository; a long download must not block local captures.
+        lock_name = ("monitor.lock" if arguments.command in ["monitor", "status", "inventory", "rehearsal-reminder"]
+                     else "export.lock" if arguments.command == "archive-export" else "operation.lock")
         with (runner.state / lock_name).open("a") as lock:
             # Scheduled jobs queue behind each other instead of failing, which
-            # would leave the unit failed until its retry.
-            waits = arguments.command in ["backup", "maintain"]
+            # would leave the unit failed until its retry. Holding the operation
+            # lock also keeps archive deletions out of a running upload's scan.
+            waits = arguments.command in ["backup", "maintain", "archive"]
             deadline = time.monotonic() + (runner.config.get("localLockWaitSeconds", 900) if waits else 0)
             reported = False
             while True:
@@ -814,7 +1048,7 @@ def main():
                         runner.log_progress("Waiting for another local backup operation to finish")
                         reported = True
                     time.sleep(1)
-            if arguments.command in ["backup", "monitor", "restore-test", "maintain"] and not getattr(arguments, "dry_run", False):
+            if arguments.command in ["backup", "monitor", "restore-test", "maintain", "archive"] and not getattr(arguments, "dry_run", False):
                 run_key = arguments.command + ":" + getattr(arguments, "scope", "repository")
                 started = time.monotonic()
             if arguments.command == "backup":
@@ -832,6 +1066,10 @@ def main():
                 print(json.dumps(runner.update(lambda data: data["inventory"])))
             elif arguments.command == "restore-test":
                 runner.restore_test(arguments.host, arguments.scope, arguments.target, arguments.include)
+            elif arguments.command == "archive":
+                runner.archive(arguments.dry_run, arguments.scheduled)
+            elif arguments.command == "archive-export":
+                runner.archive_export(arguments.name, arguments.target, arguments.host)
             elif arguments.command == "restic":
                 returncode = runner.admin_restic(arguments.arguments)
             if run_key:
@@ -868,7 +1106,8 @@ def main():
         print(str(error), file=sys.stderr)
         return 75 if error.transient else 1
     finally:
-        if "runner" in locals() and arguments.command in ["backup", "monitor", "maintain", "inventory", "restore-test", "rehearsal-reminder"]:
+        if "runner" in locals() and arguments.command in ["backup", "monitor", "maintain", "inventory", "restore-test",
+                                                          "rehearsal-reminder", "archive"]:
             # Telemetry availability never changes the backup's exit status.
             runner.push_metrics()
     return returncode

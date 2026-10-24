@@ -56,16 +56,26 @@ in {
     };
   };
 
-  services.machineBackups.directories = [
-    {
-      name = "cli-proxy-api";
-      paths = [stateDir];
-      # Keep multi-hour request streams running throughout the backup.
-      writerCoverageNote = "State and the AI exchange corpus are read live. In-flight exchanges may be incomplete and rotating credentials may need manual recovery; these races are accepted to avoid disrupting requests.";
-      # Request/response exchanges are retained; only diagnostic logs are disposable.
-      excludes = ["/logs/main.log" "/logs/main-*.log"];
-    }
-  ];
+  services.machineBackups = {
+    directories = [
+      {
+        name = "cli-proxy-api";
+        paths = [stateDir];
+        # Keep multi-hour request streams running throughout the backup.
+        writerCoverageNote = "State and the AI exchange corpus are read live. Completed exchanges are renamed into place, but in-flight temporary parts may be incomplete and rotating credentials may need manual recovery; these races are accepted to avoid disrupting requests.";
+        # Request/response exchanges are retained; only diagnostic logs are disposable.
+        excludes = ["/logs/main.log" "/logs/main-*.log"];
+      }
+    ];
+    # Settled exchanges leave this low-end server for the permanent corpus archive.
+    archives.ai-exchange-corpus = {
+      directory = "${stateDir}/logs";
+      # Request and error exchange names; rotated main logs use a different timestamp format.
+      namePattern = ".+-[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{6}(_[0-9]+)?-.+\\.log";
+      contentPrefix = "=== REQUEST INFO ===\n";
+      minAgeSeconds = 2 * 86400;
+    };
+  };
 
   services.lferrazTailnetAccess.proxy.aliases.llm = port;
 }

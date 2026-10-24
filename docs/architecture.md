@@ -55,7 +55,9 @@ Important composition rules:
   is selected automatically; `note` explicitly selects its standalone Home Manager
   output through `services.machineBackups.homeManager`. Native database
   captures merge dependent application registrations by capture name. The engine
-  contains no service catalogue or service enable checks. `loem` owns
+  contains no service catalogue or service enable checks. Services register files
+  that leave the machine permanently through `services.machineBackups.archives`,
+  such as CLIProxyAPI's corpus archive. `loem` owns
   shared repository maintenance. Restic reads selected files directly; staging
   holds native database exports and recovery artifacts. Application writers pause
   through upload, with a configurable one-hour limit; transient systemd watchdogs

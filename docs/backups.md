@@ -57,9 +57,14 @@ data referenced by any retained restore point.
   disrupting multi-hour requests and coding sessions. T3's SQLite databases
   still use consistent native online exports. Associated files, CLIProxyAPI
   credentials/configuration, and the AI exchange corpus are read live; concurrent
-  changes and incomplete recent exchanges are accepted. Credentials affected by
+  changes and incomplete in-flight temporary parts are accepted. Credentials affected by
   rotation can be restored manually. Preserve the existing paths and corpus
   coverage.
+- Keep the AI exchange corpus permanently without filling `loem`'s disk. A daily
+  job moves exchanges settled for two days into the
+  [corpus archive](#corpus-archive): retention-exempt restore points
+  in the shared repository. Recent exchanges stay under the normal service backup
+  until they move. See [ADR-0003](adr/0003-permanent-corpus-archive-in-shared-repository.md).
 - Run notebook backups at low priority while awake and connected, including on
   battery. Do not wake the notebook. Catch up after resume or reconnection.
   The user reports that the notebook is on almost all the time.
@@ -117,13 +122,13 @@ No request payloads were read during this investigation.
 
 The current log-directory size cleanup is disabled; ordinary request exchanges
 have no discovered automatic age limit. Enabling the size cleaner later could
-delete corpus files as well as diagnostics. A file remaining in the source can
-remain in new restore points indefinitely despite the one-year history policy;
-after source deletion, eventual expiration of its last retained restore point
-can remove it from backups too. This is the accepted behavior: the user will
-delete exchanges after placing them elsewhere, and their old backup copies may
-then expire normally. This backup protects the machines; it does not provide a
-separate permanent corpus archive or add source cleanup.
+delete corpus files as well as diagnostics. Error-log rotation applies only while
+request logging is disabled. A file remaining in the source can remain in new
+restore points indefinitely despite the one-year history policy; after source
+deletion, eventual expiration of its last retained restore point removes it from
+ordinary backups too. The [corpus archive](#corpus-archive) is the
+permanent copy: exchanges are deleted from `loem` only after it verifiably holds
+them, and their ordinary backup copies then expire normally.
 [Pinned request writer](https://github.com/Fryuni/CLIProxyAPI/blob/6b763383c43ac26af5890e3b1f32717598812b8d/internal/logging/request_logger_writer.go),
 [log-directory cleanup](https://github.com/Fryuni/CLIProxyAPI/blob/6b763383c43ac26af5890e3b1f32717598812b8d/internal/logging/log_dir_cleaner.go).
 
@@ -281,13 +286,15 @@ Implementation must validate these mechanisms against the installed versions:
   upload finishes. The restore wrapper reconstructs a portable snapshot using
   only the isolated restored files.
   [VictoriaMetrics snapshot documentation](https://docs.victoriametrics.com/victoriametrics/single-server-victoriametrics/#how-to-work-with-snapshots)
-- CLIProxyAPI creates unique request filenames but writes directly to the final
-  filename, so a `.log` name does not prove that capture is complete. Transient
-  request/response parts also disappear during normal operation. Keep the service
-  running while restic reads its state and corpus directly; incomplete in-flight
-  exchanges and credential-rotation races are accepted to avoid disrupting
-  long-running requests. Read failures still follow the normal failed/partial
-  backup handling.
+- CLIProxyAPI assembles each exchange in a `request-log-*.tmp` file and renames
+  it to a unique final `.log` name once complete; an empty file under that name
+  is a reservation still being written. The diagnostic `main.log` is written
+  concurrently. Transient request/response parts disappear during normal operation,
+  and startup removes parts orphaned by a stopped process. Keep the service running
+  while restic reads its state and corpus directly; incomplete temporary parts and
+  credential-rotation races are accepted to avoid disrupting long-running requests.
+  Read failures still follow the normal failed/partial backup handling.
+  [Pinned atomic writer](https://github.com/Fryuni/CLIProxyAPI/blob/0deb4f868a0cec6efdf7c91bbcc3ee08aa8607c0/internal/logging/request_logger_writer.go).
 - T3 Code uses consistent online SQLite exports while all managed and independent
   backends remain running. Associated settings, attachments and terminal history
   are read live; a common capture boundary with the database is not required.
@@ -331,6 +338,64 @@ Source services stopped during preparation remain paused through the direct
 restic backup. Recovery runs after upload, on failure, or at the configured
 interruption deadline. A complete tag is added only after both upload and
 service/writer recovery succeed.
+
+## Corpus archive
+
+The corpus archive keeps settled AI exchanges permanently while freeing `loem`'s
+disk. [CLIProxyAPI's module](../servers/loem/cli-proxy-api.nix) registers
+`services.machineBackups.archives.ai-exchange-corpus`. It selects files directly
+in `/var/lib/cli-proxy-api/logs` that have request or error exchange names, begin
+with CLIProxyAPI's `=== REQUEST INFO ===` header, and have not changed for two
+days. Main logs, temporary parts, empty name reservations and files without the
+header stay local. Subdirectories are not scanned.
+
+`machine-backup-archive` runs daily at 04:40 UTC on machines with registered
+archives. It holds the local operation lock, so it never deletes a file while a
+home or service upload is scanning. Each run:
+
+1. Hard-links the selected files into `/var/lib/machine-backups/archives/NAME`.
+   No payload is copied; the archived directory must share a filesystem with the
+   backup state.
+2. Uploads that directory as a restore point tagged `permanent-archive` and `NAME`,
+   without the `machine-backup` tag. Exchanges already uploaded by hourly service
+   backups deduplicate, so their content is not uploaded again.
+3. Lists the new restore point and deletes each original only when the restore
+   point records the same size and nanosecond modification time and the local file
+   still matches. Mismatched files remain local; the run fails and alerts.
+4. Discards its staging links. A run interrupted after deleting an original leaves
+   the only copy in staging; the next run archives that copy rather than discarding it.
+
+Maintenance selects only `machine-backup` restore points for retention, so archive
+restore points are never forgotten and prune keeps their data. The weekly rotating
+data check covers them with the rest of the repository; a regression fixture keeps
+a 900-day-old archive restore point through maintenance. Every archive restore point
+has the same single path, keeping `restic snapshots` output readable.
+
+Scheduled runs use `archive --scheduled` and delete nothing until the archive has
+a restore point from this host. Until then they record the waiting backlog and raise
+one `archive:repository` warning. Review and run the first archive manually:
+
+```bash
+sudo machine-backup archive --dry-run  # file count, bytes, oldest and newest names; changes nothing
+sudo machine-backup archive            # first archive; later runs are scheduled
+```
+
+The first archive reads the whole backlog while holding the local operation lock.
+Hourly service backups wait up to 15 minutes and then retry, so a long first run
+can raise a services freshness warning.
+
+To use the corpus, export every archive restore point into a new directory. Export
+runs on any enrolled machine and does not hold the local operation lock:
+
+```bash
+sudo machine-backup archive-export --name ai-exchange-corpus --target /var/tmp/ai-exchange-corpus
+```
+
+Each restore point is restored and verified into its own `HOST-TIMESTAMP-ID`
+directory, so a name reused by a later batch cannot overwrite an earlier exchange.
+The archive shares the backup repository's encryption, credentials and provider
+snapshots. Moving to another repository must copy the archive restore points too,
+for example with `restic copy --tag permanent-archive`.
 
 ## Declaring service state
 
@@ -388,6 +453,13 @@ through `extraPackages`, additional natively covered paths through a capture's
 `coveredPaths`, and any regenerable-state or parent-directory classifications
 under `inventory`.
 
+Files that should leave the machine permanently use
+`services.machineBackups.archives.<name>`, with a `directory`, a full-name Python
+`namePattern`, an optional identifying `contentPrefix` and `minAgeSeconds`. The
+owning module classifies which files are settled; see the
+[permanent archive](#corpus-archive). Archive names are unique and
+cannot reuse the tags that retention and monitoring select.
+
 List registrations require explicit names, unique across directory and native
 registrations. Supported capture and unit fields are typed: misspelled settings
 and incomplete native captures fail Nix validation instead of silently losing
@@ -415,6 +487,7 @@ are under `/var/lib/machine-backups`, mode `0700`.
 | `machine-backup-metrics` | Every 5 minutes, plus pushes after jobs | Publish persisted state to VictoriaMetrics without repository access |
 | `machine-backup-maintain` | Sunday 03:30, on `loem` | Retention, prune, structure check, rotating data check |
 | `machine-backup-rehearsal-reminder` | First day of each quarter, on `loem` | Reminder to perform isolated recovery rehearsals |
+| `machine-backup-archive` | 04:40, where archives are registered (`loem`) | Move settled AI exchanges into the permanent corpus archive |
 
 Calendar timers catch up when a machine returns. Jobs use low CPU/I/O priority,
 do not wake the notebook, and can run on battery. A local lock serializes capture,
@@ -446,7 +519,9 @@ sudo machine-backup status
 sudo machine-backup monitor
 sudo machine-backup metrics           # publish persisted state only
 sudo machine-backup maintain --dry-run  # loem only
+sudo machine-backup archive --dry-run   # loem only
 sudo machine-backup restic -- snapshots --host loem --tag machine-backup,complete
+sudo machine-backup restic -- snapshots --tag permanent-archive
 journalctl -u machine-backup-services -u machine-backup-home -u machine-backup-monitor
 systemctl list-timers 'machine-backup-*'
 ```
@@ -528,6 +603,7 @@ Messages, credentials, source paths and snapshot IDs are excluded from labels.
 | `repository_contact_timestamp_seconds`, `integrity_check_timestamp_seconds`, `maintenance_timestamp_seconds` | Successful repository check, rotating-quarter data check, and retention/prune completion |
 | `inventory_*`, `notifications_pending`, `notification_delivery_success` | Coverage inspection time/counts and notification queue/delivery state |
 | `restore_rehearsal_*` | Verification time/duration, scope/host, partial selection and application-startup confirmation |
+| `archive_timestamp_seconds`, `archived_files_total`, `archived_bytes_total`, `archive_pending_files`, `archive_pending_bytes` | Last fully verified archive run, files and bytes moved, and the archivable backlog still on the source, per configured `archive` |
 | `metrics_push_failures_total` | Persistent failed pushes, visible remotely once delivery recovers |
 
 Timestamp gauges carry event times as values, while their samples are ingested at
@@ -668,8 +744,8 @@ initial availability. PostgreSQL remains online; databases are independent
 consistent captures rather than a simultaneous cluster-wide transaction. Executor uses a clean stop and
 direct file backup to preserve its libSQL data and keys. Soft Serve, Tuwunel,
 Syncthing and the registry use bounded stopped captures. CLIProxyAPI reads
-request-exchange files and mutable state online, accepting incomplete recent
-files and credential-rotation races.
+request-exchange files and mutable state online, accepting incomplete temporary
+parts and credential-rotation races.
 Node-RED pauses both its service and, when configured, its git-sync service so
 both writers are stopped during the direct file backup.
 VictoriaMetrics uses its native snapshot and recorded symlink-target mappings.
@@ -820,6 +896,9 @@ application checks and coverage gaps. Repeat quarterly.
 - Verify `.direnv` exclusion at arbitrary depth and preservation of all AI
   exchange families, even under `logs` and with `.log` extensions. The diagnostic
   exclusions must not match request exchanges.
+- Review `machine-backup archive --dry-run` on `loem`, run the first corpus archive
+  manually, and confirm that the next scheduled run archives and deletes only
+  settled exchanges.
 - Verify shared-repository host/scope separation, cross-host deduplication, and
   retention dry runs. Partial snapshots must not replace complete snapshots in
   the health indicator or the retained recovery history.

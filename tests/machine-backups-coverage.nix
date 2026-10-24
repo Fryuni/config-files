@@ -13,6 +13,7 @@
     in {
       inherit host;
       inherit (cfg) configFile;
+      archives = lib.sort lib.lessThan (lib.attrNames cfg.archives ++ lib.attrNames home.archives);
       expected = lib.genAttrs ["home" "services"] (scope:
         map (entry: {inherit (entry) name paths kind;})
         (lib.filter (entry: lib.elem scope entry.scopes) registrations));
@@ -76,6 +77,7 @@ in
 
     for case in cases["cases"]:
         config = json.loads(Path(case["configFile"]).read_text())
+        assert sorted(archive["name"] for archive in config["archives"]) == case["archives"], (case["host"], "archive registrations differ", config["archives"])
         for scope, expected in case["expected"].items():
             actual = {entry["name"]: entry for entry in config["scopes"][scope]["captures"]}
             for entry in expected:

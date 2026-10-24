@@ -75,6 +75,10 @@
   capturesFor = scope:
     map (entry: builtins.removeAttrs entry ["scopes" "coveredPaths"])
     (lib.filter (entry: lib.elem scope entry.scopes) registeredCaptures);
+  registeredArchives = map stripNulls (lib.attrValues cfg.archives ++ lib.attrValues (homeDeclarations.archives or {}));
+  # Retention and monitoring select restore points by these tags; an archive
+  # sharing one could become a retention candidate or a false freshness signal.
+  reservedArchiveNames = ["machine-backup" "complete" "home" "services" "permanent-archive"];
   homeCaptures = capturesFor "home";
   serviceCaptures = capturesFor "services";
   excludes = [".direnv"] ++ cfg.exclude ++ (homeDeclarations.exclude or []);
@@ -145,6 +149,7 @@
         inherit excludes;
       };
     };
+    archives = registeredArchives;
   };
   job = command: {
     wants = ["network-online.target"];
@@ -288,6 +293,14 @@ in {
           assertion = lib.all (unit: (unit.type or "system") != "user" || (unit ? user && unit ? uid)) registeredUnits;
           message = "services.machineBackups user units require user and uid; Home Manager declarations inherit them from the backed-up owner.";
         }
+        {
+          assertion = lib.length registeredArchives == lib.length (lib.unique (map (archive: archive.name) registeredArchives));
+          message = "services.machineBackups archives must have unique names.";
+        }
+        {
+          assertion = lib.all (archive: !(lib.elem archive.name reservedArchiveNames)) registeredArchives;
+          message = "services.machineBackups archive names must not reuse the restore point tags ${lib.concatStringsSep ", " reservedArchiveNames}.";
+        }
       ]
       ++ lib.mapAttrsToList (kind: fields: {
         assertion = lib.all (entry: entry.kind == kind || lib.all (field: !(builtins.hasAttr field entry)) fields) registeredCaptures;
@@ -343,6 +356,8 @@ in {
         });
         machine-backup-maintain = lib.mkIf cfg.maintenance.enable (job "maintain");
         machine-backup-rehearsal-reminder = lib.mkIf cfg.maintenance.enable (job "rehearsal-reminder");
+        # Scheduled runs delete nothing until an operator has run the first archive.
+        machine-backup-archive = lib.mkIf (registeredArchives != []) (job "archive --scheduled");
       };
       timers = {
         machine-backup-services = {
@@ -384,6 +399,13 @@ in {
           wantedBy = ["timers.target"];
           timerConfig = {
             OnCalendar = "*-01,04,07,10-01 10:00:00 UTC";
+            Persistent = true;
+          };
+        };
+        machine-backup-archive = lib.mkIf (registeredArchives != []) {
+          wantedBy = ["timers.target"];
+          timerConfig = {
+            OnCalendar = "*-*-* 04:40:00 UTC";
             Persistent = true;
           };
         };

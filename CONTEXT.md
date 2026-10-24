@@ -45,9 +45,14 @@ _Avoid_: Restic restore point
 
 **AI exchange corpus**:
 The full AI request and response exchanges retained for future model fine-tuning.
-This is ordinary machine data covered by backup retention, even when its files
-are described as logs.
+Exchanges still on their source machine are ordinary machine data covered by
+backup retention, even when their files are described as logs.
 _Avoid_: Diagnostic logs
+
+**Corpus archive**:
+The permanent record of AI exchanges moved off their source machine, kept in the
+shared backup repository but exempt from backup retention.
+_Avoid_: Corpus backup, log archive
 
 **Diagnostic logs**:
 Operational messages used to investigate application behavior. They are distinct

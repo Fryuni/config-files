@@ -178,7 +178,38 @@
           };
         };
     });
+  archiveType = lib.types.submodule ({name, ...}: {
+    options = {
+      name = lib.mkOption {
+        type = captureName;
+        default = name;
+        description = "Unique archive name, recorded as a restic tag on every archive restore point.";
+      };
+      directory = lib.mkOption {
+        type = absolutePath;
+        description = "Directory whose matching regular files are moved into permanent archive restore points; subdirectories are not scanned.";
+      };
+      namePattern = lib.mkOption {
+        type = lib.types.nonEmptyStr;
+        description = "Python regular expression that a file name must match in full to be archived.";
+      };
+      contentPrefix = lib.mkOption {
+        type = lib.types.nullOr lib.types.nonEmptyStr;
+        default = null;
+        description = "Leading content that identifies files written by the owning service; other matching names stay local.";
+      };
+      minAgeSeconds = lib.mkOption {
+        type = lib.types.ints.positive;
+        description = "Minimum time since a file's last modification before it is archived and deleted locally.";
+      };
+    };
+  });
 in {
+  archives = lib.mkOption {
+    type = lib.types.attrsOf archiveType;
+    default = {};
+    description = "Files moved into restore points that retention never removes, then deleted from the source machine.";
+  };
   directories = lib.mkOption {
     type = lib.types.listOf (captureType false);
     default = [];

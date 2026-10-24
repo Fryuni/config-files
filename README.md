@@ -40,8 +40,11 @@ lists and scoped exclusions; staging holds only native database exports and
 recovery artifacts. CLIProxyAPI and T3 Code remain online, with consistent SQLite
 exports for T3 and accepted live-file races for associated state and request
 exchanges. Other writers requiring pauses remain paused through upload, with a
-configurable one-hour interruption limit. Selected locked flake source inputs
-support offline recovery evaluation; the backup module declares their configured
+configurable one-hour interruption limit. A daily job on `loem` moves AI exchanges
+settled for two days into the permanent corpus archive: retention-exempt restore
+points in the same repository. Each file is deleted locally only after the new
+restore point records it, and scheduled runs wait for an operator-run first
+archive. Selected locked flake source inputs support offline recovery evaluation; the backup module declares their configured
 checkouts as safe Git directories for root's Nix capture. Package builds use normal
 network access. The dedicated SSH identity, repository password, and backup
 notification token use agenix and host rekeying.

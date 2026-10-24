@@ -63,7 +63,7 @@ def render(config, state, now):
 
     for key, run in sorted(state.get("lastRun", {}).items()):
         operation, scope = key.split(":", 1)
-        if operation not in ["backup", "monitor", "maintain", "restore-test"] or scope not in ["home", "services", "repository"]:
+        if operation not in ["backup", "monitor", "maintain", "restore-test", "archive"] or scope not in ["home", "services", "repository"]:
             continue
         labels = {"operation": operation, "scope": scope}
         emit("run_timestamp_seconds", timestamp(run["finishedAt"]), "Last operation completion time.", labels)
@@ -80,7 +80,7 @@ def render(config, state, now):
         labels = {"check": check}
         if check == "freshness" and len(parts) == 3 and parts[1] in hosts and parts[2] in ["home", "services"]:
             labels.update(source_host=parts[1], scope=parts[2])
-        elif check in ["backup", "restore-test", "maintain"] and len(parts) == 2 and parts[1] in ["home", "services", "repository"]:
+        elif check in ["backup", "restore-test", "maintain", "archive"] and len(parts) == 2 and parts[1] in ["home", "services", "repository"]:
             labels["scope"] = parts[1]
         elif key not in ["repository", "capacity", "inventory"]:
             continue
@@ -102,6 +102,21 @@ def render(config, state, now):
         emit("inventory_check_timestamp_seconds", timestamp(inventory.get("checkedAt")), "Last service coverage inspection.")
         emit("inventory_uncovered_paths", len(inventory.get("uncoveredPaths", [])), "Unclassified persistent state paths.")
         emit("inventory_inspection_issues", len(inventory.get("issues", [])), "Service coverage inspection failures.")
+    # Only configured archives are labelled, so stale state cannot add series.
+    for archive in sorted(entry["name"] for entry in config.get("archives", [])):
+        record = state.get("archives", {}).get(archive, {})
+        labels = {"archive": archive}
+        emit("archive_timestamp_seconds", timestamp(record.get("succeededAt")),
+             "Last fully verified permanent archive run; zero means none.", labels)
+        emit("archived_files_total", record.get("files", 0),
+             "Files moved into permanent archive restore points since local state was created.", labels, kind="counter")
+        emit("archived_bytes_total", record.get("bytes", 0),
+             "Bytes moved into permanent archive restore points since local state was created.", labels, kind="counter")
+        if "pending" in record:
+            emit("archive_pending_files", record["pending"]["files"],
+                 "Archivable files still on the source machine after the last archive run.", labels)
+            emit("archive_pending_bytes", record["pending"]["bytes"],
+                 "Archivable bytes still on the source machine after the last archive run.", labels)
     emit("notifications_pending", len(state.get("notifications", [])), "Queued backup health notifications.")
     if "notificationDelivery" in state:
         emit("notification_delivery_success", int(state["notificationDelivery"]["level"] == "ok"),
