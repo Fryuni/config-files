@@ -1,0 +1,4 @@
+{
+  "dev": { "run": "pnpm dev" },
+  "generate": [{ "language": "typescript", "out-dir": "./src/module_bindings" }]
+}

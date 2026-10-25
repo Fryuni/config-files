@@ -1,0 +1,27 @@
+name: Test
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: test-pr-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: nix
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: nix develop -c pnpm install
+
+      - name: Generate module bindings
+        run: nix develop -c pnpm generate
+
+      - name: Typecheck and lint
+        run: nix develop -c pnpm lint

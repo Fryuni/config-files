@@ -1,0 +1,52 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: production
+  # Forgejo cancels by default; queue pushes instead of interrupting a deployment.
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: nix
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: nix develop -c pnpm install
+
+      - name: Publish SpacetimeDB module
+        run: |
+          config_dir="$(mktemp -d)"
+          trap 'rm -rf "$config_dir"' EXIT
+          nix develop -c spacetime --root-dir "$config_dir" login \
+            --token "$SPACETIMEDB_TOKEN"
+          nix develop -c spacetime --root-dir "$config_dir" publish \
+            --server "$SPACETIMEDB_HOST" \
+            --yes=remote,migrate,skip-login \
+            "$SPACETIMEDB_DATABASE"
+        env:
+          SPACETIMEDB_TOKEN: ${{ secrets.SPACETIMEDB_TOKEN }}
+          SPACETIMEDB_HOST: ${{ secrets.SPACETIMEDB_HOST }}
+          SPACETIMEDB_DATABASE: ${{ secrets.SPACETIMEDB_DATABASE }}
+
+      - name: Generate module bindings
+        run: nix develop -c pnpm generate
+
+      - name: Build client
+        run: nix develop -c pnpm build
+        env:
+          PUBLIC_SPACETIMEDB_HOST: ${{ secrets.SPACETIMEDB_HOST }}
+          PUBLIC_SPACETIMEDB_DB_NAME: ${{ secrets.SPACETIMEDB_DATABASE }}
+
+      - name: Deploy Cloudflare Worker
+        run: nix develop -c pnpm exec wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

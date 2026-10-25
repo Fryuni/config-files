@@ -6,6 +6,8 @@ on:
 
 concurrency:
   group: spacetimedb-production
+  # Forgejo cancels by default; queue pushes instead of interrupting a deployment.
+  cancel-in-progress: false
 
 jobs:
   deploy:

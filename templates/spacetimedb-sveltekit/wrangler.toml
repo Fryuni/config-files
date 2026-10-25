@@ -1,0 +1,12 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "spacetimedb-sveltekit-template"
+compatibility_date = "2026-10-24"
+compatibility_flags = ["nodejs_als"]
+main = ".svelte-kit/cloudflare/_worker.js"
+workers_dev = true
+# Required for Worker Previews; Preview-only vars and bindings go here.
+previews = {}
+
+[assets]
+binding = "ASSETS"
+directory = ".svelte-kit/cloudflare"

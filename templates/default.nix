@@ -11,4 +11,8 @@ _: {
     path = ./spacetimedb;
     description = "A SpacetimeDB Rust module with a Nix development shell.";
   };
+  spacetimedb-sveltekit = {
+    path = ./spacetimedb-sveltekit;
+    description = "A SpacetimeDB TypeScript module with a SvelteKit client on Cloudflare Workers, using pnpm and Nix.";
+  };
 }

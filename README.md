@@ -123,14 +123,19 @@ nix flake init -t git+https://git.fryuni.dev/Fryuni/nix-files#convex
 
 # Rust SpacetimeDB module with the CLI and Rust WebAssembly toolchain
 nix flake init -t git+https://git.fryuni.dev/Fryuni/nix-files#spacetimedb
+
+# TypeScript SpacetimeDB module with a SvelteKit client on Cloudflare Workers
+nix flake init -t git+https://git.fryuni.dev/Fryuni/nix-files#spacetimedb-sveltekit
 ```
 
-Both project templates include a flake, `.envrc`, Forgejo Actions for PR tests
-and `main` deployment, and usage instructions. Convex also deploys its client to
-Cloudflare Workers and creates a backend and client preview for each PR,
-deleted when the PR closes. The template READMEs document their required Forgejo
-secrets. Dependency lockfiles and generated code are created locally and
-ignored. The existing `basic` template remains available as `#basic`.
+All project templates include a flake, `.envrc`, Forgejo Actions for PR tests
+and `main` deployment, and usage instructions. The SvelteKit templates
+(`convex` and `spacetimedb-sveltekit`) also deploy their client to Cloudflare
+Workers and create a backend and client preview for each PR, deleted when the
+PR closes. The template READMEs document their required Forgejo
+secrets. Dependency lockfiles and generated code are created on first use and
+are not committed to this repository. The existing `basic` template remains
+available as `#basic`.
 
 ## Documentation
 

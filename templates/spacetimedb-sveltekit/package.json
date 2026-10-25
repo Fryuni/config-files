@@ -1,0 +1,35 @@
+{
+  "name": "spacetimedb-sveltekit-template",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "pnpm build && wrangler dev",
+    "prepare": "svelte-kit sync || echo ''",
+    "generate": "spacetime generate",
+    "typecheck": "tsc -p spacetimedb && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "lint": "pnpm typecheck && eslint . --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "spacetimedb": "~2.10.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@sveltejs/adapter-cloudflare": "^8.0.1",
+    "@sveltejs/kit": "^3.1.0",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.66.0",
+    "@typescript-eslint/parser": "^8.66.0",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "eslint": "^10.8.0",
+    "eslint-plugin-svelte": "^3.23.1",
+    "globals": "^17.9.0",
+    "svelte": "^5.57.2",
+    "svelte-check": "^4.7.7",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "vite": "^8.3.5",
+    "wrangler": "^4.152.0"
+  }
+}

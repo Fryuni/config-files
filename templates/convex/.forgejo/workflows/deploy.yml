@@ -6,6 +6,8 @@ on:
 
 concurrency:
   group: production
+  # Forgejo cancels by default; queue pushes instead of interrupting a deployment.
+  cancel-in-progress: false
 
 jobs:
   deploy:

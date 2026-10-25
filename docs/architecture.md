@@ -97,9 +97,11 @@ Important composition rules:
   formatting helpers.
 - `templates/` — flake templates exported by this repository: `basic`, `convex`
   (TypeScript and pnpm, with a SvelteKit client on Cloudflare Workers), and
-  `spacetimedb` (Rust with the WebAssembly target). Both project templates
-  include Forgejo PR tests and `main` deployment workflows; Convex additionally
-  deploys a backend and client preview for each PR.
+  `spacetimedb` (Rust with the WebAssembly target), and `spacetimedb-sveltekit`
+  (a TypeScript SpacetimeDB module and SvelteKit client on Cloudflare Workers in
+  one pnpm workspace). All project templates include Forgejo PR tests and
+  `main` deployment workflows; the SvelteKit templates additionally deploy a
+  backend and client preview for each PR.
 
 ## Flake outputs
 
@@ -121,8 +123,8 @@ The main exported outputs are:
 - `legacyPackages` — the full nixpkgs package set for supported systems, including
   overlays, channel overlays, and specialized package families.
 - `checks` — Linux checks for selected reusable NixOS modules and the Vite+ updater.
-- `templates` — project starters for `nix flake init`: `basic`, `convex`, and
-  `spacetimedb`.
+- `templates` — project starters for `nix flake init`: `basic`, `convex`,
+  `spacetimedb`, and `spacetimedb-sveltekit`.
 - `formatter` — the repository Nix formatter.
 - `apps` — command wrappers from `commands.nix` for build, diff, update, and maintenance
   workflows.

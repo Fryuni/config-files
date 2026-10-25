@@ -6,7 +6,9 @@ on:
 
 concurrency:
   group: preview-pr-${{ github.event.number }}
-  cancel-in-progress: true
+  # Queue instead of cancelling: Forgejo does not wait for a cancelled run to
+  # stop, so a preview and a cleanup could otherwise race on the same resources.
+  cancel-in-progress: false
 
 jobs:
   preview:
