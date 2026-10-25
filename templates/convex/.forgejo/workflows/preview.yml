@@ -2,14 +2,15 @@ name: Preview
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, closed]
 
 concurrency:
-  group: convex-preview-pr-${{ github.event.number }}
+  group: preview-pr-${{ github.event.number }}
   cancel-in-progress: true
 
 jobs:
   preview:
+    if: github.event.action != 'closed'
     runs-on: nix
     steps:
       - name: Checkout
@@ -25,9 +26,69 @@ jobs:
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_PREVIEW_DEPLOY_KEY }}
 
-      - name: Deploy Convex backend preview
+      - name: Deploy Convex backend preview and build client
         run: >-
           nix develop -c pnpm exec convex deploy
           --preview-name "pr-${{ github.event.number }}" --typecheck enable
+          --cmd "pnpm build" --cmd-url-env-var-name PUBLIC_CONVEX_URL
+        env:
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_PREVIEW_DEPLOY_KEY }}
+
+      - name: Deploy Cloudflare Worker preview
+        run: >-
+          nix develop -c pnpm exec wrangler preview
+          --name "pr-${{ github.event.number }}"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  cleanup:
+    if: github.event.action == 'closed'
+    runs-on: nix
+    env:
+      PREVIEW_NAME: pr-${{ github.event.number }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        id: install
+        run: nix develop -c pnpm install
+
+      - name: Delete Cloudflare Worker preview
+        run: >-
+          nix develop -c pnpm exec wrangler preview delete
+          --name "$PREVIEW_NAME" --skip-confirmation
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Delete Convex backend preview
+        # Independent of the Cloudflare cleanup, so run even if it failed.
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          nix shell nixpkgs#curl --command bash -euo pipefail <<'EOF'
+          # Prints https://dashboard.convex.dev/d/<deployment-name>.
+          if ! url="$(nix develop -c pnpm exec convex dashboard --no-open --preview-name "$PREVIEW_NAME" 2>lookup.err)"; then
+            cat lookup.err >&2
+            # Previews expire after 5 days, so a missing one needs no cleanup.
+            # shortcut: matches the CLI's HTTP error text, unverified against a
+            # real expired preview; widen the pattern if that case fails here.
+            if grep -Eq '404 Not Found|NotFound' lookup.err; then
+              echo "No Convex preview $PREVIEW_NAME to delete"
+              exit 0
+            fi
+            exit 1
+          fi
+          if [[ $url != https://dashboard.convex.dev/d/* ]]; then
+            echo "Unexpected dashboard URL: $url" >&2
+            exit 1
+          fi
+          curl --fail-with-body --silent --show-error --request POST \
+            --header "Authorization: Bearer $CONVEX_DEPLOY_KEY" \
+            "https://api.convex.dev/v1/deployments/${url##*/}/delete"
+          EOF
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_PREVIEW_DEPLOY_KEY }}

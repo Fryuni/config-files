@@ -118,7 +118,7 @@ instance to verify collection gaps and restore evidence from another machine.
 Initialize a new project directly from this flake:
 
 ```bash
-# TypeScript Convex backend with pnpm and a Nix development shell
+# Convex backend with a SvelteKit client on Cloudflare Workers, pnpm, and Nix
 nix flake init -t git+https://git.fryuni.dev/Fryuni/nix-files#convex
 
 # Rust SpacetimeDB module with the CLI and Rust WebAssembly toolchain
@@ -126,8 +126,9 @@ nix flake init -t git+https://git.fryuni.dev/Fryuni/nix-files#spacetimedb
 ```
 
 Both project templates include a flake, `.envrc`, Forgejo Actions for PR tests
-and `main` deployment, and usage instructions. Convex also creates a backend
-preview for each PR. The template READMEs document their required Forgejo
+and `main` deployment, and usage instructions. Convex also deploys its client to
+Cloudflare Workers and creates a backend and client preview for each PR,
+deleted when the PR closes. The template READMEs document their required Forgejo
 secrets. Dependency lockfiles and generated code are created locally and
 ignored. The existing `basic` template remains available as `#basic`.
 

@@ -5,7 +5,7 @@ _: {
   };
   convex = {
     path = ./convex;
-    description = "A Convex TypeScript project using pnpm and Nix.";
+    description = "A Convex project with a SvelteKit client on Cloudflare Workers, using pnpm and Nix.";
   };
   spacetimedb = {
     path = ./spacetimedb;

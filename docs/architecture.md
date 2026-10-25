@@ -96,9 +96,10 @@ Important composition rules:
 - `commands.nix` — flake apps for local workflows such as build, diff, update, and
   formatting helpers.
 - `templates/` — flake templates exported by this repository: `basic`, `convex`
-  (TypeScript and pnpm), and `spacetimedb` (Rust with the WebAssembly target).
-  Both project templates include Forgejo PR tests and `main` deployment
-  workflows; Convex additionally deploys a backend preview for each PR.
+  (TypeScript and pnpm, with a SvelteKit client on Cloudflare Workers), and
+  `spacetimedb` (Rust with the WebAssembly target). Both project templates
+  include Forgejo PR tests and `main` deployment workflows; Convex additionally
+  deploys a backend and client preview for each PR.
 
 ## Flake outputs
 

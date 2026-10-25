@@ -1,16 +1,13 @@
 import { v } from "convex/values";
-import {
-  internalQuery,
-  internalMutation,
-  internalAction,
-} from "./_generated/server";
-import { internal } from "./_generated/api";
+import { query, internalMutation, internalAction } from "./_generated/server";
+import { api, internal } from "./_generated/api";
 
 // Write your Convex functions in any file inside this directory (`convex`).
 // See https://docs.convex.dev/functions for more.
 
-// You can read data from the database via a query:
-export const myQuery = internalQuery({
+// You can read data from the database via a query.
+// This one is public so the SvelteKit client can subscribe to it:
+export const myQuery = query({
   // Validators for arguments.
   args: {
     first: v.number(),
@@ -66,7 +63,7 @@ export const myAction = internalAction({
     // const data = await response.json();
 
     //// Query data by running Convex queries.
-    const data = await ctx.runQuery(internal.myFunctions.myQuery, {
+    const data = await ctx.runQuery(api.myFunctions.myQuery, {
       first: args.first,
       second: args.second,
     });

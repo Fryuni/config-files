@@ -4,6 +4,7 @@ import globals from "globals";
 import tsParser from "@typescript-eslint/parser";
 import js from "@eslint/js";
 import convexPlugin from "@convex-dev/eslint-plugin";
+import svelte from "eslint-plugin-svelte";
 
 import { FlatCompat } from "@eslint/eslintrc";
 import { join, dirname } from "node:path";
@@ -57,6 +58,20 @@ export default defineConfig([
       "@typescript-eslint/require-await": "off",
     },
   },
-  globalIgnores(["convex/_generated"]),
+  {
+    files: ["src/**/*.ts", "src/**/*.svelte"],
+    languageOptions: { globals: globals.browser },
+    extends: compat.extends(
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+    ),
+  },
+  // After the TypeScript config so `.svelte` files keep the Svelte parser.
+  ...svelte.configs.recommended,
+  {
+    files: ["src/**/*.svelte"],
+    languageOptions: { parserOptions: { parser: tsParser } },
+  },
+  globalIgnores(["convex/_generated", ".svelte-kit", ".wrangler"]),
   ...convexPlugin.configs.recommended,
 ]);

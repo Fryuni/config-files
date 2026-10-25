@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 concurrency:
-  group: convex-production
+  group: production
 
 jobs:
   deploy:
@@ -24,7 +24,15 @@ jobs:
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
 
-      - name: Deploy Convex backend
-        run: nix develop -c pnpm exec convex deploy --typecheck enable
+      - name: Deploy Convex backend and build client
+        run: >-
+          nix develop -c pnpm exec convex deploy --typecheck enable
+          --cmd "pnpm build" --cmd-url-env-var-name PUBLIC_CONVEX_URL
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+
+      - name: Deploy Cloudflare Worker
+        run: nix develop -c pnpm exec wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

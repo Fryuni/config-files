@@ -15,3 +15,6 @@ temp
 TODOs.md
 .eslintcache
 .direnv
+.svelte-kit
+.wrangler
+.convex

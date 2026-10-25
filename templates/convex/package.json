@@ -2,26 +2,41 @@
   "name": "convex-template",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "convex dev",
+    "dev": "pnpm run \"/^dev:/\"",
+    "dev:backend": "convex dev",
+    "dev:frontend": "vite dev",
     "predev": "convex dev --until-success && convex dashboard",
+    "build": "vite build",
+    "preview": "pnpm build && wrangler dev",
+    "prepare": "svelte-kit sync || echo ''",
     "logs": "convex logs",
-    "typecheck": "tsc -p convex",
+    "typecheck": "tsc -p convex && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "lint": "pnpm typecheck && eslint . --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "convex": "^1.44.0"
+    "convex": "^1.48.0",
+    "convex-svelte": "^0.15.1"
   },
   "devDependencies": {
     "@convex-dev/eslint-plugin": "^5.0.0",
     "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
+    "@sveltejs/adapter-cloudflare": "^8.0.1",
+    "@sveltejs/kit": "^3.1.0",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@types/node": "^24.13.3",
     "@typescript-eslint/eslint-plugin": "^8.66.0",
     "@typescript-eslint/parser": "^8.66.0",
     "@typescript/native": "npm:typescript@^7.0.2",
     "eslint": "^10.8.0",
+    "eslint-plugin-svelte": "^3.23.1",
     "globals": "^17.9.0",
-    "typescript": "npm:@typescript/typescript6@^6.0.2"
+    "svelte": "^5.57.2",
+    "svelte-check": "^4.7.7",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "vite": "^8.3.5",
+    "wrangler": "^4.152.0"
   }
 }
