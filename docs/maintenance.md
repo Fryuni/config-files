@@ -83,8 +83,9 @@ hand-maintained package list anywhere else:
 
 ### Package inputs
 
-- `google-workspace-cli` follows the root `nixpkgs` input so its `gws` package uses the
-  same upstream Cargo fetcher fixes as the main package set.
+- `gws` (Google Workspace CLI) and `fh` (FlakeHub CLI) come from nixpkgs rather than
+  their upstream flakes, whose package definitions use deprecated `stdenv.isLinux` /
+  `stdenv.isDarwin` aliases and emit evaluation warnings.
 - The shared Tailscale module uses `pkgs.master.tailscale`; update it through the
   `nixpkgs-master` flake input.
 

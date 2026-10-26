@@ -1,16 +1,9 @@
-{
-  nixpkgs,
-  determinate,
-  ...
-} @ attrs: let
-  pickPackages = f: pick: final: pkgs: nixpkgs.lib.filterAttrs (name: _: builtins.elem name pick) (f final pkgs);
-in [
+{determinate, ...} @ attrs: [
   attrs.fenix.overlays.default
   attrs.zig.overlays.default
   attrs.agenix.overlays.default
   attrs.nix-alien.overlays.default
   attrs.nur.overlays.default
-  (pickPackages attrs.flakehub.overlays.default ["fh"])
   attrs.polymc.overlay
   attrs.tmux-treehouse.overlays.default
 
@@ -28,7 +21,6 @@ in [
     inherit (final.master) direnv;
 
     inherit (determinate.inputs.nix.packages.${system}) nix;
-    google-workspace-cli = attrs.google-workspace-cli.packages.${system}.default;
     llm-agents = attrs.llm-agents.packages.${system};
     forgejo-cli = attrs.forgejo-cli.packages.${system}.default;
 

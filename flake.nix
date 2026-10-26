@@ -8,10 +8,6 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     cargo2nix.url = "github:AstroForge-Incorporated/cargo2nix";
 
-    google-workspace-cli = {
-      url = "github:googleworkspace/cli";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     treehouse = {
       url = "github:kunchenguid/treehouse";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -50,11 +46,6 @@
       url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
       # inputs.nixpkgs.follows = "nixpkgs";
     };
-    flakehub = {
-      url = "https://flakehub.com/f/DeterminateSystems/fh/*";
-      # inputs.nixpkgs.follows = "nixpkgs";
-      # inputs.fenix.follows = "fenix";
-    };
 
     systems.url = "github:nix-systems/default";
     nixos-facter.url = "github:nix-community/nixos-facter";
@@ -72,8 +63,6 @@
     agenix = {
       url = "github:ryantm/agenix";
       # inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-      inputs.systems.follows = "systems";
     };
     agenix-rekey = {
       url = "github:oddlama/agenix-rekey";
@@ -126,10 +115,6 @@
       allowUnfree = true;
       permittedInsecurePackages = [
       ];
-      # https://github.com/NixOS/nixpkgs/pull/258447
-      # https://discourse.nixos.org/t/your-system-configures-nixpkgs-with-an-externally-created-instance/33802
-      pulseaudio = true;
-
       doCheckByDefault = false;
     };
 

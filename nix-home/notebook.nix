@@ -14,7 +14,7 @@
     master.bitwarden-cli
     master.bitwarden-menu
     master.qbittorrent
-    google-workspace-cli
+    gws
 
     (makeDesktopItem {
       name = "set-camera-normal";
