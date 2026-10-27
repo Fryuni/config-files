@@ -593,11 +593,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1791385747,
-        "narHash": "sha256-4D9y9Z/+XWY3BJKoZIjc7+MT/Fkj76LAk7NRY+f1qKc=",
+        "lastModified": 1793109799,
+        "narHash": "sha256-XsdIlxTO5OX7cS9UfqZ0zSDm2thfm1YF8VeWBmpapTc=",
         "ref": "main",
-        "rev": "43bca3a1d64718c8bfb2aecf434d89991cf1d8a7",
-        "revCount": 1128,
+        "rev": "4d5f174965ae600f25bd1a2a1def9d97d8cdbc27",
+        "revCount": 1201,
         "type": "git",
         "url": "https://git.fryuni.dev/Fryuni/forgejo-cli.git"
       },
