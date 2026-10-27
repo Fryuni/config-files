@@ -30,7 +30,7 @@
     ];
 
     home.packages = with pkgs; [
-      llm-agents.opencode
+      llm-agents.opencode2
       llm-agents.agent-browser
       llm-agents.t3code
       llm-agents.crush
@@ -64,7 +64,7 @@
     programs = {
       zsh.shellAliases = {
         th = "treehouse";
-        oc = "opencode";
+        oc = "opencode2";
         wm = "workmux";
         wma = "workmux add -o";
         wmb = "workmux add -o --background --prompt-editor";
