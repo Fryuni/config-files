@@ -301,6 +301,28 @@
         "url": "https://flakehub.com/f/nix-community/fenix/0.1"
       }
     },
+    "fenix_2": {
+      "inputs": {
+        "nixpkgs": [
+          "llm-agents",
+          "nixpkgs"
+        ],
+        "rust-analyzer-src": "rust-analyzer-src_2"
+      },
+      "locked": {
+        "lastModified": 1793018157,
+        "narHash": "sha256-kArfwGR+jBZHzYf2+4Bp9SIfYikKlM8GfxlvO/TV1Oo=",
+        "owner": "nix-community",
+        "repo": "fenix",
+        "rev": "39ed929ecdac73f1d4f6adeb416399f1eb052ab4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "fenix",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -759,17 +781,18 @@
     "llm-agents": {
       "inputs": {
         "bun2nix": "bun2nix",
+        "fenix": "fenix_2",
         "flake-parts": "flake-parts_3",
         "nixpkgs": "nixpkgs_9",
         "systems": "systems_3",
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1792766782,
-        "narHash": "sha256-/EvSsgTCnJ7J4n4gZmThqpGGHLimyK0KXeTJ8HQqIog=",
+        "lastModified": 1793198197,
+        "narHash": "sha256-bkQtSYKSUq+48rOQ8ZQznCm/Whaqq7rqvvvgyOBjmUo=",
         "ref": "main",
-        "rev": "7842f584ce361762e7705301d5468df3948a145d",
-        "revCount": 21788,
+        "rev": "fab459d7243abaa4e3716b98a6ebed82f32f9da3",
+        "revCount": 22526,
         "type": "git",
         "url": "https://git.fryuni.dev/Fryuni/llm-agents.nix"
       },
@@ -1383,6 +1406,23 @@
         "owner": "rust-lang",
         "repo": "rust-analyzer",
         "rev": "03fcb77246f2568adb0e9b2fa60d19c6cc1686f4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rust-lang",
+        "ref": "nightly",
+        "repo": "rust-analyzer",
+        "type": "github"
+      }
+    },
+    "rust-analyzer-src_2": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792691653,
+        "narHash": "sha256-3/DMV3Lpmthk6OV2b7bJSJ5Okouyvl755YZENyLwllo=",
+        "owner": "rust-lang",
+        "repo": "rust-analyzer",
+        "rev": "0c4d74686b21f2b3bd8872b6d3cf36ad2e740d49",
         "type": "github"
       },
       "original": {
