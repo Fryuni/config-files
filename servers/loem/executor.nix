@@ -7,15 +7,16 @@
 in {
   # /data holds data.db plus the generated BetterAuth session secret and the
   # master key for stored secrets, so it must survive restarts and upgrades.
-  # The image runs as root, so a bind mount needs no ownership fixups.
+  # Match the image's nonroot UID/GID, including previously root-owned files.
   systemd.tmpfiles.rules = [
-    "d ${stateDir} 0700 root root - -"
+    "d ${stateDir} 0700 65532 65532 - -"
+    "Z ${stateDir} - 65532 65532 - -"
   ];
 
   virtualisation.oci-containers.containers.executor = {
-    # Pinned to the multi-arch index digest of :latest (v1.6.10) as of 2026-10-15. Re-pin with:
-    #   docker buildx imagetools inspect ghcr.io/rhyssullivan/executor-selfhost:latest --format '{{.Manifest.Digest}}'
-    image = "ghcr.io/rhyssullivan/executor-selfhost@sha256:b9e001775d3eb7d662d347c8f7054333c78c1a4fd97cb5a86dc1d1d1406093b9";
+    # Pinned to the multi-arch index digest of :latest (v1.6.11) as of 2026-11-03. Re-pin with:
+    #   docker buildx imagetools inspect ghcr.io/usefulsoftwareco/executor-selfhost:latest --format '{{.Manifest.Digest}}'
+    image = "ghcr.io/usefulsoftwareco/executor-selfhost@sha256:ea8b4d1019cc00c81cb4236d8edc07a12ac75ef465593b89ae652c0800cd33c1";
 
     # Docker publishes ports past the NixOS firewall, so bind to loopback and
     # let Caddy be the only reachable entrypoint.
