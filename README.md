@@ -39,7 +39,9 @@ backup job is killed. Restic reads registered files directly using literal file
 lists and scoped exclusions; staging holds only native database exports and
 recovery artifacts. CLIProxyAPI and T3 Code remain online, with consistent SQLite
 exports for T3 and accepted live-file races for associated state and request
-exchanges. Other writers requiring pauses remain paused through upload, with a
+exchanges. Forgejo and its runners also stay online: Forgejo is frozen for the
+seconds needed to export a database snapshot and hard-link its tree into staging,
+then Git pushes and CI continue while the dump and upload read that instant. Other writers requiring pauses remain paused through upload, with a
 configurable one-hour interruption limit. A daily job on `loem` moves AI exchanges
 settled for two days into the permanent corpus archive: retention-exempt restore
 points in the same repository. Each file is deleted locally only after the new

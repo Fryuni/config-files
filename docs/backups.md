@@ -264,9 +264,10 @@ Implementation must validate these mechanisms against the installed versions:
   tablespaces need separate coverage. Dumps taken independently are not one
   simultaneous cluster-wide snapshot.
   [PostgreSQL 17 documentation](https://www.postgresql.org/docs/17/app-pgdump.html)
-- Forgejo requires coordination across database and file storage. On the
-  current ext4 setup, coordinate a native database dump and direct file backup
-  while writes are paused, including remote upload within the configured limit.
+- Forgejo requires coordination across database and file storage. Agents,
+  scripts and CI depend on it continuously, so it is never stopped: its cgroup
+  is frozen only while a PostgreSQL snapshot is exported and its files are
+  hard-linked into staging; the dump then reads that exported snapshot.
   [Forgejo backup guidance](https://forgejo.org/docs/v16.0/admin/upgrade/#backup)
 - Tuwunel 1.9.3 offers online RocksDB backups/checkpoints, but media needs
   separate coverage and checkpoint completion must be verified.
@@ -738,9 +739,22 @@ close intermittent writers when a transaction across the whole folder is needed.
 
 PostgreSQL captures every connectable database, roles and tablespaces, with
 server version and extension inventories. Forgejo's native
-PostgreSQL dump and repository/LFS files are captured while Forgejo is paused.
-Forgejo-dependent runners are paused and restarted with Forgejo, preserving their
-initial availability. PostgreSQL remains online; databases are independent
+capture uses `hardlinkSnapshot`: `systemctl freeze` suspends `forgejo.service`
+(including its Git subprocesses) while a held PostgreSQL transaction exports its
+snapshot and the state tree is hard-linked, then `thaw` resumes it. Requests stall
+for those seconds instead of failing. The independent service guardian described
+below owns both freeze and thaw, as it does stop and restart: it never freezes
+after its deadline and thaws within 30 seconds even if the backup dies, and a
+capture that outlives that limit fails. `pg_dump --snapshot` then dumps the exported snapshot
+while Forgejo serves again. The link walk copies no payload; files that Git, LFS
+and attachments later replace by rename keep their linked inode through upload.
+Refs are linked before `packed-refs`, which is re-read after the ref walk, and both
+before `objects/`; `objects/` is rescanned when a concurrent repack removes files
+mid-walk. Git `*.lock` files of in-flight transactions are not captured.
+Bleve indexers rewrite files in place and are excluded; Forgejo rebuilds them
+after a restore. Runner state directories are linked the same way without a
+freeze, so runners and their jobs never stop. Link trees are removed after upload. Their ctime changes
+each run, so restic rereads, but does not re-upload, Forgejo's files. PostgreSQL remains online; databases are independent
 consistent captures rather than a simultaneous cluster-wide transaction. Executor uses a clean stop and
 direct file backup to preserve its libSQL data and keys. Soft Serve, Tuwunel,
 Syncthing and the registry use bounded stopped captures. CLIProxyAPI reads
@@ -756,8 +770,9 @@ application captures. Restic snapshot paths are:
 
 - Original absolute source paths for ordinary home and service files.
 - Resolved root paths for selected symlinks, including private StateDirectories.
-- `/var/lib/machine-backups/staging/SCOPE/tree/...` only for native SQLite files,
-  with their original absolute path below `tree`.
+- `/var/lib/machine-backups/staging/SCOPE/tree/...` for native SQLite files and
+  `hardlinkSnapshot` trees (Forgejo and its runners), with their original
+  absolute path below `tree`.
 - `.../databases/postgresql/globals.sql` and indexed `database-000.dump` archives.
   The manifest maps each archive to its database name, owner, locale and extensions.
 - VictoriaMetrics' native snapshot directory and its referenced snapshot targets.

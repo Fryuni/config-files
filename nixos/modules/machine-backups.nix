@@ -286,6 +286,10 @@ in {
           message = "services.machineBackups pauseOpenWriters requires a SQLite capture and writerUid.";
         }
         {
+          assertion = lib.all (entry: entry.kind != "sqlite" || !(entry.hardlinkSnapshot or false)) registeredCaptures;
+          message = "services.machineBackups hardlinkSnapshot is unsupported by SQLite captures.";
+        }
+        {
           assertion = lib.all (entry: entry.kind == "postgres" || (entry.coordinated or []) == []) registeredCaptures;
           message = "services.machineBackups coordinated database captures require kind = postgres.";
         }

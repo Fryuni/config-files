@@ -1,8 +1,8 @@
 """Select service files and prepare native database artifacts for restic.
 
 ``prepare`` runs its consumer while managed services and open writers are
-paused; ``restore_victoria`` reconstructs native snapshots in an isolated
-restore. System commands use PATH supplied by the NixOS backup unit. Staging
+paused, or over trees hard-linked into staging; ``restore_victoria``
+reconstructs native snapshots in an isolated restore. System commands use PATH supplied by the NixOS backup unit. Staging
 must be root-owned and private.
 """
 from __future__ import annotations
@@ -61,7 +61,7 @@ class Selection:
             return self.stack.enter_context(_suspended_writers(entry, self.staging, deadline))
         return []
 
-    def select(self, source, excludes=()):
+    def select(self, source, excludes=(), link=False):
         resolved = source.resolve()
         if self.staging.resolve().is_relative_to(resolved):
             raise CaptureError(f"Source must not contain the staging directory: {source}")
@@ -69,6 +69,13 @@ class Selection:
         # root of private StateDirectories, while retaining its logical name in
         # the recovery manifest. Internal symlinks remain ordinary symlinks.
         root = resolved if source.is_symlink() else source
+        if link:
+            root = _destination(source, self.staging)
+            self.stack.callback(_remove, root)
+            if resolved.is_dir():
+                _link_tree(resolved, root)
+            else:
+                os.link(resolved, root)
         self.paths.append(root)
         for pattern in excludes:
             negate = pattern.startswith("!")
@@ -80,6 +87,55 @@ class Selection:
         metadata = source.stat()
         return {"path": str(source), "resolvedSource": str(resolved), "snapshotPath": str(root),
                 "uid": metadata.st_uid, "gid": metadata.st_gid, "mode": stat.S_IMODE(metadata.st_mode)}
+
+
+def _link_tree(source, destination, git=False):
+    """Hard-link a live tree; return whether entries vanished while linking.
+
+    Files later replaced by rename keep their linked inode, so writers that
+    never rewrite files in place stay at their linked state during upload.
+    """
+    try:
+        metadata = os.lstat(source)
+        names = os.listdir(source)
+    except FileNotFoundError:
+        return True
+    git = git or {"HEAD", "refs", "objects"} <= set(names)
+    if git and "refs" in names:
+        # pack-refs writes packed-refs before pruning loose refs, possibly
+        # after this listing: always read packed-refs after walking refs.
+        names = [name for name in names if name != "packed-refs"] + ["packed-refs"]
+    # Git writes objects before the refs naming them; link every ref first.
+    names.sort(key=lambda name: {"refs": 0, "packed-refs": 1, "objects": 3}.get(name, 2))
+    destination.mkdir(exist_ok=True)
+    vanished = False
+    for name in names:
+        path, target = source / name, destination / name
+        try:
+            if not stat.S_ISDIR(os.lstat(path).st_mode):
+                # A live transaction's lock would block that ref after restore.
+                if not (git and name.endswith(".lock")):
+                    os.link(path, target, follow_symlinks=False)
+            elif name != "objects":
+                vanished |= _link_tree(path, target, git)
+            else:
+                # A concurrent repack writes new packs before deleting old
+                # ones; rescan until one pass links every object it listed.
+                for _ in range(5):
+                    if not _link_tree(path, target, git):
+                        break
+                else:
+                    raise CaptureError(f"Git objects kept moving while linking {path}")
+        except FileExistsError:
+            pass
+        except FileNotFoundError:
+            vanished = True
+    os.chown(destination, metadata.st_uid, metadata.st_gid)
+    try:
+        shutil.copystat(source, destination, follow_symlinks=False)
+    except FileNotFoundError:
+        return True
+    return vanished
 
 
 def escape_pattern(path):
@@ -163,8 +219,9 @@ def _trim_staging(scope_config, staging):
     if tree.exists():
         if tree.is_symlink():
             raise CaptureError("Staging tree must not be a symlink")
-        # Remove legacy bulk copies before preparing any new artifacts. Only
-        # native SQLite backup files may repopulate this tree.
+        # Remove legacy bulk copies and interrupted link trees before preparing
+        # any new artifacts. Only native SQLite backup files and hard-link
+        # trees removed after upload may repopulate this tree.
         _remove(tree)
     for group, allowed in (("databases", {entry["name"] for entry in scope_config.get("captures", []) if entry["kind"] == "postgres"}), ("recovery", {entry["name"] for entry in scope_config.get("captures", []) if entry["kind"] == "nix"})):
         directory = staging / group
@@ -219,6 +276,11 @@ def _capture_units(entry):
         unique[key] = unit
     return list(unique.values())
 
+# A freeze stalls requests without dropping connections; keep it well below
+# client timeouts. The service guardian thaws at this limit even if the backup dies.
+FREEZE_LIMIT_SECONDS = 30
+
+
 def _remaining(deadline):
     remaining = deadline - time.monotonic()
     if remaining <= 0:
@@ -270,7 +332,7 @@ def _check_service_recovery(units, directory):
 
 
 @contextmanager
-def _paused(units, timeout_seconds, staging):
+def _paused(units, timeout_seconds, staging, actions=("stop", "start")):
     directory = staging.parent / "service-watchdogs"
     # A retry must not mistake a service awaiting old recovery for an originally
     # inactive service: that old guardian could start it during the new backup.
@@ -291,7 +353,9 @@ def _paused(units, timeout_seconds, staging):
     capture_deadline = deadline - min(10.0, timeout_seconds / 4)
     if not active:
         yield capture_deadline
-        _remaining(capture_deadline)
+        # A freeze budget bounds frozen units; with none, it bounds nothing.
+        if actions[0] != "freeze":
+            _remaining(capture_deadline)
         return
     if not hasattr(os, "pidfd_open"):
         raise CaptureError("Safe service interruption requires Linux pidfd support")
@@ -306,11 +370,11 @@ def _paused(units, timeout_seconds, staging):
             shutil.rmtree(old)
     control = Path(tempfile.mkdtemp(prefix="capture-", dir=directory))
     plan = control / "plan.json"
-    _control_json(plan, {"parent": _process_identity(os.getpid()), "units": active,
+    _control_json(plan, {"parent": _process_identity(os.getpid()), "units": active, "actions": list(actions),
                          "deadline": capture_deadline, "recoveryDeadline": deadline})
     try:
-        # The guardian owns STOP too: a descheduled/orphaned capture cannot
-        # submit a late stop after independent recovery has already started.
+        # The guardian owns STOP/FREEZE too: a descheduled/orphaned capture cannot
+        # submit a late interruption after independent recovery has already started.
         _launch_service_watchdog(plan, timeout=min(5.0, _remaining(capture_deadline)))
         while not plan.with_suffix(".ready").exists():
             if plan.with_suffix(".done").exists():
@@ -374,13 +438,14 @@ def _recover_service_lease(plan_path):
                     or plan_path.with_suffix(".release").exists()
                     or time.monotonic() >= plan["deadline"])
         failures = []
+        interrupt, resume = plan.get("actions", ["stop", "start"])
         ready = plan_path.with_suffix(".ready")
         if not ready.exists():
             try:
                 for unit in plan["units"]:
                     if released():
                         raise CaptureError("Service capture was interrupted before all units stopped")
-                    _run_service_command(unit, "stop", timeout=_remaining(plan["deadline"]))
+                    _run_service_command(unit, interrupt, timeout=_remaining(plan["deadline"]))
                 if not released():
                     _control_json(ready, {})
             except CaptureError as error:
@@ -394,7 +459,7 @@ def _recover_service_lease(plan_path):
                 try:
                     # Bound each attempt so one broken unit cannot prevent the
                     # other services from recovering; PID 1 supervises retries.
-                    _run_service_command(unit, "start", timeout=min(5.0, max(0.1, plan["recoveryDeadline"] - time.monotonic())))
+                    _run_service_command(unit, resume, timeout=min(5.0, max(0.1, plan["recoveryDeadline"] - time.monotonic())))
                 except CaptureError as error:
                     print(f"Service recovery will retry {unit['name']}: {error}", file=sys.stderr, flush=True)
                     retry.append(unit)
@@ -409,6 +474,9 @@ def _recover_service_lease(plan_path):
 
 def _files(entry, selection, timeout_seconds):
     sources = _paths(entry)
+    if entry.get("hardlinkSnapshot"):
+        with _paused(entry.get("units", []), FREEZE_LIMIT_SECONDS, selection.staging, ("freeze", "thaw")):
+            return [selection.select(source, entry.get("excludes", []), True) for source in _paths(entry)]
     if sources:
         selection.pause(entry, timeout_seconds)
     return [selection.select(source, entry.get("excludes", [])) for source in _paths(entry)]
@@ -781,15 +849,36 @@ def _postgres_query(entry, statement, database=None, *, timeout=None):
         raise CaptureError("Invalid PostgreSQL inventory output") from error
 
 
-def _postgres_dump(entry, database, destination, *, timeout=None):
+def _postgres_dump(entry, database, destination, *, timeout=None, snapshot=None):
     # Root opens the target: the postgres account need not read private staging.
     temporary = destination.with_name(destination.name + ".new")
     try:
         with temporary.open("wb") as output:
-            _run([*_postgres_command(entry, "pg_dump", database), "--format=custom", "--compress=none", "--create"], timeout=timeout, stdout=output)
+            _run([*_postgres_command(entry, "pg_dump", database), "--format=custom", "--compress=none", "--create",
+                  *(["--snapshot=" + snapshot] if snapshot else [])], timeout=timeout, stdout=output)
         temporary.replace(destination)
     finally:
         temporary.unlink(missing_ok=True)
+
+
+@contextmanager
+def _postgres_snapshot(entry, database):
+    """Connect now; the yielded function exports a snapshot held until exit."""
+    command = [*_postgres_command(entry, "psql", database), "--no-psqlrc", "--quiet", "--tuples-only", "--no-align", "--set=ON_ERROR_STOP=1"]
+    with subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as session:
+        def export():
+            session.stdin.write("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY;\nSELECT pg_export_snapshot();\n")
+            session.stdin.flush()
+            if not select.select([session.stdout], [], [], 10)[0]:
+                raise CaptureError("PostgreSQL did not export a snapshot")
+            snapshot = session.stdout.readline().strip()
+            if not snapshot:
+                raise CaptureError("PostgreSQL snapshot export failed: " + session.stderr.read()[-2000:])
+            return snapshot
+        try:
+            yield export
+        finally:
+            session.kill()
 
 
 def _postgres(entry, selection, timeout_seconds):
@@ -814,10 +903,19 @@ def _postgres(entry, selection, timeout_seconds):
         if name not in indexed:
             raise CaptureError(f"Coordinated service database is missing: {name}")
         index, database = indexed[name]
-        selection.pause(coordinated, timeout_seconds)
         dump_path = destination / f"database-{index:03d}.dump"
-        _postgres_dump(entry, name, dump_path, timeout=_remaining(selection.deadline) if selection.deadline is not None else None)
-        file_details.extend(selection.select(source, coordinated.get("excludes", [])) for source in _paths(coordinated))
+        if coordinated.get("hardlinkSnapshot"):
+            # The snapshot and links are taken in one freeze; the slower dump
+            # then reads that snapshot while the application runs again.
+            with _postgres_snapshot(entry, name) as export:
+                with _paused(coordinated.get("units", []), FREEZE_LIMIT_SECONDS, selection.staging, ("freeze", "thaw")):
+                    snapshot = export()
+                    file_details.extend(selection.select(source, coordinated.get("excludes", []), True) for source in _paths(coordinated))
+                _postgres_dump(entry, name, dump_path, snapshot=snapshot)
+        else:
+            selection.pause(coordinated, timeout_seconds)
+            _postgres_dump(entry, name, dump_path, timeout=_remaining(selection.deadline) if selection.deadline is not None else None)
+            file_details.extend(selection.select(source, coordinated.get("excludes", [])) for source in _paths(coordinated))
         captured_names.add(name)
     for index, database in enumerate(databases):
         name = database["name"]

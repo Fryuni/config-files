@@ -1,6 +1,6 @@
 {pkgs}:
 pkgs.runCommand "machine-backups-runtime-check" {
-  nativeBuildInputs = with pkgs; [python3 restic rsync postgresql_18 nix coreutils victoriametrics acl util-linux];
+  nativeBuildInputs = with pkgs; [python3 restic rsync postgresql_18 nix coreutils victoriametrics acl util-linux gitMinimal];
 } ''
   export XDG_CACHE_HOME="$TMPDIR/cache"
   export XDG_CONFIG_HOME="$TMPDIR/config"

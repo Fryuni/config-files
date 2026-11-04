@@ -12,6 +12,7 @@ import subprocess
 import threading
 import time
 import signal
+import stat
 import sys
 import errno
 import socket
@@ -128,8 +129,12 @@ if action == 'start':
     if name == os.environ.get('CAPTURE_TEST_FAILED_RESTART'):
         sys.exit(1)
     states[name] = True
+if action == 'freeze':
+    states[name] = 'frozen'
+if action == 'thaw' and states.get(name):
+    states[name] = True
 state_path.write_text(json.dumps(states))
-if action == 'stop' and os.environ.get('CAPTURE_TEST_SIGNAL'):
+if action in ('stop', 'freeze') and os.environ.get('CAPTURE_TEST_SIGNAL'):
     os.kill(int(os.environ['CAPTURE_TEST_PARENT']), int(os.environ['CAPTURE_TEST_SIGNAL']))
 """)
         script.chmod(0o755)
@@ -1042,6 +1047,212 @@ subprocess.run(sys.argv[1:], check=True)
         self.assertFalse(attempted.exists(), "No old stop client may run after service recovery")
         self.assertTrue(json.loads(self.service_state.read_text())["managed.service"])
         self.assertFalse((self.staging / "capture-manifest.json").exists())
+
+    def test_hardlink_snapshot_keeps_git_consistent_without_pausing_writers(self):
+        repository = self.source / "repositories/repo.git"
+        (repository / "refs/heads").mkdir(parents=True)
+        (repository / "objects/pack").mkdir(parents=True)
+        (repository / "objects/pack/old.pack").write_text("old objects")
+        (repository / "refs/heads/main").write_text("old head")
+        (self.source / "data/indexers").mkdir(parents=True)
+        (self.source / "data/indexers/issues.bleve").write_text("in-place index")
+        (self.source / "data").chmod(0o750)
+        real_link = os.link
+        linked = []
+
+        def racing_link(source, destination, **kwargs):
+            linked.append(pathlib.Path(source).name)
+            # A repack lands while the walk is inside objects/.
+            if pathlib.Path(source).name == "old.pack":
+                (repository / "objects/pack/new.pack").write_text("repacked objects")
+                os.unlink(source)
+            return real_link(source, destination, **kwargs)
+
+        def upload(selection):
+            staged = self.staging / "tree" / repository.relative_to("/") / "objects/pack"
+            return list(selection.paths), list(selection.excludes), sorted(path.name for path in staged.iterdir())
+
+        os.link = racing_link
+        try:
+            selection = prepare_selection({"captures": [{"name": "forgejo", "kind": "files", "paths": [str(self.source)], "excludes": ["/data/indexers"], "hardlinkSnapshot": True}]}, self.staging, consume=upload)
+        finally:
+            os.link = real_link
+        paths, excludes, packs = selection.result
+        self.assertEqual(packs, ["new.pack"], "objects moved by a repack must be rescanned")
+        root = self.staging / "tree" / self.source.relative_to("/")
+        self.assertIn(root, paths)
+        self.assertNotIn(self.source, paths)
+        self.assertLess(linked.index("main"), linked.index("old.pack"), "refs must be linked before objects")
+        self.assertIn(capture.escape_pattern(str(root)) + "/data/indexers", excludes)
+        self.assertEqual(json.loads((self.staging / "capture-manifest.json").read_text())["captures"][0]["paths"][0]["snapshotPath"], str(root))
+        self.assertFalse(root.exists(), "link tree must be released after upload")
+
+    def test_hardlink_snapshot_preserves_captured_state_during_upload(self):
+        (self.source / "repo.git/refs/heads").mkdir(parents=True)
+        (self.source / "repo.git/refs/heads/main").write_text("old head")
+        (self.source / "repo.git/objects").mkdir()
+        (self.source / "repo.git/objects/old.pack").write_text("old objects")
+        (self.source / "repo.git").chmod(0o750)
+        root = self.staging / "tree" / self.source.relative_to("/")
+
+        def upload(selection):
+            (self.source / "repo.git/refs/heads/main.lock").write_text("new head")
+            os.replace(self.source / "repo.git/refs/heads/main.lock", self.source / "repo.git/refs/heads/main")
+            os.unlink(self.source / "repo.git/objects/old.pack")
+            return ((root / "repo.git/refs/heads/main").read_text(), (root / "repo.git/objects/old.pack").read_text(),
+                    stat.S_IMODE((root / "repo.git").stat().st_mode))
+
+        selection = prepare_selection({"captures": [{"name": "forgejo", "kind": "files", "paths": [str(self.source)], "hardlinkSnapshot": True}]}, self.staging, consume=upload)
+        self.assertEqual(selection.result, ("old head", "old objects", 0o750))
+
+    def git_repository(self):
+        environment = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"}
+        git = lambda *args: subprocess.run(["git", *args], check=True, capture_output=True, text=True, env=environment).stdout.strip()
+        work, repository = self.root / "work", self.source / "repo.git"
+        git("init", "-q", str(work))
+        (work / "file").write_text("content")
+        git("-C", str(work), "add", "file")
+        git("-C", str(work), "commit", "-q", "-m", "initial")
+        git("init", "-q", "--bare", str(repository))
+        git("-C", str(work), "push", "-q", str(repository), "HEAD:refs/heads/main")
+        self.assertFalse((repository / "packed-refs").exists())
+        return git, repository, git("-C", str(work), "rev-parse", "HEAD")
+
+    def test_hardlink_snapshot_keeps_refs_packed_after_listing_the_repository(self):
+        git, repository, head = self.git_repository()
+        real_listdir, real_scandir = os.listdir, os.scandir
+
+        def pack_before(read):
+            def racing(path):
+                # pack-refs lands after the repository listing, before its refs are read.
+                if not isinstance(path, int) and pathlib.Path(path) == repository / "refs" and not (repository / "packed-refs").exists():
+                    git("--git-dir", str(repository), "pack-refs", "--all", "--prune")
+                return read(path)
+            return racing
+
+        def upload(selection):
+            staged = self.staging / "tree" / repository.relative_to("/")
+            return git("--git-dir", str(staged), "rev-parse", "refs/heads/main"), git("--git-dir", str(staged), "fsck", "--strict")
+
+        os.listdir, os.scandir = pack_before(real_listdir), pack_before(real_scandir)
+        try:
+            selection = prepare_selection({"captures": [{"name": "forgejo", "kind": "files", "paths": [str(self.source)], "hardlinkSnapshot": True}]}, self.staging, consume=upload)
+        finally:
+            os.listdir, os.scandir = real_listdir, real_scandir
+        self.assertEqual(selection.result[0], head)
+
+    def test_hardlink_snapshot_omits_locks_of_live_git_transactions(self):
+        git, repository, head = self.git_repository()
+        (repository / "refs/heads/main.lock").write_text(head + "\n")
+        (repository / "config.lock").write_text("")
+
+        def upload(selection):
+            os.replace(repository / "refs/heads/main.lock", repository / "refs/heads/main")
+            staged = self.staging / "tree" / repository.relative_to("/")
+            git("--git-dir", str(staged), "update-ref", "refs/heads/main", head)
+            return sorted(path.name for path in staged.rglob("*.lock"))
+
+        selection = prepare_selection({"captures": [{"name": "forgejo", "kind": "files", "paths": [str(self.source)], "hardlinkSnapshot": True}]}, self.staging, consume=upload)
+        self.assertEqual(selection.result, [])
+
+    def service_actions(self):
+        return [(call["action"], call["name"]) for call in map(json.loads, self.service_calls.read_text().splitlines())]
+
+    def test_hardlink_snapshot_freezes_units_only_while_linking(self):
+        (self.source / "state").write_text("linked while frozen")
+        self.fake_services({"forgejo.service": True, "idle.service": False})
+        real_link, during_link = os.link, []
+
+        def observed_link(source, destination, **kwargs):
+            during_link.append(json.loads(self.service_state.read_text())["forgejo.service"])
+            return real_link(source, destination, **kwargs)
+
+        os.link = observed_link
+        try:
+            selection = prepare_selection({"captures": [{"name": "forgejo", "kind": "files", "paths": [str(self.source)], "hardlinkSnapshot": True,
+                                                         "units": [{"name": "forgejo.service"}, {"name": "idle.service"}]}]}, self.staging,
+                                          consume=lambda selection: (json.loads(self.service_state.read_text()), self.service_actions()))
+        finally:
+            os.link = real_link
+        self.assertEqual(during_link, ["frozen"])
+        states, actions = selection.result
+        self.assertEqual(states, {"forgejo.service": True, "idle.service": False}, "units must be thawed before upload")
+        self.assertEqual([action for action in actions if action[0] != "is-active"], [("freeze", "forgejo.service"), ("thaw", "forgejo.service")])
+
+    def test_applied_freeze_is_thawed_when_the_backup_is_terminated(self):
+        (self.source / "state").write_text("linked while frozen")
+        self.fake_services({"forgejo.service": True}, signal_on_stop=signal.SIGTERM)
+        with self.assertRaises(capture.CaptureError):
+            capture.prepare({"captures": [{"name": "forgejo", "kind": "files", "paths": [str(self.source)], "hardlinkSnapshot": True, "units": [{"name": "forgejo.service"}]}]}, self.staging)
+        self.assertEqual(json.loads(self.service_state.read_text())["forgejo.service"], True)
+        self.assertFalse((self.staging / "capture-manifest.json").exists())
+
+    def test_freeze_limit_applies_only_while_units_are_frozen(self):
+        (self.source / "state").write_text("large runner workspace")
+        self.fake_services({"forgejo.service": True, "idle.service": False})
+        real_link, limit = os.link, capture.FREEZE_LIMIT_SECONDS
+
+        def slow_link(source, destination, **kwargs):
+            time.sleep(0.5)
+            return real_link(source, destination, **kwargs)
+
+        os.link, capture.FREEZE_LIMIT_SECONDS = slow_link, 0.4
+        try:
+            for units in ([], [{"name": "idle.service"}]):
+                capture.prepare({"captures": [{"name": "runner", "kind": "files", "paths": [str(self.source)], "hardlinkSnapshot": True, "units": units}]}, self.staging)
+            with self.assertRaises(capture.CaptureError):
+                capture.prepare({"captures": [{"name": "forgejo", "kind": "files", "paths": [str(self.source)], "hardlinkSnapshot": True, "units": [{"name": "forgejo.service"}]}]}, self.staging)
+        finally:
+            os.link, capture.FREEZE_LIMIT_SECONDS = real_link, limit
+        self.assertEqual(json.loads(self.service_state.read_text())["forgejo.service"], True)
+
+    def test_freeze_guardian_never_freezes_after_its_deadline(self):
+        self.fake_services({"forgejo.service": True})
+        plan = self.root / "late/plan.json"
+        plan.parent.mkdir()
+        # A guardian scheduled only after the freeze budget expired must thaw, not freeze.
+        capture._control_json(plan, {"parent": capture._process_identity(os.getpid()), "units": [{"name": "forgejo.service"}], "actions": ["freeze", "thaw"],
+                                     "deadline": time.monotonic() - 1, "recoveryDeadline": time.monotonic() + 5})
+        capture._recover_service_lease(plan)
+        self.assertEqual(self.service_actions(), [("thaw", "forgejo.service")])
+        self.assertTrue(json.loads(plan.with_suffix(".done").read_text())["failures"])
+        self.assertEqual(json.loads(self.service_state.read_text())["forgejo.service"], True)
+
+    @unittest.skipUnless(shutil.which("initdb") and shutil.which("pg_dump"), "PostgreSQL test tools not installed")
+    def test_hardlink_coordinated_dump_reads_the_snapshot_taken_inside_the_freeze(self):
+        data, socket = self.root / "pgdata", self.root / "socket"
+        socket.mkdir()
+        subprocess.run(["initdb", "-D", str(data), "--no-locale", "--encoding=UTF8", "--auth=trust"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        subprocess.run(["pg_ctl", "-D", str(data), "-l", str(self.root / "postgres.log"), "-o", f"-F -p 5441 -k {socket} -c listen_addresses=''", "-w", "start"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        self.addCleanup(lambda: subprocess.run(["pg_ctl", "-D", str(data), "-m", "immediate", "-w", "stop"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE))
+        connection = ["-h", str(socket), "-p", "5441"]
+        def sql(database, statement):
+            return subprocess.run(["psql", *connection, "-d", database, "-v", "ON_ERROR_STOP=1", "-At", "-c", statement], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).stdout.decode().strip()
+        sql("postgres", "CREATE DATABASE forgejo")
+        sql("forgejo", "CREATE TABLE repository (name TEXT); INSERT INTO repository VALUES ('linked')")
+        (self.source / "linked.git").mkdir()
+        self.fake_services({"forgejo.service": True})
+        real_link = os.link
+
+        def late_write(source, destination, **kwargs):
+            # Anything committed after the exported snapshot belongs to the next backup.
+            sql("forgejo", "INSERT INTO repository VALUES ('after snapshot')")
+            os.link = real_link
+            return real_link(source, destination, **kwargs)
+
+        (self.source / "linked.git/HEAD").write_text("ref: refs/heads/main\n")
+        os.link = late_write
+        try:
+            capture.prepare({"captures": [{"name": "postgresql", "kind": "postgres", "socket": str(socket), "port": 5441,
+                                           "coordinated": [{"name": "forgejo", "database": "forgejo", "paths": [str(self.source)], "hardlinkSnapshot": True, "units": [{"name": "forgejo.service"}]}]}]}, self.staging)
+        finally:
+            os.link = real_link
+        manifest = json.loads((self.staging / "capture-manifest.json").read_text())["captures"][0]
+        dump = next(entry for entry in manifest["databases"] if entry["name"] == "forgejo")
+        sql("postgres", "CREATE DATABASE restored")
+        subprocess.run(["pg_restore", *connection, "-d", "restored", "--exit-on-error", str(self.staging / dump["dump"])], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        self.assertEqual(sql("restored", "SELECT string_agg(name, ',') FROM repository"), "linked")
+        self.assertNotIn("stop", [action for action, name in self.service_actions() if name == "forgejo.service"])
 
 
 if __name__ == "__main__":

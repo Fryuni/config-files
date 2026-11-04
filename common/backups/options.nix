@@ -64,6 +64,11 @@
       default = false;
       description = "Whether an absent source is acceptable.";
     };
+    hardlinkSnapshot = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Hard-link sources into staging before upload so writers that replace files by rename (such as Git) keep running; sources must share the staging filesystem. Listed units are frozen only while linking (and exporting the coordinated database snapshot) instead of stopped through upload. Unsupported by sqlite captures.";
+    };
   };
   coordinatedType = lib.types.submodule {
     options =
