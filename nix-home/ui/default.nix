@@ -3,7 +3,7 @@
   pkgs,
   ...
 }: let
-  brave = pkgs.brave.override {
+  brave = pkgs.master.brave-origin.override {
     vulkanSupport = true;
   };
   setRandomWallpaper = pkgs.writeShellScript "set-random-wallpaper" ''
