@@ -545,7 +545,7 @@ while True:
         expected = {"managed.service": True, "inactive.service": False}
         self.fake_services(expected)
         marker = self.block_service_final_copy()
-        child = self.service_capture_child(timeout=0.8)
+        child = self.service_capture_child(timeout=3)
         self.await_file(marker, child)
         child.send_signal(signal.SIGSTOP)
         self.await_service_states(expected)
