@@ -30,11 +30,14 @@ _: prev: {
   # Determinate Nix 3.23 adds activity 10113 and result 10111 to internal-json.
   # Remove once nixpkgs carries https://github.com/maralorn/nix-output-monitor/pull/321.
   nix-output-monitor = assert prev.lib.assertMsg (prev.nix-output-monitor.version == "2.2.0")
-  "nix-output-monitor changed from 2.2.0 to ${prev.nix-output-monitor.version}; review whether the unknown activity/result types patch is still needed.";
-    prev.nix-output-monitor.override {
-      extraComposeFunctions = [
-        (prev.haskell.lib.compose.appendPatch ./nix-output-monitor-unknown-types.patch)
-      ];
+  "nix-output-monitor changed from 2.2.0 to ${prev.nix-output-monitor.version}; The override might no longer be necessary.";
+    prev.nix-output-monitor.overrideAttrs {
+      src = prev.fetchgit {
+        url = "https://github.com/maralorn/nix-output-monitor.git";
+        rev = "d48ff7935da72a5a5764ee8c5358d38417b0f337";
+        hash = "sha256-GOP4WQiZMTEMvwM2kH4YEE6sU7oEgPo9+Ys+kerIhes=";
+      };
+      patches = [];
     };
 
   python312Packages =
