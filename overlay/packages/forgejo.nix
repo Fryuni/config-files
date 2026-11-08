@@ -6,11 +6,11 @@
 }: let
   # Reuse nixpkgs' build recipe so the backend and frontend share the fork pin.
   package = import (path + "/pkgs/by-name/fo/forgejo/generic.nix") {
-    version = "16.0.3-unstable-2026-10-22";
-    rev = "9c0857d037d19f439a149508ee9407e28da0f0f8";
-    hash = "sha256-M0RFCxjRtwzhcw8Lh8MCKaNYNBOIULNg9+5vLK4tk+A=";
-    npmDepsHash = "sha256-ZIF0udmW1tDzSCsKtZU7S9GMdgfy5fuirtj38nPrnRw=";
-    vendorHash = "sha256-eEkZ9I+hlP+QXaLgL5vrkAPiDVvfKEHiNNN6bqYETbM=";
+    version = "16.0.3-unstable-2026-11-04";
+    rev = "3d64256c884b62d29718f909e23ebec3493a6c9f";
+    hash = "sha256-fER7NsJGH7NFp6qBRqpdKEXa3LXTD0dIB7hYJd80M50=";
+    npmDepsHash = "sha256-uTi1c4PnvhKLxL/A+TI0t6bLmRw0Qo7b67+tCeVZqu8=";
+    vendorHash = "sha256-8S1LmnPmj/lvg54BkYC58Pu3K28kAjZY1+8fg+BYFfM=";
   };
 in
   (callPackage package {
