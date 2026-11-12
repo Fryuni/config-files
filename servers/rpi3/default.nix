@@ -1,28 +1,42 @@
 {
   config,
-  pkgs,
   lib,
   modulesPath,
-  inputs,
   ...
 }: {
   imports = [
     "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
-    inputs.nixos-hardware.nixosModules.raspberry-pi-3
-    ../../nixos/modules/networking/tailscale.nix
     ../common.nix
+    ../../nixos/modules/networking/tailscale.nix
   ];
 
   networking.hostName = "rpi3";
+  system.stateVersion = "26.05";
 
-  # Build the Pi image as an x86_64 -> aarch64 cross system on the notebook.
-  # Without an explicit buildPlatform, pure flake evaluation treats this as a
-  # native aarch64 build and runs timing-sensitive target tests under emulation
-  # (coreutils 9.10 env-signal-handler is one such flaky test).
-  nixpkgs.buildPlatform = lib.mkDefault "x86_64-linux";
-  nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
+  # Build natively through binfmt emulation so nearly everything comes from
+  # cache.nixos.org; the flake defaults aarch64 boxes to x86_64 cross builds,
+  # which have no binary cache. The mainline kernel from the SD image module
+  # supports the Pi 3 B and is cached, unlike the nixos-hardware vendor kernel.
+  nixpkgs.buildPlatform = lib.mkForce "aarch64-linux";
 
-  services.vmagent.enable = true;
+  # The SD image base profile pulls in many filesystems (including ZFS).
+  boot.supportedFilesystems = lib.mkForce ["ext4" "vfat"];
+  # Manual pages and the NixOS manual are slow to build under emulation.
+  documentation.enable = false;
+  # Wired Ethernet needs no firmware; this drops ~800 MiB of linux-firmware.
+  hardware.enableRedistributableFirmware = lib.mkForce false;
 
-  # time.timeZone = lib.mkForce "America/Sao_Paulo";
+  # Decrypted with the host key that `just sd-image rpi3` writes into the image.
+  age.secrets.tailscale-authkey.rekeyFile = ../../secrets/rpi3/tailscale-enroll-key;
+  services.tailscale = {
+    enable = true;
+    authKeyFile = config.age.secrets.tailscale-authkey.path;
+    fileInbox.enable = false;
+    openFirewall = true;
+  };
+  networking.firewall.trustedInterfaces = [config.services.tailscale.interfaceName];
+
+  services.openssh. settings = {
+    KbdInteractiveAuthentication = false;
+  };
 }

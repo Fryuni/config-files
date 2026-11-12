@@ -10,7 +10,7 @@
     }
   '';
 
-  home.packages = with pkgs; [fh];
+  home.packages = with pkgs; [fh nh];
 
   programs.nix-index = {
     enable = true;

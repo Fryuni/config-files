@@ -2,8 +2,9 @@
 
 [Project overview](../README.md) · [Secrets](secrets.md)
 
-`nixos/nix-settings.nix` enables `nixos/modules/nix-store-cache.nix` on all four NixOS
-machines, through the workstation baseline or `servers/common.nix`. It replaces the SSH
+`nixos/nix-settings.nix` enables `nixos/modules/nix-store-cache.nix` on `note`, `loem`,
+and `gce-automation`, through the workstation baseline or `servers/common.nix`. The
+minimal `rpi3` image imports neither and uses only the default binary cache. It replaces the SSH
 peer cache; host SSH keys remain in use for normal SSH and agenix. The remote server is
 [Cubby](https://git.fryuni.dev/Fryuni/cloudflare-nix-cache).
 
@@ -99,9 +100,9 @@ timer: clear any remaining queue symlinks when decommissioning the module.
 
 `services.nixStoreCache.metrics` publishes queue telemetry through the Prometheus node
 exporter's textfile collector. It defaults to following
-`services.prometheus.exporters.node.enable`, so `note`, `loem`, and `rpi3` collect
-metrics while `gce-automation`, which runs no exporter and has no Tailnet identity, does
-not. `nix-store-cache-metrics.timer` fires every `metrics.interval` (default `30s`, with
+`services.prometheus.exporters.node.enable`, so `note` and `loem` collect
+metrics while `gce-automation`, which runs no exporter and has no Tailnet identity, and
+the minimal `rpi3` image, which does not import the module, do not. `nix-store-cache-metrics.timer` fires every `metrics.interval` (default `30s`, with
 `AccuracySec=1s` so systemd does not coalesce it past the 15s scrape interval) and
 publishes `nix-store-cache.prom` into `metrics.textfileDirectory` (default
 `/var/lib/prometheus-node-exporter/textfile`) by atomic rename. That directory is

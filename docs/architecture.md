@@ -31,7 +31,7 @@ flowchart TD
     loem --> remoteDev[servers/remoteDev.nix]
     remoteDev --> interactive[servers/interactive.nix]
     gce --> serverCommon
-    rpi3 --> serverCommon
+    rpi3 --> rpiStandalone[servers/rpi3 standalone minimal SD image]
 ```
 
 Important composition rules:
@@ -171,11 +171,25 @@ automation assets.
 
 ### `rpi3`
 
-`rpi3` is an aarch64-linux Raspberry Pi 3 SD image. Its configuration imports the NixOS
-aarch64 SD image module, Raspberry Pi 3 hardware support, the shared server baseline,
-and repository networking modules. It sets `networking.hostName = "rpi3"` and declares
-x86_64 build-platform defaults so the image can be cross-built from the notebook when
-needed.
+`rpi3` is a deliberately minimal aarch64-linux Raspberry Pi 3 B SD image. It imports only
+the NixOS aarch64 SD image module (mainline kernel, U-Boot, extlinux); it does not import
+`servers/common.nix`, `nixos/users.nix`, or the repository networking modules. It forces a
+native aarch64 build platform so the notebook builds it through binfmt emulation with
+binary-cache hits instead of cross-compiling. The image carries Ethernet DHCP, key-only
+OpenSSH, a host-local `lotus` account with passwordless sudo, and Tailscale, which joins
+the tailnet on first boot with an agenix-managed auth key.
+
+Its SSH host key is kept encrypted in `secrets/rpi3/ssh-host-ed25519-key` and written
+into the image by `just sd-image rpi3 <out>` (used by `just flash-sd-image rpi3
+<device>`), so the Pi can decrypt its secrets from the first boot and keeps its identity
+across reflashes. `just test-sd-image` boots that image in an emulated aarch64 VM and
+checks it over SSH. Once enrolled, the Pi is updated with `just deploy rpi3`.
+
+Only the SSH identity survives a reflash; Tailscale state does not. Before reflashing,
+remove the old `rpi3` device from the tailnet admin console (otherwise the new one
+enrolls as `rpi3-1` and `just deploy rpi3` reaches the stale entry), and make sure
+`secrets/rpi3/tailscale-enroll-key` holds an unexpired key: single-use keys are spent
+by the first enrollment, so a reusable key avoids rotating it for every reflash.
 
 ## Users and Home Manager
 

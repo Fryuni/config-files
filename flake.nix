@@ -189,7 +189,6 @@
       }
       {
         system = flake-utils.lib.system.aarch64-linux;
-
         boxes = {
           rpi3 = [
             ./servers/rpi3

@@ -79,7 +79,7 @@ local storage. See [Hollama operation and validation](docs/ai-tools.md#hollama).
 | `note` | `x86_64-linux` | Workstation and notebook |
 | `loem` | `x86_64-linux` | Hosted services and remote development |
 | `gce-automation` | `x86_64-linux` | Google Compute automation image |
-| `rpi3` | `aarch64-linux` | Raspberry Pi 3 SD image |
+| `rpi3` | `aarch64-linux` | Minimal Raspberry Pi 3 B SD image that joins the tailnet |
 | `lotus@note` | `x86_64-linux` | Standalone Home Manager environment |
 
 ## Working with the configuration

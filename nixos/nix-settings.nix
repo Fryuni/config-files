@@ -7,10 +7,6 @@
     ./modules/nix-store-cache.nix
   ];
 
-  environment.systemPackages = with pkgs; [
-    nh
-  ];
-
   age.secrets.nix-access-tokens.rekeyFile = ../secrets/nix-access-tokens;
 
   age.secrets.nix-store-cache-token = {
@@ -35,7 +31,7 @@
   programs.nix-ld.enable = true;
 
   nix.settings = {
-    trusted-users = ["root" "lotus"];
+    trusted-users = ["@wheel"];
 
     experimental-features = [
       "nix-command"

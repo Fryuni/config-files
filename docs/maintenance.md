@@ -95,10 +95,10 @@ Forgejo Actions automate maintenance on the self-hosted Nix runner. The workflow
 in `.forgejo/workflows/validate.yml` and `.forgejo/workflows/update.yml`.
 
 - Pull requests and pushes to `main` build the `note` and `loem` NixOS configurations,
+  the `rpi3` SD image (natively, through the runner host's aarch64 binfmt emulation),
   the `lotus@note` Home Manager generation, and all `x86_64-linux` flake checks,
   including reusable-module checks and offline Vite+ updater regression tests. The
-  workflow currently omits `gce-automation`, and the `rpi3` SD-image target is commented
-  out.
+  workflow currently omits `gce-automation`.
 - A weekly and manually dispatched update workflow runs `just update` from `main`.
   Serialized runs force-push the existing update PR branch, or create
   `automation/update-dependencies` and a PR when needed. It reuses branches from the

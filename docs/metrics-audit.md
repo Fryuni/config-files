@@ -30,10 +30,8 @@ Remote write uses the device-independent Tailscale Service
 module](../servers/loem/metrics/default.nix) stores one month of data and provisions
 the `victoriametrics` Grafana datasource.
 
-[Raspberry Pi configuration](../servers/rpi3/default.nix) enables vmagent, but
-`rpi3` was absent from the observed host inventory. Check whether that configuration
-has been deployed and whether the Pi is running and can reach the remote-write
-service; the inventory alone does not establish its state.
+The [Raspberry Pi configuration](../servers/rpi3/default.nix) is now a minimal image
+without vmagent, so `rpi3` is not expected in the metrics inventory.
 
 ## Existing endpoints covered by this change
 

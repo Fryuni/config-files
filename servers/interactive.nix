@@ -1,23 +1,14 @@
 {
   inputs,
-  lib,
+  pkgs,
   ...
 }: {
-  imports = [
-    inputs.home-manager.nixosModules.home-manager
-    ../nixos/sshHosts.nix
-    ../nixos/users.nix
-  ];
-
-  networking.firewall.allowedTCPPorts = [22];
+  imports = [inputs.home-manager.nixosModules.home-manager];
 
   services.openssh = {
     enable = true;
-    ports = [22];
     settings = {
-      AllowUsers = ["lotus"];
       PermitRootLogin = "no";
-      PasswordAuthentication = false;
     };
   };
 

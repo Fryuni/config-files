@@ -9,25 +9,22 @@
     ../nixos/modules/networking/cloudflare-tunnel.nix
     ../nixos/nix-settings.nix
     ../nixos/registries.nix
+    ../nixos/users.nix
+    ../nixos/sshHosts.nix
   ];
 
   environment.systemPackages = with pkgs;
     [
-      tmux
-      gcc
-      clang
+      herdr
       curl
       wget
       git
       jq
       dig
-      htop
       btop
-      gnumake
       ripgrep
       duf
       dua
-      xarchiver
       cachix
     ]
     ++ lib.optionals (!stdenv.hostPlatform.isAarch64) [
@@ -86,7 +83,9 @@
     };
     openssh = {
       enable = lib.mkDefault true;
+      ports = [22];
       settings = {
+        AllowUsers = ["lotus"];
         PasswordAuthentication = false;
         PermitRootLogin = lib.mkDefault "prohibit-password";
       };

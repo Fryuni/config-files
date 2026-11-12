@@ -35,6 +35,16 @@ configuration can build. They cannot decrypt secrets until a real host identity 
 registered and the secrets are rekeyed. `gce-automation` still needs a stable hostname
 and host key for this workflow.
 
+SD-image hosts such as `rpi3` have no host to scan before their first boot, so their
+host key is generated ahead of time: the private key is stored in
+`secrets/<config>/ssh-host-ed25519-key`, encrypted to the master recipients, and its
+public key in `secrets/host-keys/<config>.pub`. `just sd-image <config> <out>` decrypts
+it and writes it into the image's root filesystem, so the image decrypts its rekeyed
+secrets on first boot. The `rpi3` Tailscale enrollment key lives in
+`secrets/rpi3/tailscale-enroll-key`; replace it with `agenix -e
+secrets/rpi3/tailscale-enroll-key`, run `just rekey`, and stage the rekeyed output before
+building a new image or deploying.
+
 ## Service-specific credentials
 
 - Grafana's browser Editor login and automation service-account token are stored

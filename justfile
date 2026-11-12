@@ -76,25 +76,38 @@ apply-reload:
 build-sd-image config:
   nix build --impure --no-link --print-out-paths ".#nixosConfigurations.{{config}}.config.system.build.sdImage"
 
+# Write a raw, flashable image to `out`, with the host's SSH key from
+# secrets/<config>/ssh-host-ed25519-key so it can decrypt its agenix secrets.
+# The output then holds that private key in plaintext; keep it private.
+sd-image config out:
+  common/sd-image/prepare.sh "{{config}}" "{{out}}"
+
 flash-sd-image config device:
   #!/usr/bin/env bash
   set -euo pipefail
-  image_path=$(nix build --impure --no-link --print-out-paths ".#nixosConfigurations.{{config}}.config.system.build.sdImage")
-  image_file=$(find "$image_path" -name '*.img.zst' | head -1)
-  echo "Flashing $image_file to {{device}}"
-  zstdcat "$image_file" | sudo dd of={{device}} bs=4M status=progress conv=fsync
+  # dd would happily create a regular (world-readable) file holding the host key.
+  [[ -b "{{device}}" ]] || { echo "{{device}} is not a block device" >&2; exit 1; }
+  dir=$(mktemp -d)
+  trap 'rm -rf "$dir"' EXIT
+  just sd-image "{{config}}" "$dir/image.img"
+  echo "Flashing {{config}} to {{device}}"
+  sudo dd if="$dir/image.img" of="{{device}}" bs=4M status=progress conv=fsync,nocreat
+
+# Boot the flashable image in an emulated aarch64 VM and check it over SSH.
+test-sd-image config="rpi3":
+  common/sd-image/vm-test.sh "{{config}}"
 
 deploy config host="":
   #!/usr/bin/env bash
   DEPLOY_HOST="{{host}}"
   : ${DEPLOY_HOST:="{{config}}"}
-  nh os switch -H "{{config}}" . --target-host "$DEPLOY_HOST" --use-substitutes
+  nh os switch -H "{{config}}" . --target-host "$DEPLOY_HOST" --use-substitutes --elevation-strategy passwordless
 
 deploy-reboot config host="":
   #!/usr/bin/env bash
   DEPLOY_HOST="{{host}}"
   : ${DEPLOY_HOST:="{{config}}"}
-  nh os boot -H "{{config}}" . --target-host "$DEPLOY_HOST" --use-substitutes
+  nh os boot -H "{{config}}" . --target-host "$DEPLOY_HOST" --use-substitutes --elevation-strategy passwordless
   ssh "$DEPLOY_HOST" "sudo systemctl reboot"
 
 remote-switch config host="":
