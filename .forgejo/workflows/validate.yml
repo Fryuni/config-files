@@ -38,10 +38,58 @@ jobs:
           persist-credentials: false
 
       - name: Build target
+        id: build
         if: matrix.attr != 'checks'
         env:
           GITHUB_TOKEN: ${{ secrets.READ_ONLY_GITHUB_TOKEN }}
-        run: nix build --no-link --print-out-paths ${{ matrix.flags }} "${{ matrix.attr }}"
+        run: |
+          out="$(nix build --no-link --print-out-paths ${{ matrix.flags }} "${{ matrix.attr }}")"
+          echo "$out"
+          echo "out=$out" >> "$GITHUB_OUTPUT"
+
+      # Informational: a broken base branch or a read-only fork token must not fail the PR.
+      - name: Compare with base branch
+        if: matrix.attr != 'checks' && github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.READ_ONLY_GITHUB_TOKEN }}
+          FORGEJO_TOKEN: ${{ github.token }}
+          TITLE: ${{ matrix.name }}
+          ATTR: ${{ matrix.attr }}
+          NEW_OUT: ${{ steps.build.outputs.out }}
+          BASE_REF: ${{ github.base_ref }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          API_URL: ${{ github.api_url }}
+          REPOSITORY: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -o pipefail
+          base="$(git ls-remote "$REPO_URL" "refs/heads/$BASE_REF" | cut -f1)"
+          # Shallow like actions/checkout, so revCount is absent on both sides and the
+          # paths match the base branch's own CI builds.
+          OLD_OUT="$(nix build --no-link --print-out-paths ${{ matrix.flags }} "git+$REPO_URL?rev=$base&shallow=1${ATTR#.}")"
+          export OLD_OUT
+          nix shell nixpkgs#dix nixpkgs#curl nixpkgs#jq nixpkgs#diffutils nixpkgs#findutils nixpkgs#gnugrep --command bash -euo pipefail <<'EOF'
+          marker="<!-- closure-diff: $TITLE -->"
+          report="$(.forgejo/closure-diff.sh "$TITLE" "$OLD_OUT" "$NEW_OUT")"
+          echo "$report"
+
+          api() {
+            curl --fail-with-body --silent --show-error \
+              --header "Authorization: token $FORGEJO_TOKEN" \
+              --header "Content-Type: application/json" "$@"
+          }
+
+          # Keep one comment per target, refreshed on every push.
+          id="$(api "$API_URL/repos/$REPOSITORY/issues/$PR/comments" |
+            jq -r --arg m "$marker" 'first(.[] | select(.body | startswith($m)) | .id) // empty')"
+          payload() { jq -n --arg body "$marker"$'\n'"$report" '{body: $body}'; }
+          if [ -n "$id" ]; then
+            payload | api --request PATCH --data @- "$API_URL/repos/$REPOSITORY/issues/comments/$id" >/dev/null
+          else
+            payload | api --request POST --data @- "$API_URL/repos/$REPOSITORY/issues/$PR/comments" >/dev/null
+          fi
+          EOF
 
       - name: Build all x86_64-linux flake checks
         if: matrix.attr == 'checks'

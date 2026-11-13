@@ -99,6 +99,15 @@ in `.forgejo/workflows/validate.yml` and `.forgejo/workflows/update.yml`.
   the `lotus@note` Home Manager generation, and all `x86_64-linux` flake checks,
   including reusable-module checks and offline Vite+ updater regression tests. The
   workflow currently omits `gce-automation`.
+- On pull requests, each configuration job also builds the same output from the current
+  tip of the base branch (fetched shallowly by revision, like `actions/checkout`, so the
+  paths match the branch's own CI builds) and keeps one PR comment per configuration up to date. The
+  comment, rendered by `.forgejo/closure-diff.sh`, has the `dix` package diff (added,
+  removed, updated, and changed packages) and a unified diff of the text files in the
+  output with store hashes masked; package environments (`sw`, `etc/profiles`,
+  `home-path`), firmware, and kernel modules are left to `dix`. Each section is truncated
+  at 50,000 characters. Comments use the job's automatic token, so fork PRs, which get a
+  read-only token, fail this step without failing the job.
 - A weekly and manually dispatched update workflow runs `just update` from `main`.
   Serialized runs force-push the existing update PR branch, or create
   `automation/update-dependencies` and a PR when needed. It reuses branches from the
