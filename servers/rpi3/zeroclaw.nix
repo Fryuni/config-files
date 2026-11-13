@@ -28,17 +28,27 @@
       mv -f ${configFile}.tmp ${configFile}
     fi
   '';
+  # Raw key file, not KEY=VALUE, so it can't go through the module's envsubst.
+  injectEmbeddingKey = pkgs.writeShellScript "zeroclaw-${instance}-inject-embedding-key" ''
+    set -euo pipefail
+    KEY="$(<"$CREDENTIALS_DIRECTORY/openrouter-key")" ${yq} -p toml -o toml '.memory.embedding_api_key = strenv(KEY)' ${configFile} > ${configFile}.tmp
+    mv -f ${configFile}.tmp ${configFile}
+  '';
 in {
   imports = ["${inputs.zeroclaw}/nix/module.nix"];
 
-  age.secrets.zeroclaw-env = {
-    rekeyFile = ../../secrets/rpi3/zeroclaw-env;
-    generator.script = {pkgs, ...}: ''
-      printf 'MATRIX_PASSWORD=%s\n' "$(${lib.getExe pkgs.openssl} rand -hex 32)"
-    '';
+  age.secrets = {
+    zeroclaw-env = {
+      rekeyFile = ../../secrets/rpi3/zeroclaw-env;
+      generator.script = {pkgs, ...}: ''
+        printf 'MATRIX_PASSWORD=%s\n' "$(${lib.getExe pkgs.openssl} rand -hex 32)"
+      '';
+    };
+    # EXECUTOR_TOKEN: an organization-scoped Executor personal access token.
+    zeroclaw-executor-env.rekeyFile = ../../secrets/rpi3/executor-env;
+    # Same key the home config uses, rekeyed for this host.
+    zeroclaw-openrouter-key.rekeyFile = ../../secrets/ai/openrouter;
   };
-  # EXECUTOR_TOKEN: an organization-scoped Executor personal access token.
-  age.secrets.zeroclaw-executor-env.rekeyFile = ../../secrets/rpi3/executor-env;
 
   services.zeroclaw.instances.${instance} = {
     environmentFile = config.age.secrets.zeroclaw-env.path;
@@ -82,6 +92,30 @@ in {
         mcp_bundles = ["executor"];
       };
 
+      memory = {
+        embedding_provider = "openrouter";
+        embedding_model = "perplexity/pplx-embed-v1-0.6b";
+        embedding_dimensions = 1024;
+        types.enabled = true;
+      };
+
+      # Not enabled; only the target agent and adaptive pacing are set.
+      heartbeat = {
+        agent = "assistant";
+        adaptive = true;
+      };
+
+      skills = {
+        allow_scripts = true;
+        skill_creation = {
+          enabled = true;
+          reflection_enabled = true;
+        };
+        skill_improvement.enabled = true;
+      };
+      # The only bundle, so skill references and created skills resolve to it.
+      skill_bundles.default = {};
+
       mcp.servers = [
         {
           name = "executor";
@@ -124,16 +158,21 @@ in {
 
   systemd.services."zeroclaw-${instance}" = {
     # Channel startup validates the runtime shell, even before receiving messages.
-    path = [pkgs.bash];
+    # Doctor checks git and curl, and finds CLI tools with `which`.
+    path = with pkgs; [bash curl git gws which];
     serviceConfig = {
       # Loaded alongside the module's environmentFile, before the config is rendered.
       EnvironmentFile = [config.age.secrets.zeroclaw-executor-env.path];
+      LoadCredential = ["openrouter-key:${config.age.secrets.zeroclaw-openrouter-key.path}"];
       ExecStartPre = lib.mkMerge [
         (lib.mkBefore ["${savePairedTokens}"])
-        (lib.mkAfter ["${restorePairedTokens}"])
+        (lib.mkAfter ["${restorePairedTokens}" "${injectEmbeddingKey}"])
       ];
     };
   };
+
+  # Doctor asks loginctl about the service user, which fails unless it lingers.
+  users.users.${config.services.zeroclaw.instances.${instance}.user}.linger = true;
 
   services.lferrazTailnetAccess.proxy.aliases.claw = port;
 

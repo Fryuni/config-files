@@ -104,7 +104,9 @@ instance, `zeroclaw-claw.service`, on `rpi3` through upstream's NixOS module. Th
 comes from the source-only `zeroclaw` flake input; keep its tag at the version of nixpkgs'
 `zeroclaw` package. State lives in `/var/lib/zeroclaw-claw`.
 The service PATH includes Bash: ZeroClaw validates its default `sh` runtime before
-starting channel workers, even when no shell tool has been used.
+starting channel workers, even when no shell tool has been used. It also includes `git`,
+`curl`, `gws` and `which` for `zeroclaw doctor`, which finds CLI tools by running `which`.
+The `zeroclaw-claw` user lingers only so doctor's `loginctl` check succeeds.
 ZeroClaw 0.8.4's dashboard drops the provider alias from model catalog requests. The
 dashboard proxy rewrites `provider=custom` to `provider=custom.loem` so the model picker
 uses Loem's live catalog. Revisit this mapping before adding another custom endpoint,
@@ -124,6 +126,16 @@ or remove it when upstream sends the full provider reference.
   client only trusts public CAs. It authenticates with an organization-scoped Executor
   personal access token in `secrets/rpi3/executor-env` (`EXECUTOR_TOKEN=...`). Create a new
   one under Account settings → Tokens to rotate it.
+- **Memory embeddings:** hybrid memory search embeds through OpenRouter with
+  `perplexity/pplx-embed-v1-0.6b` (1024 dimensions), using the shared
+  `secrets/ai/openrouter` key rekeyed for `rpi3`. The key is a raw file rather than
+  `KEY=VALUE`, so it reaches the unit through `LoadCredential=`, and an `ExecStartPre`
+  step writes it into `config.toml`. If you change the model or dimensions, run
+  `zeroclaw memory reindex --config-dir /var/lib/zeroclaw-claw` as `zeroclaw-claw`.
+- **Skills and memory:** skills may include scripts, and the agent creates skills from
+  successful multi-step tasks (with a reflection call) and improves them after use. All
+  skills live in the single `default` bundle. Typed memory is on. Heartbeat targets the
+  `assistant` agent with adaptive pacing but stays disabled.
 - **Approvals:** the agent uses upstream's YOLO preset as its `yolo` risk profile. It runs
   every tool and shell command without asking, with no forbidden paths or command
   allowlist. The systemd hardening still confines it to the `zeroclaw-claw` user, a
