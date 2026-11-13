@@ -64,6 +64,11 @@
       url = "github:ryantm/agenix";
       # inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Source only, for its NixOS module; keep the tag at nixpkgs' zeroclaw version.
+    zeroclaw = {
+      url = "github:zeroclaw-labs/zeroclaw/v0.8.4";
+      flake = false;
+    };
     agenix-rekey = {
       url = "github:oddlama/agenix-rekey";
       inputs.nixpkgs.follows = "nixpkgs";

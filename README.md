@@ -72,6 +72,10 @@ Tailnet proxy, connected directly to its local CLIProxyAPI for model testing.
 It needs no sign-in or server database: chats and settings stay in each browser's
 local storage. See [Hollama operation and validation](docs/ai-tools.md#hollama).
 
+The Raspberry Pi runs a ZeroClaw agent backed by Loem's CLIProxyAPI. Its web dashboard is
+at `https://claw.rpi3.lferraz.dev` on the Tailnet, and it answers `@luiz:lferraz.com` on
+Matrix as `@claw:lferraz.com`. See [ZeroClaw operation](docs/ai-tools.md#zeroclaw).
+
 ## Configurations
 
 | Configuration | Platform | Purpose |
@@ -79,7 +83,7 @@ local storage. See [Hollama operation and validation](docs/ai-tools.md#hollama).
 | `note` | `x86_64-linux` | Workstation and notebook |
 | `loem` | `x86_64-linux` | Hosted services and remote development |
 | `gce-automation` | `x86_64-linux` | Google Compute automation image |
-| `rpi3` | `aarch64-linux` | Minimal Raspberry Pi 3 B SD image that joins the tailnet |
+| `rpi3` | `aarch64-linux` | Raspberry Pi 3 B SD image running the ZeroClaw agent on the tailnet |
 | `lotus@note` | `x86_64-linux` | Standalone Home Manager environment |
 
 ## Working with the configuration
@@ -149,5 +153,5 @@ available as `#basic`.
 | Backup policy, operation, service coverage, and recovery | [Backups and recovery](docs/backups.md) |
 | Desktop sessions, shell display access, and tray icons | [Notebook desktop](docs/desktop.md) |
 | Forgejo, Actions runners, Executor, metrics, and private networking | [Hosted services and Tailnet access](docs/services.md) |
-| T3 Code, Hollama, Claude Code, and Herdr configuration | [AI tools](docs/ai-tools.md) |
+| T3 Code, Hollama, ZeroClaw, Claude Code, and Herdr configuration | [AI tools](docs/ai-tools.md) |
 | Cache authentication, upload queues, and telemetry | [Shared Nix cache](docs/nix-store-cache.md) |

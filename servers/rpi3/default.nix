@@ -8,6 +8,7 @@
     "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
     ../common.nix
     ../../nixos/modules/networking/tailscale.nix
+    ./zeroclaw.nix
   ];
 
   networking.hostName = "rpi3";

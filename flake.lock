@@ -1395,6 +1395,7 @@
         "treehouse": "treehouse_2",
         "vicinae": "vicinae",
         "vicinae-extensions": "vicinae-extensions",
+        "zeroclaw": "zeroclaw",
         "zig": "zig"
       }
     },
@@ -1737,6 +1738,23 @@
       "original": {
         "owner": "vicinaehq",
         "repo": "extensions",
+        "type": "github"
+      }
+    },
+    "zeroclaw": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785690283,
+        "narHash": "sha256-6WAF826aftGuZjSHM/upWYmmVVjMS+vS+Kg4NetvjJc=",
+        "owner": "zeroclaw-labs",
+        "repo": "zeroclaw",
+        "rev": "a56c345d51dd8ab562e9351e0d4ab83f6a741db9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zeroclaw-labs",
+        "ref": "v0.8.4",
+        "repo": "zeroclaw",
         "type": "github"
       }
     },

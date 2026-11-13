@@ -171,13 +171,14 @@ automation assets.
 
 ### `rpi3`
 
-`rpi3` is a deliberately minimal aarch64-linux Raspberry Pi 3 B SD image. It imports only
-the NixOS aarch64 SD image module (mainline kernel, U-Boot, extlinux); it does not import
-`servers/common.nix`, `nixos/users.nix`, or the repository networking modules. It forces a
+`rpi3` is a small aarch64-linux Raspberry Pi 3 B SD image. It imports the NixOS aarch64
+SD image module (mainline kernel, U-Boot, extlinux), `servers/common.nix`, and the shared
+Tailscale module, which brings the private Tailnet DNS, CA trust, and Caddy proxy. It forces a
 native aarch64 build platform so the notebook builds it through binfmt emulation with
 binary-cache hits instead of cross-compiling. The image carries Ethernet DHCP, key-only
-OpenSSH, a host-local `lotus` account with passwordless sudo, and Tailscale, which joins
-the tailnet on first boot with an agenix-managed auth key.
+OpenSSH, the shared `lotus` account with passwordless sudo, and Tailscale, which joins the tailnet on first boot with an agenix-managed auth key.
+It runs the [ZeroClaw agent](ai-tools.md#zeroclaw) through upstream's NixOS module, pinned
+as the source-only `zeroclaw` flake input.
 
 Its SSH host key is kept encrypted in `secrets/rpi3/ssh-host-ed25519-key` and written
 into the image by `just sd-image rpi3 <out>` (used by `just flash-sd-image rpi3
