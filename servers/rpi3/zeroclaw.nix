@@ -51,7 +51,12 @@ in {
         # provider as unconfigured and the dashboard hides it.
         api_key = "loem";
         uri = "https://llm.loem.lferraz.dev/v1";
-        model = "claude-opus-5-5";
+        model = "gpt-6.1-sol";
+        # ZeroClaw's built-in reasoning filter does not recognize GPT 6 yet.
+        provider_extra = {
+          reasoning_effort = "high";
+          service_tier = "priority";
+        };
         # ZeroClaw trusts only webpki roots unless given the Tailnet CA.
         tls_ca_cert_path = "${../../common/certs/lferraz-tailnet-ca.crt}";
       };
@@ -117,14 +122,31 @@ in {
     pkgs.gws
   ];
 
-  systemd.services."zeroclaw-${instance}".serviceConfig = {
-    # Loaded alongside the module's environmentFile, before the config is rendered.
-    EnvironmentFile = [config.age.secrets.zeroclaw-executor-env.path];
-    ExecStartPre = lib.mkMerge [
-      (lib.mkBefore ["${savePairedTokens}"])
-      (lib.mkAfter ["${restorePairedTokens}"])
-    ];
+  systemd.services."zeroclaw-${instance}" = {
+    # Channel startup validates the runtime shell, even before receiving messages.
+    path = [pkgs.bash];
+    serviceConfig = {
+      # Loaded alongside the module's environmentFile, before the config is rendered.
+      EnvironmentFile = [config.age.secrets.zeroclaw-executor-env.path];
+      ExecStartPre = lib.mkMerge [
+        (lib.mkBefore ["${savePairedTokens}"])
+        (lib.mkAfter ["${restorePairedTokens}"])
+      ];
+    };
   };
 
   services.lferrazTailnetAccess.proxy.aliases.claw = port;
+
+  # shortcut: the dashboard drops provider aliases; revisit for multiple custom endpoints
+  # or when upstream sends the full provider reference.
+  services.caddy.virtualHosts = lib.genAttrs ["tailnet" "tailnet-no-tls"] (_: {
+    extraConfig = lib.mkBefore ''
+      @claw_model_catalog {
+        host claw.rpi3.lferraz.dev
+        path /api/config/catalog/models
+        query provider=custom
+      }
+      rewrite @claw_model_catalog /api/config/catalog/models?provider=custom.loem
+    '';
+  });
 }
