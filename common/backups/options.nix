@@ -69,6 +69,11 @@
       default = false;
       description = "Hard-link sources into staging before upload so writers that replace files by rename (such as Git) keep running; sources must share the staging filesystem. Listed units are frozen only while linking (and exporting the coordinated database snapshot) instead of stopped through upload. Unsupported by sqlite captures.";
     };
+    stopForSnapshot = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "With hardlinkSnapshot, stop and restart listed units around linking instead of freezing them, for writers that buffer data in memory or append to existing files (such as RocksDB). The service is down for its restart time instead of the whole upload.";
+    };
   };
   coordinatedType = lib.types.submodule {
     options =

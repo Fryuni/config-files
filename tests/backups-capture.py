@@ -1179,6 +1179,27 @@ subprocess.run(sys.argv[1:], check=True)
         self.assertEqual(states, {"forgejo.service": True, "idle.service": False}, "units must be thawed before upload")
         self.assertEqual([action for action in actions if action[0] != "is-active"], [("freeze", "forgejo.service"), ("thaw", "forgejo.service")])
 
+    def test_stop_for_snapshot_restarts_units_after_linking_before_upload(self):
+        (self.source / "state").write_text("linked while stopped")
+        self.fake_services({"tuwunel.service": True})
+        real_link, during_link = os.link, []
+
+        def observed_link(source, destination, **kwargs):
+            during_link.append(json.loads(self.service_state.read_text())["tuwunel.service"])
+            return real_link(source, destination, **kwargs)
+
+        os.link = observed_link
+        try:
+            selection = prepare_selection({"captures": [{"name": "tuwunel", "kind": "files", "paths": [str(self.source)], "hardlinkSnapshot": True,
+                                                         "stopForSnapshot": True, "units": [{"name": "tuwunel.service"}]}]}, self.staging,
+                                          consume=lambda selection: (json.loads(self.service_state.read_text()), self.service_actions()))
+        finally:
+            os.link = real_link
+        self.assertEqual(during_link, [False])
+        states, actions = selection.result
+        self.assertEqual(states, {"tuwunel.service": True}, "units must be restarted before upload")
+        self.assertEqual([action for action in actions if action[0] != "is-active"], [("stop", "tuwunel.service"), ("start", "tuwunel.service")])
+
     def test_applied_freeze_is_thawed_when_the_backup_is_terminated(self):
         (self.source / "state").write_text("linked while frozen")
         self.fake_services({"forgejo.service": True}, signal_on_stop=signal.SIGTERM)

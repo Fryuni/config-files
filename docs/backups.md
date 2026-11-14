@@ -756,8 +756,13 @@ after a restore. Runner state directories are linked the same way without a
 freeze, so runners and their jobs never stop. Link trees are removed after upload. Their ctime changes
 each run, so restic rereads, but does not re-upload, Forgejo's files. PostgreSQL remains online; databases are independent
 consistent captures rather than a simultaneous cluster-wide transaction. Executor uses a clean stop and
-direct file backup to preserve its libSQL data and keys. Soft Serve, Tuwunel,
-Syncthing and the registry use bounded stopped captures. CLIProxyAPI reads
+direct file backup to preserve its libSQL data and keys. Tuwunel uses
+`hardlinkSnapshot` with `stopForSnapshot`: it is stopped only while its RocksDB
+and media trees are hard-linked, then restarted before upload, so Matrix clients
+see a restart-length gap instead of an outage for the whole upload. Freezing is
+unsafe there because RocksDB buffers WAL writes in memory and appends to the
+linked WAL and MANIFEST after thaw; a clean restart writes new files instead.
+Soft Serve, Syncthing and the registry use bounded stopped captures. CLIProxyAPI reads
 request-exchange files and mutable state online, accepting incomplete temporary
 parts and credential-rotation races.
 Node-RED pauses both its service and, when configured, its git-sync service so

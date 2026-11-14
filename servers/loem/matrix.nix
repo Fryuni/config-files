@@ -37,6 +37,11 @@ in {
       name = "matrix-tuwunel";
       paths = ["/var/lib/${config.services.matrix-tuwunel.stateDirectory}"];
       units = [{name = "tuwunel.service";}];
+      # Stopping Tuwunel through the whole upload made Cloudflare answer 502
+      # (seen by Element as CORS failures); link RocksDB and media while stopped,
+      # then restart before upload.
+      hardlinkSnapshot = true;
+      stopForSnapshot = true;
     }
   ];
 

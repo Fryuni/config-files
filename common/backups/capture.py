@@ -472,10 +472,18 @@ def _recover_service_lease(plan_path):
             os.close(parent_handle)
 
 
+def _snapshot_paused(entry, staging, timeout_seconds):
+    # Writers that buffer data in memory or append to linked files (RocksDB's WAL
+    # and MANIFEST) need a clean stop; a restart then only writes new files.
+    if entry.get("stopForSnapshot"):
+        return _paused(entry.get("units", []), timeout_seconds, staging)
+    return _paused(entry.get("units", []), FREEZE_LIMIT_SECONDS, staging, ("freeze", "thaw"))
+
+
 def _files(entry, selection, timeout_seconds):
     sources = _paths(entry)
     if entry.get("hardlinkSnapshot"):
-        with _paused(entry.get("units", []), FREEZE_LIMIT_SECONDS, selection.staging, ("freeze", "thaw")):
+        with _snapshot_paused(entry, selection.staging, timeout_seconds):
             return [selection.select(source, entry.get("excludes", []), True) for source in _paths(entry)]
     if sources:
         selection.pause(entry, timeout_seconds)
@@ -908,7 +916,7 @@ def _postgres(entry, selection, timeout_seconds):
             # The snapshot and links are taken in one freeze; the slower dump
             # then reads that snapshot while the application runs again.
             with _postgres_snapshot(entry, name) as export:
-                with _paused(coordinated.get("units", []), FREEZE_LIMIT_SECONDS, selection.staging, ("freeze", "thaw")):
+                with _snapshot_paused(coordinated, selection.staging, timeout_seconds):
                     snapshot = export()
                     file_details.extend(selection.select(source, coordinated.get("excludes", []), True) for source in _paths(coordinated))
                 _postgres_dump(entry, name, dump_path, snapshot=snapshot)
