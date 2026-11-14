@@ -38,12 +38,8 @@ in {
   imports = ["${inputs.zeroclaw}/nix/module.nix"];
 
   age.secrets = {
-    zeroclaw-env = {
-      rekeyFile = ../../secrets/rpi3/zeroclaw-env;
-      generator.script = {pkgs, ...}: ''
-        printf 'MATRIX_PASSWORD=%s\n' "$(${lib.getExe pkgs.openssl} rand -hex 32)"
-      '';
-    };
+    # MATRIX_PASSWORD and MATRIX_RECOVERY_KEY (the @claw account's Secure Backup key).
+    zeroclaw-env.rekeyFile = ../../secrets/rpi3/zeroclaw-env;
     # EXECUTOR_TOKEN: an organization-scoped Executor personal access token.
     zeroclaw-executor-env.rekeyFile = ../../secrets/rpi3/executor-env;
     # Same key the home config uses, rekeyed for this host.
@@ -132,6 +128,9 @@ in {
         homeserver = "https://matrix.lferraz.com";
         user_id = "@claw:lferraz.com";
         password = "$MATRIX_PASSWORD";
+        # Cross-signs this device and imports backed-up room keys on start, so senders
+        # stop withholding keys (m.unverified) and a lost crypto store is recoverable.
+        recovery_key = "$MATRIX_RECOVERY_KEY";
       };
       # The homeserver federates, so only the owner may reach the agent.
       peer_groups.owner = {
