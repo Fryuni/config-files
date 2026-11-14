@@ -81,9 +81,16 @@ in {
         sandbox_enabled = false;
         delegation_policy.mode = "allow";
       };
+      # Limits from upstream's unbounded preset; the defaults stop a turn after 10
+      # tool calls and allow only 20 side-effecting actions per hour.
+      runtime_profiles.long = {
+        max_tool_iterations = 100;
+        max_actions_per_hour = 4294967295; # u32::MAX
+      };
       agents.assistant = {
         model_provider = "custom.loem";
         risk_profile = "yolo";
+        runtime_profile = "long";
         channels = ["matrix.lferraz"];
         mcp_bundles = ["executor"];
       };
