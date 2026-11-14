@@ -11,6 +11,7 @@
   ];
 
   home.packages = with pkgs; [
+    anki
     master.bitwarden-cli
     master.bitwarden-menu
     master.qbittorrent
