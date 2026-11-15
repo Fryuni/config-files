@@ -99,23 +99,24 @@ Model discovery alone does not prove inference works.
 
 ## ZeroClaw
 
-`servers/rpi3/zeroclaw.nix` runs one [ZeroClaw](https://github.com/zeroclaw-labs/zeroclaw)
-instance, `zeroclaw-claw.service`, on `rpi3` through upstream's NixOS module. The module
-comes from the source-only `zeroclaw` flake input; keep its tag at the version of nixpkgs'
-`zeroclaw` package. State lives in `/var/lib/zeroclaw-claw`.
+`servers/rpi3/zeroclaw.nix` runs one [ZeroClaw fork](https://github.com/Fryuni/zeroclaw)
+instance, `zeroclaw-claw.service`, on `rpi3`. Its binary, web dashboard, and NixOS module
+come from the same `zeroclaw` flake input, following the fork's `master` branch through
+`flake.lock`. Update them together with `nix flake update zeroclaw`. The overlay exposes
+`zeroclaw` and `zeroclaw-web`; the module serves the separate dashboard bundle through
+`gateway.web_dist_dir`. The Nix settings use schema version 4.
+State lives in `/var/lib/zeroclaw-claw`.
 The service PATH includes Bash: ZeroClaw validates its default `sh` runtime before
 starting channel workers, even when no shell tool has been used. It also includes `git`,
 `curl`, `gws` and `which` for `zeroclaw doctor`, which finds CLI tools by running `which`.
 The `zeroclaw-claw` user lingers only so doctor's `loginctl` check succeeds.
-ZeroClaw 0.8.4's dashboard drops the provider alias from model catalog requests. The
-dashboard proxy rewrites `provider=custom` to `provider=custom.loem` so the model picker
-uses Loem's live catalog. Revisit this mapping before adding another custom endpoint,
-or remove it when upstream sends the full provider reference.
+The dashboard sends the provider family and alias in model catalog requests, so the
+model picker uses Loem's live catalog without a proxy rewrite.
 
 - **Model:** the `assistant` agent uses `gpt-6.1-sol` with high reasoning and requests fast mode
   through Loem's CLIProxyAPI at `https://llm.loem.lferraz.dev/v1`. The provider's
   `provider_extra` sends `reasoning_effort = "high"` and `service_tier = "priority"`.
-  ZeroClaw 0.8.4's built-in reasoning filter does not recognize GPT 6, so use these
+  ZeroClaw's built-in reasoning filter does not recognize GPT 6, so use these
   explicit parameters. ZeroClaw only trusts public roots, so the provider
   points `tls_ca_cert_path` at the Tailnet CA.
 - **Matrix:** the agent logs in as `@claw:lferraz.com` on `https://matrix.lferraz.com`
@@ -160,7 +161,7 @@ stores in that file, are saved before the rewrite and restored after it.
 
 Reasoning and fast mode are configured in the provider's `provider_extra` attribute
 in `servers/rpi3/zeroclaw.nix`. Config → Model providers → custom / loem → Advanced →
-Provider Extra displays them, but ZeroClaw 0.8.4 saves edits to this field as a string,
+Provider Extra displays them, but ZeroClaw saves edits to this field as a string,
 which its provider ignores. Use Nix to change these values until upstream fixes the
 editor. They apply to every agent using `custom.loem`, rather than individual messages.
 A different model may require different extra parameters; remove GPT-specific values

@@ -177,8 +177,8 @@ Tailscale module, which brings the private Tailnet DNS, CA trust, and Caddy prox
 native aarch64 build platform so the notebook builds it through binfmt emulation with
 binary-cache hits instead of cross-compiling. The image carries Ethernet DHCP, key-only
 OpenSSH, the shared `lotus` account with passwordless sudo, and Tailscale, which joins the tailnet on first boot with an agenix-managed auth key.
-It runs the [ZeroClaw agent](ai-tools.md#zeroclaw) through upstream's NixOS module, pinned
-as the source-only `zeroclaw` flake input.
+It runs the [ZeroClaw fork](ai-tools.md#zeroclaw), with its binary, separate dashboard
+bundle, and NixOS module pinned together by the `zeroclaw` flake input.
 
 Its SSH host key is kept encrypted in `secrets/rpi3/ssh-host-ed25519-key` and written
 into the image by `just sd-image rpi3 <out>` (used by `just flash-sd-image rpi3

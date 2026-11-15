@@ -72,11 +72,11 @@ Tailnet proxy, connected directly to its local CLIProxyAPI for model testing.
 It needs no sign-in or server database: chats and settings stay in each browser's
 local storage. See [Hollama operation and validation](docs/ai-tools.md#hollama).
 
-The Raspberry Pi runs a ZeroClaw agent backed by Loem's CLIProxyAPI. Its web dashboard is
-at `https://claw.rpi3.lferraz.dev` on the Tailnet, and it answers `@luiz:lferraz.com` on
-Matrix as `@claw:lferraz.com`, using GPT 6.1 Sol with high reasoning and requesting fast mode.
-Its dashboard proxy resolves bare custom-provider model
-catalog requests to Loem. See [ZeroClaw operation](docs/ai-tools.md#zeroclaw).
+The Raspberry Pi runs a [ZeroClaw fork](https://github.com/Fryuni/zeroclaw) backed by
+Loem's CLIProxyAPI. The binary, dashboard, and NixOS module share the `zeroclaw` flake pin.
+Its web dashboard is at `https://claw.rpi3.lferraz.dev` on the Tailnet, and it answers
+`@luiz:lferraz.com` on Matrix as `@claw:lferraz.com`, using GPT 6.1 Sol with high reasoning
+and requesting fast mode. See [ZeroClaw operation](docs/ai-tools.md#zeroclaw).
 
 ## Configurations
 

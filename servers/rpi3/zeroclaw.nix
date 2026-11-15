@@ -35,7 +35,7 @@
     mv -f ${configFile}.tmp ${configFile}
   '';
 in {
-  imports = ["${inputs.zeroclaw}/nix/module.nix"];
+  imports = [inputs.zeroclaw.nixosModules.default];
 
   age.secrets = {
     # MATRIX_PASSWORD and MATRIX_RECOVERY_KEY (the @claw account's Secure Backup key).
@@ -50,7 +50,7 @@ in {
     environmentFile = config.age.secrets.zeroclaw-env.path;
     settings = {
       # Without it, aliased sections like channels.matrix.<alias> parse as v1 and are dropped.
-      schema_version = 3;
+      schema_version = 4;
 
       providers.models.custom.loem = {
         # Loem's CLIProxyAPI needs no client key, but without one ZeroClaw treats the
@@ -181,17 +181,4 @@ in {
   users.users.${config.services.zeroclaw.instances.${instance}.user}.linger = true;
 
   services.lferrazTailnetAccess.proxy.aliases.claw = port;
-
-  # shortcut: the dashboard drops provider aliases; revisit for multiple custom endpoints
-  # or when upstream sends the full provider reference.
-  services.caddy.virtualHosts = lib.genAttrs ["tailnet" "tailnet-no-tls"] (_: {
-    extraConfig = lib.mkBefore ''
-      @claw_model_catalog {
-        host claw.rpi3.lferraz.dev
-        path /api/config/catalog/models
-        query provider=custom
-      }
-      rewrite @claw_model_catalog /api/config/catalog/models?provider=custom.loem
-    '';
-  });
 }

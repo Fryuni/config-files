@@ -23,6 +23,7 @@
     inherit (determinate.inputs.nix.packages.${system}) nix;
     llm-agents = attrs.llm-agents.packages.${system};
     forgejo-cli = attrs.forgejo-cli.packages.${system}.default;
+    inherit (attrs.zeroclaw.packages.${system}) zeroclaw zeroclaw-web;
 
     treehouse = attrs.treehouse.packages.${system}.default.overrideAttrs (_: {doCheck = false;});
   })

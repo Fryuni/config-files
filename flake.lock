@@ -1742,18 +1742,28 @@
       }
     },
     "zeroclaw": {
-      "flake": false,
+      "inputs": {
+        "fenix": [
+          "fenix"
+        ],
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
       "locked": {
-        "lastModified": 1785690283,
-        "narHash": "sha256-6WAF826aftGuZjSHM/upWYmmVVjMS+vS+Kg4NetvjJc=",
-        "owner": "zeroclaw-labs",
+        "lastModified": 1794683129,
+        "narHash": "sha256-BkAcJwcRiKpHB8lAiSdDq7uzuMJZUZmcnzNOrtCJklY=",
+        "owner": "Fryuni",
         "repo": "zeroclaw",
-        "rev": "a56c345d51dd8ab562e9351e0d4ab83f6a741db9",
+        "rev": "8bd5bd199a64b58c36bcab0ab65e4e36fda621be",
         "type": "github"
       },
       "original": {
-        "owner": "zeroclaw-labs",
-        "ref": "v0.8.4",
+        "owner": "Fryuni",
+        "ref": "master",
         "repo": "zeroclaw",
         "type": "github"
       }
