@@ -97,6 +97,38 @@ that its response streams and the exchange appears in CPA Manager Plus at
 conversation remains in that browser. Start a new chat after adding a proxy model to refresh discovery.
 Model discovery alone does not prove inference works.
 
+## Novelmaker
+
+`servers/loem/novelmaker.nix` runs [Novelmaker](https://github.com/maniesoft/Novelmaker-public),
+a novel-writing app with AI drafting inside the manuscript, as the `novelmaker`
+system service on `loem`. It listens on `127.0.0.32:3210` (Grafana owns upstream's
+default port 3000) and the private Tailnet Caddy proxy publishes it at
+`https://novelmaker.loem.lferraz.dev`.
+
+Novelmaker is built for one person on localhost: it has no sign-in, and its
+database stores AI provider API keys in plain text. Anyone who can reach the
+Tailnet hostname can read and change the manuscripts and those keys, so access
+control is the Tailnet's. Its proxy route omits the cross-origin headers that
+port aliases add and rejects requests sent from any other origin, so other
+websites cannot read or change it through a Tailnet browser. The dedicated
+loopback address keeps it out of reach of the proxy's generic
+`<port>.loem.lferraz.dev` routes, which forward only `localhost` ports and would
+skip that check. The service runs as its own user with a read-only
+system and no access to home directories, because the interface can point the
+database and backup folders at any path. "Data → Quit Novelmaker" only restarts it.
+
+The package (`overlay/packages/novelmaker.nix`) follows upstream's `main` branch,
+which has no releases, and runs upstream's tests during the build. It uses
+Node.js 22: better-sqlite3 aborts on Node.js 24.
+
+Everything lives in `/var/lib/novelmaker`: the SQLite database, upstream's own
+backup copies, and `config.json`. The service backup captures the directory with
+online SQLite exports while the service keeps running, so the editor's autosaves
+are not interrupted. Provider keys and models are configured in the app
+(Settings → AI providers), not in this repository.
+
+The in-app translation editor cannot save: it writes into the read-only program folder.
+
 ## ZeroClaw
 
 `servers/rpi3/zeroclaw.nix` runs one [ZeroClaw fork](https://github.com/Fryuni/zeroclaw)

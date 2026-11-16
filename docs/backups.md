@@ -172,7 +172,7 @@ libgit2 used by the installed Nix.
 
 Additional `loem` coverage comprises every PostgreSQL database and cluster
 globals; Forgejo; Soft Serve; Tuwunel including media; Executor; CLIProxyAPI and
-the AI exchange corpus; CPA Manager Plus; the Docker registry; Grafana;
+the AI exchange corpus; CPA Manager Plus; Novelmaker; the Docker registry; Grafana;
 VictoriaMetrics; and the configured Forgejo runner state. Home service coverage
 includes T3 Code, Hermes, Syncthing, and the discovered no-mistakes daemon.
 Preserve generated application keys alongside their databases.

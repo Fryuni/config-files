@@ -72,6 +72,11 @@ Tailnet proxy, connected directly to its local CLIProxyAPI for model testing.
 It needs no sign-in or server database: chats and settings stay in each browser's
 local storage. See [Hollama operation and validation](docs/ai-tools.md#hollama).
 
+Loem hosts Novelmaker, a novel-writing app with AI drafting, at
+`https://novelmaker.loem.lferraz.dev` through the private Tailnet proxy. It has no
+sign-in, so the Tailnet is its only access control. See
+[Novelmaker operation](docs/ai-tools.md#novelmaker).
+
 The Raspberry Pi runs a [ZeroClaw fork](https://github.com/Fryuni/zeroclaw) backed by
 Loem's CLIProxyAPI. The binary, dashboard, and NixOS module share the `zeroclaw` flake pin.
 Its web dashboard is at `https://claw.rpi3.lferraz.dev` on the Tailnet, and it answers
@@ -155,5 +160,5 @@ available as `#basic`.
 | Backup policy, operation, service coverage, and recovery | [Backups and recovery](docs/backups.md) |
 | Desktop sessions, shell display access, and tray icons | [Notebook desktop](docs/desktop.md) |
 | Forgejo, Actions runners, Executor, metrics, and private networking | [Hosted services and Tailnet access](docs/services.md) |
-| T3 Code, Hollama, ZeroClaw, Claude Code, and Herdr configuration | [AI tools](docs/ai-tools.md) |
+| T3 Code, Hollama, Novelmaker, ZeroClaw, Claude Code, and Herdr configuration | [AI tools](docs/ai-tools.md) |
 | Cache authentication, upload queues, and telemetry | [Shared Nix cache](docs/nix-store-cache.md) |

@@ -19,6 +19,7 @@
     ./matrix.nix
     ./metrics
     ./networking.nix
+    ./novelmaker.nix
     ./postgresql.nix
     ./soft-serve.nix
   ];

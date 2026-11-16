@@ -54,6 +54,15 @@
     };
   };
 
+  # Upstream publishes no tags or releases; follow the default branch.
+  novelmaker = {
+    package = ./packages/novelmaker.nix;
+    update = {
+      kind = "nix-update";
+      args = ["--version=branch=main"];
+    };
+  };
+
   openwhispr = {
     package = ./packages/openwhispr.nix;
     update = {
