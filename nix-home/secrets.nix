@@ -33,6 +33,10 @@
       file = ../secrets/npm-token;
       path = "${config.home.homeDirectory}/.npmrc";
     };
+    composer-auth = {
+      file = ../secrets/composer-auth;
+      path = "${config.home.homeDirectory}/.composer/auth.json";
+    };
     # TODO: Remove when https://github.com/oven-sh/bun/issues/23128 is fixed
     bun-token = {
       file = ../secrets/npm-token;
