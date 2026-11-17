@@ -6,6 +6,7 @@ SHIM_NAME="$(basename "$0" .sh)"
 
 args=(
   --rm
+  --interactive
   -u "$UID:$GID"
   -v "/run/user/$UID:/run/user/$UID"
   -v /home/lotus:/home/lotus
@@ -15,7 +16,7 @@ args=(
 
 if [ -t 0 ]; then
   # Stdin is a terminal, bind it to docker
-  args+=("-it")
+  args+=("--tty")
 fi
 
 exec docker run "${args[@]}" crocttech/php-base-image:php8.5-dev "$SHIM_NAME" "$@"
