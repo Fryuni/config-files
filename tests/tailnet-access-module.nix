@@ -151,6 +151,14 @@
     caKeyPath = cfg.age.secrets.lferraz-tailnet-ca-key.path;
     caKeySymlink = cfg.age.secrets.lferraz-tailnet-ca-key.symlink;
     coreDnsConfig = dnsEvaluated.config.services.coredns.config;
+    coreDnsTailnetBind = let
+      service = dnsEvaluated.config.systemd.services.coredns-tailnet-bind or {};
+    in {
+      wantedBy = service.wantedBy or [];
+      after = service.after or [];
+      type = service.serviceConfig.Type or "";
+      script = service.script or "";
+    };
     resolvedConfig = dnsEvaluated.config.environment.etc."systemd/resolved.conf".text;
     onDemandUser = onDemandService.serviceConfig.User;
     onDemandGroup = onDemandService.serviceConfig.Group;
@@ -273,6 +281,10 @@ in
     jq -e '.caKeyPath == "/run/lferraz-tailnet-ca-key"' config.json
     jq -e '.caKeySymlink == false' config.json
 
+    jq -e '.coreDnsTailnetBind | .type == "exec"
+      and (.wantedBy | index("multi-user.target")) != null
+      and (.after | index("coredns.service")) != null
+      and (.script | test("/bin/tailscale wait\nexec [^\n]+/bin/systemctl try-restart coredns.service"))' config.json
     jq -e '.coreDnsConfig | contains("rewrite stop")' config.json
     jq -e '.coreDnsConfig | contains("name regex ^(?:.*[.])?([^.]+)[.]example[.]test[.]$ {1}.tailnet.test.")' config.json
     jq -e '.coreDnsConfig | contains("answer auto")' config.json

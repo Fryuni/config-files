@@ -486,6 +486,20 @@ in {
         wants = ["tailscaled.service" "network-online.target"];
       };
 
+      # Tailscale needs local DNS to connect, and CoreDNS only binds interface
+      # addresses present when it starts.
+      systemd.services.coredns-tailnet-bind = {
+        description = "Bind CoreDNS to Tailscale addresses once they are ready";
+        wantedBy = ["multi-user.target"];
+        after = ["coredns.service" "tailscaled.service"];
+        wants = ["coredns.service" "tailscaled.service"];
+        serviceConfig.Type = "exec";
+        script = ''
+          ${lib.getExe config.services.tailscale.package} wait
+          exec ${config.systemd.package}/bin/systemctl try-restart coredns.service
+        '';
+      };
+
       # Make this host's CoreDNS the primary resolver: ~. takes every name
       # away from DHCP-provided link DNS servers. lferraz.dev is listed too so
       # it stays exclusive to CoreDNS when Tailscale also claims ~. on its
