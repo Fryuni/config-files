@@ -64,6 +64,7 @@ in {
         SSH_LISTEN_PORT = sshPort;
       };
       repository = {
+        DEFAULT_REPO_UNITS = "repo.code,repo.releases,repo.issues,repo.pulls,repo.actions";
         ENABLE_PUSH_CREATE_USER = true;
         ENABLE_PUSH_CREATE_ORG = true;
       };
