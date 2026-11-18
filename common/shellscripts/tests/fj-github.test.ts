@@ -71,6 +71,13 @@ globalThis.fetch = async (url, options = {}) => {
   else if (path === "repos/owner/project") { value = state.forgejoRepo; status = state.forgejoStatus ?? 200; }
   else if (path === "repos/mirror/project") { value = state.mirror; status = value ? 200 : 404; }
   else if (path === "repos/forgejo-user/project") { value = state.forgejoFork; status = value ? 200 : 404; }
+  else if (path === "repos/forgejo-user/project/branches") {
+    value = state.forkBranches.slice((Number(new URL(url).searchParams.get("page")) - 1) * 50).slice(0, 50).map(name => ({ name }));
+  } else if (path.startsWith("repos/forgejo-user/project/branches/") && options.method === "DELETE") {
+    const name = decodeURIComponent(path.slice("repos/forgejo-user/project/branches/".length));
+    state.forkBranches = state.forkBranches.filter(branch => branch !== name);
+    status = 204;
+  }
   else if (path.endsWith("/push_mirrors-sync")) value = undefined;
   else if (path.endsWith("/push_mirrors")) {
     if (options.method === "POST") {
@@ -91,7 +98,8 @@ const defaults = () => ({
   keys: [] as any[],
   upstream: { id: 1, name: "project", full_name: "upstream/project", owner: { login: "upstream" }, private: false, isPrivate: false, url: "https://github.com/upstream/project" },
   newMirror: { id: 2, mirror: true, private: false, original_url: "https://github.com/upstream/project.git" },
-  newForgejoFork: { id: 3, full_name: "forgejo-user/project", fork: true, private: false, parent: { id: 2 } },
+  newForgejoFork: { id: 3, full_name: "forgejo-user/project", fork: true, private: false, default_branch: "main", parent: { id: 2 } },
+  forkBranches: ["main", "feature/a#1", ...Array.from({ length: 50 }, (_, i) => `b${i}`)],
   newGithubFork: { id: 4, full_name: "github-user/project", fork: true, private: false, source: { id: 1 } },
   githubForks: [] as any[],
 });
@@ -129,7 +137,7 @@ async function run(script: string, changes: object = {}, args?: string[]) {
   }
 }
 
-const mutations = (events: any[]) => events.filter(event => event.method === "POST"
+const mutations = (events: any[]) => events.filter(event => event.method === "POST" || event.method === "DELETE"
   || event.command === "fj-from-github" || event.command === "fj-to-github"
   || event.args?.includes("create") || event.args?.includes("fork") || event.args?.includes("POST"));
 
@@ -220,10 +228,14 @@ test("builds the fork square in order and uses each authenticated user's identit
   const result = await run("fj-fork-square");
   expect(result.exitCode).toBe(0);
   const writes = mutations(result.events);
-  expect(writes.map(event => event.command)).toEqual(["fj-from-github", "fj", "gh", "fj-to-github"]);
+  expect(writes.filter(event => event.command).map(event => event.command)).toEqual(["fj-from-github", "fj", "gh", "fj-to-github"]);
   expect(writes[0].args).toEqual(["upstream/project", "forgejo.test"]);
   expect(writes[1].args).toEqual(["-H", "forgejo.test", "repo", "fork", "mirror/project"]);
-  expect(writes[3].args).toEqual(["forgejo.test/forgejo-user/project", "github-user/project"]);
+  // The new Forgejo fork keeps only its default branch, across branch pages, before GitHub is touched.
+  expect(writes.slice(2, -2).every(event => event.method === "DELETE")).toBe(true);
+  expect(result.state.forkBranches).toEqual(["main"]);
+  expect(writes.at(-2).args).toContain("default_branch_only=true");
+  expect(writes.at(-1).args).toEqual(["forgejo.test/forgejo-user/project", "github-user/project"]);
 });
 
 test("resumes an existing square and locates a renamed GitHub fork", async () => {

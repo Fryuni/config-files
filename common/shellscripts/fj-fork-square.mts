@@ -10,6 +10,7 @@ type Repository = {
   full_name: string;
   fork: boolean;
   private: boolean;
+  default_branch?: string;
   mirror?: boolean;
   original_url?: string;
   parent?: { id: number };
@@ -28,8 +29,9 @@ async function forgejoApi(host: string) {
   if (!token) throw new Error(`No fj authentication found for ${host}.`);
   const version = (await $`fj version`.quiet().text()).trim().replace(/^fj v/, "");
 
-  return async function request<T>(path: string, allowMissing = false): Promise<T | null> {
+  return async function request<T>(path: string, allowMissing = false, method = "GET"): Promise<T | null> {
     const response = await fetch(`https://${apiHost}/api/v1/${path}`, {
+      method,
       redirect: "error",
       headers: {
         Authorization: `token ${token}`,
@@ -38,7 +40,7 @@ async function forgejoApi(host: string) {
     });
     if (allowMissing && response.status === 404) return null;
     if (!response.ok) throw new Error(`Forgejo ${path} failed (HTTP ${response.status}).`);
-    return await response.json() as T;
+    return response.status === 204 ? null : await response.json() as T;
   };
 }
 
@@ -46,7 +48,7 @@ async function main() {
   const args = Bun.argv.slice(2);
   const usage = "Usage: fj-fork-square <github-owner>/<repo> [forgejo-host]";
   if (args.length === 1 && ["--help", "-h"].includes(args[0])) {
-    console.log(`${usage}\n\nMirror upstream, fork on both hosts, and push-mirror your Forgejo fork to GitHub.\nForgejo host defaults to git.fryuni.dev. Requires fj, gh, fj-from-github and fj-to-github.`);
+    console.log(`${usage}\n\nMirror upstream, fork its default branch on both hosts, and push-mirror your Forgejo fork to GitHub.\nForgejo host defaults to git.fryuni.dev. Requires fj, gh, fj-from-github and fj-to-github.`);
     return;
   }
   const [originalRef, host = "git.fryuni.dev"] = args;
@@ -84,12 +86,29 @@ async function main() {
 
   const forgejoForkRef = `${forgejoUser.login}/${original.name}`;
   let forgejoFork = await api<Repository>(`repos/${forgejoForkRef}`, true);
+  const forgejoForkCreated = !forgejoFork;
   if (!forgejoFork) {
     await $`fj -H ${host} repo fork ${mirrorRef}`;
     forgejoFork = await api<Repository>(`repos/${forgejoForkRef}`);
   }
   if (!forgejoFork?.fork || forgejoFork.parent?.id !== mirror.id) {
     throw new Error(`${host}/${forgejoForkRef} is not a fork of ${mirrorRef}.`);
+  }
+  if (forgejoForkCreated) {
+    // Forgejo's fork API lacks the web UI's single-branch option, so prune the new fork.
+    // Its push mirror would otherwise copy every upstream branch to the GitHub fork.
+    const defaultBranch = forgejoFork.default_branch;
+    if (!defaultBranch) throw new Error(`Cannot resolve the default branch of ${host}/${forgejoForkRef}.`);
+    const branches: string[] = [];
+    for (let page = 1; ; page++) {
+      const batch = await api<{ name: string }[]>(`repos/${forgejoForkRef}/branches?page=${page}&limit=50`);
+      if (!batch?.length) break;
+      branches.push(...batch.map(branch => branch.name));
+    }
+    for (const branch of branches.filter(name => name !== defaultBranch)) {
+      const path = branch.split("/").map(encodeURIComponent).join("/");
+      await api(`repos/${forgejoForkRef}/branches/${path}`, false, "DELETE");
+    }
   }
 
   // Search owned forks by network identity, rather than assuming the fork
@@ -105,7 +124,7 @@ async function main() {
     }
   }
   if (!githubFork) {
-    githubFork = await $`gh api --hostname github.com --method POST repos/${original.full_name}/forks`.quiet().json();
+    githubFork = await $`gh api --hostname github.com --method POST repos/${original.full_name}/forks -F default_branch_only=true`.quiet().json();
   }
   if (!githubFork?.full_name) throw new Error("GitHub did not return the fork's repository name.");
 
