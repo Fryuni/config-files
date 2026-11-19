@@ -83,6 +83,13 @@ Its web dashboard is at `https://claw.rpi3.lferraz.dev` on the Tailnet, and it a
 `@luiz:lferraz.com` on Matrix as `@claw:lferraz.com`, using GPT 6.1 Sol with high reasoning
 and requesting fast mode. See [ZeroClaw operation](docs/ai-tools.md#zeroclaw).
 
+The Pi also runs a [gost](https://gost.run) proxy on port 8888 that speaks both HTTP and
+SOCKS5, bound only to its Tailnet addresses, so individual apps can send requests from the Pi
+without making it an exit node (for example `HTTPS_PROXY=http://rpi3:8888` or
+`curl -x socks5h://rpi3:8888 …`). Any Tailnet peer that can reach it also gets the Pi's LAN and
+Tailnet reach. Only gost's direct connections to the Pi's loopback are blocked (except the DNS
+stub); services the Pi publishes on its Tailnet address, such as those behind Caddy, stay reachable.
+
 ## Configurations
 
 | Configuration | Platform | Purpose |
@@ -90,7 +97,7 @@ and requesting fast mode. See [ZeroClaw operation](docs/ai-tools.md#zeroclaw).
 | `note` | `x86_64-linux` | Workstation and notebook |
 | `loem` | `x86_64-linux` | Hosted services and remote development |
 | `gce-automation` | `x86_64-linux` | Google Compute automation image |
-| `rpi3` | `aarch64-linux` | Raspberry Pi 3 B SD image running the ZeroClaw agent on the tailnet |
+| `rpi3` | `aarch64-linux` | Raspberry Pi 3 B SD image running the ZeroClaw agent and an HTTP/SOCKS5 proxy on the tailnet |
 | `lotus@note` | `x86_64-linux` | Standalone Home Manager environment |
 
 ## Working with the configuration

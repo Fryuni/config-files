@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   modulesPath,
   ...
 }: {
@@ -36,6 +37,34 @@
     openFirewall = true;
   };
   networking.firewall.trustedInterfaces = [config.services.tailscale.interfaceName];
+
+  # HTTP (incl. CONNECT) and SOCKS5 forward proxy on one port, auto-detected per
+  # connection, for apps that should egress from the Pi. Bound only to the
+  # Tailscale addresses, which exist only once Tailscale is up.
+  systemd.services.tailnet-proxy = {
+    description = "HTTP and SOCKS5 proxy on the Tailscale addresses";
+    wantedBy = ["multi-user.target"];
+    after = ["tailscaled.service"];
+    wants = ["tailscaled.service"];
+    path = [config.services.tailscale.package];
+    serviceConfig = {
+      DynamicUser = true;
+      Restart = "on-failure";
+      # Keep loopback-only services private; LAN and tailnet reach is intended.
+      # The resolved stub stays reachable so DNS works.
+      IPAddressDeny = "localhost";
+      IPAddressAllow = "127.0.0.53";
+    };
+    script = ''
+      tailscale wait
+      ips="$(tailscale ip)"
+      args=()
+      for ip in $ips; do args+=(-L "[$ip]:8888"); done
+      # Never start without a bind address.
+      (( ''${#args[@]} ))
+      exec ${lib.getExe pkgs.gost} "''${args[@]}"
+    '';
+  };
 
   services.openssh. settings = {
     KbdInteractiveAuthentication = false;

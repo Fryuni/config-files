@@ -178,7 +178,9 @@ native aarch64 build platform so the notebook builds it through binfmt emulation
 binary-cache hits instead of cross-compiling. The image carries Ethernet DHCP, key-only
 OpenSSH, the shared `lotus` account with passwordless sudo, and Tailscale, which joins the tailnet on first boot with an agenix-managed auth key.
 It runs the [ZeroClaw fork](ai-tools.md#zeroclaw), with its binary, separate dashboard
-bundle, and NixOS module pinned together by the `zeroclaw` flake input.
+bundle, and NixOS module pinned together by the `zeroclaw` flake input. It also runs gost on
+port 8888 as an HTTP and SOCKS5 forward proxy (protocol detected per connection) for apps that
+should egress from the Pi. Its unit waits for Tailscale and binds only to the Pi's Tailnet addresses.
 
 Its SSH host key is kept encrypted in `secrets/rpi3/ssh-host-ed25519-key` and written
 into the image by `just sd-image rpi3 <out>` (used by `just flash-sd-image rpi3
