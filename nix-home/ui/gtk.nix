@@ -11,6 +11,9 @@
   gtk = {
     enable = true;
 
+    # Force config override because GTK 2 is retarded and replaces the symlink every time
+    gtk2.force = true;
+
     # Enable dark theme preference
     theme = {
       name = "Adwaita-dark";
