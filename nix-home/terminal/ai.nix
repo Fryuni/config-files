@@ -34,7 +34,6 @@
       llm-agents.agent-browser
       llm-agents.t3code
       llm-agents.crush
-      llm-agents.code
       (pkgs.lib.makeAuthWrapper llm-agents.claude-code {
         ANTHROPIC_BASE_URL = "https://llm.loem.lferraz.dev";
         # Loem does not require a key; satisfy Claude Code's client-side auth check.
@@ -44,7 +43,9 @@
       })
       (pkgs.lib.makeAuthWrapper llm-agents.omp {
         OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
-        KIMI_API_KEY = {file = config.age.secrets.kimi-api-key.path;};
+      })
+      (pkgs.lib.makeAuthWrapper llm-agents.pi {
+        OPENROUTER_API_KEY = {file = config.age.secrets.openrouter-key.path;};
       })
 
       # AI auxiliary tools
