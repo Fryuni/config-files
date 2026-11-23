@@ -30,6 +30,7 @@
     ];
 
     home.packages = with pkgs; [
+      llm-agents.antigravity-cli
       llm-agents.opencode2
       llm-agents.agent-browser
       llm-agents.t3code
