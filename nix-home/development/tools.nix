@@ -8,7 +8,7 @@
       py.pyopenssl
     ]))
     nodejs_latest
-    corepack_latest
+    (corepack.override { nodejs-slim = pkgs.nodejs_latest; })
     bun
     vite-plus
 
