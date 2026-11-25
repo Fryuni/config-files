@@ -11,7 +11,6 @@
     corepack
     bun
     vite-plus
-    wakatime-cli
 
     libnotify
 
