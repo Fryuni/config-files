@@ -120,10 +120,11 @@ formatting, and dependency updates.
 The Bun scripts in [common/shellscripts/](common/shellscripts/) are installed in
 `~/.local/bin` without their extensions. With `fj` and `gh` authenticated,
 `fj-to-github <forgejo-host>/<owner>/<repo> <github-owner>/<repo>` configures an
-SSH push mirror and a writable GitHub deploy key. `fj-fork-square <github-owner>/<repo>
-[forgejo-host]` creates an upstream pull mirror in the `mirror` namespace, forks
-it under your Forgejo account, and push-mirrors that fork to your GitHub fork.
-New forks on both hosts keep only the default branch.
+SSH push mirror and a writable GitHub deploy key. `fj-fork [--square]
+<github-owner>/<repo> [forgejo-host]` creates an upstream pull mirror in the
+`mirror` namespace and forks it under your Forgejo account; with `--square`, it
+also forks upstream on GitHub and push-mirrors your Forgejo fork to your GitHub
+fork. New forks on both hosts keep only the default branch.
 The default Forgejo host is `git.fryuni.dev`; rerunning either script resumes a
 partial setup. Push mirrors sync on commits and every eight hours.
 Private sources require private targets, including existing upstream pull mirrors.

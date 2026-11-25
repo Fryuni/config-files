@@ -224,8 +224,45 @@ test("does not queue a push if GitHub rejects the deploy key", async () => {
   expect(result.events.some(event => event.api?.endsWith("push_mirrors-sync"))).toBe(false);
 });
 
-test("builds the fork square in order and uses each authenticated user's identity", async () => {
-  const result = await run("fj-fork-square");
+test("mirrors upstream and creates only the Forgejo fork by default", async () => {
+  const result = await run("fj-fork");
+  expect(result.exitCode).toBe(0);
+  const writes = mutations(result.events);
+  expect(writes.filter(event => event.command).map(event => event.command)).toEqual(["fj-from-github", "fj"]);
+  expect(writes[0].args).toEqual(["upstream/project", "forgejo.test"]);
+  expect(writes[1].args).toEqual(["-H", "forgejo.test", "repo", "fork", "mirror/project"]);
+  expect(writes.slice(2).every(event => event.method === "DELETE")).toBe(true);
+  expect(result.state.forkBranches).toEqual(["main"]);
+  expect(result.events.some(event => event.command === "fj-to-github")).toBe(false);
+  expect(result.events.some(event => event.command === "gh" && event.args?.includes("user"))).toBe(false);
+  expect(result.stdout).toContain("https://forgejo.test/forgejo-user/project");
+});
+
+test("resumes an existing Forgejo fork without touching GitHub", async () => {
+  const data = defaults();
+  const result = await run("fj-fork", {
+    mirror: data.newMirror,
+    forgejoFork: data.newForgejoFork,
+  });
+  expect(result.exitCode).toBe(0);
+  expect(mutations(result.events)).toEqual([]);
+});
+
+test("allows mirroring and forking your own GitHub repo on Forgejo, but rejects --square", async () => {
+  const data = defaults();
+  const ownRepo = { upstream: { ...data.upstream, owner: { login: "github-user" } } };
+  const forgejoOnly = await run("fj-fork", ownRepo);
+  expect(forgejoOnly.exitCode).toBe(0);
+  expect(mutations(forgejoOnly.events).filter(event => event.command).map(event => event.command)).toEqual(["fj-from-github", "fj"]);
+
+  const square = await run("fj-fork", ownRepo, ["--square", "upstream/project", "forgejo.test"]);
+  expect(square.exitCode).toBe(1);
+  expect(square.stderr).toContain("Cannot create a personal GitHub fork of your own repository");
+  expect(mutations(square.events)).toEqual([]);
+});
+
+test("builds the fork square in order with --square and uses each authenticated user's identity", async () => {
+  const result = await run("fj-fork", {}, ["--square", "upstream/project", "forgejo.test"]);
   expect(result.exitCode).toBe(0);
   const writes = mutations(result.events);
   expect(writes.filter(event => event.command).map(event => event.command)).toEqual(["fj-from-github", "fj", "gh", "fj-to-github"]);
@@ -238,13 +275,13 @@ test("builds the fork square in order and uses each authenticated user's identit
   expect(writes.at(-1).args).toEqual(["forgejo.test/forgejo-user/project", "github-user/project"]);
 });
 
-test("resumes an existing square and locates a renamed GitHub fork", async () => {
+test("resumes an existing square with trailing --square and locates a renamed GitHub fork", async () => {
   const data = defaults();
-  const result = await run("fj-fork-square", {
+  const result = await run("fj-fork", {
     mirror: data.newMirror, forgejoFork: data.newForgejoFork,
     githubForks: [{ full_name: "github-user/renamed", fork: true }],
     githubFork: { ...data.newGithubFork, full_name: "github-user/renamed" },
-  });
+  }, ["upstream/project", "forgejo.test", "--square"]);
   expect(result.exitCode).toBe(0);
   expect(mutations(result.events)).toHaveLength(1);
   expect(mutations(result.events)[0].args[1]).toBe("github-user/renamed");
@@ -252,7 +289,7 @@ test("resumes an existing square and locates a renamed GitHub fork", async () =>
 
 test("rejects an existing public pull mirror for a private GitHub upstream before forking", async () => {
   const data = defaults();
-  const result = await run("fj-fork-square", {
+  const result = await run("fj-fork", {
     upstream: { ...data.upstream, private: true, isPrivate: true },
     mirror: data.newMirror,
   });
@@ -263,20 +300,20 @@ test("rejects an existing public pull mirror for a private GitHub upstream befor
 
 test("resumes a private fork square with a private pull mirror", async () => {
   const data = defaults();
-  const result = await run("fj-fork-square", {
+  const result = await run("fj-fork", {
     upstream: { ...data.upstream, private: true, isPrivate: true },
     mirror: { ...data.newMirror, private: true },
     forgejoFork: { ...data.newForgejoFork, private: true },
     githubForks: [{ ...data.newGithubFork, private: true }],
     githubFork: { ...data.newGithubFork, private: true },
-  });
+  }, ["--square", "upstream/project", "forgejo.test"]);
   expect(result.exitCode).toBe(0);
   expect(mutations(result.events)).toHaveLength(1);
   expect(mutations(result.events)[0].command).toBe("fj-to-github");
 });
 
 test("waits for an asynchronous GitHub fork before configuring the push mirror", async () => {
-  const result = await run("fj-fork-square", { forkNotVisible: 2 });
+  const result = await run("fj-fork", { forkNotVisible: 2 }, ["--square", "upstream/project", "forgejo.test"]);
   expect(result.exitCode).toBe(0);
   expect(result.events.filter(event => event.args?.includes("repos/github-user/project"))).toHaveLength(3);
   expect(result.events.at(-1).command).toBe("fj-to-github");
@@ -287,21 +324,34 @@ test("rejects collisions in the mirror namespace and in the Forgejo user's names
     { mirror: { ...defaults().newMirror, original_url: "https://github.com/other/project" } },
     { mirror: defaults().newMirror, forgejoFork: { ...defaults().newForgejoFork, parent: { id: 999 } } },
   ]) {
-    const result = await run("fj-fork-square", changes);
+    const result = await run("fj-fork", changes);
     expect(result.exitCode).toBe(1);
     expect(mutations(result.events)).toEqual([]);
   }
 });
 
-test("rejects invalid references before invoking any CLI", async () => {
+test("prints help for fj-fork without invoking any CLI", async () => {
+  const result = await run("fj-fork", {}, ["--help"]);
+  expect(result.exitCode).toBe(0);
+  expect(result.stdout).toContain("Usage: fj-fork [--square]");
+  expect(result.events).toEqual([]);
+});
+
+test("rejects invalid references and unknown flags before invoking any CLI", async () => {
   for (const [script, args] of [
     ["fj-to-github", ["https://forgejo.test/owner/project", "github-user/project"]],
     ["fj-to-github", ["forgejo.test/owner/..", "github-user/project"]],
-    ["fj-fork-square", ["upstream/project", "https://forgejo.test"]],
+    ["fj-fork", ["upstream/project", "https://forgejo.test"]],
+    ["fj-fork", ["--unknown", "upstream/project"]],
+    ["fj-fork", ["--square"]],
   ] as const) {
     const result = await run(script, {}, [...args]);
     expect(result.exitCode).toBe(1);
     expect(result.events).toEqual([]);
+    if (args.includes("--unknown")) {
+      expect(result.stderr).toContain("--unknown");
+      expect(result.stderr).toContain("Usage: fj-fork");
+    }
   }
 });
 
