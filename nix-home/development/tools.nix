@@ -19,6 +19,8 @@
     golangci-lint
     gosec
 
+    sqlite
+    duckdb
     just
     zigpkgs.master
 
