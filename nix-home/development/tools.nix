@@ -7,8 +7,8 @@
     (python313.withPackages (py: [
       py.pyopenssl
     ]))
-    nodejs_26
-    corepack
+    nodejs_latest
+    corepack_latest
     bun
     vite-plus
 
