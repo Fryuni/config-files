@@ -19,7 +19,6 @@
     golangci-lint
     gosec
 
-    ngrok
     just
     zigpkgs.master
 
