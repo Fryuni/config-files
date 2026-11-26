@@ -13,8 +13,8 @@ buildNpmPackage {
   version = "0-unstable-2026-11-23";
 
   src = fetchFromGitHub {
-    owner = "maniesoft";
-    repo = "Novelmaker-public";
+    owner = "Fryuni";
+    repo = "novelmaker";
     rev = "317084d3a9ee78623559e95794d5f1063fdde710";
     hash = "sha256-1AF4Da5KDoyZ0qvQEyhB1cdsaN0b/KN3/RL2wQtj0UI=";
   };
@@ -56,7 +56,7 @@ buildNpmPackage {
 
   meta = {
     description = "Local writing app for novels with AI help built into the manuscript";
-    homepage = "https://github.com/maniesoft/Novelmaker-public";
+    homepage = "https://github.com/Fryuni/novelmaker";
     license = lib.licenses.agpl3Only;
     mainProgram = "novelmaker";
     platforms = lib.platforms.linux;
