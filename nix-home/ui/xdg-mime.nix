@@ -3,7 +3,14 @@
   defaultVideo,
   defaultAudio ? defaultVideo,
   defaultImage,
+  defaultEditor,
 }: let
+  associate = app: types:
+    builtins.listToAttrs (map (type: {
+        name = type;
+        value = app;
+      })
+      types);
   imageTypes = [
     "image/avif"
     "image/avif-sequence"
@@ -23,24 +30,89 @@
     "image/tiff"
     "image/webp"
   ];
-  imageAssociations = builtins.listToAttrs (map (type: {
-      name = type;
-      value = defaultImage;
-    })
-    imageTypes);
+  imageAssociations = associate defaultImage imageTypes;
+  # Unlisted text types still reach the editor through their `text/plain` parent.
+  # Listing them stops another editor that claims the exact type from winning.
+  textTypes = [
+    "text/plain"
+    "application/x-zerosize"
+    "text/markdown"
+    "text/x-readme"
+    "text/x-log"
+    "text/x-patch"
+    "text/x-rst"
+    "text/org"
+    "text/x-tex"
+    "text/vnd.typst"
+    "application/json"
+    "application/yaml"
+    "application/toml"
+    "application/xml"
+    "application/sql"
+    "text/css"
+    "text/x-scss"
+    "text/x-sass"
+    "text/javascript"
+    "application/typescript"
+    "text/x-shellscript"
+    "application/x-fishscript"
+    "application/x-nuscript"
+    "application/x-perl"
+    "application/x-php"
+    "application/x-ruby"
+    "text/x-python"
+    "text/x-python3"
+    "text/x-csrc"
+    "text/x-chdr"
+    "text/x-c++src"
+    "text/x-c++hdr"
+    "text/x-objcsrc"
+    "text/x-moc"
+    "text/x-csharp"
+    "text/x-java"
+    "text/x-kotlin"
+    "text/x-scala"
+    "text/x-groovy"
+    "text/x-go"
+    "text/rust"
+    "text/x-nim"
+    "text/x-dsrc"
+    "text/x-vala"
+    "application/vnd.dart"
+    "text/x-lua"
+    "text/x-nix"
+    "text/x-haskell"
+    "text/x-ocaml"
+    "text/x-erlang"
+    "text/x-elixir"
+    "text/x-common-lisp"
+    "text/x-scheme"
+    "text/x-emacs-lisp"
+    "text/x-pascal"
+    "text/tcl"
+    "text/x-asm"
+    "text/x-qml"
+    "text/x-makefile"
+    "text/x-cmake"
+    "text/x-meson"
+    "text/x-dockerfile"
+    "text/x-systemd-unit"
+  ];
+  textAssociations = associate defaultEditor textTypes;
 in {
   enable = true;
   associations.added =
     imageAssociations
+    // textAssociations
     // {
       "applications/zip" = "xarchiver.desktop";
-      "text/plain" = "org.xfce.mousepad.desktop";
       "x-scheme-handler/http" = defaultBrowser;
       "x-scheme-handler/https" = defaultBrowser;
     };
 
   defaultApplications =
     imageAssociations
+    // textAssociations
     // {
       "applications/zip" = "xarchiver.desktop";
       "application/pdf" = "okularApplication_pdf.desktop";

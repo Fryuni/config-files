@@ -10,7 +10,7 @@
   # ];
 
   programs.zed-editor = {
-    enable = false;
+    enable = true;
     package = pkgs.zed-editor;
     installRemoteServer = true;
 

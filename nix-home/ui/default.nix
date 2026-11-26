@@ -111,6 +111,7 @@ in {
     defaultBrowser = "brave-browser.desktop";
     defaultVideo = "mpv.desktop";
     defaultImage = "org.kde.gwenview.desktop";
+    defaultEditor = "dev.zed.Zed.desktop";
   };
 
   programs.chromium = {
