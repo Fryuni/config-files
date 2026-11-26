@@ -10,16 +10,16 @@ buildNpmPackage {
   nodejs = nodejs_22;
 
   pname = "novelmaker";
-  version = "0-unstable-2026-11-13";
+  version = "0-unstable-2026-11-23";
 
   src = fetchFromGitHub {
     owner = "maniesoft";
     repo = "Novelmaker-public";
-    rev = "9e8e78589c0bbcabbc41891197033214a7bbeb6a";
-    hash = "sha256-kHabXo4JPwMbNyN8gfmyROQco+BlFCmtbfa3brWW0Ow=";
+    rev = "317084d3a9ee78623559e95794d5f1063fdde710";
+    hash = "sha256-1AF4Da5KDoyZ0qvQEyhB1cdsaN0b/KN3/RL2wQtj0UI=";
   };
 
-  npmDepsHash = "sha256-oZb4pTQNj10wwSlOJ2FvHHANoeoDpNThdH6mRHvl8Ck=";
+  npmDepsHash = "sha256-t8i1sPOHVvR/t4H5Ty/yfTBDKAN6r0d8W7mV4orHhiE=";
 
   nativeBuildInputs = [makeWrapper];
 
