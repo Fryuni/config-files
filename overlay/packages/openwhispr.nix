@@ -27,6 +27,14 @@ in
         pulseaudio
       ];
 
+    # Ship the desktop entry so launchers (Vicinae) can start the app.
+    extraInstallCommands = ''
+      install -Dm444 ${extracted}/open-whispr.desktop $out/share/applications/openwhispr.desktop
+      substituteInPlace $out/share/applications/openwhispr.desktop \
+        --replace-fail 'Exec=AppRun --no-sandbox' 'Exec=${pname}'
+      cp -r ${extracted}/usr/share/icons $out/share/icons
+    '';
+
     passthru.appImage = src;
 
     meta = {
