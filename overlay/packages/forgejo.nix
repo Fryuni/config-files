@@ -21,6 +21,8 @@ in
           owner = "Fryuni";
         });
   }).overrideAttrs (old: {
+    # nixpkgs backports this upstream commit, which the fork branch already has.
+    patches = lib.filter (patch: (patch.name or "") != "go_1_27.patch") old.patches;
     # This branch adds a test that makes real HTTP requests to example.com.
     checkFlags = map (flag: flag + "|^TestActivityPubMatchesList$") old.checkFlags;
     doCheck = false;
