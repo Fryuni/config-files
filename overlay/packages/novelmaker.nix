@@ -10,13 +10,13 @@ buildNpmPackage {
   nodejs = nodejs_22;
 
   pname = "novelmaker";
-  version = "0-unstable-2026-11-23";
+  version = "0-unstable-2026-11-27";
 
   src = fetchFromGitHub {
     owner = "Fryuni";
     repo = "novelmaker";
-    rev = "317084d3a9ee78623559e95794d5f1063fdde710";
-    hash = "sha256-1AF4Da5KDoyZ0qvQEyhB1cdsaN0b/KN3/RL2wQtj0UI=";
+    rev = "ac8527854656b5147644f47316344657151f0d93";
+    hash = "sha256-wHiFFvE6l8WTsAwH7CEyTsO2lNaoK/5R0P0vOKraS6g=";
   };
 
   npmDepsHash = "sha256-t8i1sPOHVvR/t4H5Ty/yfTBDKAN6r0d8W7mV4orHhiE=";
